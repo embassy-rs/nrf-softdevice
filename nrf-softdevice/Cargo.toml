@@ -1,0 +1,23 @@
+[package]
+name = "nrf-softdevice"
+version = "0.1.0"
+authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
+edition = "2018"
+
+[features]
+defmt-default = []
+defmt-trace = []
+defmt-debug = []
+defmt-info = []
+defmt-warn = []
+defmt-error = []
+
+[dependencies]
+async-flash = { version = "0.1.0", path = "../async-flash" }
+nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140" }
+cortex-m = "0.6.2"
+cortex-m-rt = "0.6.12"
+bare-metal = { version = "0.2.0", features = ["const-fn"] }
+nrf52840-pac  = { version = "0.9.0", features = ["rt"] }
+
+defmt = "0.1.0"

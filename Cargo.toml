@@ -1,0 +1,58 @@
+cargo-features = ["resolver"]
+
+[workspace]
+resolver = "2"
+members = [
+    "nrf-softdevice",
+    "nrf-softdevice-mbr",
+    "nrf-softdevice-s112",
+    "nrf-softdevice-s113",
+    "nrf-softdevice-s122",
+    "nrf-softdevice-s132",
+    "nrf-softdevice-s140",
+
+    "async-flash",
+
+    "examples/flash",
+]
+
+[patch.crates-io]
+cortex-m = { git = "https://github.com/Dirbaio/cortex-m"}
+panic-probe = { git = "https://github.com/knurling-rs/probe-run", branch="main" }
+defmt-rtt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
+defmt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
+nrf52840-pac = { git = "https://github.com/Dirbaio/nrf52840-pac" }
+static-executor = { git = "https://github.com/Dirbaio/static-executor" }
+static-executor-cortex-m = { git = "https://github.com/Dirbaio/static-executor" }
+
+[profile.dev]
+codegen-units = 1
+debug = 2
+debug-assertions = true
+incremental = false
+opt-level = 3
+overflow-checks = true
+
+[profile.release]
+codegen-units = 1
+debug = 2
+debug-assertions = false
+incremental = false
+lto = "fat"
+opt-level = 3
+overflow-checks = false
+
+# do not optimize proc-macro crates = faster builds from scratch
+[profile.dev.build-override]
+codegen-units = 8
+debug = false
+debug-assertions = false
+opt-level = 0
+overflow-checks = false
+
+[profile.release.build-override]
+codegen-units = 8
+debug = false
+debug-assertions = false
+opt-level = 0
+overflow-checks = false
