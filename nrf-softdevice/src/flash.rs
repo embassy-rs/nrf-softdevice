@@ -1,9 +1,8 @@
 use core::future::Future;
-use defmt::{info, warn};
 
-use nrf_softdevice_s140 as sd;
-
-use crate::util::{DropBomb, Signal};
+use crate::error::Error;
+use crate::sd;
+use crate::util::*;
 
 pub struct Flash {}
 
@@ -63,17 +62,17 @@ impl async_flash::Flash for Flash {
             let words_len = data_len / 4;
 
             let mut bomb = DropBomb::new();
-
             let ret = unsafe { sd::sd_flash_write(address as _, words_ptr, words_len) };
-            if ret != 0 {
-                warn!("sd_flash_write failed: {:u32}", ret);
-                bomb.defuse();
-                return Err(async_flash::Error::Failed);
-            }
+            let ret = match Error::convert(ret) {
+                Ok(()) => SIGNAL.wait().await,
+                Err(e) => {
+                    warn!("sd_flash_write err {:?}", e);
+                    Err(async_flash::Error::Failed)
+                }
+            };
 
-            let res = SIGNAL.wait().await;
             bomb.defuse();
-            res
+            ret
         }
     }
 
@@ -83,19 +82,20 @@ impl async_flash::Flash for Flash {
                 return Err(async_flash::Error::AddressMisaligned);
             }
 
-            let mut bomb = DropBomb::new();
-
             let page_number = address / Flash::PAGE_SIZE;
-            let ret = unsafe { sd::sd_flash_page_erase(page_number as u32) };
-            if ret != 0 {
-                warn!("sd_flash_page_erase failed: {:u32}", ret);
-                bomb.defuse();
-                return Err(async_flash::Error::Failed);
-            }
 
-            let res = SIGNAL.wait().await;
+            let mut bomb = DropBomb::new();
+            let ret = unsafe { sd::sd_flash_page_erase(page_number as u32) };
+            let ret = match Error::convert(ret) {
+                Ok(()) => SIGNAL.wait().await,
+                Err(e) => {
+                    warn!("sd_flash_page_erase err {:?}", e);
+                    Err(async_flash::Error::Failed)
+                }
+            };
+
             bomb.defuse();
-            res
+            ret
         }
     }
 

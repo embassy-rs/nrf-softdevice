@@ -13,6 +13,7 @@ defmt-warn = []
 defmt-error = []
 
 [dependencies]
+num_enum = { version = "0.5.1", default-features = false }
 async-flash = { version = "0.1.0", path = "../async-flash" }
 nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140" }
 cortex-m = "0.6.2"

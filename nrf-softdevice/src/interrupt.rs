@@ -1,9 +1,8 @@
-pub use bare_metal::{CriticalSection, Mutex};
+use bare_metal::CriticalSection;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 use cortex_m::interrupt::InterruptNumber;
-pub use nrf52840_pac::Interrupt;
 
-use nrf52840_pac::{NVIC, NVIC_PRIO_BITS};
+use crate::pac::{Interrupt, NVIC, NVIC_PRIO_BITS};
 
 const RESERVED_IRQS: [u32; 2] = [
     (1 << (Interrupt::POWER_CLOCK as u8))
