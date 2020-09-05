@@ -20,6 +20,8 @@ pub use flash::*;
 mod error;
 pub use error::*;
 
+pub use cortex_m_rt::interrupt;
+
 use defmt::{info, warn};
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
@@ -64,5 +66,5 @@ pub unsafe fn enable() {
         warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:u32}", wanted_app_ram_base);
     }
 
-    crate::interrupt::unmask(pac::Interrupt::SWI2_EGU2);
+    interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
 }

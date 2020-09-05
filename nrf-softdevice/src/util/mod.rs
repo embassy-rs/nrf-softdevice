@@ -1,6 +1,6 @@
 #![macro_use]
 
-mod depanic;
+mod macros;
 
 mod signal;
 pub use signal::*;

@@ -1,5 +1,7 @@
 {
   "editor.formatOnSave": true,
   "rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
-  "rust-analyzer.checkOnSave.allTargets": false
+  "rust-analyzer.checkOnSave.allTargets": false,
+  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
+  "rust-analyzer.procMacro.enable": true
 }

@@ -1,8 +1,13 @@
-use bare_metal::CriticalSection;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 use cortex_m::interrupt::InterruptNumber;
 
-use crate::pac::{Interrupt, NVIC, NVIC_PRIO_BITS};
+use crate::pac::{NVIC, NVIC_PRIO_BITS};
+use crate::util::*;
+
+// Re-exports
+pub use crate::pac::Interrupt;
+pub use crate::pac::Interrupt::*; // needed for cortex-m-rt #[interrupt]
+pub use bare_metal::{CriticalSection, Mutex};
 
 const RESERVED_IRQS: [u32; 2] = [
     (1 << (Interrupt::POWER_CLOCK as u8))
@@ -17,7 +22,7 @@ const RESERVED_IRQS: [u32; 2] = [
     0,
 ];
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(defmt::Format, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(u8)]
 pub enum Priority {
     Level0 = 0,
@@ -52,7 +57,7 @@ impl Priority {
     }
 }
 
-static mut CS_FLAG: AtomicBool = AtomicBool::new(false);
+static CS_FLAG: AtomicBool = AtomicBool::new(false);
 static mut CS_MASK: [u32; 2] = [0; 2];
 
 #[inline]
@@ -91,9 +96,6 @@ where
     F: FnOnce(&CriticalSection) -> R,
 {
     unsafe {
-        // TODO: assert that we're in privileged level
-        // Needed because disabling irqs in non-privileged level is a noop, which would break safety.
-
         let nvic = &*NVIC::ptr();
 
         let nested_cs = CS_FLAG.load(Ordering::SeqCst);
@@ -151,10 +153,26 @@ fn is_app_accessible_priority(priority: Priority) -> bool {
     }
 }
 
+macro_rules! assert_app_accessible_irq {
+    ($irq:ident) => {
+        deassert!(
+            is_app_accessible_irq($irq),
+            "irq {:istr} is reserved for the softdevice",
+            irq_str($irq)
+        );
+    };
+}
+
 #[inline]
-pub fn unmask(irq: Interrupt) {
-    assert!(is_app_accessible_irq(irq));
-    assert!(is_app_accessible_priority(get_priority(irq)));
+pub fn enable(irq: Interrupt) {
+    assert_app_accessible_irq!(irq);
+    let prio = get_priority(irq);
+    deassert!(
+        is_app_accessible_priority(prio),
+        "irq {:istr} has priority {:?} which is reserved for the softdevice. Set another prority before enabling it.",
+        irq_str(irq),
+        prio
+    );
 
     unsafe {
         if CS_FLAG.load(Ordering::SeqCst) {
@@ -167,8 +185,8 @@ pub fn unmask(irq: Interrupt) {
 }
 
 #[inline]
-pub fn mask(irq: Interrupt) {
-    assert!(is_app_accessible_irq(irq));
+pub fn disable(irq: Interrupt) {
+    assert_app_accessible_irq!(irq);
 
     unsafe {
         if CS_FLAG.load(Ordering::SeqCst) {
@@ -182,46 +200,104 @@ pub fn mask(irq: Interrupt) {
 
 #[inline]
 pub fn is_active(irq: Interrupt) -> bool {
-    assert!(is_app_accessible_irq(irq));
+    assert_app_accessible_irq!(irq);
     NVIC::is_active(irq)
 }
 
 #[inline]
 pub fn is_enabled(irq: Interrupt) -> bool {
-    assert!(is_app_accessible_irq(irq));
-    NVIC::is_enabled(irq)
+    assert_app_accessible_irq!(irq);
+    if CS_FLAG.load(Ordering::SeqCst) {
+        let nr = irq.number();
+        unsafe { CS_MASK[usize::from(nr / 32)] & (1 << (nr % 32)) != 0 }
+    } else {
+        NVIC::is_enabled(irq)
+    }
 }
 
 #[inline]
 pub fn is_pending(irq: Interrupt) -> bool {
-    assert!(is_app_accessible_irq(irq));
+    assert_app_accessible_irq!(irq);
     NVIC::is_pending(irq)
 }
 
 #[inline]
 pub fn pend(irq: Interrupt) {
-    assert!(is_app_accessible_irq(irq));
+    assert_app_accessible_irq!(irq);
     NVIC::pend(irq)
 }
 
 #[inline]
 pub fn unpend(irq: Interrupt) {
-    assert!(is_app_accessible_irq(irq));
+    assert_app_accessible_irq!(irq);
     NVIC::unpend(irq)
 }
 
 #[inline]
 pub fn get_priority(irq: Interrupt) -> Priority {
+    assert_app_accessible_irq!(irq);
     Priority::from_nvic(NVIC::get_priority(irq))
 }
 
 #[inline]
 pub fn set_priority(irq: Interrupt, prio: Priority) {
-    assert!(is_app_accessible_irq(irq));
-    assert!(is_app_accessible_priority(prio));
+    assert_app_accessible_irq!(irq);
+    deassert!(
+        is_app_accessible_priority(prio),
+        "priority level {:?} is reserved for the softdevice",
+        prio
+    );
     unsafe {
         cortex_m::peripheral::Peripherals::steal()
             .NVIC
             .set_priority(irq, prio.to_nvic())
+    }
+}
+
+fn irq_str(irq: Interrupt) -> defmt::Str {
+    match irq {
+        POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
+        RADIO => defmt::intern!("RADIO"),
+        UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
+        SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0 => defmt::intern!("SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0"),
+        SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1 => defmt::intern!("SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1"),
+        NFCT => defmt::intern!("NFCT"),
+        GPIOTE => defmt::intern!("GPIOTE"),
+        SAADC => defmt::intern!("SAADC"),
+        TIMER0 => defmt::intern!("TIMER0"),
+        TIMER1 => defmt::intern!("TIMER1"),
+        TIMER2 => defmt::intern!("TIMER2"),
+        RTC0 => defmt::intern!("RTC0"),
+        TEMP => defmt::intern!("TEMP"),
+        RNG => defmt::intern!("RNG"),
+        ECB => defmt::intern!("ECB"),
+        CCM_AAR => defmt::intern!("CCM_AAR"),
+        WDT => defmt::intern!("WDT"),
+        RTC1 => defmt::intern!("RTC1"),
+        QDEC => defmt::intern!("QDEC"),
+        COMP_LPCOMP => defmt::intern!("COMP_LPCOMP"),
+        SWI0_EGU0 => defmt::intern!("SWI0_EGU0"),
+        SWI1_EGU1 => defmt::intern!("SWI1_EGU1"),
+        SWI2_EGU2 => defmt::intern!("SWI2_EGU2"),
+        SWI3_EGU3 => defmt::intern!("SWI3_EGU3"),
+        SWI4_EGU4 => defmt::intern!("SWI4_EGU4"),
+        SWI5_EGU5 => defmt::intern!("SWI5_EGU5"),
+        TIMER3 => defmt::intern!("TIMER3"),
+        TIMER4 => defmt::intern!("TIMER4"),
+        PWM0 => defmt::intern!("PWM0"),
+        PDM => defmt::intern!("PDM"),
+        MWU => defmt::intern!("MWU"),
+        PWM1 => defmt::intern!("PWM1"),
+        PWM2 => defmt::intern!("PWM2"),
+        SPIM2_SPIS2_SPI2 => defmt::intern!("SPIM2_SPIS2_SPI2"),
+        RTC2 => defmt::intern!("RTC2"),
+        I2S => defmt::intern!("I2S"),
+        FPU => defmt::intern!("FPU"),
+        USBD => defmt::intern!("USBD"),
+        UARTE1 => defmt::intern!("UARTE1"),
+        QSPI => defmt::intern!("QSPI"),
+        CRYPTOCELL => defmt::intern!("CRYPTOCELL"),
+        PWM3 => defmt::intern!("PWM3"),
+        SPIM3 => defmt::intern!("SPIM3"),
     }
 }

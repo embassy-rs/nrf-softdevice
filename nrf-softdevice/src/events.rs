@@ -4,8 +4,7 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::error::Error;
 use crate::util::*;
-use crate::{pac, sd};
-use pac::interrupt;
+use crate::{interrupt, sd};
 
 static SWI2_SIGNAL: Signal<()> = Signal::new();
 
@@ -146,7 +145,7 @@ pub async fn run() {
     }
 }
 
-#[cortex_m_rt::interrupt]
+#[interrupt]
 unsafe fn SWI2_EGU2() {
     SWI2_SIGNAL.signal(());
 }
