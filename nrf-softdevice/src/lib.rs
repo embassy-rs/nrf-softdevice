@@ -42,5 +42,27 @@ pub unsafe fn enable() {
         Err(err) => depanic!("sd_softdevice_enable err {:?}", err),
     }
 
+    extern "C" {
+        static mut __sdata: u32;
+    }
+
+    // TODO configure the stack with sd_ble_cfg_set
+
+    let app_ram_base: u32 = (&mut __sdata) as *mut u32 as u32;
+    let mut wanted_app_ram_base = app_ram_base;
+    let ret = sd::sd_ble_enable(&mut wanted_app_ram_base as _);
+    match ret {
+        sd::NRF_SUCCESS => {}
+        sd::NRF_ERROR_NO_MEM => depanic!(
+            "too little RAM for softdevice. Change your app's RAM start address to {:u32}",
+            wanted_app_ram_base
+        ),
+        _ => depanic!("sd_ble_enable ret {:u32}", ret),
+    }
+
+    if wanted_app_ram_base < app_ram_base {
+        warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:u32}", wanted_app_ram_base);
+    }
+
     crate::interrupt::unmask(pac::Interrupt::SWI2_EGU2);
 }
