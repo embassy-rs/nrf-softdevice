@@ -13,7 +13,7 @@ members = [
 
     "async-flash",
 
-    "examples/flash",
+    "example",
 ]
 
 [patch.crates-io]
