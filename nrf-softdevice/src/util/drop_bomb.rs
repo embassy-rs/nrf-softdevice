@@ -1,21 +1,21 @@
+use core::mem;
+
 pub struct DropBomb {
-    defused: bool,
+    _private: (),
 }
 
 impl DropBomb {
     pub fn new() -> Self {
-        Self { defused: false }
+        Self { _private: () }
     }
 
-    pub fn defuse(&mut self) {
-        self.defused = true;
+    pub fn defuse(self) {
+        mem::forget(self)
     }
 }
 
 impl Drop for DropBomb {
     fn drop(&mut self) {
-        if !self.defused {
-            depanic!("boom")
-        }
+        depanic!("boom")
     }
 }
