@@ -64,7 +64,7 @@ pub enum Error {
 }
 
 impl Error {
-    pub(crate) fn convert(err: u32) -> Result<(), Error> {
+    pub fn convert(err: u32) -> Result<(), Error> {
         if err == sd::NRF_SUCCESS {
             Ok(())
         } else {
