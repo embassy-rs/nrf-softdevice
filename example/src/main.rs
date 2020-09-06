@@ -133,8 +133,8 @@ async fn bluetooth_task() {
     ];
 
     loop {
-        nrf_softdevice::advertise(
-            nrf_softdevice::ConnectableAdvertisement::ScannableUndirected {
+        nrf_softdevice::gap::advertise(
+            nrf_softdevice::gap::ConnectableAdvertisement::ScannableUndirected {
                 adv_data,
                 scan_data,
             },
