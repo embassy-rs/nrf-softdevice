@@ -160,7 +160,7 @@ async fn bluetooth_task() {
         Err(err) => depanic!("sd_ble_gap_adv_set_configure err {:?}", err),
     }
 
-    let ret = unsafe { sd::sd_ble_gap_adv_start(adv_handle, sd::BLE_CONN_CFG_TAG_DEFAULT as u8) };
+    let ret = unsafe { sd::sd_ble_gap_adv_start(adv_handle, 1 as u8) };
     match Error::convert(ret) {
         Ok(()) => info!("advertising started!"),
         Err(err) => depanic!("sd_ble_gap_adv_start err {:?}", err),
@@ -176,9 +176,22 @@ async fn bluetooth_task() {
 fn main() -> ! {
     info!("Hello World!");
 
-    info!("enabling softdevice");
-    unsafe { nrf_softdevice::enable() }
-    info!("softdevice enabled");
+    let config = nrf_softdevice::Config {
+        clock: Some(sd::nrf_clock_lf_cfg_t {
+            source: sd::NRF_CLOCK_LF_SRC_XTAL as u8,
+            rc_ctiv: 0,
+            rc_temp_ctiv: 0,
+            accuracy: 7,
+        }),
+        conn_gap: Some(sd::ble_gap_conn_cfg_t {
+            conn_count: 20,
+            event_length: 6,
+        }),
+        conn_gatt: Some(sd::ble_gatt_conn_cfg_t { att_mtu: 128 }),
+        ..Default::default()
+    };
+
+    unsafe { nrf_softdevice::enable(&config) }
 
     unsafe {
         softdevice_task.spawn().unwrap();
