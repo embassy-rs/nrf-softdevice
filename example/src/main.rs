@@ -8,6 +8,7 @@ use panic_probe as _;
 use static_executor_cortex_m as _;
 
 use async_flash::Flash;
+use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use cortex_m_rt::entry;
 use defmt::info;
@@ -120,56 +121,28 @@ async fn flash_task() {
 
 #[static_executor::task]
 async fn bluetooth_task() {
-    let mut adv_handle: u8 = sd::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
-
-    let mut adv_params: sd::ble_gap_adv_params_t = unsafe { core::mem::zeroed() };
-    adv_params.properties.type_ = sd::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8;
-    adv_params.primary_phy = sd::BLE_GAP_PHY_1MBPS as u8;
-    adv_params.secondary_phy = sd::BLE_GAP_PHY_1MBPS as u8;
-    adv_params.duration = sd::BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED as u16;
-    adv_params.interval = 100;
-
     #[rustfmt::skip]
-    let adv = &mut [
+    let adv_data = &mut [
         0x02, 0x01, sd::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
         0x03, 0x03, 0x09, 0x18,
-        0x06, 0x09, b'H', b'e', b'l', b'l', b'o',
+        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
     ];
     #[rustfmt::skip]
-    let sr = &mut [
+    let scan_data = &mut [
         0x03, 0x03, 0x09, 0x18,
     ];
 
-    let adv_data = sd::ble_gap_adv_data_t {
-        adv_data: sd::ble_data_t {
-            p_data: adv.as_mut_ptr(),
-            len: adv.len() as u16,
-        },
-        scan_rsp_data: sd::ble_data_t {
-            p_data: sr.as_mut_ptr(),
-            len: sr.len() as u16,
-        },
-    };
+    loop {
+        nrf_softdevice::advertise(
+            nrf_softdevice::ConnectableAdvertisement::ScannableUndirected {
+                adv_data,
+                scan_data,
+            },
+        )
+        .await;
 
-    let ret = unsafe {
-        sd::sd_ble_gap_adv_set_configure(&mut adv_handle as _, &adv_data as _, &adv_params as _)
-    };
-
-    match Error::convert(ret) {
-        Ok(()) => info!("advertising configured!"),
-        Err(err) => depanic!("sd_ble_gap_adv_set_configure err {:?}", err),
+        info!("advertising done");
     }
-
-    let ret = unsafe { sd::sd_ble_gap_adv_start(adv_handle, 1 as u8) };
-    match Error::convert(ret) {
-        Ok(()) => info!("advertising started!"),
-        Err(err) => depanic!("sd_ble_gap_adv_start err {:?}", err),
-    }
-
-    // The structs above need to be kept alive for the entire duration of the advertising procedure.
-    // For now just wait here forever.
-
-    futures::future::pending::<()>().await;
 }
 
 #[entry]
@@ -188,6 +161,22 @@ fn main() -> ! {
             event_length: 6,
         }),
         conn_gatt: Some(sd::ble_gatt_conn_cfg_t { att_mtu: 128 }),
+        gap_role_count: Some(sd::ble_gap_cfg_role_count_t {
+            adv_set_count: 1,
+            periph_role_count: 20,
+            central_role_count: 0,
+            central_sec_count: 0,
+            _bitfield_1: sd::ble_gap_cfg_role_count_t::new_bitfield_1(0),
+        }),
+        gap_device_name: Some(sd::ble_gap_cfg_device_name_t {
+            p_value: b"HelloRust" as *const u8 as _,
+            current_len: 9,
+            max_len: 9,
+            write_perm: unsafe { mem::zeroed() },
+            _bitfield_1: sd::ble_gap_cfg_device_name_t::new_bitfield_1(
+                sd::BLE_GATTS_VLOC_STACK as u8,
+            ),
+        }),
         ..Default::default()
     };
 

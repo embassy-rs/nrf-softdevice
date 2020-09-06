@@ -19,6 +19,8 @@ mod flash;
 pub use flash::*;
 mod error;
 pub use error::*;
+mod ble;
+pub use ble::*;
 
 pub use cortex_m_rt::interrupt;
 
