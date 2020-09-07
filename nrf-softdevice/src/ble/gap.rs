@@ -1,4 +1,5 @@
 use core::convert::TryFrom;
+use core::mem;
 use core::mem::MaybeUninit;
 use core::ptr;
 
@@ -130,8 +131,17 @@ impl Event {
 pub(crate) fn on_evt(evt: Event) {
     info!("gap evt {:istr}", evt.str());
     match evt {
-        Event::Connected { .. } => ADV_SIGNAL.signal(()),
-        Event::AdvSetTerminated { .. } => ADV_SIGNAL.signal(()),
+        Event::Connected {
+            conn_handle,
+            params,
+        } => {
+            if params.role == sd::BLE_GAP_ROLE_PERIPH as u8 {
+                ADV_SIGNAL.signal(Ok(Connection { conn_handle }))
+            } else {
+                CONNECT_SIGNAL.signal(Ok(Connection { conn_handle }))
+            }
+        }
+        Event::AdvSetTerminated { .. } => ADV_SIGNAL.signal(Err(AdvertiseError::Stopped)),
         _ => {}
     }
 }
@@ -155,11 +165,30 @@ pub enum ConnectableAdvertisement<'a> {
     },
 }
 
+enum NonconnectableAdvertisement {
+    ScannableUndirected,
+    NonscannableUndirected,
+    ExtendedScannableUndirected,
+    ExtendedScannableDirected,
+    ExtendedNonscannableUndirected,
+    ExtendedNonscannableDirected,
+}
+
 static mut ADV_HANDLE: u8 = sd::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 
-pub async fn advertise(adv: ConnectableAdvertisement<'_>) {
+pub struct Connection {
+    conn_handle: u16,
+}
+
+#[derive(defmt::Format)]
+pub enum AdvertiseError {
+    Stopped,
+    Raw(Error),
+}
+
+pub async fn advertise(adv: ConnectableAdvertisement<'_>) -> Result<Connection, AdvertiseError> {
     // TODO make these configurable, only the right params based on type?
-    let mut adv_params: sd::ble_gap_adv_params_t = unsafe { core::mem::zeroed() };
+    let mut adv_params: sd::ble_gap_adv_params_t = unsafe { mem::zeroed() };
     adv_params.properties.type_ = sd::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8;
     adv_params.primary_phy = sd::BLE_GAP_PHY_1MBPS as u8;
     adv_params.secondary_phy = sd::BLE_GAP_PHY_1MBPS as u8;
@@ -209,29 +238,121 @@ pub async fn advertise(adv: ConnectableAdvertisement<'_>) {
 
     match Error::convert(ret) {
         Ok(()) => {}
-        Err(err) => depanic!("sd_ble_gap_adv_set_configure err {:?}", err),
+        Err(err) => {
+            warn!("sd_ble_gap_adv_set_configure err {:?}", err);
+            return Err(AdvertiseError::Raw(err));
+        }
     }
 
     let ret = unsafe { sd::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
     match Error::convert(ret) {
         Ok(()) => {}
-        Err(err) => depanic!("sd_ble_gap_adv_start err {:?}", err),
+        Err(err) => {
+            warn!("sd_ble_gap_adv_start err {:?}", err);
+            return Err(AdvertiseError::Raw(err));
+        }
     }
+
+    // TODO handle future drop
 
     info!("Advertising started!");
 
     // The structs above need to be kept alive for the entire duration of the advertising procedure.
 
-    ADV_SIGNAL.wait().await;
+    ADV_SIGNAL.wait().await
 }
 
-static ADV_SIGNAL: Signal<()> = Signal::new();
+static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
 
-enum NonconnectableAdvertisement {
-    ScannableUndirected,
-    NonscannableUndirected,
-    ExtendedScannableUndirected,
-    ExtendedScannableDirected,
-    ExtendedNonscannableUndirected,
-    ExtendedNonscannableDirected,
+pub fn advertise_stop() {
+    let ret = unsafe { sd::sd_ble_gap_adv_stop(ADV_HANDLE) };
+    match Error::convert(ret) {
+        Ok(()) => {}
+        Err(err) => depanic!("sd_ble_gap_adv_stop err {:?}", err),
+    }
+}
+
+#[derive(defmt::Format)]
+pub enum ConnectError {
+    Stopped,
+    Raw(Error),
+}
+
+static CONNECT_SIGNAL: Signal<Result<Connection, ConnectError>> = Signal::new();
+
+pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> {
+    let (addr, fp) = match whitelist.len() {
+        0 => depanic!("zero-length whitelist"),
+        1 => (
+            &whitelist[0] as *const Address as *const sd::ble_gap_addr_t,
+            sd::BLE_GAP_SCAN_FP_ACCEPT_ALL as u8,
+        ),
+        _ => depanic!("todo"),
+    };
+
+    // TODO make configurable
+    let mut scan_params: sd::ble_gap_scan_params_t = unsafe { mem::zeroed() };
+    scan_params.set_extended(1);
+    scan_params.set_active(1);
+    scan_params.scan_phys = sd::BLE_GAP_PHY_1MBPS as u8;
+    scan_params.interval = 2732;
+    scan_params.window = 500;
+    scan_params.set_filter_policy(fp);
+
+    // TODO make configurable
+    let mut conn_params: sd::ble_gap_conn_params_t = unsafe { mem::zeroed() };
+    conn_params.min_conn_interval = 50;
+    conn_params.max_conn_interval = 200;
+    conn_params.slave_latency = 4;
+    conn_params.conn_sup_timeout = 400; // 4 s
+
+    let ret = unsafe { sd::sd_ble_gap_connect(addr, &mut scan_params, &mut conn_params, 1) };
+    match Error::convert(ret) {
+        Ok(()) => {}
+        Err(err) => depanic!("sd_ble_gap_connect err {:?}", err),
+    }
+
+    info!("connect started");
+
+    // TODO handle future drop
+
+    CONNECT_SIGNAL.wait().await
+}
+
+pub fn connect_stop() {
+    let ret = unsafe { sd::sd_ble_gap_connect_cancel() };
+    match Error::convert(ret) {
+        Ok(()) => {}
+        Err(err) => depanic!("sd_ble_gap_connect_cancel err {:?}", err),
+    }
+}
+
+#[repr(transparent)]
+pub struct Address {
+    inner: sd::ble_gap_addr_t,
+}
+
+impl Address {
+    pub fn new_public(address: [u8; 6]) -> Self {
+        Self {
+            inner: sd::ble_gap_addr_t {
+                addr: address,
+                _bitfield_1: sd::ble_gap_addr_t::new_bitfield_1(
+                    0,
+                    sd::BLE_GAP_ADDR_TYPE_PUBLIC as u8,
+                ),
+            },
+        }
+    }
+    pub fn new_random_static(address: [u8; 6]) -> Self {
+        Self {
+            inner: sd::ble_gap_addr_t {
+                addr: address,
+                _bitfield_1: sd::ble_gap_addr_t::new_bitfield_1(
+                    0,
+                    sd::BLE_GAP_ADDR_TYPE_RANDOM_STATIC as u8,
+                ),
+            },
+        }
+    }
 }
