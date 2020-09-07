@@ -142,6 +142,13 @@ pub(crate) fn on_evt(evt: Event) {
             }
         }
         Event::AdvSetTerminated { .. } => ADV_SIGNAL.signal(Err(AdvertiseError::Stopped)),
+        Event::Timeout {
+            conn_handle,
+            params,
+        } => match params.src as u32 {
+            sd::BLE_GAP_TIMEOUT_SRC_CONN => CONNECT_SIGNAL.signal(Err(ConnectError::Stopped)),
+            x => warn!("unknown timeout src {:u32}", x),
+        },
         _ => {}
     }
 }
@@ -298,6 +305,7 @@ pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> 
     scan_params.interval = 2732;
     scan_params.window = 500;
     scan_params.set_filter_policy(fp);
+    scan_params.timeout = 123;
 
     // TODO make configurable
     let mut conn_params: sd::ble_gap_conn_params_t = unsafe { mem::zeroed() };
@@ -309,7 +317,10 @@ pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> 
     let ret = unsafe { sd::sd_ble_gap_connect(addr, &mut scan_params, &mut conn_params, 1) };
     match Error::convert(ret) {
         Ok(()) => {}
-        Err(err) => depanic!("sd_ble_gap_connect err {:?}", err),
+        Err(err) => {
+            warn!("sd_ble_gap_connect err {:?}", err);
+            return Err(ConnectError::Raw(err));
+        }
     }
 
     info!("connect started");
