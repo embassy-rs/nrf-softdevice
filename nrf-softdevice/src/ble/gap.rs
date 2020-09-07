@@ -7,150 +7,46 @@ use crate::error::Error;
 use crate::util::*;
 use crate::{interrupt, sd};
 
-pub(crate) enum Event {
-    Connected {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_connected_t,
-    },
-    Disconnected {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_disconnected_t,
-    },
-    ConnParamUpdate {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_conn_param_update_t,
-    },
-    SecParamsRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_sec_params_request_t,
-    },
-    SecInfoRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_sec_info_request_t,
-    },
-    PasskeyDisplay {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_passkey_display_t,
-    },
-    KeyPressed {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_key_pressed_t,
-    },
-    AuthKeyRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_auth_key_request_t,
-    },
-    LescDhkeyRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_lesc_dhkey_request_t,
-    },
-    AuthStatus {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_auth_status_t,
-    },
-    ConnSecUpdate {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_conn_sec_update_t,
-    },
-    Timeout {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_timeout_t,
-    },
-    RssiChanged {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_rssi_changed_t,
-    },
-    AdvReport {
-        params: sd::ble_gap_evt_adv_report_t,
-    },
-    SecRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_sec_request_t,
-    },
-    ConnParamUpdateRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_conn_param_update_request_t,
-    },
-    ScanReqReport {
-        params: sd::ble_gap_evt_scan_req_report_t,
-    },
-    PhyUpdateRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_phy_update_request_t,
-    },
-    PhyUpdate {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_phy_update_t,
-    },
-    DataLengthUpdateRequest {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_data_length_update_request_t,
-    },
-    DataLengthUpdate {
-        conn_handle: u16,
-        params: sd::ble_gap_evt_data_length_update_t,
-    },
-    QosChannelSurveyReport {
-        params: sd::ble_gap_evt_qos_channel_survey_report_t,
-    },
-    AdvSetTerminated {
-        params: sd::ble_gap_evt_adv_set_terminated_t,
-    },
-}
+pub(crate) unsafe fn on_connected(evt: &sd::ble_gap_evt_t) {
+    let params = &evt.params.connected;
+    let conn_handle = evt.conn_handle;
 
-impl Event {
-    fn str(&self) -> defmt::Str {
-        match self {
-            Self::Connected { .. } => defmt::intern!("Connected"),
-            Self::Disconnected { .. } => defmt::intern!("Disconnected"),
-            Self::ConnParamUpdate { .. } => defmt::intern!("ConnParamUpdate"),
-            Self::SecParamsRequest { .. } => defmt::intern!("SecParamsRequest"),
-            Self::SecInfoRequest { .. } => defmt::intern!("SecInfoRequest"),
-            Self::PasskeyDisplay { .. } => defmt::intern!("PasskeyDisplay"),
-            Self::KeyPressed { .. } => defmt::intern!("KeyPressed"),
-            Self::AuthKeyRequest { .. } => defmt::intern!("AuthKeyRequest"),
-            Self::LescDhkeyRequest { .. } => defmt::intern!("LescDhkeyRequest"),
-            Self::AuthStatus { .. } => defmt::intern!("AuthStatus"),
-            Self::ConnSecUpdate { .. } => defmt::intern!("ConnSecUpdate"),
-            Self::Timeout { .. } => defmt::intern!("Timeout"),
-            Self::RssiChanged { .. } => defmt::intern!("RssiChanged"),
-            Self::AdvReport { .. } => defmt::intern!("AdvReport"),
-            Self::SecRequest { .. } => defmt::intern!("SecRequest"),
-            Self::ConnParamUpdateRequest { .. } => defmt::intern!("ConnParamUpdateRequest"),
-            Self::ScanReqReport { .. } => defmt::intern!("ScanReqReport"),
-            Self::PhyUpdateRequest { .. } => defmt::intern!("PhyUpdateRequest"),
-            Self::PhyUpdate { .. } => defmt::intern!("PhyUpdate"),
-            Self::DataLengthUpdateRequest { .. } => defmt::intern!("DataLengthUpdateRequest"),
-            Self::DataLengthUpdate { .. } => defmt::intern!("DataLengthUpdate"),
-            Self::QosChannelSurveyReport { .. } => defmt::intern!("QosChannelSurveyReport"),
-            Self::AdvSetTerminated { .. } => defmt::intern!("AdvSetTerminated"),
-        }
+    if params.role == sd::BLE_GAP_ROLE_PERIPH as u8 {
+        ADV_SIGNAL.signal(Ok(Connection { conn_handle }))
+    } else {
+        CONNECT_SIGNAL.signal(Ok(Connection { conn_handle }))
     }
 }
 
-pub(crate) fn on_evt(evt: Event) {
-    info!("gap evt {:istr}", evt.str());
-    match evt {
-        Event::Connected {
-            conn_handle,
-            params,
-        } => {
-            if params.role == sd::BLE_GAP_ROLE_PERIPH as u8 {
-                ADV_SIGNAL.signal(Ok(Connection { conn_handle }))
-            } else {
-                CONNECT_SIGNAL.signal(Ok(Connection { conn_handle }))
-            }
-        }
-        Event::AdvSetTerminated { .. } => ADV_SIGNAL.signal(Err(AdvertiseError::Stopped)),
-        Event::Timeout {
-            conn_handle,
-            params,
-        } => match params.src as u32 {
-            sd::BLE_GAP_TIMEOUT_SRC_CONN => CONNECT_SIGNAL.signal(Err(ConnectError::Stopped)),
-            x => warn!("unknown timeout src {:u32}", x),
-        },
-        _ => {}
+pub(crate) unsafe fn on_disconnected(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_param_update(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_params_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_info_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_passkey_display(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_key_pressed(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_auth_key_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_lesc_dhkey_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_auth_status(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_sec_update(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_timeout(evt: &sd::ble_gap_evt_t) {
+    let params = &evt.params.timeout;
+    match params.src as u32 {
+        sd::BLE_GAP_TIMEOUT_SRC_CONN => CONNECT_SIGNAL.signal(Err(ConnectError::Stopped)),
+        x => warn!("unknown timeout src {:u32}", x),
     }
+}
+pub(crate) unsafe fn on_rssi_changed(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_adv_report(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_param_update_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_scan_req_report(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_phy_update_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_phy_update(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_data_length_update_request(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_data_length_update(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_qos_channel_survey_report(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_adv_set_terminated(evt: &sd::ble_gap_evt_t) {
+    ADV_SIGNAL.signal(Err(AdvertiseError::Stopped))
 }
 
 pub enum ConnectableAdvertisement<'a> {
@@ -184,7 +80,7 @@ enum NonconnectableAdvertisement {
 static mut ADV_HANDLE: u8 = sd::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 
 pub struct Connection {
-    conn_handle: u16,
+    pub conn_handle: u16,
 }
 
 #[derive(defmt::Format)]

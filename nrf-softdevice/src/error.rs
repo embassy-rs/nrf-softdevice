@@ -64,11 +64,11 @@ pub enum Error {
 }
 
 impl Error {
-    pub fn convert(err: u32) -> Result<(), Error> {
-        if err == sd::NRF_SUCCESS {
+    pub fn convert(ret: u32) -> Result<(), Error> {
+        if ret == sd::NRF_SUCCESS {
             Ok(())
         } else {
-            Err(Error::from(err))
+            Err(Error::from(ret))
         }
     }
 }

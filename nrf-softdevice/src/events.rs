@@ -64,7 +64,7 @@ pub async fn run() {
                 let mut len: u16 = BLE_EVT_MAX_SIZE;
                 let ret = sd::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
                 match Error::convert(ret) {
-                    Ok(()) => crate::ble::on_ble_evt(&*(evt.as_ptr() as *const sd::ble_evt_t)),
+                    Ok(()) => crate::ble::on_evt(&*(evt.as_ptr() as *const sd::ble_evt_t)),
                     Err(Error::NotFound) => break,
                     Err(Error::BleNotEnabled) => break,
                     Err(Error::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),

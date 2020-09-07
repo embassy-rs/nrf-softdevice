@@ -2,6 +2,7 @@ use crate::error::Error;
 use crate::sd;
 use crate::util::*;
 
+#[repr(transparent)]
 pub struct Uuid {
     inner: sd::ble_uuid_t,
 }

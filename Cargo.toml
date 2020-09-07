@@ -16,6 +16,10 @@ members = [
     "example",
 ]
 
+exclude = [
+    "nrf-softdevice-gen"
+]
+
 [patch.crates-io]
 cortex-m = { git = "https://github.com/Dirbaio/cortex-m"}
 panic-probe = { git = "https://github.com/knurling-rs/probe-run", branch="main" }
