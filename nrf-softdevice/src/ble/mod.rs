@@ -11,6 +11,7 @@ pub mod gap;
 pub mod gatt_client;
 pub mod gatt_server;
 pub mod l2cap;
+pub mod uuid;
 
 enum Event {
     UserMemRequest,
@@ -74,14 +75,14 @@ pub(crate) unsafe fn on_ble_evt(evt: &sd::ble_evt_t) {
         sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => Event::GattClient(gatt_client::Event::ExchangeMtuRsp),
         sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => Event::GattClient(gatt_client::Event::Timeout),
         sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => Event::GattClient(gatt_client::Event::WriteCmdTxComplete),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => Event::GattServer(gatt_server::Event::Write),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST => Event::GattServer(gatt_server::Event::RwAuthorizeRequest),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => Event::GattServer(gatt_server::Event::SysAttrMissing),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVC => Event::GattServer(gatt_server::Event::Hvc),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SC_CONFIRM => Event::GattServer(gatt_server::Event::ScConfirm),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST => Event::GattServer(gatt_server::Event::ExchangeMtuRequest),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_TIMEOUT => Event::GattServer(gatt_server::Event::Timeout),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => Event::GattServer(gatt_server::Event::HvnTxComplete),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => Event::GattServer(gatt_server::Event::Write{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.write}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST => Event::GattServer(gatt_server::Event::RwAuthorizeRequest{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.authorize_request}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => Event::GattServer(gatt_server::Event::SysAttrMissing{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.sys_attr_missing}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVC => Event::GattServer(gatt_server::Event::Hvc{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.hvc}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SC_CONFIRM => Event::GattServer(gatt_server::Event::ScConfirm{conn_handle: evt.evt.gatts_evt.conn_handle}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST => Event::GattServer(gatt_server::Event::ExchangeMtuRequest{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.exchange_mtu_request}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_TIMEOUT => Event::GattServer(gatt_server::Event::Timeout{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.timeout}),
+        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => Event::GattServer(gatt_server::Event::HvnTxComplete{conn_handle: evt.evt.gatts_evt.conn_handle, params: evt.evt.gatts_evt.params.hvn_tx_complete}),
         x => depanic!("Unknown ble evt {:u32}", x),
     };
 
