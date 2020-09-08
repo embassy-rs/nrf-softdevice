@@ -85,6 +85,13 @@ fn main() {
     }
 
     gen_bindings(&tmp_dir, &src_dir, &tmp_bindings_path, |data| {
+        // Change all "dynamically-sized" arrays from length 1 to length 0.
+        // This avoids UB when creating Rust references to structs when the length is 0.
+        //
+        // We can't use a "real" flexible array ([] instead of [0]) because
+        // they're used inside enums :(
+        let data = data.replace("[1];", "[0];");
+
         let re = Regex::new(r"SVCALL\((?P<svc>[A-Za-z0-9_]+),\s*(?P<ret>[A-Za-z0-9_]+),\s*(?P<name>[A-Za-z0-9_]+)\((?P<args>.*)\)\);").unwrap();
         re.replace_all(&data, "$ret $name($args);").into()
     });

@@ -6,9 +6,9 @@ use crate::sd;
 use crate::util::*;
 use crate::uuid::Uuid;
 
-pub(crate) unsafe fn on_connected(evt: &sd::ble_gap_evt_t) {
-    let params = &evt.params.connected;
-    let conn_handle = evt.conn_handle;
+pub(crate) unsafe fn on_connected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::ble_gap_evt_t) {
+    let params = &gap_evt.params.connected;
+    let conn_handle = gap_evt.conn_handle;
 
     if params.role == sd::BLE_GAP_ROLE_PERIPH as u8 {
         ADV_SIGNAL.signal(Ok(Connection { conn_handle }))
@@ -17,34 +17,111 @@ pub(crate) unsafe fn on_connected(evt: &sd::ble_gap_evt_t) {
     }
 }
 
-pub(crate) unsafe fn on_disconnected(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_param_update(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_params_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_info_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_passkey_display(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_key_pressed(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_auth_key_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_lesc_dhkey_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_auth_status(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_sec_update(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_timeout(evt: &sd::ble_gap_evt_t) {
-    let params = &evt.params.timeout;
+pub(crate) unsafe fn on_disconnected(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {
+}
+
+pub(crate) unsafe fn on_conn_param_update(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_sec_params_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_sec_info_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_passkey_display(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_key_pressed(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_auth_key_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_lesc_dhkey_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_auth_status(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {}
+
+pub(crate) unsafe fn on_conn_sec_update(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_timeout(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::ble_gap_evt_t) {
+    let params = &gap_evt.params.timeout;
     match params.src as u32 {
         sd::BLE_GAP_TIMEOUT_SRC_CONN => CONNECT_SIGNAL.signal(Err(ConnectError::Stopped)),
         x => warn!("unknown timeout src {:u32}", x),
     }
 }
-pub(crate) unsafe fn on_rssi_changed(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_adv_report(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_param_update_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_scan_req_report(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_phy_update_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_phy_update(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_data_length_update_request(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_data_length_update(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_qos_channel_survey_report(_evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_adv_set_terminated(_evt: &sd::ble_gap_evt_t) {
+
+pub(crate) unsafe fn on_rssi_changed(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {
+}
+
+pub(crate) unsafe fn on_adv_report(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {}
+
+pub(crate) unsafe fn on_sec_request(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {}
+
+pub(crate) unsafe fn on_conn_param_update_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_scan_req_report(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_phy_update_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_phy_update(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {}
+
+pub(crate) unsafe fn on_data_length_update_request(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_data_length_update(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_qos_channel_survey_report(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_adv_set_terminated(
+    _ble_evt: *const sd::ble_evt_t,
+    _gap_evt: &sd::ble_gap_evt_t,
+) {
     ADV_SIGNAL.signal(Err(AdvertiseError::Stopped))
 }
 

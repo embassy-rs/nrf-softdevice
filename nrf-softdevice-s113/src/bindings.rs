@@ -209,6 +209,79 @@ where
         }
     }
 }
+#[repr(C)]
+#[derive(Default)]
+pub struct __IncompleteArrayField<T>(::core::marker::PhantomData<T>, [T; 0]);
+impl<T> __IncompleteArrayField<T> {
+    #[inline]
+    pub const fn new() -> Self {
+        __IncompleteArrayField(::core::marker::PhantomData, [])
+    }
+    #[inline]
+    pub fn as_ptr(&self) -> *const T {
+        self as *const _ as *const T
+    }
+    #[inline]
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        self as *mut _ as *mut T
+    }
+    #[inline]
+    pub unsafe fn as_slice(&self, len: usize) -> &[T] {
+        ::core::slice::from_raw_parts(self.as_ptr(), len)
+    }
+    #[inline]
+    pub unsafe fn as_mut_slice(&mut self, len: usize) -> &mut [T] {
+        ::core::slice::from_raw_parts_mut(self.as_mut_ptr(), len)
+    }
+}
+impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
+    fn fmt(&self, fmt: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        fmt.write_str("__IncompleteArrayField")
+    }
+}
+#[repr(C)]
+pub struct __BindgenUnionField<T>(::core::marker::PhantomData<T>);
+impl<T> __BindgenUnionField<T> {
+    #[inline]
+    pub const fn new() -> Self {
+        __BindgenUnionField(::core::marker::PhantomData)
+    }
+    #[inline]
+    pub unsafe fn as_ref(&self) -> &T {
+        ::core::mem::transmute(self)
+    }
+    #[inline]
+    pub unsafe fn as_mut(&mut self) -> &mut T {
+        ::core::mem::transmute(self)
+    }
+}
+impl<T> ::core::default::Default for __BindgenUnionField<T> {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<T> ::core::clone::Clone for __BindgenUnionField<T> {
+    #[inline]
+    fn clone(&self) -> Self {
+        Self::new()
+    }
+}
+impl<T> ::core::marker::Copy for __BindgenUnionField<T> {}
+impl<T> ::core::fmt::Debug for __BindgenUnionField<T> {
+    fn fmt(&self, fmt: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+        fmt.write_str("__BindgenUnionField")
+    }
+}
+impl<T> ::core::hash::Hash for __BindgenUnionField<T> {
+    fn hash<H: ::core::hash::Hasher>(&self, _state: &mut H) {}
+}
+impl<T> ::core::cmp::PartialEq for __BindgenUnionField<T> {
+    fn eq(&self, _other: &__BindgenUnionField<T>) -> bool {
+        true
+    }
+}
+impl<T> ::core::cmp::Eq for __BindgenUnionField<T> {}
 pub const NRF_ERROR_BASE_NUM: u32 = 0;
 pub const NRF_ERROR_SDM_BASE_NUM: u32 = 4096;
 pub const NRF_ERROR_SOC_BASE_NUM: u32 = 8192;
@@ -11054,19 +11127,19 @@ fn bindgen_test_layout_ble_gattc_attr_info128_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_prim_srvc_disc_rsp_t {
     #[doc = "< Service count."]
     pub count: u16,
     #[doc = "< Service data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub services: [ble_gattc_service_t; 1usize],
+    pub services: __IncompleteArrayField<ble_gattc_service_t>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_prim_srvc_disc_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_prim_srvc_disc_rsp_t>(),
-        10usize,
+        2usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_prim_srvc_disc_rsp_t))
     );
     assert_eq!(
@@ -11106,19 +11179,19 @@ fn bindgen_test_layout_ble_gattc_evt_prim_srvc_disc_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_REL_DISC_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_rel_disc_rsp_t {
     #[doc = "< Include count."]
     pub count: u16,
     #[doc = "< Include data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub includes: [ble_gattc_include_t; 1usize],
+    pub includes: __IncompleteArrayField<ble_gattc_include_t>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_rel_disc_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_rel_disc_rsp_t>(),
-        12usize,
+        2usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_rel_disc_rsp_t))
     );
     assert_eq!(
@@ -11153,19 +11226,19 @@ fn bindgen_test_layout_ble_gattc_evt_rel_disc_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_CHAR_DISC_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_char_disc_rsp_t {
     #[doc = "< Characteristic count."]
     pub count: u16,
     #[doc = "< Characteristic data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub chars: [ble_gattc_char_t; 1usize],
+    pub chars: __IncompleteArrayField<ble_gattc_char_t>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_char_disc_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_char_disc_rsp_t>(),
-        12usize,
+        2usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_char_disc_rsp_t))
     );
     assert_eq!(
@@ -11200,19 +11273,19 @@ fn bindgen_test_layout_ble_gattc_evt_char_disc_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_DESC_DISC_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_desc_disc_rsp_t {
     #[doc = "< Descriptor count."]
     pub count: u16,
     #[doc = "< Descriptor data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub descs: [ble_gattc_desc_t; 1usize],
+    pub descs: __IncompleteArrayField<ble_gattc_desc_t>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_desc_disc_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_desc_disc_rsp_t>(),
-        8usize,
+        2usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_desc_disc_rsp_t))
     );
     assert_eq!(
@@ -11247,7 +11320,6 @@ fn bindgen_test_layout_ble_gattc_evt_desc_disc_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_ATTR_INFO_DISC_RSP."]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct ble_gattc_evt_attr_info_disc_rsp_t {
     #[doc = "< Attribute count."]
     pub count: u16,
@@ -11257,23 +11329,22 @@ pub struct ble_gattc_evt_attr_info_disc_rsp_t {
     pub info: ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub union ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1 {
+pub struct ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1 {
     #[doc = "< Attribute information for 16-bit Attribute UUID."]
     #[doc = "@note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub attr_info16: [ble_gattc_attr_info16_t; 1usize],
+    pub attr_info16: __BindgenUnionField<[ble_gattc_attr_info16_t; 0usize]>,
     #[doc = "< Attribute information for 128-bit Attribute UUID."]
     #[doc = "@note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub attr_info128: [ble_gattc_attr_info128_t; 1usize],
-    _bindgen_union_align: [u16; 9usize],
+    pub attr_info128: __BindgenUnionField<[ble_gattc_attr_info128_t; 0usize]>,
+    pub bindgen_union_field: [u16; 0usize],
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1>(),
-        18usize,
+        0usize,
         concat!(
             "Size of: ",
             stringify!(ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1)
@@ -11318,7 +11389,7 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1() {
 fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_attr_info_disc_rsp_t>(),
-        22usize,
+        4usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_attr_info_disc_rsp_t))
     );
     assert_eq!(
@@ -11417,7 +11488,7 @@ fn bindgen_test_layout_ble_gattc_handle_value_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_char_val_by_uuid_read_rsp_t {
     #[doc = "< Handle-Value Pair Count."]
     pub count: u16,
@@ -11426,13 +11497,13 @@ pub struct ble_gattc_evt_char_val_by_uuid_read_rsp_t {
     #[doc = "< Handle-Value(s) list. To iterate through the list use @ref sd_ble_gattc_evt_char_val_by_uuid_read_rsp_iter."]
     #[doc = "@note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub handle_value: [u8; 1usize],
+    pub handle_value: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_char_val_by_uuid_read_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>(),
-        6usize,
+        4usize,
         concat!(
             "Size of: ",
             stringify!(ble_gattc_evt_char_val_by_uuid_read_rsp_t)
@@ -11488,7 +11559,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_val_by_uuid_read_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_READ_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_read_rsp_t {
     #[doc = "< Attribute Handle."]
     pub handle: u16,
@@ -11498,13 +11569,13 @@ pub struct ble_gattc_evt_read_rsp_t {
     pub len: u16,
     #[doc = "< Attribute data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub data: [u8; 1usize],
+    pub data: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_read_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_read_rsp_t>(),
-        8usize,
+        6usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_read_rsp_t))
     );
     assert_eq!(
@@ -11559,19 +11630,19 @@ fn bindgen_test_layout_ble_gattc_evt_read_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_CHAR_VALS_READ_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_char_vals_read_rsp_t {
     #[doc = "< Concatenated Attribute values length."]
     pub len: u16,
     #[doc = "< Attribute values. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub values: [u8; 1usize],
+    pub values: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_char_vals_read_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_char_vals_read_rsp_t>(),
-        4usize,
+        2usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_char_vals_read_rsp_t))
     );
     assert_eq!(
@@ -11610,7 +11681,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_vals_read_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_WRITE_RSP."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_write_rsp_t {
     #[doc = "< Attribute Handle."]
     pub handle: u16,
@@ -11622,13 +11693,13 @@ pub struct ble_gattc_evt_write_rsp_t {
     pub len: u16,
     #[doc = "< Data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub data: [u8; 1usize],
+    pub data: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_write_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_write_rsp_t>(),
-        10usize,
+        8usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_write_rsp_t))
     );
     assert_eq!(
@@ -11695,7 +11766,7 @@ fn bindgen_test_layout_ble_gattc_evt_write_rsp_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTC_EVT_HVX."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gattc_evt_hvx_t {
     #[doc = "< Handle to which the HVx operation applies."]
     pub handle: u16,
@@ -11705,13 +11776,13 @@ pub struct ble_gattc_evt_hvx_t {
     pub len: u16,
     #[doc = "< Attribute data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub data: [u8; 1usize],
+    pub data: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_hvx_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_hvx_t>(),
-        8usize,
+        6usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_hvx_t))
     );
     assert_eq!(
@@ -11867,7 +11938,6 @@ fn bindgen_test_layout_ble_gattc_evt_write_cmd_tx_complete_t() {
 }
 #[doc = "@brief GATTC event structure."]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct ble_gattc_evt_t {
     #[doc = "< Connection Handle on which event occurred."]
     pub conn_handle: u16,
@@ -11879,41 +11949,40 @@ pub struct ble_gattc_evt_t {
     pub params: ble_gattc_evt_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub union ble_gattc_evt_t__bindgen_ty_1 {
+pub struct ble_gattc_evt_t__bindgen_ty_1 {
     #[doc = "< Primary Service Discovery Response Event Parameters."]
-    pub prim_srvc_disc_rsp: ble_gattc_evt_prim_srvc_disc_rsp_t,
+    pub prim_srvc_disc_rsp: __BindgenUnionField<ble_gattc_evt_prim_srvc_disc_rsp_t>,
     #[doc = "< Relationship Discovery Response Event Parameters."]
-    pub rel_disc_rsp: ble_gattc_evt_rel_disc_rsp_t,
+    pub rel_disc_rsp: __BindgenUnionField<ble_gattc_evt_rel_disc_rsp_t>,
     #[doc = "< Characteristic Discovery Response Event Parameters."]
-    pub char_disc_rsp: ble_gattc_evt_char_disc_rsp_t,
+    pub char_disc_rsp: __BindgenUnionField<ble_gattc_evt_char_disc_rsp_t>,
     #[doc = "< Descriptor Discovery Response Event Parameters."]
-    pub desc_disc_rsp: ble_gattc_evt_desc_disc_rsp_t,
+    pub desc_disc_rsp: __BindgenUnionField<ble_gattc_evt_desc_disc_rsp_t>,
     #[doc = "< Characteristic Value Read by UUID Response Event Parameters."]
-    pub char_val_by_uuid_read_rsp: ble_gattc_evt_char_val_by_uuid_read_rsp_t,
+    pub char_val_by_uuid_read_rsp: __BindgenUnionField<ble_gattc_evt_char_val_by_uuid_read_rsp_t>,
     #[doc = "< Read Response Event Parameters."]
-    pub read_rsp: ble_gattc_evt_read_rsp_t,
+    pub read_rsp: __BindgenUnionField<ble_gattc_evt_read_rsp_t>,
     #[doc = "< Characteristic Values Read Response Event Parameters."]
-    pub char_vals_read_rsp: ble_gattc_evt_char_vals_read_rsp_t,
+    pub char_vals_read_rsp: __BindgenUnionField<ble_gattc_evt_char_vals_read_rsp_t>,
     #[doc = "< Write Response Event Parameters."]
-    pub write_rsp: ble_gattc_evt_write_rsp_t,
+    pub write_rsp: __BindgenUnionField<ble_gattc_evt_write_rsp_t>,
     #[doc = "< Handle Value Notification/Indication Event Parameters."]
-    pub hvx: ble_gattc_evt_hvx_t,
+    pub hvx: __BindgenUnionField<ble_gattc_evt_hvx_t>,
     #[doc = "< Exchange MTU Response Event Parameters."]
-    pub exchange_mtu_rsp: ble_gattc_evt_exchange_mtu_rsp_t,
+    pub exchange_mtu_rsp: __BindgenUnionField<ble_gattc_evt_exchange_mtu_rsp_t>,
     #[doc = "< Timeout Event Parameters."]
-    pub timeout: ble_gattc_evt_timeout_t,
+    pub timeout: __BindgenUnionField<ble_gattc_evt_timeout_t>,
     #[doc = "< Attribute Information Discovery Event Parameters."]
-    pub attr_info_disc_rsp: ble_gattc_evt_attr_info_disc_rsp_t,
+    pub attr_info_disc_rsp: __BindgenUnionField<ble_gattc_evt_attr_info_disc_rsp_t>,
     #[doc = "< Write without Response transmission complete Event Parameters."]
-    pub write_cmd_tx_complete: ble_gattc_evt_write_cmd_tx_complete_t,
-    _bindgen_union_align: [u16; 11usize],
+    pub write_cmd_tx_complete: __BindgenUnionField<ble_gattc_evt_write_cmd_tx_complete_t>,
+    pub bindgen_union_field: [u16; 4usize],
 }
 #[test]
 fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_t__bindgen_ty_1>(),
-        22usize,
+        8usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_t__bindgen_ty_1))
     );
     assert_eq!(
@@ -12092,7 +12161,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
 fn bindgen_test_layout_ble_gattc_evt_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_t>(),
-        28usize,
+        14usize,
         concat!("Size of: ", stringify!(ble_gattc_evt_t))
     );
     assert_eq!(
@@ -13656,7 +13725,7 @@ fn bindgen_test_layout_ble_gatts_cfg_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTS_EVT_WRITE."]
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
 pub struct ble_gatts_evt_write_t {
     #[doc = "< Attribute Handle."]
     pub handle: u16,
@@ -13672,13 +13741,13 @@ pub struct ble_gatts_evt_write_t {
     pub len: u16,
     #[doc = "< Received data. @note This is a variable length array. The size of 1 indicated is only a placeholder for compilation."]
     #[doc = "See @ref sd_ble_evt_get for more information on how to use event structures with variable length array members."]
-    pub data: [u8; 1usize],
+    pub data: __IncompleteArrayField<u8>,
 }
 #[test]
 fn bindgen_test_layout_ble_gatts_evt_write_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_write_t>(),
-        14usize,
+        12usize,
         concat!("Size of: ", stringify!(ble_gatts_evt_write_t))
     );
     assert_eq!(
@@ -13815,7 +13884,6 @@ fn bindgen_test_layout_ble_gatts_evt_read_t() {
 }
 #[doc = "@brief Event structure for @ref BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST."]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct ble_gatts_evt_rw_authorize_request_t {
     #[doc = "< Type of authorize operation, see @ref BLE_GATTS_AUTHORIZE_TYPES."]
     pub type_: u8,
@@ -13823,19 +13891,18 @@ pub struct ble_gatts_evt_rw_authorize_request_t {
     pub request: ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub union ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1 {
+pub struct ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1 {
     #[doc = "< Attribute Read Parameters."]
-    pub read: ble_gatts_evt_read_t,
+    pub read: __BindgenUnionField<ble_gatts_evt_read_t>,
     #[doc = "< Attribute Write Parameters."]
-    pub write: ble_gatts_evt_write_t,
-    _bindgen_union_align: [u16; 7usize],
+    pub write: __BindgenUnionField<ble_gatts_evt_write_t>,
+    pub bindgen_union_field: [u16; 6usize],
 }
 #[test]
 fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1>(),
-        14usize,
+        12usize,
         concat!(
             "Size of: ",
             stringify!(ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1)
@@ -13880,7 +13947,7 @@ fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1() {
 fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_rw_authorize_request_t>(),
-        16usize,
+        14usize,
         concat!(
             "Size of: ",
             stringify!(ble_gatts_evt_rw_authorize_request_t)
@@ -14089,7 +14156,6 @@ fn bindgen_test_layout_ble_gatts_evt_hvn_tx_complete_t() {
 }
 #[doc = "@brief GATTS event structure."]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct ble_gatts_evt_t {
     #[doc = "< Connection Handle on which the event occurred."]
     pub conn_handle: u16,
@@ -14097,29 +14163,28 @@ pub struct ble_gatts_evt_t {
     pub params: ble_gatts_evt_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub union ble_gatts_evt_t__bindgen_ty_1 {
+pub struct ble_gatts_evt_t__bindgen_ty_1 {
     #[doc = "< Write Event Parameters."]
-    pub write: ble_gatts_evt_write_t,
+    pub write: __BindgenUnionField<ble_gatts_evt_write_t>,
     #[doc = "< Read or Write Authorize Request Parameters."]
-    pub authorize_request: ble_gatts_evt_rw_authorize_request_t,
+    pub authorize_request: __BindgenUnionField<ble_gatts_evt_rw_authorize_request_t>,
     #[doc = "< System attributes missing."]
-    pub sys_attr_missing: ble_gatts_evt_sys_attr_missing_t,
+    pub sys_attr_missing: __BindgenUnionField<ble_gatts_evt_sys_attr_missing_t>,
     #[doc = "< Handle Value Confirmation Event Parameters."]
-    pub hvc: ble_gatts_evt_hvc_t,
+    pub hvc: __BindgenUnionField<ble_gatts_evt_hvc_t>,
     #[doc = "< Exchange MTU Request Event Parameters."]
-    pub exchange_mtu_request: ble_gatts_evt_exchange_mtu_request_t,
+    pub exchange_mtu_request: __BindgenUnionField<ble_gatts_evt_exchange_mtu_request_t>,
     #[doc = "< Timeout Event."]
-    pub timeout: ble_gatts_evt_timeout_t,
+    pub timeout: __BindgenUnionField<ble_gatts_evt_timeout_t>,
     #[doc = "< Handle Value Notification transmission complete Event Parameters."]
-    pub hvn_tx_complete: ble_gatts_evt_hvn_tx_complete_t,
-    _bindgen_union_align: [u16; 8usize],
+    pub hvn_tx_complete: __BindgenUnionField<ble_gatts_evt_hvn_tx_complete_t>,
+    pub bindgen_union_field: [u16; 7usize],
 }
 #[test]
 fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_t__bindgen_ty_1>(),
-        16usize,
+        14usize,
         concat!("Size of: ", stringify!(ble_gatts_evt_t__bindgen_ty_1))
     );
     assert_eq!(
@@ -14220,7 +14285,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
 fn bindgen_test_layout_ble_gatts_evt_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_t>(),
-        18usize,
+        16usize,
         concat!("Size of: ", stringify!(ble_gatts_evt_t))
     );
     assert_eq!(
@@ -15180,7 +15245,6 @@ fn bindgen_test_layout_ble_evt_hdr_t() {
 }
 #[doc = "@brief Common BLE Event type, wrapping the module specific event reports."]
 #[repr(C)]
-#[derive(Copy, Clone)]
 pub struct ble_evt_t {
     #[doc = "< Event header."]
     pub header: ble_evt_hdr_t,
@@ -15188,19 +15252,18 @@ pub struct ble_evt_t {
     pub evt: ble_evt_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
-pub union ble_evt_t__bindgen_ty_1 {
+pub struct ble_evt_t__bindgen_ty_1 {
     #[doc = "< Common Event, evt_id in BLE_EVT_* series."]
-    pub common_evt: ble_common_evt_t,
+    pub common_evt: __BindgenUnionField<ble_common_evt_t>,
     #[doc = "< GAP originated event, evt_id in BLE_GAP_EVT_* series."]
-    pub gap_evt: ble_gap_evt_t,
+    pub gap_evt: __BindgenUnionField<ble_gap_evt_t>,
     #[doc = "< GATT client originated event, evt_id in BLE_GATTC_EVT* series."]
-    pub gattc_evt: ble_gattc_evt_t,
+    pub gattc_evt: __BindgenUnionField<ble_gattc_evt_t>,
     #[doc = "< GATT server originated event, evt_id in BLE_GATTS_EVT* series."]
-    pub gatts_evt: ble_gatts_evt_t,
+    pub gatts_evt: __BindgenUnionField<ble_gatts_evt_t>,
     #[doc = "< L2CAP originated event, evt_id in BLE_L2CAP_EVT* series."]
-    pub l2cap_evt: ble_l2cap_evt_t,
-    _bindgen_union_align: [u32; 10usize],
+    pub l2cap_evt: __BindgenUnionField<ble_l2cap_evt_t>,
+    pub bindgen_union_field: [u32; 10usize],
 }
 #[test]
 fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
