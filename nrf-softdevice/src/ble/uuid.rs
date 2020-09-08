@@ -1,13 +1,21 @@
 use crate::error::Error;
 use crate::sd;
-use crate::util::*;
 
 #[repr(transparent)]
+#[derive(Copy, Clone)]
 pub struct Uuid {
     inner: sd::ble_uuid_t,
 }
 
 impl Uuid {
+    pub const fn from_raw(raw: sd::ble_uuid_t) -> Option<Self> {
+        if raw.type_ == sd::BLE_UUID_TYPE_UNKNOWN as u8 {
+            None
+        } else {
+            Some(Self { inner: raw })
+        }
+    }
+
     pub const fn new_16(uuid: u16) -> Self {
         Self {
             inner: sd::ble_uuid_t {
@@ -35,5 +43,12 @@ impl Uuid {
 
     pub unsafe fn as_raw_ptr(&self) -> *const sd::ble_uuid_t {
         &self.inner as _
+    }
+}
+
+impl Eq for Uuid {}
+impl PartialEq for Uuid {
+    fn eq(&self, other: &Uuid) -> bool {
+        self.inner.type_ == other.inner.type_ && self.inner.uuid == other.inner.uuid
     }
 }

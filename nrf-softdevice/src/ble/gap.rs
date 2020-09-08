@@ -1,11 +1,10 @@
-use core::convert::TryFrom;
 use core::mem;
-use core::mem::MaybeUninit;
 use core::ptr;
 
 use crate::error::Error;
+use crate::sd;
 use crate::util::*;
-use crate::{interrupt, sd};
+use crate::uuid::Uuid;
 
 pub(crate) unsafe fn on_connected(evt: &sd::ble_gap_evt_t) {
     let params = &evt.params.connected;
@@ -18,16 +17,16 @@ pub(crate) unsafe fn on_connected(evt: &sd::ble_gap_evt_t) {
     }
 }
 
-pub(crate) unsafe fn on_disconnected(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_param_update(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_params_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_info_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_passkey_display(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_key_pressed(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_auth_key_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_lesc_dhkey_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_auth_status(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_sec_update(evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_disconnected(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_param_update(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_params_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_info_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_passkey_display(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_key_pressed(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_auth_key_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_lesc_dhkey_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_auth_status(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_sec_update(_evt: &sd::ble_gap_evt_t) {}
 pub(crate) unsafe fn on_timeout(evt: &sd::ble_gap_evt_t) {
     let params = &evt.params.timeout;
     match params.src as u32 {
@@ -35,17 +34,17 @@ pub(crate) unsafe fn on_timeout(evt: &sd::ble_gap_evt_t) {
         x => warn!("unknown timeout src {:u32}", x),
     }
 }
-pub(crate) unsafe fn on_rssi_changed(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_adv_report(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_sec_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_conn_param_update_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_scan_req_report(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_phy_update_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_phy_update(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_data_length_update_request(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_data_length_update(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_qos_channel_survey_report(evt: &sd::ble_gap_evt_t) {}
-pub(crate) unsafe fn on_adv_set_terminated(evt: &sd::ble_gap_evt_t) {
+pub(crate) unsafe fn on_rssi_changed(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_adv_report(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_sec_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_conn_param_update_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_scan_req_report(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_phy_update_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_phy_update(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_data_length_update_request(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_data_length_update(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_qos_channel_survey_report(_evt: &sd::ble_gap_evt_t) {}
+pub(crate) unsafe fn on_adv_set_terminated(_evt: &sd::ble_gap_evt_t) {
     ADV_SIGNAL.signal(Err(AdvertiseError::Stopped))
 }
 

@@ -1,11 +1,4 @@
-use core::convert::TryFrom;
-use core::mem::MaybeUninit;
-use core::ptr;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-
-use crate::error::Error;
 use crate::sd;
-use crate::util::*;
 
 pub mod gap;
 pub mod gatt_client;
@@ -13,8 +6,8 @@ pub mod gatt_server;
 pub mod l2cap;
 pub mod uuid;
 
-fn on_user_mem_request(evt: &sd::ble_common_evt_t) {}
-fn on_user_mem_release(evt: &sd::ble_common_evt_t) {}
+fn on_user_mem_request(_evt: &sd::ble_common_evt_t) {}
+fn on_user_mem_release(_evt: &sd::ble_common_evt_t) {}
 
 #[rustfmt::skip]
 pub(crate) unsafe fn on_evt(evt: &sd::ble_evt_t) {

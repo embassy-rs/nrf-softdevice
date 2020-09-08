@@ -7,7 +7,7 @@ use crate::sd;
 #[derive(defmt::Format, IntoPrimitive, FromPrimitive)]
 pub enum Error {
     // This is not really an error, but IMO it's better to add it
-    // anyway, just in case mistakenly someone converts NRF_SUCCESS into Error.
+    // anyway, just in case someone mistakenly converts NRF_SUCCESS into Error.
     // if they see "Success" they'll easily realize their mistake, if they see "Unknown" it'd be confusing.
     Success = sd::NRF_SUCCESS,
 

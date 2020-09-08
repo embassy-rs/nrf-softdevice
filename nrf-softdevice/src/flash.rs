@@ -61,7 +61,7 @@ impl async_flash::Flash for Flash {
             let words_ptr = data_ptr as *const u32;
             let words_len = data_len / 4;
 
-            let mut bomb = DropBomb::new();
+            let bomb = DropBomb::new();
             let ret = unsafe { sd::sd_flash_write(address as _, words_ptr, words_len) };
             let ret = match Error::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
@@ -84,7 +84,7 @@ impl async_flash::Flash for Flash {
 
             let page_number = address / Flash::PAGE_SIZE;
 
-            let mut bomb = DropBomb::new();
+            let bomb = DropBomb::new();
             let ret = unsafe { sd::sd_flash_page_erase(page_number as u32) };
             let ret = match Error::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,

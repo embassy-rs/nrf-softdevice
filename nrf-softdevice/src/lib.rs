@@ -24,8 +24,10 @@ pub use ble::*;
 
 pub use cortex_m_rt::interrupt;
 
+// ====================
 use core::ptr;
-use defmt::{info, intern, warn};
+
+use crate::util::*;
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     depanic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
