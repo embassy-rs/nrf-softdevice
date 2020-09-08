@@ -20,5 +20,5 @@ cortex-m = "0.6.2"
 cortex-m-rt = "0.6.12"
 bare-metal = { version = "0.2.0", features = ["const-fn"] }
 nrf52840-pac  = { version = "0.9.0", features = ["rt"] }
-
+heapless = "0.5.5"
 defmt = "0.1.0"

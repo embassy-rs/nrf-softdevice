@@ -1,6 +1,7 @@
 use core::mem;
 use core::ptr;
 
+use crate::ble::gatt_client;
 use crate::error::Error;
 use crate::sd;
 use crate::util::*;
@@ -157,6 +158,12 @@ static mut ADV_HANDLE: u8 = sd::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 
 pub struct Connection {
     pub conn_handle: u16,
+}
+
+impl Connection {
+    pub async fn discover(&self, uuid: Uuid) -> Result<(), gatt_client::DiscoveryError> {
+        gatt_client::discover(self.conn_handle, uuid).await
+    }
 }
 
 #[derive(defmt::Format)]

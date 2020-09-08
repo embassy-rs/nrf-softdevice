@@ -4,6 +4,8 @@ mod macros;
 
 mod signal;
 pub use signal::*;
+mod portal;
+pub use portal::*;
 mod waker_store;
 pub use waker_store::*;
 mod drop_bomb;
