@@ -52,12 +52,16 @@ pub struct Config {
 
 const APP_CONN_CFG_TAG: u8 = 1;
 
-extern "C" {
-    static mut __sdata: u32;
+unsafe fn get_app_ram_base() -> u32 {
+    extern "C" {
+        static mut __sdata: u32;
+    }
+
+    (&mut __sdata) as *mut u32 as u32
 }
 
 unsafe fn cfg_set(id: u32, cfg: &sd::ble_cfg_t) {
-    let app_ram_base: u32 = (&mut __sdata) as *mut u32 as u32;
+    let app_ram_base = get_app_ram_base();
     let ret = sd::sd_ble_cfg_set(id, cfg, app_ram_base);
     match Error::convert(ret) {
         Ok(()) => {}
@@ -77,7 +81,7 @@ pub unsafe fn enable(config: &Config) {
 
     // TODO configure the stack with sd_ble_cfg_set
 
-    let app_ram_base: u32 = (&mut __sdata) as *mut u32 as u32;
+    let app_ram_base = get_app_ram_base();
 
     // Set at least one GAP config so APP_CONN_CFG_TAG is usable.
     // If you set none, it seem the softdevice won't let you use it, requiring 0 instead.
@@ -224,10 +228,16 @@ pub unsafe fn enable(config: &Config) {
     let ret = sd::sd_ble_enable(&mut wanted_app_ram_base as _);
     match Error::convert(ret) {
         Ok(()) => {}
-        Err(Error::NoMem) => depanic!(
-            "too little RAM for softdevice. Change your app's RAM start address to {:u32}",
-            wanted_app_ram_base
-        ),
+        Err(Error::NoMem) => {
+            if wanted_app_ram_base <= app_ram_base {
+                depanic!("selected configuration has too high RAM requirements.")
+            } else {
+                depanic!(
+                    "too little RAM for softdevice. Change your app's RAM start address to {:u32}",
+                    wanted_app_ram_base
+                );
+            }
+        }
         Err(err) => depanic!("sd_ble_enable err {:?}", err),
     }
 
