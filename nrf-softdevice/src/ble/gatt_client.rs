@@ -207,17 +207,34 @@ pub(crate) unsafe fn on_char_disc_rsp(
 pub(crate) async fn discover(conn_handle: u16, uuid: Uuid) -> Result<(), DiscoveryError> {
     // TODO this hangs forever if connection is disconnected during discovery.
 
-    let svc = discover_service(conn_handle, uuid).await?;
+    let svc = match discover_service(conn_handle, uuid).await {
+        Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => {
+            Err(DiscoveryError::ServiceNotFound)
+        }
+        x => x,
+    }?;
     info!("got svc");
 
-    let chars = discover_chars(
-        conn_handle,
-        svc.handle_range.start_handle,
-        svc.handle_range.end_handle,
-    )
-    .await?;
+    let mut curr_handle = svc.handle_range.start_handle;
+    let end_handle = svc.handle_range.end_handle;
 
-    info!("got {:?} chars", chars.len());
+    info!("handles: {:u16}-{:u16}", curr_handle, end_handle);
+    while curr_handle < end_handle {
+        let chars = match discover_chars(conn_handle, curr_handle, end_handle).await {
+            Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => break,
+            x => x,
+        }?;
+
+        info!("got {:?} chars", chars.len());
+        for c in chars.iter() {
+            let c: &sd::ble_gattc_char_t = c;
+            info!(
+                "handle_decl={:u16} handle_value={:u16} uuid={:u8}:{:u16}",
+                c.handle_decl, c.handle_value, c.uuid.type_, c.uuid.uuid
+            );
+            curr_handle = c.handle_value;
+        }
+    }
 
     Ok(())
 }
