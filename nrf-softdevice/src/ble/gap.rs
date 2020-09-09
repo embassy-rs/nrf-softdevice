@@ -161,8 +161,8 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub async fn discover(&self, uuid: Uuid) -> Result<(), gatt_client::DiscoveryError> {
-        gatt_client::discover(self.conn_handle, uuid).await
+    pub async fn discover<T: gatt_client::Client>(&self) -> Result<T, gatt_client::DiscoveryError> {
+        gatt_client::discover(self.conn_handle).await
     }
 }
 

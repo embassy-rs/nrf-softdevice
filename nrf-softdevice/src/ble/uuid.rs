@@ -44,6 +44,10 @@ impl Uuid {
     pub unsafe fn as_raw_ptr(&self) -> *const sd::ble_uuid_t {
         &self.inner as _
     }
+
+    pub fn into_raw(self) -> sd::ble_uuid_t {
+        self.inner
+    }
 }
 
 impl Eq for Uuid {}

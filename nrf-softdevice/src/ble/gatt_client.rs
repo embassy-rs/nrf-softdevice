@@ -95,6 +95,7 @@ pub enum GattError {
 #[derive(defmt::Format)]
 pub enum DiscoveryError {
     ServiceNotFound,
+    ServiceIncomplete,
     Gatt(GattError),
     Raw(Error),
 }
@@ -250,41 +251,58 @@ pub(crate) unsafe fn on_desc_disc_rsp(
     DISCOVER_DESCS_PORTAL.signal(val);
 }
 
-pub(crate) async fn discover(conn_handle: u16, uuid: Uuid) -> Result<(), DiscoveryError> {
-    // TODO this hangs forever if connection is disconnected during discovery.
+async fn discover_char<T: Client>(
+    client: &mut T,
+    conn_handle: u16,
+    svc: &sd::ble_gattc_service_t,
+    curr: sd::ble_gattc_char_t,
+    next: Option<sd::ble_gattc_char_t>,
+) -> Result<(), DiscoveryError> {
+    // Calcuate range of possible descriptors
+    let start_handle = curr.handle_value + 1;
+    let end_handle = next
+        .map(|c| c.handle_decl - 1)
+        .unwrap_or(svc.handle_range.end_handle);
 
-    let svc = match discover_service(conn_handle, uuid).await {
+    let characteristic = Characteristic {
+        uuid: Uuid::from_raw(curr.uuid),
+        handle_decl: curr.handle_decl,
+        handle_value: curr.handle_value,
+        has_ext_props: curr.char_ext_props() != 0,
+        props: curr.char_props,
+    };
+
+    let mut descriptors: Vec<Descriptor, DiscDescsMax> = Vec::new();
+
+    // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
+    if start_handle <= end_handle {
+        for desc in discover_descs(conn_handle, start_handle, end_handle).await? {
+            descriptors
+                .push(Descriptor {
+                    uuid: Uuid::from_raw(desc.uuid),
+                    handle: desc.handle,
+                })
+                .unwrap_or_else(|_| depanic!("no size in descriptors"));
+        }
+    }
+
+    client.discovered_characteristic(&characteristic, &descriptors[..]);
+
+    Ok(())
+}
+
+pub(crate) async fn discover<T: Client>(conn_handle: u16) -> Result<T, DiscoveryError> {
+    // TODO this hangs forever if connection is disconnected during discovery.
+    // TODO handle drop. Probably doable gracefully (no DropBomb)
+
+    let svc = match discover_service(conn_handle, T::uuid()).await {
         Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => {
             Err(DiscoveryError::ServiceNotFound)
         }
         x => x,
     }?;
 
-    let discover_char = |curr: sd::ble_gattc_char_t, next: Option<sd::ble_gattc_char_t>| async move {
-        info!(
-            "char: handle_decl={:u16} handle_value={:u16} uuid={:u8}:{:u16}",
-            curr.handle_decl, curr.handle_value, curr.uuid.type_, curr.uuid.uuid
-        );
-
-        // Calcuate range of possible descriptors
-        let start_handle = curr.handle_value + 1;
-        let end_handle = next
-            .map(|c| c.handle_decl - 1)
-            .unwrap_or(svc.handle_range.end_handle);
-
-        // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
-        if start_handle <= end_handle {
-            let descs = discover_descs(conn_handle, start_handle, end_handle).await?;
-            for desc in descs.iter() {
-                info!(
-                    "    desc: handle={:u16} uuid={:u8}:{:u16}",
-                    desc.handle, desc.uuid.type_, desc.uuid.uuid
-                );
-            }
-        }
-
-        Ok(())
-    };
+    let mut client = T::new_undiscovered();
 
     let mut curr_handle = svc.handle_range.start_handle;
     let end_handle = svc.handle_range.end_handle;
@@ -298,15 +316,41 @@ pub(crate) async fn discover(conn_handle: u16, uuid: Uuid) -> Result<(), Discove
         deassert!(chars.len() != 0);
         for curr in chars {
             if let Some(prev) = prev_char {
-                discover_char(prev, Some(curr)).await?;
+                discover_char(&mut client, conn_handle, &svc, prev, Some(curr)).await?;
             }
             prev_char = Some(curr);
             curr_handle = curr.handle_value + 1;
         }
     }
     if let Some(prev) = prev_char {
-        discover_char(prev, None).await?;
+        discover_char(&mut client, conn_handle, &svc, prev, None).await?;
     }
 
-    Ok(())
+    client.discovery_complete()?;
+
+    Ok(client)
+}
+
+pub struct Characteristic {
+    pub uuid: Option<Uuid>,
+    pub handle_decl: u16,
+    pub handle_value: u16,
+    pub props: sd::ble_gatt_char_props_t,
+    pub has_ext_props: bool,
+}
+
+pub struct Descriptor {
+    pub uuid: Option<Uuid>,
+    pub handle: u16,
+}
+
+pub trait Client {
+    fn uuid() -> Uuid;
+    fn new_undiscovered() -> Self;
+    fn discovered_characteristic(
+        &mut self,
+        characteristic: &Characteristic,
+        descriptors: &[Descriptor],
+    );
+    fn discovery_complete(&mut self) -> Result<(), DiscoveryError>;
 }
