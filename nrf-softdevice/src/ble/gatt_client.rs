@@ -13,12 +13,6 @@ pub(crate) unsafe fn on_rel_disc_rsp(
 ) {
 }
 
-pub(crate) unsafe fn on_desc_disc_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
-) {
-}
-
 pub(crate) unsafe fn on_attr_info_disc_rsp(
     _ble_evt: *const sd::ble_evt_t,
     _gattc_evt: &sd::ble_gattc_evt_t,
@@ -204,6 +198,58 @@ pub(crate) unsafe fn on_char_disc_rsp(
     DISCOVER_CHARS_PORTAL.signal(val);
 }
 
+// =============================
+
+type DiscDescsMax = U6;
+
+static DISCOVER_DESCS_PORTAL: Portal<
+    Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoveryError>,
+> = Portal::new();
+
+pub(crate) async fn discover_descs(
+    conn_handle: u16,
+    start_handle: u16,
+    end_handle: u16,
+) -> Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoveryError> {
+    let ret = unsafe {
+        sd::sd_ble_gattc_descriptors_discover(
+            conn_handle,
+            &sd::ble_gattc_handle_range_t {
+                start_handle,
+                end_handle,
+            },
+        )
+    };
+    match Error::convert(ret) {
+        Ok(_) => {}
+        Err(err) => {
+            warn!("sd_ble_gattc_characteristics_discover err {:?}", err);
+            return Err(DiscoveryError::Raw(err));
+        }
+    };
+
+    DISCOVER_DESCS_PORTAL.wait().await
+}
+
+pub(crate) unsafe fn on_desc_disc_rsp(
+    ble_evt: *const sd::ble_evt_t,
+    gattc_evt: &sd::ble_gattc_evt_t,
+) {
+    let val = if gattc_evt.gatt_status as u32 == sd::BLE_GATT_STATUS_SUCCESS {
+        let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
+        let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
+        let v = Vec::from_slice(v).unwrap_or_else(|_| {
+            depanic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
+        });
+        Ok(v)
+    } else {
+        Err(DiscoveryError::Gatt(GattError::from(
+            gattc_evt.gatt_status as u32,
+        )))
+    };
+    DISCOVER_DESCS_PORTAL.signal(val);
+}
+
 pub(crate) async fn discover(conn_handle: u16, uuid: Uuid) -> Result<(), DiscoveryError> {
     // TODO this hangs forever if connection is disconnected during discovery.
 
@@ -213,27 +259,53 @@ pub(crate) async fn discover(conn_handle: u16, uuid: Uuid) -> Result<(), Discove
         }
         x => x,
     }?;
-    info!("got svc");
+
+    let discover_char = |curr: sd::ble_gattc_char_t, next: Option<sd::ble_gattc_char_t>| async move {
+        info!(
+            "char: handle_decl={:u16} handle_value={:u16} uuid={:u8}:{:u16}",
+            curr.handle_decl, curr.handle_value, curr.uuid.type_, curr.uuid.uuid
+        );
+
+        // Calcuate range of possible descriptors
+        let start_handle = curr.handle_value + 1;
+        let end_handle = next
+            .map(|c| c.handle_decl - 1)
+            .unwrap_or(svc.handle_range.end_handle);
+
+        // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
+        if start_handle <= end_handle {
+            let descs = discover_descs(conn_handle, start_handle, end_handle).await?;
+            for desc in descs.iter() {
+                info!(
+                    "    desc: handle={:u16} uuid={:u8}:{:u16}",
+                    desc.handle, desc.uuid.type_, desc.uuid.uuid
+                );
+            }
+        }
+
+        Ok(())
+    };
 
     let mut curr_handle = svc.handle_range.start_handle;
     let end_handle = svc.handle_range.end_handle;
 
-    info!("handles: {:u16}-{:u16}", curr_handle, end_handle);
+    let mut prev_char: Option<sd::ble_gattc_char_t> = None;
     while curr_handle < end_handle {
         let chars = match discover_chars(conn_handle, curr_handle, end_handle).await {
             Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => break,
             x => x,
         }?;
-
-        info!("got {:?} chars", chars.len());
-        for c in chars.iter() {
-            let c: &sd::ble_gattc_char_t = c;
-            info!(
-                "handle_decl={:u16} handle_value={:u16} uuid={:u8}:{:u16}",
-                c.handle_decl, c.handle_value, c.uuid.type_, c.uuid.uuid
-            );
-            curr_handle = c.handle_value;
+        deassert!(chars.len() != 0);
+        for curr in chars {
+            if let Some(prev) = prev_char {
+                discover_char(prev, Some(curr)).await?;
+            }
+            prev_char = Some(curr);
+            curr_handle = curr.handle_value + 1;
         }
+    }
+    if let Some(prev) = prev_char {
+        discover_char(prev, None).await?;
     }
 
     Ok(())
