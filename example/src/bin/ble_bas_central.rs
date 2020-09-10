@@ -63,9 +63,9 @@ impl gatt_client::Client for BatteryServiceClient {
         }
     }
 
-    fn discovery_complete(&mut self) -> Result<(), gatt_client::DiscoveryError> {
+    fn discovery_complete(&mut self) -> Result<(), gatt_client::DiscoverError> {
         if self.battery_level_cccd_handle == 0 || self.battery_level_value_handle == 0 {
-            return Err(gatt_client::DiscoveryError::ServiceIncomplete);
+            return Err(gatt_client::DiscoverError::ServiceIncomplete);
         }
         Ok(())
     }
