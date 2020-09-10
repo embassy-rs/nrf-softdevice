@@ -26,6 +26,7 @@ struct BatteryServiceClient {
 const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
 const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
 
+// This is mostly boilerplate, ideally it'll be generated with a proc macro in the future.
 impl gatt_client::Client for BatteryServiceClient {
     fn uuid() -> Uuid {
         return GATT_BAS_SVC_UUID;
@@ -37,6 +38,7 @@ impl gatt_client::Client for BatteryServiceClient {
             battery_level_cccd_handle: 0,
         }
     }
+
     fn discovered_characteristic(
         &mut self,
         characteristic: &gatt_client::Characteristic,
@@ -58,6 +60,7 @@ impl gatt_client::Client for BatteryServiceClient {
             }
         }
     }
+
     fn discovery_complete(&mut self) -> Result<(), gatt_client::DiscoveryError> {
         if self.battery_level_cccd_handle == 0 || self.battery_level_value_handle == 0 {
             return Err(gatt_client::DiscoveryError::ServiceIncomplete);

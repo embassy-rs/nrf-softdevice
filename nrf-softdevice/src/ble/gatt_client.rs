@@ -6,6 +6,7 @@ use crate::error::Error;
 use crate::sd;
 use crate::util::*;
 use crate::uuid::Uuid;
+use crate::DisconnectedError;
 
 pub(crate) unsafe fn on_rel_disc_rsp(
     _ble_evt: *const sd::ble_evt_t,
@@ -94,10 +95,29 @@ pub enum GattError {
 
 #[derive(defmt::Format)]
 pub enum DiscoveryError {
+    Disconnected,
     ServiceNotFound,
     ServiceIncomplete,
     Gatt(GattError),
     Raw(Error),
+}
+
+impl From<DisconnectedError> for DiscoveryError {
+    fn from(_: DisconnectedError) -> Self {
+        DiscoveryError::Disconnected
+    }
+}
+
+impl From<GattError> for DiscoveryError {
+    fn from(err: GattError) -> Self {
+        DiscoveryError::Gatt(err)
+    }
+}
+
+impl From<Error> for DiscoveryError {
+    fn from(err: Error) -> Self {
+        DiscoveryError::Raw(err)
+    }
 }
 
 static DISCOVER_SERVICE_PORTAL: Portal<Result<sd::ble_gattc_service_t, DiscoveryError>> =

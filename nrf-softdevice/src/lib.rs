@@ -80,8 +80,6 @@ pub unsafe fn enable(config: &Config) {
         Err(err) => depanic!("sd_softdevice_enable err {:?}", err),
     }
 
-    // TODO configure the stack with sd_ble_cfg_set
-
     let app_ram_base = get_app_ram_base();
 
     // Set at least one GAP config so APP_CONN_CFG_TAG is usable.

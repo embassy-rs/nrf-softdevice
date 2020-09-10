@@ -9,7 +9,7 @@ use crate::util::*;
 pub(crate) struct OutOfConnsError;
 
 #[derive(defmt::Format)]
-pub(crate) struct DisconnectedError;
+pub struct DisconnectedError;
 
 // We could make the public Connection type simply hold the softdevice's conn_handle.
 // However, that would allow for bugs like:
@@ -49,6 +49,7 @@ pub(crate) struct ConnectionState {
     pub refcount: Cell<u8>, // number of existing Connection instances
     pub conn_handle: Cell<Option<u16>>, // none = not connected
 
+    pub disconnecting: Cell<bool>,
     pub role: Cell<Role>,
     // TODO gattc portals go here instead of being globals.
 }
@@ -58,8 +59,13 @@ impl ConnectionState {
         Self {
             refcount: Cell::new(0),
             conn_handle: Cell::new(None),
+            disconnecting: Cell::new(false),
             role: Cell::new(Role::Central),
         }
+    }
+
+    fn reset(&self) {
+        self.disconnecting.set(false);
     }
 
     pub(crate) fn by_conn_handle(conn_handle: u16) -> &'static Self {
@@ -67,6 +73,32 @@ impl ConnectionState {
             .get()
             .expect("by_conn_handle on not connected conn_handle");
         &STATE_BY_INDEX.0[index as usize]
+    }
+
+    pub(crate) fn check_connected(&self) -> Result<u16, DisconnectedError> {
+        match self.conn_handle.get() {
+            Some(h) => Ok(h),
+            None => Err(DisconnectedError),
+        }
+    }
+
+    pub(crate) fn disconnect(&self) -> Result<(), DisconnectedError> {
+        let conn_handle = self.check_connected()?;
+
+        if self.disconnecting.get() {
+            return Ok(());
+        }
+
+        let ret = unsafe {
+            sd::sd_ble_gap_disconnect(
+                conn_handle,
+                sd::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
+            )
+        };
+        Error::convert(ret).dexpect(intern!("sd_ble_gap_disconnect"));
+
+        self.disconnecting.set(true);
+        Ok(())
     }
 
     pub(crate) fn on_disconnected(&self) {
@@ -115,17 +147,12 @@ impl Drop for Connection {
         );
 
         if new_refcount == 0 {
-            trace!("all refs dropped, disconnecting");
-            let ret = unsafe {
-                sd::sd_ble_gap_disconnect(
-                    state.conn_handle.get().dewrap(),
-                    sd::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
-                )
-            };
-            if let Err(e) = Error::convert(ret) {
-                warn!("sd_ble_gap_disconnect err {:?}", e);
+            if state.conn_handle.get().is_some() {
+                trace!("all refs dropped, disconnecting");
+                state.disconnect().dewrap();
+            } else {
+                trace!("all refs dropped, already disconnected");
             }
-
             // We still leave conn_handle set, because the connection is
             // not really disconnected until we get GAP_DISCONNECTED event.
         }
@@ -156,12 +183,13 @@ impl Clone for Connection {
 impl Connection {
     pub async fn discover<T: gatt_client::Client>(&self) -> Result<T, gatt_client::DiscoveryError> {
         let state = self.state();
-        // TODO return error if not connected instead of panicking
-        let conn_handle = state
-            .conn_handle
-            .get()
-            .dexpect(intern!("Connection is disconnected"));
+        let conn_handle = state.check_connected()?;
         gatt_client::discover(conn_handle).await
+    }
+
+    pub fn disconnect(&self) -> Result<(), DisconnectedError> {
+        let state = self.state();
+        state.disconnect()
     }
 
     pub(crate) fn new(conn_handle: u16) -> Result<Self, OutOfConnsError> {
@@ -169,9 +197,10 @@ impl Connection {
             if s.refcount.get() == 0 && s.conn_handle.get().is_none() {
                 let index = i as u8;
 
-                // Initialize basic fields
+                // Initialize
                 s.refcount.set(1);
                 s.conn_handle.set(Some(conn_handle));
+                s.reset();
 
                 // Update index_by_handle
                 deassert!(
