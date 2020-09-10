@@ -7,6 +7,7 @@ use crate::sd;
 use crate::util::*;
 use crate::uuid::Uuid;
 use crate::DisconnectedError;
+use crate::{Connection, ConnectionState, Role};
 
 pub(crate) unsafe fn on_rel_disc_rsp(
     _ble_evt: *const sd::ble_evt_t,
@@ -120,13 +121,21 @@ impl From<Error> for DiscoveryError {
     }
 }
 
-static DISCOVER_SERVICE_PORTAL: Portal<Result<sd::ble_gattc_service_t, DiscoveryError>> =
-    Portal::new();
+type DiscCharsMax = U6;
+type DiscDescsMax = U6;
+
+pub(crate) enum PortalMessage {
+    DiscoverService(Result<sd::ble_gattc_service_t, DiscoveryError>),
+    DiscoverCharacteristics(Result<Vec<sd::ble_gattc_char_t, DiscCharsMax>, DiscoveryError>),
+    DiscoverDescriptors(Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoveryError>),
+    Disconnected,
+}
 
 pub(crate) async fn discover_service(
-    conn_handle: u16,
+    conn: &ConnectionState,
     uuid: Uuid,
 ) -> Result<sd::ble_gattc_service_t, DiscoveryError> {
+    let conn_handle = conn.check_connected()?;
     let ret =
         unsafe { sd::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
     match Error::convert(ret) {
@@ -137,7 +146,11 @@ pub(crate) async fn discover_service(
         }
     };
 
-    DISCOVER_SERVICE_PORTAL.wait().await
+    match conn.gattc_portal.wait().await {
+        PortalMessage::DiscoverService(r) => r,
+        PortalMessage::Disconnected => Err(DiscoveryError::Disconnected),
+        _ => unreachable!(),
+    }
 }
 
 pub(crate) unsafe fn on_prim_srvc_disc_rsp(
@@ -164,22 +177,20 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
             gattc_evt.gatt_status as u32,
         )))
     };
-    DISCOVER_SERVICE_PORTAL.signal(val);
+
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .signal(PortalMessage::DiscoverService(val))
 }
 
 // =============================
 
-type DiscCharsMax = U6;
-
-static DISCOVER_CHARS_PORTAL: Portal<
-    Result<Vec<sd::ble_gattc_char_t, DiscCharsMax>, DiscoveryError>,
-> = Portal::new();
-
 pub(crate) async fn discover_chars(
-    conn_handle: u16,
+    conn: &ConnectionState,
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<sd::ble_gattc_char_t, DiscCharsMax>, DiscoveryError> {
+    let conn_handle = conn.check_connected()?;
     let ret = unsafe {
         sd::sd_ble_gattc_characteristics_discover(
             conn_handle,
@@ -197,7 +208,11 @@ pub(crate) async fn discover_chars(
         }
     };
 
-    DISCOVER_CHARS_PORTAL.wait().await
+    match conn.gattc_portal.wait().await {
+        PortalMessage::DiscoverCharacteristics(r) => r,
+        PortalMessage::Disconnected => Err(DiscoveryError::Disconnected),
+        _ => unreachable!(),
+    }
 }
 
 pub(crate) unsafe fn on_char_disc_rsp(
@@ -216,22 +231,19 @@ pub(crate) unsafe fn on_char_disc_rsp(
             gattc_evt.gatt_status as u32,
         )))
     };
-    DISCOVER_CHARS_PORTAL.signal(val);
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .signal(PortalMessage::DiscoverCharacteristics(val))
 }
 
 // =============================
 
-type DiscDescsMax = U6;
-
-static DISCOVER_DESCS_PORTAL: Portal<
-    Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoveryError>,
-> = Portal::new();
-
 pub(crate) async fn discover_descs(
-    conn_handle: u16,
+    conn: &ConnectionState,
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoveryError> {
+    let conn_handle = conn.check_connected()?;
     let ret = unsafe {
         sd::sd_ble_gattc_descriptors_discover(
             conn_handle,
@@ -249,7 +261,11 @@ pub(crate) async fn discover_descs(
         }
     };
 
-    DISCOVER_DESCS_PORTAL.wait().await
+    match conn.gattc_portal.wait().await {
+        PortalMessage::DiscoverDescriptors(r) => r,
+        PortalMessage::Disconnected => Err(DiscoveryError::Disconnected),
+        _ => unreachable!(),
+    }
 }
 
 pub(crate) unsafe fn on_desc_disc_rsp(
@@ -268,12 +284,15 @@ pub(crate) unsafe fn on_desc_disc_rsp(
             gattc_evt.gatt_status as u32,
         )))
     };
-    DISCOVER_DESCS_PORTAL.signal(val);
+
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .signal(PortalMessage::DiscoverDescriptors(val))
 }
 
 async fn discover_char<T: Client>(
     client: &mut T,
-    conn_handle: u16,
+    conn: &ConnectionState,
     svc: &sd::ble_gattc_service_t,
     curr: sd::ble_gattc_char_t,
     next: Option<sd::ble_gattc_char_t>,
@@ -296,7 +315,7 @@ async fn discover_char<T: Client>(
 
     // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
     if start_handle <= end_handle {
-        for desc in discover_descs(conn_handle, start_handle, end_handle).await? {
+        for desc in discover_descs(conn, start_handle, end_handle).await? {
             descriptors
                 .push(Descriptor {
                     uuid: Uuid::from_raw(desc.uuid),
@@ -311,39 +330,41 @@ async fn discover_char<T: Client>(
     Ok(())
 }
 
-pub(crate) async fn discover<T: Client>(conn_handle: u16) -> Result<T, DiscoveryError> {
+pub(crate) async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoveryError> {
     // TODO this hangs forever if connection is disconnected during discovery.
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
-    let svc = match discover_service(conn_handle, T::uuid()).await {
+    let state = conn.state();
+
+    let svc = match discover_service(state, T::uuid()).await {
         Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => {
             Err(DiscoveryError::ServiceNotFound)
         }
         x => x,
     }?;
 
-    let mut client = T::new_undiscovered();
+    let mut client = T::new_undiscovered(conn.clone());
 
     let mut curr_handle = svc.handle_range.start_handle;
     let end_handle = svc.handle_range.end_handle;
 
     let mut prev_char: Option<sd::ble_gattc_char_t> = None;
     while curr_handle < end_handle {
-        let chars = match discover_chars(conn_handle, curr_handle, end_handle).await {
+        let chars = match discover_chars(state, curr_handle, end_handle).await {
             Err(DiscoveryError::Gatt(GattError::AtterrAttributeNotFound)) => break,
             x => x,
         }?;
         deassert!(chars.len() != 0);
         for curr in chars {
             if let Some(prev) = prev_char {
-                discover_char(&mut client, conn_handle, &svc, prev, Some(curr)).await?;
+                discover_char(&mut client, state, &svc, prev, Some(curr)).await?;
             }
             prev_char = Some(curr);
             curr_handle = curr.handle_value + 1;
         }
     }
     if let Some(prev) = prev_char {
-        discover_char(&mut client, conn_handle, &svc, prev, None).await?;
+        discover_char(&mut client, state, &svc, prev, None).await?;
     }
 
     client.discovery_complete()?;
@@ -366,7 +387,7 @@ pub struct Descriptor {
 
 pub trait Client {
     fn uuid() -> Uuid;
-    fn new_undiscovered() -> Self;
+    fn new_undiscovered(conn: Connection) -> Self;
     fn discovered_characteristic(
         &mut self,
         characteristic: &Characteristic,

@@ -51,7 +51,8 @@ pub(crate) struct ConnectionState {
 
     pub disconnecting: Cell<bool>,
     pub role: Cell<Role>,
-    // TODO gattc portals go here instead of being globals.
+
+    pub gattc_portal: Portal<gatt_client::PortalMessage>,
 }
 
 impl ConnectionState {
@@ -61,6 +62,7 @@ impl ConnectionState {
             conn_handle: Cell::new(None),
             disconnecting: Cell::new(false),
             role: Cell::new(Role::Central),
+            gattc_portal: Portal::new(),
         }
     }
 
@@ -111,8 +113,14 @@ impl ConnectionState {
             INDEX_BY_HANDLE.0[conn_handle as usize].get().is_some(),
             "conn_handle has no index"
         );
+
         INDEX_BY_HANDLE.0[conn_handle as usize].set(None);
-        self.conn_handle.set(None)
+        self.conn_handle.set(None);
+
+        // Signal possible in-progess gattc procedures that the connection
+        // has disconnected.
+        self.gattc_portal
+            .signal(gatt_client::PortalMessage::Disconnected);
     }
 }
 
@@ -182,9 +190,7 @@ impl Clone for Connection {
 
 impl Connection {
     pub async fn discover<T: gatt_client::Client>(&self) -> Result<T, gatt_client::DiscoveryError> {
-        let state = self.state();
-        let conn_handle = state.check_connected()?;
-        gatt_client::discover(conn_handle).await
+        gatt_client::discover(self).await
     }
 
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {

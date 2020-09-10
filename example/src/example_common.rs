@@ -5,7 +5,7 @@ use nrf52840_hal as _;
 use panic_probe as _;
 use static_executor_cortex_m as _;
 
-pub use defmt::info;
+pub use defmt::{info, intern};
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -28,14 +28,41 @@ macro_rules! depanic {
 }
 
 pub trait Dewrap<T> {
+    /// dewrap = defmt unwrap
     fn dewrap(self) -> T;
+
+    /// dexpect = defmt expect
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T;
+}
+
+impl<T> Dewrap<T> for Option<T> {
+    fn dewrap(self) -> T {
+        match self {
+            Some(t) => t,
+            None => depanic!("unwrap failed: enum is none"),
+        }
+    }
+
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T {
+        match self {
+            Some(t) => t,
+            None => depanic!("unexpected None: {:?}", msg),
+        }
+    }
 }
 
 impl<T, E: defmt::Format> Dewrap<T> for Result<T, E> {
     fn dewrap(self) -> T {
         match self {
             Ok(t) => t,
-            Err(e) => depanic!("dewrap failed: {:?}", e),
+            Err(e) => depanic!("unwrap failed: {:?}", e),
+        }
+    }
+
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T {
+        match self {
+            Ok(t) => t,
+            Err(e) => depanic!("unexpected error: {:?}: {:?}", msg, e),
         }
     }
 }

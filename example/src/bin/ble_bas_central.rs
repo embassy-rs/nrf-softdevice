@@ -10,7 +10,7 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{gap, gatt_client, uuid::Uuid};
+use nrf_softdevice::{gap, gatt_client, uuid::Uuid, Connection};
 use nrf_softdevice_s140 as sd;
 
 #[static_executor::task]
@@ -19,6 +19,7 @@ async fn softdevice_task() {
 }
 
 struct BatteryServiceClient {
+    conn: Connection,
     battery_level_value_handle: u16,
     battery_level_cccd_handle: u16,
 }
@@ -32,8 +33,9 @@ impl gatt_client::Client for BatteryServiceClient {
         return GATT_BAS_SVC_UUID;
     }
 
-    fn new_undiscovered() -> Self {
+    fn new_undiscovered(conn: Connection) -> Self {
         Self {
+            conn,
             battery_level_value_handle: 0,
             battery_level_cccd_handle: 0,
         }
@@ -75,10 +77,10 @@ async fn ble_central_task() {
         0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
     ])];
 
-    let conn = gap::connect(addrs).await.dewrap();
+    let conn = gap::connect(addrs).await.dexpect(intern!("connect"));
     info!("connected");
 
-    let svc: BatteryServiceClient = conn.discover().await.dewrap();
+    let svc: BatteryServiceClient = conn.discover().await.dexpect(intern!("discover"));
     info!(
         "discovered! {:u16} {:u16}",
         svc.battery_level_value_handle, svc.battery_level_cccd_handle
