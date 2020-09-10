@@ -1,20 +1,27 @@
 use core::mem;
 use core::ptr;
 
-use crate::ble::gatt_client;
 use crate::error::Error;
 use crate::sd;
 use crate::util::*;
 use crate::uuid::Uuid;
+use crate::{Connection, Role};
 
 pub(crate) unsafe fn on_connected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::ble_gap_evt_t) {
     let params = &gap_evt.params.connected;
     let conn_handle = gap_evt.conn_handle;
+    let role = Role::from_raw(params.role);
 
-    if params.role == sd::BLE_GAP_ROLE_PERIPH as u8 {
-        ADV_SIGNAL.signal(Ok(Connection { conn_handle }))
-    } else {
-        CONNECT_SIGNAL.signal(Ok(Connection { conn_handle }))
+    // TODO what to do if new fails because no free con indexes?
+    let conn = Connection::new().dewrap();
+    let state = conn.state();
+
+    state.conn_handle.set(Some(conn_handle));
+    state.role.set(role);
+
+    match role {
+        Role::Central => CONNECT_SIGNAL.signal(Ok(conn)),
+        Role::Peripheral => ADV_SIGNAL.signal(Ok(conn)),
     }
 }
 
@@ -155,16 +162,6 @@ enum NonconnectableAdvertisement {
 }
 
 static mut ADV_HANDLE: u8 = sd::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
-
-pub struct Connection {
-    pub conn_handle: u16,
-}
-
-impl Connection {
-    pub async fn discover<T: gatt_client::Client>(&self) -> Result<T, gatt_client::DiscoveryError> {
-        gatt_client::discover(self.conn_handle).await
-    }
-}
 
 #[derive(defmt::Format)]
 pub enum AdvertiseError {

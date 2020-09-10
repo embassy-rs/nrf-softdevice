@@ -102,7 +102,7 @@ async fn bluetooth_task() {
         .await
         .dewrap();
 
-        info!("advertising done, conn {:?}", conn.conn_handle);
+        info!("advertising done!");
     }
 }
 

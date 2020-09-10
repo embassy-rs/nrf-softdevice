@@ -1,6 +1,8 @@
 use crate::sd;
 use crate::util::*;
 
+mod connection;
+pub use connection::*;
 pub mod gap;
 pub mod gatt_client;
 pub mod gatt_server;

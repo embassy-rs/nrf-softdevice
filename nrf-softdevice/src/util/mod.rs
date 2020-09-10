@@ -11,9 +11,49 @@ pub use waker_store::*;
 mod drop_bomb;
 pub use drop_bomb::*;
 
-pub(crate) use defmt::{debug, error, info, trace, warn};
+pub(crate) use defmt::{debug, error, info, intern, trace, warn};
 
 use crate::sd;
+
+pub trait Dewrap<T> {
+    /// dewrap = defmt unwrap
+    fn dewrap(self) -> T;
+
+    /// dexpect = defmt expect
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T;
+}
+
+impl<T> Dewrap<T> for Option<T> {
+    fn dewrap(self) -> T {
+        match self {
+            Some(t) => t,
+            None => depanic!("unwrap failed: enum is none"),
+        }
+    }
+
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T {
+        match self {
+            Some(t) => t,
+            None => depanic!("unexpected None: {:?}", msg),
+        }
+    }
+}
+
+impl<T, E: defmt::Format> Dewrap<T> for Result<T, E> {
+    fn dewrap(self) -> T {
+        match self {
+            Ok(t) => t,
+            Err(e) => depanic!("unwrap failed: {:?}", e),
+        }
+    }
+
+    fn dexpect<M: defmt::Format>(self, msg: M) -> T {
+        match self {
+            Ok(t) => t,
+            Err(e) => depanic!("unexpected error: {:?}: {:?}", msg, e),
+        }
+    }
+}
 
 /// Create a slice from a variable-length array in a BLE event.
 ///
