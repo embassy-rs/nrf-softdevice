@@ -19,19 +19,22 @@ async fn softdevice_task() {
 }
 
 struct BatteryServiceClient {
-    level_value_handle: u16,
-    level_cccd_handle: u16,
+    battery_level_value_handle: u16,
+    battery_level_cccd_handle: u16,
 }
+
+const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
+const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
 
 impl gatt_client::Client for BatteryServiceClient {
     fn uuid() -> Uuid {
-        return Uuid::new_16(0x4200);
+        return GATT_BAS_SVC_UUID;
     }
 
     fn new_undiscovered() -> Self {
         Self {
-            level_value_handle: 0,
-            level_cccd_handle: 0,
+            battery_level_value_handle: 0,
+            battery_level_cccd_handle: 0,
         }
     }
     fn discovered_characteristic(
@@ -40,15 +43,15 @@ impl gatt_client::Client for BatteryServiceClient {
         descriptors: &[gatt_client::Descriptor],
     ) {
         if let Some(char_uuid) = characteristic.uuid {
-            if char_uuid == Uuid::new_16(0x2A19) {
+            if char_uuid == GATT_BAS_BATTERY_LEVEL_CHAR_UUID {
                 // TODO maybe check the char_props have the necessary operations allowed? read/write/notify/etc
-                self.level_value_handle = characteristic.handle_value;
+                self.battery_level_value_handle = characteristic.handle_value;
                 for desc in descriptors {
                     if let Some(desc_uuid) = desc.uuid {
                         if desc_uuid
                             == Uuid::new_16(sd::BLE_UUID_DESCRIPTOR_CLIENT_CHAR_CONFIG as u16)
                         {
-                            self.level_cccd_handle = desc.handle;
+                            self.battery_level_cccd_handle = desc.handle;
                         }
                     }
                 }
@@ -56,7 +59,7 @@ impl gatt_client::Client for BatteryServiceClient {
         }
     }
     fn discovery_complete(&mut self) -> Result<(), gatt_client::DiscoveryError> {
-        if self.level_cccd_handle == 0 || self.level_value_handle == 0 {
+        if self.battery_level_cccd_handle == 0 || self.battery_level_value_handle == 0 {
             return Err(gatt_client::DiscoveryError::ServiceIncomplete);
         }
         Ok(())
@@ -75,7 +78,7 @@ async fn ble_central_task() {
     let svc: BatteryServiceClient = conn.discover().await.dewrap();
     info!(
         "discovered! {:u16} {:u16}",
-        svc.level_value_handle, svc.level_cccd_handle
+        svc.battery_level_value_handle, svc.battery_level_cccd_handle
     );
 }
 
