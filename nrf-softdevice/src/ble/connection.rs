@@ -8,6 +8,9 @@ use crate::util::*;
 #[derive(defmt::Format)]
 pub(crate) struct OutOfConnsError;
 
+#[derive(defmt::Format)]
+pub(crate) struct DisconnectedError;
+
 // We could make the public Connection type simply hold the softdevice's conn_handle.
 // However, that would allow for bugs like:
 // - Connection is established with conn_handle=5
@@ -38,12 +41,15 @@ impl Role {
 // This struct is a bit ugly because it has to be usable with const-refs.
 // Hence all the cells.
 pub(crate) struct ConnectionState {
-    pub(crate) refcount: Cell<u8>,
+    // This ConnectionState is "free" if refcount == 0 and conn_handle = none
+    //
+    // When client code drops all instances, refcount becomes 0 and disconnection is initiated.
+    // However, disconnection is not complete until the event GAP_DISCONNECTED.
+    // so there's a small gap of time where the ConnectionState is not "free" even if refcount=0.
+    pub refcount: Cell<u8>, // number of existing Connection instances
+    pub conn_handle: Cell<Option<u16>>, // none = not connected
 
-    /// none = not connected
-    pub(crate) conn_handle: Cell<Option<u16>>,
-
-    pub(crate) role: Cell<Role>,
+    pub role: Cell<Role>,
     // TODO gattc portals go here instead of being globals.
 }
 
@@ -52,22 +58,44 @@ impl ConnectionState {
         Self {
             refcount: Cell::new(0),
             conn_handle: Cell::new(None),
-            role: Cell::new(Role::Peripheral),
+            role: Cell::new(Role::Central),
         }
+    }
+
+    pub(crate) fn by_conn_handle(conn_handle: u16) -> &'static Self {
+        let index = INDEX_BY_HANDLE.0[conn_handle as usize]
+            .get()
+            .expect("by_conn_handle on not connected conn_handle");
+        &STATE_BY_INDEX.0[index as usize]
+    }
+
+    pub(crate) fn on_disconnected(&self) {
+        let conn_handle = self
+            .conn_handle
+            .get()
+            .dexpect(intern!("on_disconnected when already disconnected"));
+
+        deassert!(
+            INDEX_BY_HANDLE.0[conn_handle as usize].get().is_some(),
+            "conn_handle has no index"
+        );
+        INDEX_BY_HANDLE.0[conn_handle as usize].set(None);
+        self.conn_handle.set(None)
     }
 }
 
 // Highest ever the softdevice can support.
 const CONNS_MAX: usize = 20;
 
-struct ConnectionStates([ConnectionState; CONNS_MAX]);
-
 // TODO is this really safe? should be if all the crate's public types are
 // non-Send, so client code can only call this crate from the same thread.
-unsafe impl Send for ConnectionStates {}
-unsafe impl Sync for ConnectionStates {}
+struct ForceSync<T>(T);
+unsafe impl<T> Sync for ForceSync<T> {}
 
-static STATES: ConnectionStates = ConnectionStates([ConnectionState::new(); CONNS_MAX]);
+static STATE_BY_INDEX: ForceSync<[ConnectionState; CONNS_MAX]> =
+    ForceSync([ConnectionState::new(); CONNS_MAX]);
+static INDEX_BY_HANDLE: ForceSync<[Cell<Option<u8>>; CONNS_MAX]> =
+    ForceSync([Cell::new(None); CONNS_MAX]);
 
 pub struct Connection {
     index: u8,
@@ -98,7 +126,8 @@ impl Drop for Connection {
                 warn!("sd_ble_gap_disconnect err {:?}", e);
             }
 
-            state.conn_handle.set(None)
+            // We still leave conn_handle set, because the connection is
+            // not really disconnected until we get GAP_DISCONNECTED event.
         }
     }
 }
@@ -135,11 +164,22 @@ impl Connection {
         gatt_client::discover(conn_handle).await
     }
 
-    pub(crate) fn new() -> Result<Self, OutOfConnsError> {
-        for (i, s) in STATES.0.iter().enumerate() {
-            if s.refcount.get() == 0 {
-                s.refcount.set(1);
+    pub(crate) fn new(conn_handle: u16) -> Result<Self, OutOfConnsError> {
+        for (i, s) in STATE_BY_INDEX.0.iter().enumerate() {
+            if s.refcount.get() == 0 && s.conn_handle.get().is_none() {
                 let index = i as u8;
+
+                // Initialize basic fields
+                s.refcount.set(1);
+                s.conn_handle.set(Some(conn_handle));
+
+                // Update index_by_handle
+                deassert!(
+                    INDEX_BY_HANDLE.0[conn_handle as usize].get().is_none(),
+                    "conn_handle already has index"
+                );
+                INDEX_BY_HANDLE.0[conn_handle as usize].set(Some(index));
+
                 trace!("allocated conn index {:u8}, refcount=1", index);
                 return Ok(Self { index });
             }
@@ -150,6 +190,6 @@ impl Connection {
     }
 
     pub(crate) fn state(&self) -> &ConnectionState {
-        &STATES.0[self.index as usize]
+        &STATE_BY_INDEX.0[self.index as usize]
     }
 }

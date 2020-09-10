@@ -5,7 +5,7 @@ use crate::error::Error;
 use crate::sd;
 use crate::util::*;
 use crate::uuid::Uuid;
-use crate::{Connection, Role};
+use crate::{Connection, ConnectionState, Role};
 
 pub(crate) unsafe fn on_connected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::ble_gap_evt_t) {
     let params = &gap_evt.params.connected;
@@ -13,10 +13,9 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::
     let role = Role::from_raw(params.role);
 
     // TODO what to do if new fails because no free con indexes?
-    let conn = Connection::new().dewrap();
+    let conn = Connection::new(conn_handle).dewrap();
     let state = conn.state();
 
-    state.conn_handle.set(Some(conn_handle));
     state.role.set(role);
 
     match role {
@@ -25,7 +24,10 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::
     }
 }
 
-pub(crate) unsafe fn on_disconnected(_ble_evt: *const sd::ble_evt_t, _gap_evt: &sd::ble_gap_evt_t) {
+pub(crate) unsafe fn on_disconnected(_ble_evt: *const sd::ble_evt_t, gap_evt: &sd::ble_gap_evt_t) {
+    let conn_handle = gap_evt.conn_handle;
+    let state = ConnectionState::by_conn_handle(conn_handle);
+    state.on_disconnected()
 }
 
 pub(crate) unsafe fn on_conn_param_update(
