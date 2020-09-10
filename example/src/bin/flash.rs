@@ -37,8 +37,8 @@ fn main() -> ! {
     unsafe {
         nrf_softdevice::enable(&Default::default());
 
-        softdevice_task.spawn().unwrap();
-        flash_task.spawn().unwrap();
+        softdevice_task.spawn().dewrap();
+        flash_task.spawn().dewrap();
 
         static_executor::run();
     }

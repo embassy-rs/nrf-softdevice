@@ -123,11 +123,8 @@ fn main() -> ! {
     unsafe { nrf_softdevice::enable(&config) }
 
     unsafe {
-        softdevice_task.spawn().unwrap();
-        //interrupt_task.spawn().unwrap();
-        //flash_task.spawn().unwrap();
-        //bluetooth_task.spawn().unwrap();
-        ble_central_task.spawn().unwrap();
+        softdevice_task.spawn().dewrap();
+        ble_central_task.spawn().dewrap();
 
         static_executor::run();
     }

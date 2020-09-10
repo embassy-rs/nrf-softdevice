@@ -35,7 +35,7 @@ impl<T, E: defmt::Format> Dewrap<T> for Result<T, E> {
     fn dewrap(self) -> T {
         match self {
             Ok(t) => t,
-            Err(e) => depanic!("unwrap failed: {:?}", e),
+            Err(e) => depanic!("dewrap failed: {:?}", e),
         }
     }
 }

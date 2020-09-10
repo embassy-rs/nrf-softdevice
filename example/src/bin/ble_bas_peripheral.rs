@@ -147,8 +147,8 @@ fn main() -> ! {
     unsafe { nrf_softdevice::enable(&config) }
 
     unsafe {
-        softdevice_task.spawn().unwrap();
-        bluetooth_task.spawn().unwrap();
+        softdevice_task.spawn().dewrap();
+        bluetooth_task.spawn().dewrap();
 
         static_executor::run();
     }
