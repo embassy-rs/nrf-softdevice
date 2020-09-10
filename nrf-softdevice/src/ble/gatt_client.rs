@@ -330,7 +330,7 @@ async fn discover_char<T: Client>(
     Ok(())
 }
 
-pub(crate) async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoveryError> {
+pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoveryError> {
     // TODO this hangs forever if connection is disconnected during discovery.
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 

@@ -189,10 +189,6 @@ impl Clone for Connection {
 }
 
 impl Connection {
-    pub async fn discover<T: gatt_client::Client>(&self) -> Result<T, gatt_client::DiscoveryError> {
-        gatt_client::discover(self).await
-    }
-
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {
         let state = self.state();
         state.disconnect()

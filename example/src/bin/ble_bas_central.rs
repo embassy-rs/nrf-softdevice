@@ -80,10 +80,13 @@ async fn ble_central_task() {
     let conn = gap::connect(addrs).await.dexpect(intern!("connect"));
     info!("connected");
 
-    let svc: BatteryServiceClient = conn.discover().await.dexpect(intern!("discover"));
+    let client: BatteryServiceClient = gatt_client::discover(&conn)
+        .await
+        .dexpect(intern!("discover"));
+
     info!(
         "discovered! {:u16} {:u16}",
-        svc.battery_level_value_handle, svc.battery_level_cccd_handle
+        client.battery_level_value_handle, client.battery_level_cccd_handle
     );
 }
 
