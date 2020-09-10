@@ -1,8 +1,9 @@
 use core::cell::Cell;
 
 use crate::ble::gatt_client;
+use crate::ble::types::*;
 use crate::error::Error;
-use crate::sd;
+use crate::raw;
 use crate::util::*;
 
 #[derive(defmt::Format)]
@@ -21,22 +22,6 @@ pub struct DisconnectedError;
 //
 // To avoid this, the public Connection struct has an "index" into a private ConnectionState array.
 // It is refcounted, so an index will never be reused until client code has dropped all Connection instances.
-
-#[derive(defmt::Format, Copy, Clone, Eq, PartialEq)]
-pub enum Role {
-    Central,
-    Peripheral,
-}
-
-impl Role {
-    pub fn from_raw(raw: u8) -> Self {
-        match raw as u32 {
-            sd::BLE_GAP_ROLE_CENTRAL => Self::Central,
-            sd::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
-            _ => depanic!("unknown role {:u8}", raw),
-        }
-    }
-}
 
 // This struct is a bit ugly because it has to be usable with const-refs.
 // Hence all the cells.
@@ -92,9 +77,9 @@ impl ConnectionState {
         }
 
         let ret = unsafe {
-            sd::sd_ble_gap_disconnect(
+            raw::sd_ble_gap_disconnect(
                 conn_handle,
-                sd::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
+                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
             )
         };
         Error::convert(ret).dexpect(intern!("sd_ble_gap_disconnect"));

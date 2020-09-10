@@ -9,8 +9,8 @@ pub(crate) mod util;
 
 // This is here so that the rest of the crate can easily use the right PAC and SD crates.
 // TODO change this dynamically based on features.
-pub(crate) use nrf52840_pac as pac;
-pub(crate) use nrf_softdevice_s140 as sd;
+pub use nrf52840_pac as pac;
+pub use nrf_softdevice_s140 as raw;
 
 pub mod interrupt;
 
@@ -36,19 +36,19 @@ unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
 
 #[derive(Default)]
 pub struct Config {
-    pub clock: Option<sd::nrf_clock_lf_cfg_t>,
-    pub conn_gap: Option<sd::ble_gap_conn_cfg_t>,
-    pub conn_gattc: Option<sd::ble_gattc_conn_cfg_t>,
-    pub conn_gatts: Option<sd::ble_gatts_conn_cfg_t>,
-    pub conn_gatt: Option<sd::ble_gatt_conn_cfg_t>,
-    pub conn_l2cap: Option<sd::ble_l2cap_conn_cfg_t>,
-    pub common_vs_uuid: Option<sd::ble_common_cfg_vs_uuid_t>,
-    pub gap_role_count: Option<sd::ble_gap_cfg_role_count_t>,
-    pub gap_device_name: Option<sd::ble_gap_cfg_device_name_t>,
-    pub gap_ppcp_incl: Option<sd::ble_gap_cfg_ppcp_incl_cfg_t>,
-    pub gap_car_incl: Option<sd::ble_gap_cfg_car_incl_cfg_t>,
-    pub gatts_service_changed: Option<sd::ble_gatts_cfg_service_changed_t>,
-    pub gatts_attr_tab_size: Option<sd::ble_gatts_cfg_attr_tab_size_t>,
+    pub clock: Option<raw::nrf_clock_lf_cfg_t>,
+    pub conn_gap: Option<raw::ble_gap_conn_cfg_t>,
+    pub conn_gattc: Option<raw::ble_gattc_conn_cfg_t>,
+    pub conn_gatts: Option<raw::ble_gatts_conn_cfg_t>,
+    pub conn_gatt: Option<raw::ble_gatt_conn_cfg_t>,
+    pub conn_l2cap: Option<raw::ble_l2cap_conn_cfg_t>,
+    pub common_vs_uuid: Option<raw::ble_common_cfg_vs_uuid_t>,
+    pub gap_role_count: Option<raw::ble_gap_cfg_role_count_t>,
+    pub gap_device_name: Option<raw::ble_gap_cfg_device_name_t>,
+    pub gap_ppcp_incl: Option<raw::ble_gap_cfg_ppcp_incl_cfg_t>,
+    pub gap_car_incl: Option<raw::ble_gap_cfg_car_incl_cfg_t>,
+    pub gatts_service_changed: Option<raw::ble_gatts_cfg_service_changed_t>,
+    pub gatts_attr_tab_size: Option<raw::ble_gatts_cfg_attr_tab_size_t>,
 }
 
 const APP_CONN_CFG_TAG: u8 = 1;
@@ -61,9 +61,9 @@ unsafe fn get_app_ram_base() -> u32 {
     (&mut __sdata) as *mut u32 as u32
 }
 
-unsafe fn cfg_set(id: u32, cfg: &sd::ble_cfg_t) {
+unsafe fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
     let app_ram_base = get_app_ram_base();
-    let ret = sd::sd_ble_cfg_set(id, cfg, app_ram_base);
+    let ret = raw::sd_ble_cfg_set(id, cfg, app_ram_base);
     match Error::convert(ret) {
         Ok(()) => {}
         Err(Error::NoMem) => {}
@@ -74,7 +74,7 @@ unsafe fn cfg_set(id: u32, cfg: &sd::ble_cfg_t) {
 /// safety: call at most once
 pub unsafe fn enable(config: &Config) {
     let p_clock_lf_cfg = config.clock.as_ref().map(|x| x as _).unwrap_or(ptr::null());
-    let ret = sd::sd_softdevice_enable(p_clock_lf_cfg, Some(fault_handler));
+    let ret = raw::sd_softdevice_enable(p_clock_lf_cfg, Some(fault_handler));
     match Error::convert(ret) {
         Ok(()) => {}
         Err(err) => depanic!("sd_softdevice_enable err {:?}", err),
@@ -84,27 +84,27 @@ pub unsafe fn enable(config: &Config) {
 
     // Set at least one GAP config so APP_CONN_CFG_TAG is usable.
     // If you set none, it seem the softdevice won't let you use it, requiring 0 instead.
-    let val = config.conn_gap.unwrap_or(sd::ble_gap_conn_cfg_t {
-        conn_count: sd::BLE_GAP_CONN_COUNT_DEFAULT as u8,
-        event_length: sd::BLE_GAP_EVENT_LENGTH_DEFAULT as u16,
+    let val = config.conn_gap.unwrap_or(raw::ble_gap_conn_cfg_t {
+        conn_count: raw::BLE_GAP_CONN_COUNT_DEFAULT as u8,
+        event_length: raw::BLE_GAP_EVENT_LENGTH_DEFAULT as u16,
     });
     cfg_set(
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_GAP,
-        &sd::ble_cfg_t {
-            conn_cfg: sd::ble_conn_cfg_t {
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GAP,
+        &raw::ble_cfg_t {
+            conn_cfg: raw::ble_conn_cfg_t {
                 conn_cfg_tag: APP_CONN_CFG_TAG,
-                params: sd::ble_conn_cfg_t__bindgen_ty_1 { gap_conn_cfg: val },
+                params: raw::ble_conn_cfg_t__bindgen_ty_1 { gap_conn_cfg: val },
             },
         },
     );
 
     if let Some(val) = config.conn_gatt {
         cfg_set(
-            sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATT,
-            &sd::ble_cfg_t {
-                conn_cfg: sd::ble_conn_cfg_t {
+            raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATT,
+            &raw::ble_cfg_t {
+                conn_cfg: raw::ble_conn_cfg_t {
                     conn_cfg_tag: APP_CONN_CFG_TAG,
-                    params: sd::ble_conn_cfg_t__bindgen_ty_1 { gatt_conn_cfg: val },
+                    params: raw::ble_conn_cfg_t__bindgen_ty_1 { gatt_conn_cfg: val },
                 },
             },
         );
@@ -112,11 +112,11 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.conn_gattc {
         cfg_set(
-            sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC,
-            &sd::ble_cfg_t {
-                conn_cfg: sd::ble_conn_cfg_t {
+            raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC,
+            &raw::ble_cfg_t {
+                conn_cfg: raw::ble_conn_cfg_t {
                     conn_cfg_tag: APP_CONN_CFG_TAG,
-                    params: sd::ble_conn_cfg_t__bindgen_ty_1 {
+                    params: raw::ble_conn_cfg_t__bindgen_ty_1 {
                         gattc_conn_cfg: val,
                     },
                 },
@@ -126,11 +126,11 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.conn_gatts {
         cfg_set(
-            sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS,
-            &sd::ble_cfg_t {
-                conn_cfg: sd::ble_conn_cfg_t {
+            raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS,
+            &raw::ble_cfg_t {
+                conn_cfg: raw::ble_conn_cfg_t {
                     conn_cfg_tag: APP_CONN_CFG_TAG,
-                    params: sd::ble_conn_cfg_t__bindgen_ty_1 {
+                    params: raw::ble_conn_cfg_t__bindgen_ty_1 {
                         gatts_conn_cfg: val,
                     },
                 },
@@ -140,11 +140,11 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.conn_l2cap {
         cfg_set(
-            sd::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP,
-            &sd::ble_cfg_t {
-                conn_cfg: sd::ble_conn_cfg_t {
+            raw::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP,
+            &raw::ble_cfg_t {
+                conn_cfg: raw::ble_conn_cfg_t {
                     conn_cfg_tag: APP_CONN_CFG_TAG,
-                    params: sd::ble_conn_cfg_t__bindgen_ty_1 {
+                    params: raw::ble_conn_cfg_t__bindgen_ty_1 {
                         l2cap_conn_cfg: val,
                     },
                 },
@@ -154,18 +154,18 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.common_vs_uuid {
         cfg_set(
-            sd::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID,
-            &sd::ble_cfg_t {
-                common_cfg: sd::ble_common_cfg_t { vs_uuid_cfg: val },
+            raw::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID,
+            &raw::ble_cfg_t {
+                common_cfg: raw::ble_common_cfg_t { vs_uuid_cfg: val },
             },
         );
     }
 
     if let Some(val) = config.gap_role_count {
         cfg_set(
-            sd::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT,
-            &sd::ble_cfg_t {
-                gap_cfg: sd::ble_gap_cfg_t {
+            raw::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT,
+            &raw::ble_cfg_t {
+                gap_cfg: raw::ble_gap_cfg_t {
                     role_count_cfg: val,
                 },
             },
@@ -174,9 +174,9 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.gap_device_name {
         cfg_set(
-            sd::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME,
-            &sd::ble_cfg_t {
-                gap_cfg: sd::ble_gap_cfg_t {
+            raw::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME,
+            &raw::ble_cfg_t {
+                gap_cfg: raw::ble_gap_cfg_t {
                     device_name_cfg: val,
                 },
             },
@@ -185,9 +185,9 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.gap_ppcp_incl {
         cfg_set(
-            sd::BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG,
-            &sd::ble_cfg_t {
-                gap_cfg: sd::ble_gap_cfg_t {
+            raw::BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG,
+            &raw::ble_cfg_t {
+                gap_cfg: raw::ble_gap_cfg_t {
                     ppcp_include_cfg: val,
                 },
             },
@@ -196,9 +196,9 @@ pub unsafe fn enable(config: &Config) {
 
     if let Some(val) = config.gap_car_incl {
         cfg_set(
-            sd::BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG,
-            &sd::ble_cfg_t {
-                gap_cfg: sd::ble_gap_cfg_t {
+            raw::BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG,
+            &raw::ble_cfg_t {
+                gap_cfg: raw::ble_gap_cfg_t {
                     car_include_cfg: val,
                 },
             },
@@ -206,9 +206,9 @@ pub unsafe fn enable(config: &Config) {
     }
     if let Some(val) = config.gatts_service_changed {
         cfg_set(
-            sd::BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED,
-            &sd::ble_cfg_t {
-                gatts_cfg: sd::ble_gatts_cfg_t {
+            raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED,
+            &raw::ble_cfg_t {
+                gatts_cfg: raw::ble_gatts_cfg_t {
                     service_changed: val,
                 },
             },
@@ -216,15 +216,15 @@ pub unsafe fn enable(config: &Config) {
     }
     if let Some(val) = config.gatts_attr_tab_size {
         cfg_set(
-            sd::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE,
-            &sd::ble_cfg_t {
-                gatts_cfg: sd::ble_gatts_cfg_t { attr_tab_size: val },
+            raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE,
+            &raw::ble_cfg_t {
+                gatts_cfg: raw::ble_gatts_cfg_t { attr_tab_size: val },
             },
         );
     }
 
     let mut wanted_app_ram_base = app_ram_base;
-    let ret = sd::sd_ble_enable(&mut wanted_app_ram_base as _);
+    let ret = raw::sd_ble_enable(&mut wanted_app_ram_base as _);
     match Error::convert(ret) {
         Ok(()) => {}
         Err(Error::NoMem) => {
@@ -249,30 +249,30 @@ pub unsafe fn enable(config: &Config) {
 
 fn cfg_id_str(id: u32) -> defmt::Str {
     match id {
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_GAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GAP"),
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTC"),
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTS"),
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_GATT => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATT"),
-        sd::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP"),
-        sd::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID => {
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GAP"),
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTC"),
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTS"),
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATT => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATT"),
+        raw::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP"),
+        raw::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID => {
             defmt::intern!("BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID")
         }
-        sd::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT => {
+        raw::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT => {
             defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT")
         }
-        sd::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME => {
+        raw::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME => {
             defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME")
         }
-        sd::BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG => {
+        raw::BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG => {
             defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG")
         }
-        sd::BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG => {
+        raw::BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG => {
             defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG")
         }
-        sd::BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED => {
+        raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED => {
             defmt::intern!("BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED")
         }
-        sd::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE => {
+        raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE => {
             defmt::intern!("BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE")
         }
         _ => defmt::intern!("(unknown)"),

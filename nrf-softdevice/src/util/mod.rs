@@ -13,7 +13,7 @@ pub use drop_bomb::*;
 
 pub(crate) use defmt::{debug, error, info, intern, trace, warn};
 
-use crate::sd;
+use crate::raw;
 
 pub trait Dewrap<T> {
     /// dewrap = defmt unwrap
@@ -21,6 +21,8 @@ pub trait Dewrap<T> {
 
     /// dexpect = defmt expect
     fn dexpect<M: defmt::Format>(self, msg: M) -> T;
+
+    fn dewarn<M: defmt::Format>(self, msg: M) -> Self;
 }
 
 impl<T> Dewrap<T> for Option<T> {
@@ -36,6 +38,13 @@ impl<T> Dewrap<T> for Option<T> {
             Some(t) => t,
             None => depanic!("unexpected None: {:?}", msg),
         }
+    }
+
+    fn dewarn<M: defmt::Format>(self, msg: M) -> Self {
+        if self.is_none() {
+            warn!("{:?} is none", msg);
+        }
+        self
     }
 }
 
@@ -53,6 +62,13 @@ impl<T, E: defmt::Format> Dewrap<T> for Result<T, E> {
             Err(e) => depanic!("unexpected error: {:?}: {:?}", msg, e),
         }
     }
+
+    fn dewarn<M: defmt::Format>(self, msg: M) -> Self {
+        if let Err(e) = &self {
+            warn!("{:?} err: {:?}", msg, e);
+        }
+        self
+    }
 }
 
 /// Create a slice from a variable-length array in a BLE event.
@@ -61,8 +77,8 @@ impl<T, E: defmt::Format> Dewrap<T> for Result<T, E> {
 /// see https://github.com/rust-lang/rust-bindgen/issues/1892
 /// see https://github.com/rust-lang/unsafe-code-guidelines/issues/134
 pub(crate) unsafe fn get_flexarray<T>(
-    orig_ptr: *const sd::ble_evt_t,
-    array: &sd::__IncompleteArrayField<T>,
+    orig_ptr: *const raw::ble_evt_t,
+    array: &raw::__IncompleteArrayField<T>,
     count: usize,
 ) -> &[T] {
     let offs = array.as_ptr() as usize - orig_ptr as usize;
@@ -76,7 +92,7 @@ pub(crate) unsafe fn get_flexarray<T>(
 /// see https://github.com/rust-lang/rust-bindgen/issues/1892
 /// see https://github.com/rust-lang/unsafe-code-guidelines/issues/134
 pub(crate) unsafe fn get_flexarray2<T>(
-    orig_ptr: *const sd::ble_evt_t,
+    orig_ptr: *const raw::ble_evt_t,
     array: &[T; 0],
     count: usize,
 ) -> &[T] {
@@ -91,8 +107,8 @@ pub(crate) unsafe fn get_flexarray2<T>(
 /// see https://github.com/rust-lang/rust-bindgen/issues/1892
 /// see https://github.com/rust-lang/unsafe-code-guidelines/issues/134
 pub(crate) unsafe fn get_union_field<T>(
-    orig_ptr: *const sd::ble_evt_t,
-    member: &sd::__BindgenUnionField<T>,
+    orig_ptr: *const raw::ble_evt_t,
+    member: &raw::__BindgenUnionField<T>,
 ) -> &T {
     let offs = member as *const _ as usize - orig_ptr as usize;
     let sanitized_ptr = (orig_ptr as *const u8).add(offs) as *const T;

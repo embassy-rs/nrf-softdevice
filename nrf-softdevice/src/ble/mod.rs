@@ -1,30 +1,32 @@
-use crate::sd;
+use crate::raw;
 use crate::util::*;
 
 mod connection;
 pub use connection::*;
+mod types;
+pub use types::*;
+
 pub mod gap;
 pub mod gatt_client;
 pub mod gatt_server;
 pub mod l2cap;
-pub mod uuid;
 
-fn on_user_mem_request(_ble_evt: *const sd::ble_evt_t, _common_evt: &sd::ble_common_evt_t) {}
-fn on_user_mem_release(_ble_evt: *const sd::ble_evt_t, _common_evt: &sd::ble_common_evt_t) {}
+fn on_user_mem_request(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {}
+fn on_user_mem_release(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {}
 
 macro_rules! match_event {
     ($evt_ptr:ident, $($id:ident => $func:path[$field:ident]),* $(,)? ) => {
         let evt = &*$evt_ptr;
         defmt::trace!("ble evt {:istr}", evt_str(evt.header.evt_id as u32));
         match evt.header.evt_id as u32 {
-            $(sd::$id => $func($evt_ptr, get_union_field($evt_ptr, &evt.evt.$field)) ),* ,
+            $(raw::$id => $func($evt_ptr, get_union_field($evt_ptr, &evt.evt.$field)) ),* ,
             x => depanic!("Unknown ble evt {:u32}", x),
         }
     };
 }
 
 #[rustfmt::skip]
-pub(crate) unsafe fn on_evt(evt_ptr: *const sd::ble_evt_t) {
+pub(crate) unsafe fn on_evt(evt_ptr: *const raw::ble_evt_t) {
     match_event!(evt_ptr, 
         BLE_COMMON_EVTS_BLE_EVT_USER_MEM_REQUEST => on_user_mem_request[common_evt],
         BLE_COMMON_EVTS_BLE_EVT_USER_MEM_RELEASE => on_user_mem_release[common_evt],
@@ -86,60 +88,60 @@ pub(crate) unsafe fn on_evt(evt_ptr: *const sd::ble_evt_t) {
 #[rustfmt::skip]
 fn evt_str(evt: u32) -> defmt::Str {
     match evt {
-        sd::BLE_COMMON_EVTS_BLE_EVT_USER_MEM_REQUEST => defmt::intern!("USER_MEM_REQUEST"),
-        sd::BLE_COMMON_EVTS_BLE_EVT_USER_MEM_RELEASE => defmt::intern!("USER_MEM_RELEASE"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_CONNECTED => defmt::intern!("GAP CONNECTED"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => defmt::intern!("GAP DISCONNECTED"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE => defmt::intern!("GAP CONN_PARAM_UPDATE"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_PARAMS_REQUEST => defmt::intern!("GAP SEC_PARAMS_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_INFO_REQUEST => defmt::intern!("GAP SEC_INFO_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_PASSKEY_DISPLAY => defmt::intern!("GAP PASSKEY_DISPLAY"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_KEY_PRESSED => defmt::intern!("GAP KEY_PRESSED"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_KEY_REQUEST => defmt::intern!("GAP AUTH_KEY_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_LESC_DHKEY_REQUEST => defmt::intern!("GAP LESC_DHKEY_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_STATUS => defmt::intern!("GAP AUTH_STATUS"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_SEC_UPDATE => defmt::intern!("GAP CONN_SEC_UPDATE"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => defmt::intern!("GAP TIMEOUT"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_RSSI_CHANGED => defmt::intern!("GAP RSSI_CHANGED"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_REPORT => defmt::intern!("GAP ADV_REPORT"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_REQUEST => defmt::intern!("GAP SEC_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST => defmt::intern!("GAP CONN_PARAM_UPDATE_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_SCAN_REQ_REPORT => defmt::intern!("GAP SCAN_REQ_REPORT"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_PHY_UPDATE_REQUEST => defmt::intern!("GAP PHY_UPDATE_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_PHY_UPDATE => defmt::intern!("GAP PHY_UPDATE"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST => defmt::intern!("GAP DATA_LENGTH_UPDATE_REQUEST"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE => defmt::intern!("GAP DATA_LENGTH_UPDATE"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_QOS_CHANNEL_SURVEY_REPORT => defmt::intern!("GAP QOS_CHANNEL_SURVEY_REPORT"),
-        sd::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_SET_TERMINATED => defmt::intern!("GAP ADV_SET_TERMINATED"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => defmt::intern!("L2CAP CH_SETUP_REQUEST"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REFUSED => defmt::intern!("L2CAP CH_SETUP_REFUSED"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => defmt::intern!("L2CAP CH_SETUP"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => defmt::intern!("L2CAP CH_RELEASED"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SDU_BUF_RELEASED => defmt::intern!("L2CAP CH_SDU_BUF_RELEASED"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_CREDIT => defmt::intern!("L2CAP CH_CREDIT"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => defmt::intern!("L2CAP CH_RX"),
-        sd::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => defmt::intern!("L2CAP CH_TX"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => defmt::intern!("GATTC PRIM_SRVC_DISC_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_REL_DISC_RSP => defmt::intern!("GATTC REL_DISC_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_DISC_RSP => defmt::intern!("GATTC CHAR_DISC_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_DESC_DISC_RSP => defmt::intern!("GATTC DESC_DISC_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_ATTR_INFO_DISC_RSP => defmt::intern!("GATTC ATTR_INFO_DISC_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP => defmt::intern!("GATTC CHAR_VAL_BY_UUID_READ_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_READ_RSP => defmt::intern!("GATTC READ_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_VALS_READ_RSP => defmt::intern!("GATTC CHAR_VALS_READ_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_RSP => defmt::intern!("GATTC WRITE_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_HVX => defmt::intern!("GATTC HVX"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => defmt::intern!("GATTC EXCHANGE_MTU_RSP"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => defmt::intern!("GATTC TIMEOUT"),
-        sd::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => defmt::intern!("GATTC WRITE_CMD_TX_COMPLETE"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => defmt::intern!("GATTS WRITE"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST => defmt::intern!("GATTS RW_AUTHORIZE_REQUEST"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => defmt::intern!("GATTS SYS_ATTR_MISSING"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVC => defmt::intern!("GATTS HVC"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_SC_CONFIRM => defmt::intern!("GATTS SC_CONFIRM"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST => defmt::intern!("GATTS EXCHANGE_MTU_REQUEST"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_TIMEOUT => defmt::intern!("GATTS TIMEOUT"),
-        sd::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => defmt::intern!("GATTS HVN_TX_COMPLETE"),
+        raw::BLE_COMMON_EVTS_BLE_EVT_USER_MEM_REQUEST => defmt::intern!("USER_MEM_REQUEST"),
+        raw::BLE_COMMON_EVTS_BLE_EVT_USER_MEM_RELEASE => defmt::intern!("USER_MEM_RELEASE"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONNECTED => defmt::intern!("GAP CONNECTED"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => defmt::intern!("GAP DISCONNECTED"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE => defmt::intern!("GAP CONN_PARAM_UPDATE"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_PARAMS_REQUEST => defmt::intern!("GAP SEC_PARAMS_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_INFO_REQUEST => defmt::intern!("GAP SEC_INFO_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_PASSKEY_DISPLAY => defmt::intern!("GAP PASSKEY_DISPLAY"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_KEY_PRESSED => defmt::intern!("GAP KEY_PRESSED"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_KEY_REQUEST => defmt::intern!("GAP AUTH_KEY_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_LESC_DHKEY_REQUEST => defmt::intern!("GAP LESC_DHKEY_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_STATUS => defmt::intern!("GAP AUTH_STATUS"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_SEC_UPDATE => defmt::intern!("GAP CONN_SEC_UPDATE"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => defmt::intern!("GAP TIMEOUT"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_RSSI_CHANGED => defmt::intern!("GAP RSSI_CHANGED"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_REPORT => defmt::intern!("GAP ADV_REPORT"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_REQUEST => defmt::intern!("GAP SEC_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST => defmt::intern!("GAP CONN_PARAM_UPDATE_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SCAN_REQ_REPORT => defmt::intern!("GAP SCAN_REQ_REPORT"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_PHY_UPDATE_REQUEST => defmt::intern!("GAP PHY_UPDATE_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_PHY_UPDATE => defmt::intern!("GAP PHY_UPDATE"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST => defmt::intern!("GAP DATA_LENGTH_UPDATE_REQUEST"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE => defmt::intern!("GAP DATA_LENGTH_UPDATE"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_QOS_CHANNEL_SURVEY_REPORT => defmt::intern!("GAP QOS_CHANNEL_SURVEY_REPORT"),
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_SET_TERMINATED => defmt::intern!("GAP ADV_SET_TERMINATED"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => defmt::intern!("L2CAP CH_SETUP_REQUEST"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REFUSED => defmt::intern!("L2CAP CH_SETUP_REFUSED"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => defmt::intern!("L2CAP CH_SETUP"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => defmt::intern!("L2CAP CH_RELEASED"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SDU_BUF_RELEASED => defmt::intern!("L2CAP CH_SDU_BUF_RELEASED"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_CREDIT => defmt::intern!("L2CAP CH_CREDIT"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => defmt::intern!("L2CAP CH_RX"),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => defmt::intern!("L2CAP CH_TX"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => defmt::intern!("GATTC PRIM_SRVC_DISC_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_REL_DISC_RSP => defmt::intern!("GATTC REL_DISC_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_DISC_RSP => defmt::intern!("GATTC CHAR_DISC_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_DESC_DISC_RSP => defmt::intern!("GATTC DESC_DISC_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_ATTR_INFO_DISC_RSP => defmt::intern!("GATTC ATTR_INFO_DISC_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP => defmt::intern!("GATTC CHAR_VAL_BY_UUID_READ_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_READ_RSP => defmt::intern!("GATTC READ_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_VALS_READ_RSP => defmt::intern!("GATTC CHAR_VALS_READ_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_RSP => defmt::intern!("GATTC WRITE_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_HVX => defmt::intern!("GATTC HVX"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => defmt::intern!("GATTC EXCHANGE_MTU_RSP"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => defmt::intern!("GATTC TIMEOUT"),
+        raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => defmt::intern!("GATTC WRITE_CMD_TX_COMPLETE"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => defmt::intern!("GATTS WRITE"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST => defmt::intern!("GATTS RW_AUTHORIZE_REQUEST"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => defmt::intern!("GATTS SYS_ATTR_MISSING"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVC => defmt::intern!("GATTS HVC"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_SC_CONFIRM => defmt::intern!("GATTS SC_CONFIRM"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST => defmt::intern!("GATTS EXCHANGE_MTU_REQUEST"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_TIMEOUT => defmt::intern!("GATTS TIMEOUT"),
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => defmt::intern!("GATTS HVN_TX_COMPLETE"),
         x => depanic!("Unknown ble evt {:u32}", x),
     }
 }

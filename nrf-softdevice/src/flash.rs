@@ -1,7 +1,7 @@
 use core::future::Future;
 
 use crate::error::Error;
-use crate::sd;
+use crate::raw;
 use crate::util::*;
 
 pub struct Flash {}
@@ -62,7 +62,7 @@ impl async_flash::Flash for Flash {
             let words_len = data_len / 4;
 
             let bomb = DropBomb::new();
-            let ret = unsafe { sd::sd_flash_write(address as _, words_ptr, words_len) };
+            let ret = unsafe { raw::sd_flash_write(address as _, words_ptr, words_len) };
             let ret = match Error::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {
@@ -85,7 +85,7 @@ impl async_flash::Flash for Flash {
             let page_number = address / Flash::PAGE_SIZE;
 
             let bomb = DropBomb::new();
-            let ret = unsafe { sd::sd_flash_page_erase(page_number as u32) };
+            let ret = unsafe { raw::sd_flash_page_erase(page_number as u32) };
             let ret = match Error::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {

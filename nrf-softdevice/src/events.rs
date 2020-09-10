@@ -4,7 +4,7 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::error::Error;
 use crate::util::*;
-use crate::{interrupt, sd};
+use crate::{interrupt, raw};
 
 static SWI2_SIGNAL: Signal<()> = Signal::new();
 
@@ -12,18 +12,18 @@ static SWI2_SIGNAL: Signal<()> = Signal::new();
 #[repr(u32)]
 #[derive(defmt::Format, IntoPrimitive, TryFromPrimitive)]
 enum SocEvent {
-    Hfclkstarted = sd::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,
-    PowerFailureWarning = sd::NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING,
-    FlashOperationSuccess = sd::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS,
-    FlashOperationError = sd::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR,
-    RadioBlocked = sd::NRF_SOC_EVTS_NRF_EVT_RADIO_BLOCKED,
-    RadioCanceled = sd::NRF_SOC_EVTS_NRF_EVT_RADIO_CANCELED,
-    RadioSignalCallbackInvalidReturn = sd::NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN,
-    RadioSessionIdle = sd::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_IDLE,
-    RadioSessionClosed = sd::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_CLOSED,
-    PowerUsbPowerReady = sd::NRF_SOC_EVTS_NRF_EVT_POWER_USB_POWER_READY,
-    PowerUsbDetected = sd::NRF_SOC_EVTS_NRF_EVT_POWER_USB_DETECTED,
-    PowerUsbRemoved = sd::NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED,
+    Hfclkstarted = raw::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,
+    PowerFailureWarning = raw::NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING,
+    FlashOperationSuccess = raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS,
+    FlashOperationError = raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR,
+    RadioBlocked = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_BLOCKED,
+    RadioCanceled = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_CANCELED,
+    RadioSignalCallbackInvalidReturn = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN,
+    RadioSessionIdle = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_IDLE,
+    RadioSessionClosed = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_CLOSED,
+    PowerUsbPowerReady = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_POWER_READY,
+    PowerUsbDetected = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_DETECTED,
+    PowerUsbRemoved = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED,
 }
 
 fn on_soc_evt(evt: u32) {
@@ -50,7 +50,7 @@ pub async fn run() {
         unsafe {
             let mut evt: u32 = 0;
             loop {
-                match Error::convert(sd::sd_evt_get(&mut evt as _)) {
+                match Error::convert(raw::sd_evt_get(&mut evt as _)) {
                     Ok(()) => on_soc_evt(evt),
                     Err(Error::NotFound) => break,
                     Err(err) => depanic!("sd_evt_get err {:?}", err),
@@ -62,9 +62,9 @@ pub async fn run() {
 
             loop {
                 let mut len: u16 = BLE_EVT_MAX_SIZE;
-                let ret = sd::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
+                let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
                 match Error::convert(ret) {
-                    Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const sd::ble_evt_t),
+                    Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
                     Err(Error::NotFound) => break,
                     Err(Error::BleNotEnabled) => break,
                     Err(Error::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),

@@ -2,59 +2,66 @@ use heapless::consts::*;
 use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
+use crate::ble::types::*;
 use crate::error::Error;
-use crate::sd;
+use crate::raw;
 use crate::util::*;
-use crate::uuid::Uuid;
 use crate::DisconnectedError;
-use crate::{Connection, ConnectionState, Role};
+use crate::{Connection, ConnectionState};
 
 pub(crate) unsafe fn on_rel_disc_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
 pub(crate) unsafe fn on_attr_info_disc_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
 pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
-pub(crate) unsafe fn on_read_rsp(_ble_evt: *const sd::ble_evt_t, _gattc_evt: &sd::ble_gattc_evt_t) {
+pub(crate) unsafe fn on_read_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
 }
 
 pub(crate) unsafe fn on_char_vals_read_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
 pub(crate) unsafe fn on_write_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
-pub(crate) unsafe fn on_hvx(_ble_evt: *const sd::ble_evt_t, _gattc_evt: &sd::ble_gattc_evt_t) {}
+pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gattc_evt_t) {}
 
 pub(crate) unsafe fn on_exchange_mtu_rsp(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
-pub(crate) unsafe fn on_timeout(_ble_evt: *const sd::ble_evt_t, _gattc_evt: &sd::ble_gattc_evt_t) {}
+pub(crate) unsafe fn on_timeout(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
 
 pub(crate) unsafe fn on_write_cmd_tx_complete(
-    _ble_evt: *const sd::ble_evt_t,
-    _gattc_evt: &sd::ble_gattc_evt_t,
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
 ) {
 }
 
@@ -65,33 +72,33 @@ pub enum GattError {
     // This is not really an error, but IMO it's better to add it
     // anyway, just in case someone mistakenly converts BLE_GATT_STATUS_SUCCESS into GattError.
     // if they see "Success" they'll easily realize their mistake, if they see "Unknown" it'd be confusing.
-    Success = sd::BLE_GATT_STATUS_SUCCESS,
+    Success = raw::BLE_GATT_STATUS_SUCCESS,
 
     #[num_enum(default)]
-    Unknown = sd::BLE_GATT_STATUS_UNKNOWN,
+    Unknown = raw::BLE_GATT_STATUS_UNKNOWN,
 
-    AtterrInvalid = sd::BLE_GATT_STATUS_ATTERR_INVALID,
-    AtterrInvalidHandle = sd::BLE_GATT_STATUS_ATTERR_INVALID_HANDLE,
-    AtterrReadNotPermitted = sd::BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED,
-    AtterrWriteNotPermitted = sd::BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED,
-    AtterrInvalidPdu = sd::BLE_GATT_STATUS_ATTERR_INVALID_PDU,
-    AtterrInsufAuthentication = sd::BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION,
-    AtterrRequestNotSupported = sd::BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED,
-    AtterrInvalidOffset = sd::BLE_GATT_STATUS_ATTERR_INVALID_OFFSET,
-    AtterrInsufAuthorization = sd::BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION,
-    AtterrPrepareQueueFull = sd::BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL,
-    AtterrAttributeNotFound = sd::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND,
-    AtterrAttributeNotLong = sd::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG,
-    AtterrInsufEncKeySize = sd::BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE,
-    AtterrInvalidAttValLength = sd::BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH,
-    AtterrUnlikelyError = sd::BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR,
-    AtterrInsufEncryption = sd::BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION,
-    AtterrUnsupportedGroupType = sd::BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE,
-    AtterrInsufResources = sd::BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES,
-    AtterrCpsWriteReqRejected = sd::BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED,
-    AtterrCpsCccdConfigError = sd::BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR,
-    AtterrCpsProcAlrInProg = sd::BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG,
-    AtterrCpsOutOfRange = sd::BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE,
+    AtterrInvalid = raw::BLE_GATT_STATUS_ATTERR_INVALID,
+    AtterrInvalidHandle = raw::BLE_GATT_STATUS_ATTERR_INVALID_HANDLE,
+    AtterrReadNotPermitted = raw::BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED,
+    AtterrWriteNotPermitted = raw::BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED,
+    AtterrInvalidPdu = raw::BLE_GATT_STATUS_ATTERR_INVALID_PDU,
+    AtterrInsufAuthentication = raw::BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION,
+    AtterrRequestNotSupported = raw::BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED,
+    AtterrInvalidOffset = raw::BLE_GATT_STATUS_ATTERR_INVALID_OFFSET,
+    AtterrInsufAuthorization = raw::BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION,
+    AtterrPrepareQueueFull = raw::BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL,
+    AtterrAttributeNotFound = raw::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND,
+    AtterrAttributeNotLong = raw::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG,
+    AtterrInsufEncKeySize = raw::BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE,
+    AtterrInvalidAttValLength = raw::BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH,
+    AtterrUnlikelyError = raw::BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR,
+    AtterrInsufEncryption = raw::BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION,
+    AtterrUnsupportedGroupType = raw::BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE,
+    AtterrInsufResources = raw::BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES,
+    AtterrCpsWriteReqRejected = raw::BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED,
+    AtterrCpsCccdConfigError = raw::BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR,
+    AtterrCpsProcAlrInProg = raw::BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG,
+    AtterrCpsOutOfRange = raw::BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE,
 }
 
 #[derive(defmt::Format)]
@@ -125,26 +132,20 @@ type DiscCharsMax = U6;
 type DiscDescsMax = U6;
 
 pub(crate) enum PortalMessage {
-    DiscoverService(Result<sd::ble_gattc_service_t, DiscoverError>),
-    DiscoverCharacteristics(Result<Vec<sd::ble_gattc_char_t, DiscCharsMax>, DiscoverError>),
-    DiscoverDescriptors(Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoverError>),
+    DiscoverService(Result<raw::ble_gattc_service_t, DiscoverError>),
+    DiscoverCharacteristics(Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError>),
+    DiscoverDescriptors(Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError>),
     Disconnected,
 }
 
 pub(crate) async fn discover_service(
     conn: &ConnectionState,
     uuid: Uuid,
-) -> Result<sd::ble_gattc_service_t, DiscoverError> {
+) -> Result<raw::ble_gattc_service_t, DiscoverError> {
     let conn_handle = conn.check_connected()?;
     let ret =
-        unsafe { sd::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
-    match Error::convert(ret) {
-        Ok(_) => {}
-        Err(err) => {
-            warn!("sd_ble_gattc_primary_services_discover err {:?}", err);
-            return Err(DiscoverError::Raw(err));
-        }
-    };
+        unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
+    Error::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
 
     match conn.gattc_portal.wait().await {
         PortalMessage::DiscoverService(r) => r,
@@ -153,11 +154,22 @@ pub(crate) async fn discover_service(
     }
 }
 
+fn check_gatt_status<T, E: From<GattError>>(
+    gattc_evt: &raw::ble_gattc_evt_t,
+    f: impl Fn() -> Result<T, E>,
+) -> Result<T, E> {
+    if gattc_evt.gatt_status as u32 == raw::BLE_GATT_STATUS_SUCCESS {
+        f()
+    } else {
+        Err(GattError::from(gattc_evt.gatt_status as u32).into())
+    }
+}
+
 pub(crate) unsafe fn on_prim_srvc_disc_rsp(
-    ble_evt: *const sd::ble_evt_t,
-    gattc_evt: &sd::ble_gattc_evt_t,
+    ble_evt: *const raw::ble_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = if gattc_evt.gatt_status as u32 == sd::BLE_GATT_STATUS_SUCCESS {
+    let val = check_gatt_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
         let v = get_flexarray(ble_evt, &params.services, params.count as usize);
 
@@ -172,11 +184,7 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
                 Ok(v[0])
             }
         }
-    } else {
-        Err(DiscoverError::Gatt(GattError::from(
-            gattc_evt.gatt_status as u32,
-        )))
-    };
+    });
 
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
@@ -185,28 +193,23 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
 
 // =============================
 
-pub(crate) async fn discover_chars(
+async fn discover_chars(
     conn: &ConnectionState,
     start_handle: u16,
     end_handle: u16,
-) -> Result<Vec<sd::ble_gattc_char_t, DiscCharsMax>, DiscoverError> {
+) -> Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError> {
     let conn_handle = conn.check_connected()?;
+
     let ret = unsafe {
-        sd::sd_ble_gattc_characteristics_discover(
+        raw::sd_ble_gattc_characteristics_discover(
             conn_handle,
-            &sd::ble_gattc_handle_range_t {
+            &raw::ble_gattc_handle_range_t {
                 start_handle,
                 end_handle,
             },
         )
     };
-    match Error::convert(ret) {
-        Ok(_) => {}
-        Err(err) => {
-            warn!("sd_ble_gattc_characteristics_discover err {:?}", err);
-            return Err(DiscoverError::Raw(err));
-        }
-    };
+    Error::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
 
     match conn.gattc_portal.wait().await {
         PortalMessage::DiscoverCharacteristics(r) => r,
@@ -216,21 +219,18 @@ pub(crate) async fn discover_chars(
 }
 
 pub(crate) unsafe fn on_char_disc_rsp(
-    ble_evt: *const sd::ble_evt_t,
-    gattc_evt: &sd::ble_gattc_evt_t,
+    ble_evt: *const raw::ble_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = if gattc_evt.gatt_status as u32 == sd::BLE_GATT_STATUS_SUCCESS {
+    let val = check_gatt_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
         let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
         let v = Vec::from_slice(v).unwrap_or_else(|_| {
             depanic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
         });
         Ok(v)
-    } else {
-        Err(DiscoverError::Gatt(GattError::from(
-            gattc_evt.gatt_status as u32,
-        )))
-    };
+    });
+
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .signal(PortalMessage::DiscoverCharacteristics(val))
@@ -238,28 +238,23 @@ pub(crate) unsafe fn on_char_disc_rsp(
 
 // =============================
 
-pub(crate) async fn discover_descs(
+async fn discover_descs(
     conn: &ConnectionState,
     start_handle: u16,
     end_handle: u16,
-) -> Result<Vec<sd::ble_gattc_desc_t, DiscDescsMax>, DiscoverError> {
+) -> Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError> {
     let conn_handle = conn.check_connected()?;
+
     let ret = unsafe {
-        sd::sd_ble_gattc_descriptors_discover(
+        raw::sd_ble_gattc_descriptors_discover(
             conn_handle,
-            &sd::ble_gattc_handle_range_t {
+            &raw::ble_gattc_handle_range_t {
                 start_handle,
                 end_handle,
             },
         )
     };
-    match Error::convert(ret) {
-        Ok(_) => {}
-        Err(err) => {
-            warn!("sd_ble_gattc_characteristics_discover err {:?}", err);
-            return Err(DiscoverError::Raw(err));
-        }
-    };
+    Error::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
 
     match conn.gattc_portal.wait().await {
         PortalMessage::DiscoverDescriptors(r) => r,
@@ -269,21 +264,17 @@ pub(crate) async fn discover_descs(
 }
 
 pub(crate) unsafe fn on_desc_disc_rsp(
-    ble_evt: *const sd::ble_evt_t,
-    gattc_evt: &sd::ble_gattc_evt_t,
+    ble_evt: *const raw::ble_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = if gattc_evt.gatt_status as u32 == sd::BLE_GATT_STATUS_SUCCESS {
+    let val = check_gatt_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
         let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
         let v = Vec::from_slice(v).unwrap_or_else(|_| {
             depanic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
         });
         Ok(v)
-    } else {
-        Err(DiscoverError::Gatt(GattError::from(
-            gattc_evt.gatt_status as u32,
-        )))
-    };
+    });
 
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
@@ -293,9 +284,9 @@ pub(crate) unsafe fn on_desc_disc_rsp(
 async fn discover_char<T: Client>(
     client: &mut T,
     conn: &ConnectionState,
-    svc: &sd::ble_gattc_service_t,
-    curr: sd::ble_gattc_char_t,
-    next: Option<sd::ble_gattc_char_t>,
+    svc: &raw::ble_gattc_service_t,
+    curr: raw::ble_gattc_char_t,
+    next: Option<raw::ble_gattc_char_t>,
 ) -> Result<(), DiscoverError> {
     // Calcuate range of possible descriptors
     let start_handle = curr.handle_value + 1;
@@ -331,7 +322,6 @@ async fn discover_char<T: Client>(
 }
 
 pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> {
-    // TODO this hangs forever if connection is disconnected during discovery.
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
     let state = conn.state();
@@ -348,7 +338,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     let mut curr_handle = svc.handle_range.start_handle;
     let end_handle = svc.handle_range.end_handle;
 
-    let mut prev_char: Option<sd::ble_gattc_char_t> = None;
+    let mut prev_char: Option<raw::ble_gattc_char_t> = None;
     while curr_handle < end_handle {
         let chars = match discover_chars(state, curr_handle, end_handle).await {
             Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => break,
@@ -376,7 +366,7 @@ pub struct Characteristic {
     pub uuid: Option<Uuid>,
     pub handle_decl: u16,
     pub handle_value: u16,
-    pub props: sd::ble_gatt_char_props_t,
+    pub props: raw::ble_gatt_char_props_t,
     pub has_ext_props: bool,
 }
 
