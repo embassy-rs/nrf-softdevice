@@ -53,6 +53,7 @@ pub enum Error {
     BleInvalidRole = raw::BLE_ERROR_INVALID_ROLE,
     BleBlockedByOtherLinks = raw::BLE_ERROR_BLOCKED_BY_OTHER_LINKS,
     BleGapUuidListMismatch = raw::BLE_ERROR_GAP_UUID_LIST_MISMATCH,
+    #[cfg(feature="ble-peripheral")]
     BleGapDiscoverableWithWhitelist = raw::BLE_ERROR_GAP_DISCOVERABLE_WITH_WHITELIST,
     BleGapInvalidBleAddr = raw::BLE_ERROR_GAP_INVALID_BLE_ADDR,
     BleGapWhitelistInUse = raw::BLE_ERROR_GAP_WHITELIST_IN_USE,

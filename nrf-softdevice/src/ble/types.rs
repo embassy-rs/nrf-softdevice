@@ -3,17 +3,29 @@ use crate::raw;
 
 #[derive(defmt::Format, Copy, Clone, Eq, PartialEq)]
 pub enum Role {
+    #[cfg(feature = "ble-central")]
     Central,
+    #[cfg(feature = "ble-peripheral")]
     Peripheral,
 }
 
 impl Role {
     pub fn from_raw(raw: u8) -> Self {
         match raw as u32 {
+            #[cfg(feature = "ble-central")]
             raw::BLE_GAP_ROLE_CENTRAL => Self::Central,
+            #[cfg(feature = "ble-peripheral")]
             raw::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
             _ => depanic!("unknown role {:u8}", raw),
         }
+    }
+
+    pub(crate) const fn whatever() -> Self {
+        #[cfg(not(feature = "ble-peripheral"))]
+        return Self::Central;
+
+        #[cfg(feature = "ble-peripheral")]
+        return Self::Peripheral;
     }
 }
 

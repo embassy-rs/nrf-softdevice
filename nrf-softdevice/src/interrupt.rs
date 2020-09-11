@@ -8,6 +8,21 @@ pub use crate::pac::Interrupt;
 pub use crate::pac::Interrupt::*; // needed for cortex-m-rt #[interrupt]
 pub use bare_metal::{CriticalSection, Mutex};
 
+#[cfg(feature = "nrf52810")]
+const RESERVED_IRQS: [u32; 2] = [
+    (1 << (Interrupt::POWER_CLOCK as u8))
+        | (1 << (Interrupt::RADIO as u8))
+        | (1 << (Interrupt::RTC0 as u8))
+        | (1 << (Interrupt::TIMER0 as u8))
+        | (1 << (Interrupt::RNG as u8))
+        | (1 << (Interrupt::ECB as u8))
+        | (1 << (Interrupt::CCM_AAR as u8))
+        | (1 << (Interrupt::TEMP as u8))
+        | (1 << (Interrupt::SWI5 as u8)),
+    0,
+];
+
+#[cfg(not(feature = "nrf52810"))]
 const RESERVED_IRQS: [u32; 2] = [
     (1 << (Interrupt::POWER_CLOCK as u8))
         | (1 << (Interrupt::RADIO as u8))
@@ -130,18 +145,8 @@ where
 
 #[inline]
 fn is_app_accessible_irq(irq: Interrupt) -> bool {
-    match irq {
-        Interrupt::POWER_CLOCK
-        | Interrupt::RADIO
-        | Interrupt::RTC0
-        | Interrupt::TIMER0
-        | Interrupt::RNG
-        | Interrupt::ECB
-        | Interrupt::CCM_AAR
-        | Interrupt::TEMP
-        | Interrupt::SWI5_EGU5 => false,
-        _ => true,
-    }
+    let nr = irq.number();
+    (RESERVED_IRQS[usize::from(nr / 32)] & 1 << (nr % 32)) == 0
 }
 
 #[inline]
@@ -253,6 +258,130 @@ pub fn set_priority(irq: Interrupt, prio: Priority) {
     }
 }
 
+#[cfg(feature = "nrf52810")]
+fn irq_str(irq: Interrupt) -> defmt::Str {
+    match irq {
+        POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
+        RADIO => defmt::intern!("RADIO"),
+        UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
+        TWIM0_TWIS0_TWI0 => defmt::intern!("TWIM0_TWIS0_TWI0"),
+        SPIM0_SPIS0_SPI0 => defmt::intern!("SPIM0_SPIS0_SPI0"),
+        GPIOTE => defmt::intern!("GPIOTE"),
+        SAADC => defmt::intern!("SAADC"),
+        TIMER0 => defmt::intern!("TIMER0"),
+        TIMER1 => defmt::intern!("TIMER1"),
+        TIMER2 => defmt::intern!("TIMER2"),
+        RTC0 => defmt::intern!("RTC0"),
+        TEMP => defmt::intern!("TEMP"),
+        RNG => defmt::intern!("RNG"),
+        ECB => defmt::intern!("ECB"),
+        CCM_AAR => defmt::intern!("CCM_AAR"),
+        WDT => defmt::intern!("WDT"),
+        RTC1 => defmt::intern!("RTC1"),
+        QDEC => defmt::intern!("QDEC"),
+        COMP => defmt::intern!("COMP"),
+        SWI0_EGU0 => defmt::intern!("SWI0_EGU0"),
+        SWI1_EGU1 => defmt::intern!("SWI1_EGU1"),
+        SWI2 => defmt::intern!("SWI2"),
+        SWI3 => defmt::intern!("SWI3"),
+        SWI4 => defmt::intern!("SWI4"),
+        SWI5 => defmt::intern!("SWI5"),
+        PWM0 => defmt::intern!("PWM0"),
+        PDM => defmt::intern!("PDM"),
+    }
+}
+
+#[cfg(feature = "nrf52832")]
+fn irq_str(irq: Interrupt) -> defmt::Str {
+    match irq {
+        POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
+        RADIO => defmt::intern!("RADIO"),
+        UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
+        SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0 => defmt::intern!("SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0"),
+        SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1 => defmt::intern!("SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1"),
+        NFCT => defmt::intern!("NFCT"),
+        GPIOTE => defmt::intern!("GPIOTE"),
+        SAADC => defmt::intern!("SAADC"),
+        TIMER0 => defmt::intern!("TIMER0"),
+        TIMER1 => defmt::intern!("TIMER1"),
+        TIMER2 => defmt::intern!("TIMER2"),
+        RTC0 => defmt::intern!("RTC0"),
+        TEMP => defmt::intern!("TEMP"),
+        RNG => defmt::intern!("RNG"),
+        ECB => defmt::intern!("ECB"),
+        CCM_AAR => defmt::intern!("CCM_AAR"),
+        WDT => defmt::intern!("WDT"),
+        RTC1 => defmt::intern!("RTC1"),
+        QDEC => defmt::intern!("QDEC"),
+        COMP_LPCOMP => defmt::intern!("COMP_LPCOMP"),
+        SWI0_EGU0 => defmt::intern!("SWI0_EGU0"),
+        SWI1_EGU1 => defmt::intern!("SWI1_EGU1"),
+        SWI2_EGU2 => defmt::intern!("SWI2_EGU2"),
+        SWI3_EGU3 => defmt::intern!("SWI3_EGU3"),
+        SWI4_EGU4 => defmt::intern!("SWI4_EGU4"),
+        SWI5_EGU5 => defmt::intern!("SWI5_EGU5"),
+        TIMER3 => defmt::intern!("TIMER3"),
+        TIMER4 => defmt::intern!("TIMER4"),
+        PWM0 => defmt::intern!("PWM0"),
+        PDM => defmt::intern!("PDM"),
+        MWU => defmt::intern!("MWU"),
+        PWM1 => defmt::intern!("PWM1"),
+        PWM2 => defmt::intern!("PWM2"),
+        SPIM2_SPIS2_SPI2 => defmt::intern!("SPIM2_SPIS2_SPI2"),
+        RTC2 => defmt::intern!("RTC2"),
+        I2S => defmt::intern!("I2S"),
+        FPU => defmt::intern!("FPU"),
+    }
+}
+
+#[cfg(feature = "nrf52833")]
+fn irq_str(irq: Interrupt) -> defmt::Str {
+    match irq {
+        POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
+        RADIO => defmt::intern!("RADIO"),
+        UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
+        SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0 => defmt::intern!("SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0"),
+        SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1 => defmt::intern!("SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1"),
+        NFCT => defmt::intern!("NFCT"),
+        GPIOTE => defmt::intern!("GPIOTE"),
+        SAADC => defmt::intern!("SAADC"),
+        TIMER0 => defmt::intern!("TIMER0"),
+        TIMER1 => defmt::intern!("TIMER1"),
+        TIMER2 => defmt::intern!("TIMER2"),
+        RTC0 => defmt::intern!("RTC0"),
+        TEMP => defmt::intern!("TEMP"),
+        RNG => defmt::intern!("RNG"),
+        ECB => defmt::intern!("ECB"),
+        CCM_AAR => defmt::intern!("CCM_AAR"),
+        WDT => defmt::intern!("WDT"),
+        RTC1 => defmt::intern!("RTC1"),
+        QDEC => defmt::intern!("QDEC"),
+        COMP_LPCOMP => defmt::intern!("COMP_LPCOMP"),
+        SWI0_EGU0 => defmt::intern!("SWI0_EGU0"),
+        SWI1_EGU1 => defmt::intern!("SWI1_EGU1"),
+        SWI2_EGU2 => defmt::intern!("SWI2_EGU2"),
+        SWI3_EGU3 => defmt::intern!("SWI3_EGU3"),
+        SWI4_EGU4 => defmt::intern!("SWI4_EGU4"),
+        SWI5_EGU5 => defmt::intern!("SWI5_EGU5"),
+        TIMER3 => defmt::intern!("TIMER3"),
+        TIMER4 => defmt::intern!("TIMER4"),
+        PWM0 => defmt::intern!("PWM0"),
+        PDM => defmt::intern!("PDM"),
+        MWU => defmt::intern!("MWU"),
+        PWM1 => defmt::intern!("PWM1"),
+        PWM2 => defmt::intern!("PWM2"),
+        SPIM2_SPIS2_SPI2 => defmt::intern!("SPIM2_SPIS2_SPI2"),
+        RTC2 => defmt::intern!("RTC2"),
+        I2S => defmt::intern!("I2S"),
+        FPU => defmt::intern!("FPU"),
+        USBD => defmt::intern!("USBD"),
+        UARTE1 => defmt::intern!("UARTE1"),
+        PWM3 => defmt::intern!("PWM3"),
+        SPIM3 => defmt::intern!("SPIM3"),
+    }
+}
+
+#[cfg(feature = "nrf52840")]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),

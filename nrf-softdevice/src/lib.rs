@@ -7,9 +7,24 @@
 
 pub(crate) mod util;
 
-// This is here so that the rest of the crate can easily use the right PAC and SD crates.
-// TODO change this dynamically based on features.
+#[cfg(feature = "nrf52810")]
+pub use nrf52810_pac as pac;
+#[cfg(feature = "nrf52832")]
+pub use nrf52832_pac as pac;
+#[cfg(feature = "nrf52833")]
+pub use nrf52833_pac as pac;
+#[cfg(feature = "nrf52840")]
 pub use nrf52840_pac as pac;
+
+#[cfg(feature = "s112")]
+pub use nrf_softdevice_s112 as raw;
+#[cfg(feature = "s113")]
+pub use nrf_softdevice_s113 as raw;
+#[cfg(feature = "s122")]
+pub use nrf_softdevice_s122 as raw;
+#[cfg(feature = "s132")]
+pub use nrf_softdevice_s132 as raw;
+#[cfg(feature = "s140")]
 pub use nrf_softdevice_s140 as raw;
 
 pub mod interrupt;
@@ -41,6 +56,7 @@ pub struct Config {
     pub conn_gattc: Option<raw::ble_gattc_conn_cfg_t>,
     pub conn_gatts: Option<raw::ble_gatts_conn_cfg_t>,
     pub conn_gatt: Option<raw::ble_gatt_conn_cfg_t>,
+    #[cfg(feature = "ble-l2cap")]
     pub conn_l2cap: Option<raw::ble_l2cap_conn_cfg_t>,
     pub common_vs_uuid: Option<raw::ble_common_cfg_vs_uuid_t>,
     pub gap_role_count: Option<raw::ble_gap_cfg_role_count_t>,
@@ -138,6 +154,7 @@ pub unsafe fn enable(config: &Config) {
         );
     }
 
+    #[cfg(feature = "ble-l2cap")]
     if let Some(val) = config.conn_l2cap {
         cfg_set(
             raw::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP,
@@ -244,6 +261,9 @@ pub unsafe fn enable(config: &Config) {
         warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:u32}", wanted_app_ram_base);
     }
 
+    #[cfg(feature = "nrf52810")]
+    interrupt::enable(interrupt::Interrupt::SWI2);
+    #[cfg(not(feature = "nrf52810"))]
     interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
 }
 
@@ -253,6 +273,7 @@ fn cfg_id_str(id: u32) -> defmt::Str {
         raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTC"),
         raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTS"),
         raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATT => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATT"),
+        #[cfg(feature = "ble-l2cap")]
         raw::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP"),
         raw::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID => {
             defmt::intern!("BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID")

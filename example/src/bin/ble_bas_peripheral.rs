@@ -10,7 +10,7 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{raw, Error, Uuid};
+use nrf_softdevice::{gap_peripheral, raw, Error, Uuid};
 
 #[static_executor::task]
 async fn softdevice_task() {
@@ -91,8 +91,8 @@ async fn bluetooth_task() {
     ];
 
     loop {
-        let conn = nrf_softdevice::gap::advertise(
-            nrf_softdevice::gap::ConnectableAdvertisement::ScannableUndirected {
+        let conn = gap_peripheral::advertise(
+            gap_peripheral::ConnectableAdvertisement::ScannableUndirected {
                 adv_data,
                 scan_data,
             },

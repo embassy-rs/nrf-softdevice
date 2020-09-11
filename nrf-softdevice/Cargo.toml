@@ -12,13 +12,37 @@ defmt-info = []
 defmt-warn = []
 defmt-error = []
 
+nrf52810 = ["nrf52810-pac"]
+nrf52832 = ["nrf52832-pac"]
+nrf52833 = ["nrf52833-pac"]
+nrf52840 = ["nrf52840-pac"]
+
+s112 = ["nrf-softdevice-s112"]
+s113 = ["nrf-softdevice-s113"]
+s122 = ["nrf-softdevice-s122"]
+s132 = ["nrf-softdevice-s132"]
+s140 = ["nrf-softdevice-s140"]
+
+ble-peripheral = []
+ble-central = []
+ble-l2cap = []
+
 [dependencies]
 num_enum = { version = "0.5.1", default-features = false }
 async-flash = { version = "0.1.0", path = "../async-flash" }
-nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140" }
 cortex-m = "0.6.2"
 cortex-m-rt = "0.6.12"
 bare-metal = { version = "0.2.0", features = ["const-fn"] }
-nrf52840-pac  = { version = "0.9.0", features = ["rt"] }
 heapless = "0.5.5"
 defmt = "0.1.0"
+
+nrf52810-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+nrf52832-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+nrf52833-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+nrf52840-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+
+nrf-softdevice-s112 = { version = "0.1.1", path = "../nrf-softdevice-s112", optional = true }
+nrf-softdevice-s113 = { version = "0.1.1", path = "../nrf-softdevice-s113", optional = true }
+nrf-softdevice-s122 = { version = "0.1.1", path = "../nrf-softdevice-s122", optional = true }
+nrf-softdevice-s132 = { version = "0.1.1", path = "../nrf-softdevice-s132", optional = true }
+nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", optional = true }

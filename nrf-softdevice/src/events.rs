@@ -21,8 +21,11 @@ enum SocEvent {
     RadioSignalCallbackInvalidReturn = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN,
     RadioSessionIdle = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_IDLE,
     RadioSessionClosed = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_CLOSED,
+    #[cfg(any(feature="s113", feature="s122", feature="s140"))]
     PowerUsbPowerReady = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_POWER_READY,
+    #[cfg(any(feature="s113", feature="s122", feature="s140"))]
     PowerUsbDetected = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_DETECTED,
+    #[cfg(any(feature="s113", feature="s122", feature="s140"))]
     PowerUsbRemoved = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED,
 }
 
@@ -74,7 +77,13 @@ pub async fn run() {
         }
     }
 }
+#[cfg(feature = "nrf52810")]
+#[interrupt]
+unsafe fn SWI2() {
+    SWI2_SIGNAL.signal(());
+}
 
+#[cfg(not(feature = "nrf52810"))]
 #[interrupt]
 unsafe fn SWI2_EGU2() {
     SWI2_SIGNAL.signal(());

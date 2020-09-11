@@ -10,7 +10,7 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{gap, gatt_client, raw, Address, Connection, Uuid};
+use nrf_softdevice::{gap_central, gatt_client, raw, Address, Connection, Uuid};
 
 #[static_executor::task]
 async fn softdevice_task() {
@@ -76,7 +76,9 @@ async fn ble_central_task() {
         0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
     ])];
 
-    let conn = gap::connect(addrs).await.dexpect(intern!("connect"));
+    let conn = gap_central::connect(addrs)
+        .await
+        .dexpect(intern!("connect"));
     info!("connected");
 
     let client: BatteryServiceClient = gatt_client::discover(&conn)

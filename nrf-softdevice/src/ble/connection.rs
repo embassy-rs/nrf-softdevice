@@ -46,7 +46,7 @@ impl ConnectionState {
             refcount: Cell::new(0),
             conn_handle: Cell::new(None),
             disconnecting: Cell::new(false),
-            role: Cell::new(Role::Central),
+            role: Cell::new(Role::whatever()),
             gattc_portal: Portal::new(),
         }
     }
