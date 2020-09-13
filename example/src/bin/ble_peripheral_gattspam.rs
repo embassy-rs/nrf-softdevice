@@ -10,15 +10,16 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{gap_peripheral, raw, Error, Uuid};
+use nrf_softdevice::ble::{peripheral, Uuid};
+use nrf_softdevice::{raw, Error, Softdevice};
 
 #[static_executor::task]
-async fn softdevice_task() {
-    nrf_softdevice::run().await;
+async fn softdevice_task(sd: &'static Softdevice) {
+    sd.run().await;
 }
 
 #[static_executor::task]
-async fn bluetooth_task() {
+async fn bluetooth_task(sd: &'static Softdevice) {
     for i in 0..24 {
         let service_uuid = Uuid::new_16(0x4200 + i);
 
@@ -95,8 +96,9 @@ async fn bluetooth_task() {
     ];
 
     loop {
-        let conn = gap_peripheral::advertise(
-            gap_peripheral::ConnectableAdvertisement::ScannableUndirected {
+        let conn = peripheral::advertise(
+            sd,
+            peripheral::ConnectableAdvertisement::ScannableUndirected {
                 adv_data,
                 scan_data,
             },
@@ -146,11 +148,11 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    unsafe { nrf_softdevice::enable(&config) }
+    let sd = Softdevice::enable(&config);
 
     unsafe {
-        softdevice_task.spawn().dewrap();
-        bluetooth_task.spawn().dewrap();
+        softdevice_task.spawn(sd).dewrap();
+        bluetooth_task.spawn(sd).dewrap();
 
         static_executor::run();
     }

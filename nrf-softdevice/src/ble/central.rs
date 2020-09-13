@@ -1,12 +1,10 @@
 use core::mem;
 use core::ptr;
 
-use crate::ble::types::*;
-use crate::error::Error;
+use crate::ble::{Address, Connection, ConnectionState};
 use crate::raw;
 use crate::util::*;
-use crate::{Connection, ConnectionState, Role};
-
+use crate::{Error, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(_ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
 }
@@ -35,9 +33,21 @@ impl From<Error> for ConnectError {
     }
 }
 
+#[derive(defmt::Format)]
+pub enum ConnectStopError {
+    NotRunning,
+    Raw(Error),
+}
+
+impl From<Error> for ConnectStopError {
+    fn from(err: Error) -> Self {
+        ConnectStopError::Raw(err)
+    }
+}
+
 pub(crate) static CONNECT_SIGNAL: Signal<Result<Connection, ConnectError>> = Signal::new();
 
-pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> {
+pub async fn connect(sd: &Softdevice, whitelist: &[Address]) -> Result<Connection, ConnectError> {
     let (addr, fp) = match whitelist.len() {
         0 => depanic!("zero-length whitelist"),
         1 => (
@@ -60,15 +70,15 @@ pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> 
     scan_params.timeout = 123;
 
     // s122 has these in us instead of 625us :shrug:
-    #[cfg(not(feature="s122"))]
+    #[cfg(not(feature = "s122"))]
     {
         scan_params.interval = scan_interval as u16;
-        scan_params.window = scan_interval as u16;
+        scan_params.window = scan_window as u16;
     }
-    #[cfg(feature="s122")]
+    #[cfg(feature = "s122")]
     {
         scan_params.interval_us = scan_interval * 625;
-        scan_params.window_us = scan_interval * 625;
+        scan_params.window_us = scan_window * 625;
     }
 
     // TODO make configurable
@@ -94,19 +104,7 @@ pub async fn connect(whitelist: &[Address]) -> Result<Connection, ConnectError> 
     CONNECT_SIGNAL.wait().await
 }
 
-#[derive(defmt::Format)]
-pub enum ConnectStopError {
-    NotRunning,
-    Raw(Error),
-}
-
-impl From<Error> for ConnectStopError {
-    fn from(err: Error) -> Self {
-        ConnectStopError::Raw(err)
-    }
-}
-
-pub fn connect_stop() -> Result<(), ConnectStopError> {
+pub fn connect_stop(sd: &Softdevice) -> Result<(), ConnectStopError> {
     let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
     match Error::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel")) {
         Ok(()) => Ok(()),

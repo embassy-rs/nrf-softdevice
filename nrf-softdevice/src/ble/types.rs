@@ -1,34 +1,6 @@
 use crate::error::Error;
 use crate::raw;
 
-#[derive(defmt::Format, Copy, Clone, Eq, PartialEq)]
-pub enum Role {
-    #[cfg(feature = "ble-central")]
-    Central,
-    #[cfg(feature = "ble-peripheral")]
-    Peripheral,
-}
-
-impl Role {
-    pub fn from_raw(raw: u8) -> Self {
-        match raw as u32 {
-            #[cfg(feature = "ble-central")]
-            raw::BLE_GAP_ROLE_CENTRAL => Self::Central,
-            #[cfg(feature = "ble-peripheral")]
-            raw::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
-            _ => depanic!("unknown role {:u8}", raw),
-        }
-    }
-
-    pub(crate) const fn whatever() -> Self {
-        #[cfg(not(feature = "ble-peripheral"))]
-        return Self::Central;
-
-        #[cfg(feature = "ble-peripheral")]
-        return Self::Peripheral;
-    }
-}
-
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct Uuid {
@@ -82,6 +54,34 @@ impl Eq for Uuid {}
 impl PartialEq for Uuid {
     fn eq(&self, other: &Uuid) -> bool {
         self.inner.type_ == other.inner.type_ && self.inner.uuid == other.inner.uuid
+    }
+}
+
+#[derive(defmt::Format, Copy, Clone, Eq, PartialEq)]
+pub enum Role {
+    #[cfg(feature = "ble-central")]
+    Central,
+    #[cfg(feature = "ble-peripheral")]
+    Peripheral,
+}
+
+impl Role {
+    pub fn from_raw(raw: u8) -> Self {
+        match raw as u32 {
+            #[cfg(feature = "ble-central")]
+            raw::BLE_GAP_ROLE_CENTRAL => Self::Central,
+            #[cfg(feature = "ble-peripheral")]
+            raw::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
+            _ => depanic!("unknown role {:u8}", raw),
+        }
+    }
+
+    pub(crate) const fn whatever() -> Self {
+        #[cfg(not(feature = "ble-peripheral"))]
+        return Self::Central;
+
+        #[cfg(feature = "ble-peripheral")]
+        return Self::Peripheral;
     }
 }
 

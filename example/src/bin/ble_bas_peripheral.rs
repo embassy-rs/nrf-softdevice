@@ -10,18 +10,19 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{gap_peripheral, raw, Error, Uuid};
+use nrf_softdevice::ble::{peripheral, Uuid};
+use nrf_softdevice::{raw, Error, Softdevice};
 
 #[static_executor::task]
-async fn softdevice_task() {
-    nrf_softdevice::run().await;
+async fn softdevice_task(sd: &'static Softdevice) {
+    sd.run().await;
 }
 
 const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
 const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
 
 #[static_executor::task]
-async fn bluetooth_task() {
+async fn bluetooth_task(sd: &'static Softdevice) {
     // There'll eventually be a safe API for creating GATT servers.
     // but for now this allows us to test ble_bas_central.
 
@@ -91,8 +92,9 @@ async fn bluetooth_task() {
     ];
 
     loop {
-        let conn = gap_peripheral::advertise(
-            gap_peripheral::ConnectableAdvertisement::ScannableUndirected {
+        let conn = peripheral::advertise(
+            sd,
+            peripheral::ConnectableAdvertisement::ScannableUndirected {
                 adv_data,
                 scan_data,
             },
@@ -142,11 +144,11 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    unsafe { nrf_softdevice::enable(&config) }
+    let sd = Softdevice::enable(&config);
 
     unsafe {
-        softdevice_task.spawn().dewrap();
-        bluetooth_task.spawn().dewrap();
+        softdevice_task.spawn(sd).dewrap();
+        bluetooth_task.spawn(sd).dewrap();
 
         static_executor::run();
     }

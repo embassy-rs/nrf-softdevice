@@ -1,11 +1,10 @@
 use core::mem;
 use core::ptr;
 
-use crate::ble::types::*;
-use crate::error::Error;
+use crate::ble::*;
 use crate::raw;
 use crate::util::*;
-use crate::{Connection, ConnectionState, Role};
+use crate::{Error, Softdevice};
 
 pub(crate) unsafe fn on_adv_set_terminated(
     _ble_evt: *const raw::ble_evt_t,
@@ -54,8 +53,6 @@ enum NonconnectableAdvertisement {
     ExtendedNonscannableDirected,
 }
 
-static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
-
 #[derive(defmt::Format)]
 pub enum AdvertiseError {
     Stopped,
@@ -68,7 +65,25 @@ impl From<Error> for AdvertiseError {
     }
 }
 
-pub async fn advertise(adv: ConnectableAdvertisement<'_>) -> Result<Connection, AdvertiseError> {
+#[derive(defmt::Format)]
+pub enum AdvertiseStopError {
+    NotRunning,
+    Raw(Error),
+}
+
+impl From<Error> for AdvertiseStopError {
+    fn from(err: Error) -> Self {
+        AdvertiseStopError::Raw(err)
+    }
+}
+
+static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
+pub(crate) static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
+
+pub async fn advertise(
+    sd: &Softdevice,
+    adv: ConnectableAdvertisement<'_>,
+) -> Result<Connection, AdvertiseError> {
     // TODO make these configurable, only the right params based on type?
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
     adv_params.properties.type_ = raw::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8;
@@ -131,21 +146,7 @@ pub async fn advertise(adv: ConnectableAdvertisement<'_>) -> Result<Connection, 
     ADV_SIGNAL.wait().await
 }
 
-pub(crate) static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
-
-#[derive(defmt::Format)]
-pub enum AdvertiseStopError {
-    NotRunning,
-    Raw(Error),
-}
-
-impl From<Error> for AdvertiseStopError {
-    fn from(err: Error) -> Self {
-        AdvertiseStopError::Raw(err)
-    }
-}
-
-pub fn advertise_stop() -> Result<(), AdvertiseStopError> {
+pub fn advertise_stop(sd: &Softdevice) -> Result<(), AdvertiseStopError> {
     let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
     match Error::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop")) {
         Ok(()) => Ok(()),

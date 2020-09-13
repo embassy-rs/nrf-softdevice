@@ -10,11 +10,13 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::{gap_central, gatt_client, raw, Address, Connection, Uuid};
+use nrf_softdevice::ble::{central, gatt_client, Address, Connection, Uuid};
+use nrf_softdevice::raw;
+use nrf_softdevice::Softdevice;
 
 #[static_executor::task]
-async fn softdevice_task() {
-    nrf_softdevice::run().await;
+async fn softdevice_task(sd: &'static Softdevice) {
+    sd.run().await;
 }
 
 struct BatteryServiceClient {
@@ -71,12 +73,12 @@ impl gatt_client::Client for BatteryServiceClient {
 }
 
 #[static_executor::task]
-async fn ble_central_task() {
+async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[Address::new_random_static([
         0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
     ])];
 
-    let conn = gap_central::connect(addrs)
+    let conn = central::connect(sd, addrs)
         .await
         .dexpect(intern!("connect"));
     info!("connected");
@@ -129,11 +131,11 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    unsafe { nrf_softdevice::enable(&config) }
+    let sd = Softdevice::enable(&config);
 
     unsafe {
-        softdevice_task.spawn().dewrap();
-        ble_central_task.spawn().dewrap();
+        softdevice_task.spawn(sd).dewrap();
+        ble_central_task.spawn(sd).dewrap();
 
         static_executor::run();
     }

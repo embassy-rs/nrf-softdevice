@@ -8,15 +8,17 @@ use example_common::*;
 
 use async_flash::Flash;
 use cortex_m_rt::entry;
+use nrf_softdevice::Softdevice;
 
 #[static_executor::task]
-async fn softdevice_task() {
-    nrf_softdevice::run().await;
+async fn softdevice_task(sd: &'static Softdevice) {
+    sd.run().await;
 }
 
 #[static_executor::task]
-async fn flash_task() {
-    let mut f = unsafe { nrf_softdevice::Flash::new() };
+async fn flash_task(sd: &'static Softdevice) {
+    let mut f = sd.take_flash();
+
     info!("starting erase");
     match f.erase(0x80000).await {
         Ok(()) => info!("erased!"),
@@ -34,11 +36,11 @@ async fn flash_task() {
 fn main() -> ! {
     info!("Hello World!");
 
-    unsafe {
-        nrf_softdevice::enable(&Default::default());
+    let sd = Softdevice::enable(&Default::default());
 
-        softdevice_task.spawn().dewrap();
-        flash_task.spawn().dewrap();
+    unsafe {
+        softdevice_task.spawn(sd).dewrap();
+        flash_task.spawn(sd).dewrap();
 
         static_executor::run();
     }

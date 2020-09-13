@@ -2,67 +2,33 @@ use heapless::consts::*;
 use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
-use crate::ble::types::*;
+use crate::ble::*;
 use crate::error::Error;
 use crate::raw;
 use crate::util::*;
-use crate::DisconnectedError;
-use crate::{Connection, ConnectionState};
 
-pub(crate) unsafe fn on_rel_disc_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
+pub struct Characteristic {
+    pub uuid: Option<Uuid>,
+    pub handle_decl: u16,
+    pub handle_value: u16,
+    pub props: raw::ble_gatt_char_props_t,
+    pub has_ext_props: bool,
 }
 
-pub(crate) unsafe fn on_attr_info_disc_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
+pub struct Descriptor {
+    pub uuid: Option<Uuid>,
+    pub handle: u16,
 }
 
-pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_char_vals_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_write_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gattc_evt_t) {}
-
-pub(crate) unsafe fn on_exchange_mtu_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_timeout(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_write_cmd_tx_complete(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
+pub trait Client {
+    fn uuid() -> Uuid;
+    fn new_undiscovered(conn: Connection) -> Self;
+    fn discovered_characteristic(
+        &mut self,
+        characteristic: &Characteristic,
+        descriptors: &[Descriptor],
+    );
+    fn discovery_complete(&mut self) -> Result<(), DiscoverError>;
 }
 
 #[rustfmt::skip]
@@ -139,29 +105,19 @@ pub(crate) enum PortalMessage {
 }
 
 pub(crate) async fn discover_service(
-    conn: &ConnectionState,
+    conn: &Connection,
     uuid: Uuid,
 ) -> Result<raw::ble_gattc_service_t, DiscoverError> {
-    let conn_handle = conn.check_connected()?;
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
     let ret =
         unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
     Error::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
 
-    match conn.gattc_portal.wait().await {
+    match state.gattc_portal.wait().await {
         PortalMessage::DiscoverService(r) => r,
         PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
         _ => unreachable!(),
-    }
-}
-
-fn check_gatt_status<T, E: From<GattError>>(
-    gattc_evt: &raw::ble_gattc_evt_t,
-    f: impl Fn() -> Result<T, E>,
-) -> Result<T, E> {
-    if gattc_evt.gatt_status as u32 == raw::BLE_GATT_STATUS_SUCCESS {
-        f()
-    } else {
-        Err(GattError::from(gattc_evt.gatt_status as u32).into())
     }
 }
 
@@ -169,7 +125,7 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_gatt_status(gattc_evt, || {
+    let val = check_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
         let v = get_flexarray(ble_evt, &params.services, params.count as usize);
 
@@ -193,12 +149,13 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
 
 // =============================
 
-async fn discover_chars(
-    conn: &ConnectionState,
+async fn discover_characteristics(
+    conn: &Connection,
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError> {
-    let conn_handle = conn.check_connected()?;
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
 
     let ret = unsafe {
         raw::sd_ble_gattc_characteristics_discover(
@@ -211,7 +168,7 @@ async fn discover_chars(
     };
     Error::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
 
-    match conn.gattc_portal.wait().await {
+    match state.gattc_portal.wait().await {
         PortalMessage::DiscoverCharacteristics(r) => r,
         PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
         _ => unreachable!(),
@@ -222,7 +179,7 @@ pub(crate) unsafe fn on_char_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_gatt_status(gattc_evt, || {
+    let val = check_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
         let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
         let v = Vec::from_slice(v).unwrap_or_else(|_| {
@@ -238,12 +195,13 @@ pub(crate) unsafe fn on_char_disc_rsp(
 
 // =============================
 
-async fn discover_descs(
-    conn: &ConnectionState,
+async fn discover_descriptors(
+    conn: &Connection,
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError> {
-    let conn_handle = conn.check_connected()?;
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
 
     let ret = unsafe {
         raw::sd_ble_gattc_descriptors_discover(
@@ -256,7 +214,7 @@ async fn discover_descs(
     };
     Error::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
 
-    match conn.gattc_portal.wait().await {
+    match state.gattc_portal.wait().await {
         PortalMessage::DiscoverDescriptors(r) => r,
         PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
         _ => unreachable!(),
@@ -267,7 +225,7 @@ pub(crate) unsafe fn on_desc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_gatt_status(gattc_evt, || {
+    let val = check_status(gattc_evt, || {
         let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
         let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
         let v = Vec::from_slice(v).unwrap_or_else(|_| {
@@ -281,13 +239,17 @@ pub(crate) unsafe fn on_desc_disc_rsp(
         .signal(PortalMessage::DiscoverDescriptors(val))
 }
 
-async fn discover_char<T: Client>(
+// =============================
+
+async fn discover_inner<T: Client>(
+    conn: &Connection,
     client: &mut T,
-    conn: &ConnectionState,
     svc: &raw::ble_gattc_service_t,
     curr: raw::ble_gattc_char_t,
     next: Option<raw::ble_gattc_char_t>,
 ) -> Result<(), DiscoverError> {
+    let state = conn.state();
+
     // Calcuate range of possible descriptors
     let start_handle = curr.handle_value + 1;
     let end_handle = next
@@ -306,7 +268,7 @@ async fn discover_char<T: Client>(
 
     // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
     if start_handle <= end_handle {
-        for desc in discover_descs(conn, start_handle, end_handle).await? {
+        for desc in discover_descriptors(conn, start_handle, end_handle).await? {
             descriptors
                 .push(Descriptor {
                     uuid: Uuid::from_raw(desc.uuid),
@@ -324,9 +286,7 @@ async fn discover_char<T: Client>(
 pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> {
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
-    let state = conn.state();
-
-    let svc = match discover_service(state, T::uuid()).await {
+    let svc = match discover_service(conn, T::uuid()).await {
         Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => {
             Err(DiscoverError::ServiceNotFound)
         }
@@ -340,21 +300,21 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
 
     let mut prev_char: Option<raw::ble_gattc_char_t> = None;
     while curr_handle < end_handle {
-        let chars = match discover_chars(state, curr_handle, end_handle).await {
+        let chars = match discover_characteristics(conn, curr_handle, end_handle).await {
             Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => break,
             x => x,
         }?;
         deassert!(chars.len() != 0);
         for curr in chars {
             if let Some(prev) = prev_char {
-                discover_char(&mut client, state, &svc, prev, Some(curr)).await?;
+                discover_inner(conn, &mut client, &svc, prev, Some(curr)).await?;
             }
             prev_char = Some(curr);
             curr_handle = curr.handle_value + 1;
         }
     }
     if let Some(prev) = prev_char {
-        discover_char(&mut client, state, &svc, prev, None).await?;
+        discover_inner(conn, &mut client, &svc, prev, None).await?;
     }
 
     client.discovery_complete()?;
@@ -362,26 +322,69 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     Ok(client)
 }
 
-pub struct Characteristic {
-    pub uuid: Option<Uuid>,
-    pub handle_decl: u16,
-    pub handle_value: u16,
-    pub props: raw::ble_gatt_char_props_t,
-    pub has_ext_props: bool,
+fn check_status<T, E: From<GattError>>(
+    gattc_evt: &raw::ble_gattc_evt_t,
+    f: impl Fn() -> Result<T, E>,
+) -> Result<T, E> {
+    if gattc_evt.gatt_status as u32 == raw::BLE_GATT_STATUS_SUCCESS {
+        f()
+    } else {
+        Err(GattError::from(gattc_evt.gatt_status as u32).into())
+    }
 }
 
-pub struct Descriptor {
-    pub uuid: Option<Uuid>,
-    pub handle: u16,
+pub(crate) unsafe fn on_rel_disc_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
 }
 
-pub trait Client {
-    fn uuid() -> Uuid;
-    fn new_undiscovered(conn: Connection) -> Self;
-    fn discovered_characteristic(
-        &mut self,
-        characteristic: &Characteristic,
-        descriptors: &[Descriptor],
-    );
-    fn discovery_complete(&mut self) -> Result<(), DiscoverError>;
+pub(crate) unsafe fn on_attr_info_disc_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_read_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_char_vals_read_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_write_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gattc_evt_t) {}
+
+pub(crate) unsafe fn on_exchange_mtu_rsp(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_timeout(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
+}
+
+pub(crate) unsafe fn on_write_cmd_tx_complete(
+    _ble_evt: *const raw::ble_evt_t,
+    _gattc_evt: &raw::ble_gattc_evt_t,
+) {
 }

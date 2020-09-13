@@ -8,14 +8,15 @@ use example_common::*;
 
 use cortex_m_rt::entry;
 use nrf_softdevice::interrupt;
+use nrf_softdevice::Softdevice;
 
 #[static_executor::task]
-async fn softdevice_task() {
-    nrf_softdevice::run().await;
+async fn softdevice_task(sd: &'static Softdevice) {
+    sd.run().await;
 }
 
 #[static_executor::task]
-async fn interrupt_task() {
+async fn interrupt_task(sd: &'static Softdevice) {
     let enabled = interrupt::is_enabled(interrupt::SWI0_EGU0);
     info!("enabled: {:?}", enabled);
 
@@ -81,11 +82,11 @@ fn SWI1_EGU1() {
 fn main() -> ! {
     info!("Hello World!");
 
-    unsafe {
-        nrf_softdevice::enable(&Default::default());
+    let sd = Softdevice::enable(&Default::default());
 
-        softdevice_task.spawn().dewrap();
-        interrupt_task.spawn().dewrap();
+    unsafe {
+        softdevice_task.spawn(sd).dewrap();
+        interrupt_task.spawn(sd).dewrap();
 
         static_executor::run();
     }

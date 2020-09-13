@@ -1,19 +1,26 @@
 use core::future::Future;
+use core::sync::atomic::{AtomicBool, Ordering};
 
-use crate::error::Error;
 use crate::raw;
 use crate::util::*;
+use crate::{Error, Softdevice};
 
-pub struct Flash {}
+pub struct Flash {
+    _private: (),
+}
 
 impl Flash {
     pub const PAGE_SIZE: usize = 4096;
+}
 
-    /// safety:
-    /// - call this method at most once
-    /// - do not call before enabling softdevice
-    pub unsafe fn new() -> Self {
-        Self {}
+static FLASH_TAKEN: AtomicBool = AtomicBool::new(false);
+impl Softdevice {
+    pub fn take_flash(&self) -> Flash {
+        if FLASH_TAKEN.compare_and_swap(false, true, Ordering::AcqRel) {
+            depanic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
+        }
+
+        Flash { _private: () }
     }
 }
 
@@ -78,11 +85,11 @@ impl async_flash::Flash for Flash {
 
     fn erase<'a>(&'a mut self, address: usize) -> Self::ErasePageFuture<'a> {
         async move {
-            if address % Flash::PAGE_SIZE != 0 {
+            if address % Self::PAGE_SIZE != 0 {
                 return Err(async_flash::Error::AddressMisaligned);
             }
 
-            let page_number = address / Flash::PAGE_SIZE;
+            let page_number = address / Self::PAGE_SIZE;
 
             let bomb = DropBomb::new();
             let ret = unsafe { raw::sd_flash_page_erase(page_number as u32) };

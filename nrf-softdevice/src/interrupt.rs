@@ -2,6 +2,7 @@ use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 use cortex_m::interrupt::InterruptNumber;
 
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
+use crate::util::*;
 
 // Re-exports
 pub use crate::pac::Interrupt;

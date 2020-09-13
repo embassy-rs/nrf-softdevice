@@ -2,7 +2,11 @@
 
 set -euxo pipefail
 
-# Test that build works with all supported combinations.
+# Check that examples build
+
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice-examples --bins
+
+# Check that build works with all supported combinations.
 
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52810,ble-peripheral
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52832,ble-peripheral
@@ -42,6 +46,7 @@ cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-peripheral
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-peripheral,ble-l2cap
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap
 
 # https://www.nordicsemi.com/Software-and-tools/Software/Bluetooth-Software
