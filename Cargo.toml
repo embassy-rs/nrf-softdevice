@@ -21,14 +21,9 @@ exclude = [
 ]
 
 [patch.crates-io]
-cortex-m = { git = "https://github.com/Dirbaio/cortex-m"}
 panic-probe = { git = "https://github.com/knurling-rs/probe-run", branch="main" }
 defmt-rtt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
 defmt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
-nrf52810-pac = { git = "https://github.com/Dirbaio/nrf52810-pac" }
-nrf52832-pac = { git = "https://github.com/Dirbaio/nrf52832-pac" }
-nrf52833-pac = { git = "https://github.com/Dirbaio/nrf52833-pac" }
-nrf52840-pac = { git = "https://github.com/Dirbaio/nrf52840-pac" }
 static-executor = { git = "https://github.com/Dirbaio/static-executor" }
 static-executor-cortex-m = { git = "https://github.com/Dirbaio/static-executor" }
 

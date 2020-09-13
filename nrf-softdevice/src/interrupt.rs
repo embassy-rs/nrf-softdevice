@@ -1,8 +1,7 @@
+use bare_metal::Nr;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
-use cortex_m::interrupt::InterruptNumber;
 
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
-use crate::util::*;
 
 // Re-exports
 pub use crate::pac::Interrupt;
@@ -146,7 +145,7 @@ where
 
 #[inline]
 fn is_app_accessible_irq(irq: Interrupt) -> bool {
-    let nr = irq.number();
+    let nr = irq.nr();
     (RESERVED_IRQS[usize::from(nr / 32)] & 1 << (nr % 32)) == 0
 }
 
@@ -181,7 +180,7 @@ pub fn enable(irq: Interrupt) {
 
     unsafe {
         if CS_FLAG.load(Ordering::SeqCst) {
-            let nr = irq.number();
+            let nr = irq.nr();
             CS_MASK[usize::from(nr / 32)] |= 1 << (nr % 32);
         } else {
             NVIC::unmask(irq);
@@ -195,7 +194,7 @@ pub fn disable(irq: Interrupt) {
 
     unsafe {
         if CS_FLAG.load(Ordering::SeqCst) {
-            let nr = irq.number();
+            let nr = irq.nr();
             CS_MASK[usize::from(nr / 32)] &= !(1 << (nr % 32));
         } else {
             NVIC::mask(irq);
@@ -213,7 +212,7 @@ pub fn is_active(irq: Interrupt) -> bool {
 pub fn is_enabled(irq: Interrupt) -> bool {
     assert_app_accessible_irq!(irq);
     if CS_FLAG.load(Ordering::SeqCst) {
-        let nr = irq.number();
+        let nr = irq.nr();
         unsafe { CS_MASK[usize::from(nr / 32)] & (1 << (nr % 32)) != 0 }
     } else {
         NVIC::is_enabled(irq)
