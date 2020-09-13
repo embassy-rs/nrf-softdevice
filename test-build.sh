@@ -7,6 +7,7 @@ set -euxo pipefail
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice-examples --bins
 
 # Check that build works with all supported combinations.
+cd nrf-softdevice
 
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52810,ble-peripheral
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52832,ble-peripheral
