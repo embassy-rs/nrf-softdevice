@@ -126,6 +126,7 @@ pub(crate) enum PortalMessage {
     DiscoverCharacteristics(*const raw::ble_evt_t),
     DiscoverDescriptors(*const raw::ble_evt_t),
     Read(*const raw::ble_evt_t),
+    Write(*const raw::ble_evt_t),
     Disconnected,
 }
 
@@ -413,6 +414,70 @@ pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw
         .call(PortalMessage::Read(ble_evt))
 }
 
+#[derive(defmt::Format)]
+pub enum WriteError {
+    Disconnected,
+    Gatt(GattError),
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for WriteError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+impl From<GattError> for WriteError {
+    fn from(err: GattError) -> Self {
+        WriteError::Gatt(err)
+    }
+}
+
+impl From<RawError> for WriteError {
+    fn from(err: RawError) -> Self {
+        WriteError::Raw(err)
+    }
+}
+
+pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), WriteError> {
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
+
+    deassert!(buf.len() <= u16::MAX as usize);
+    let params = raw::ble_gattc_write_params_t {
+        write_op: raw::BLE_GATT_OP_WRITE_REQ as u8,
+        flags: 0,
+        handle,
+        p_value: buf.as_ptr(),
+        len: buf.len() as u16,
+        offset: 0,
+    };
+
+    let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_write"))?;
+
+    state
+        .gattc_portal
+        .wait(|e| match e {
+            PortalMessage::Write(ble_evt) => unsafe {
+                let _gattc_evt = check_status(ble_evt)?;
+                Ok(())
+            },
+            PortalMessage::Disconnected => Err(WriteError::Disconnected),
+            _ => unreachable!(),
+        })
+        .await
+}
+
+pub(crate) unsafe fn on_write_rsp(
+    ble_evt: *const raw::ble_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
+) {
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .call(PortalMessage::Write(ble_evt))
+}
+
 unsafe fn check_status(
     ble_evt: *const raw::ble_evt_t,
 ) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
@@ -442,12 +507,6 @@ pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
 }
 
 pub(crate) unsafe fn on_char_vals_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_write_rsp(
     _ble_evt: *const raw::ble_evt_t,
     _gattc_evt: &raw::ble_gattc_evt_t,
 ) {

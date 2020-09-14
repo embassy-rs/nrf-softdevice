@@ -92,11 +92,25 @@ async fn ble_central_task(sd: &'static Softdevice) {
         client.battery_level_value_handle, client.battery_level_cccd_handle
     );
 
+    // Read
     let buf = &mut [0; 16];
     let len = gatt_client::read(&conn, client.battery_level_value_handle, buf)
         .await
         .dexpect(intern!("read"));
+    info!("read battery level: {:[u8]}", &buf[..len]);
 
+    // Write, set it to 42
+    buf[0] = 42;
+    gatt_client::write(&conn, client.battery_level_value_handle, &buf[..1])
+        .await
+        .dexpect(intern!("write"));
+    info!("Wrote battery level!");
+
+    // Read to check it's changed
+    let buf = &mut [0; 16];
+    let len = gatt_client::read(&conn, client.battery_level_value_handle, buf)
+        .await
+        .dexpect(intern!("read"));
     info!("read battery level: {:[u8]}", &buf[..len]);
 }
 
