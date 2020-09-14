@@ -12,6 +12,7 @@ members = [
     "async-flash",
 
     "example",
+    "example-rtic",
 ]
 
 exclude = [
