@@ -125,6 +125,7 @@ pub(crate) enum PortalMessage {
     DiscoverService(*const raw::ble_evt_t),
     DiscoverCharacteristics(*const raw::ble_evt_t),
     DiscoverDescriptors(*const raw::ble_evt_t),
+    Read(*const raw::ble_evt_t),
     Disconnected,
 }
 
@@ -352,6 +353,66 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     Ok(client)
 }
 
+#[derive(defmt::Format)]
+pub enum ReadError {
+    Disconnected,
+    Truncated,
+    Gatt(GattError),
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for ReadError {
+    fn from(_: DisconnectedError) -> Self {
+        ReadError::Disconnected
+    }
+}
+
+impl From<GattError> for ReadError {
+    fn from(err: GattError) -> Self {
+        ReadError::Gatt(err)
+    }
+}
+
+impl From<RawError> for ReadError {
+    fn from(err: RawError) -> Self {
+        ReadError::Raw(err)
+    }
+}
+
+pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usize, ReadError> {
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
+
+    let ret = unsafe { raw::sd_ble_gattc_read(conn_handle, handle, 0) };
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_read"))?;
+
+    state
+        .gattc_portal
+        .wait(|e| match e {
+            PortalMessage::Read(ble_evt) => unsafe {
+                let gattc_evt = check_status(ble_evt)?;
+                let params = get_union_field(ble_evt, &gattc_evt.params.read_rsp);
+                let v = get_flexarray(ble_evt, &params.data, params.len as usize);
+                let len = core::cmp::min(v.len(), buf.len());
+                buf[..len].copy_from_slice(&v[..len]);
+
+                if v.len() > buf.len() {
+                    return Err(ReadError::Truncated);
+                }
+                Ok(len)
+            },
+            PortalMessage::Disconnected => Err(ReadError::Disconnected),
+            _ => unreachable!(),
+        })
+        .await
+}
+
+pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .signal(PortalMessage::Read(ble_evt))
+}
+
 unsafe fn check_status(
     ble_evt: *const raw::ble_evt_t,
 ) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
@@ -375,12 +436,6 @@ pub(crate) unsafe fn on_attr_info_disc_rsp(
 }
 
 pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
-}
-
-pub(crate) unsafe fn on_read_rsp(
     _ble_evt: *const raw::ble_evt_t,
     _gattc_evt: &raw::ble_gattc_evt_t,
 ) {

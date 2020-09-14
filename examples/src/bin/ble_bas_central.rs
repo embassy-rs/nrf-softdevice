@@ -91,6 +91,13 @@ async fn ble_central_task(sd: &'static Softdevice) {
         "discovered! {:u16} {:u16}",
         client.battery_level_value_handle, client.battery_level_cccd_handle
     );
+
+    let buf = &mut [0; 16];
+    let len = gatt_client::read(&conn, client.battery_level_value_handle, buf)
+        .await
+        .dexpect(intern!("read"));
+
+    info!("read battery level: {:[u8]}", &buf[..len]);
 }
 
 #[entry]
