@@ -1,8 +1,38 @@
 # `nrf-softdevice`
 
-Low-level Rust bindings for Nordic Semiconductor nRF series SoftDevices.
+Rust bindings for Nordic Semiconductor nRF series SoftDevices.
 
-Bindings are generated with `bindgen`, with extra post-processing to correctly generate the `svc`-based softdevice calls.
+## High-level bindings
+
+The `nrf-softdevice` crate
+
+To use it you must specify the following Cargo features:
+
+- exactly one softdevice model, for example feature `s140`.
+- exactly one supported nRF chip model, for example feature `nrf52840`.
+
+The following softdevices are supported.
+
+- S112 (peripheral only)
+- S113 (peripheral only)
+- S122 (central only)
+- S132 (central and peripheral)
+- S140 (central and peripheral)
+
+The following nRF chips are supported
+
+- nRF52810
+- nRF52832
+- nRF52832
+- nRF52840
+
+Some softdevices support only some chips, check Nordic's documentation for details.
+
+## Low-level raw bindings
+
+The `nrf-softdevice-s1xx` crates contain low-level bindings, matching 1-1 with the softdevice C headers.
+
+They are generated with `bindgen`, with extra post-processing to correctly generate the `svc`-based softdevice calls.
 
 Generated code consists of inline functions using inline ASM, ensuring the lowest possible
 overhead. Most of the times you'll see them inlined as a single `svc` instruction in the
@@ -28,17 +58,17 @@ pub unsafe fn sd_ble_gap_connect(
 }
 ```
 
-## Generating
+### Generating
 
 The bindings are generated from the headers with the `gen.sh` script.
 
 ## License
 
 This repo includes the softdevice headers, which are licensed under [Nordic's proprietary license](LICENSE-NORDIC).
-
 Generated `binding.rs` files are a derived work of the headers, so they are also subject to Nordic's license.
 
-The generator code ([nrf-softdevice-gen](nrf-softdevice-gen)) is licensed under either of
+The high level bindings ([nrf-softdevice](nrf-softdevice)) and the generator
+code ([nrf-softdevice-gen](nrf-softdevice-gen)) are licensed under either of
 
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
   http://www.apache.org/licenses/LICENSE-2.0)
