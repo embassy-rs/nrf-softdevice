@@ -1,3 +1,14 @@
+//! This example showcases how to use nrf-softdevice inside RTIC.
+//!
+//! It mixes RTIC's real-time interrupt-based multitasking with
+//! static-executor's cooperative async/await multitasking.
+//!
+//! static-executor is run in RTIC's idle task, at lowest priority, so all RTIC
+//! tasks will preempt async tasks if needed.
+//!
+//! Note that this is not fully safe: you must not use the softdevice's reserved
+//! priorities for RTIC tasks. There is no compile-time checking for that for now.
+
 #![no_main]
 #![no_std]
 #![feature(type_alias_impl_trait)]
@@ -13,17 +24,6 @@ use nrf52840_hal::timer::{Periodic, Timer};
 use nrf_softdevice::ble::peripheral;
 use nrf_softdevice::{raw, Softdevice};
 use rtic::app;
-
-// This example showcases how to use nrf-softdevice inside RTIC.
-//
-// It mixes RTIC's real-time interrupt-based multitasking with
-// static-executor's cooperative async/await multitasking.
-//
-// static-executor is run in RTIC's idle task, at lowest priority, so all RTIC
-// tasks will preempt async tasks if needed.
-//
-// Note that this is not fully safe: you must not use the softdevice's reserved
-// priorities for RTIC tasks. There is no compile-time checking for that for now.
 
 #[static_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
