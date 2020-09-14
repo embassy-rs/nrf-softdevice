@@ -4,7 +4,21 @@ Rust bindings for Nordic Semiconductor nRF series SoftDevices.
 
 ## High-level bindings
 
-The `nrf-softdevice` crate
+The `nrf-softdevice` crate contains high-level easy-to-use Rust async/await bindings for the Softdevice.
+
+Working:
+
+- Safe interrupt management
+- Async flash API
+- Bluetooth central (scanning)
+- Bluetooth peripheral (advertising, connectable-only for now)
+- GATT client
+
+Work in progress:
+
+- GATT servers
+- Data length extension
+- ATT MTU extension
 
 To use it you must specify the following Cargo features:
 
