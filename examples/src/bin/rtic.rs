@@ -56,7 +56,8 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
         info!("advertising done!");
 
-        // conn will now get disconnected because it's dropped
+        // Detach the connection so it isn't disconnected when dropped.
+        conn.detach();
     }
 }
 

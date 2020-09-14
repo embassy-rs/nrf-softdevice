@@ -31,7 +31,8 @@ pub(crate) struct ConnectionState {
     // When client code drops all instances, refcount becomes 0 and disconnection is initiated.
     // However, disconnection is not complete until the event GAP_DISCONNECTED.
     // so there's a small gap of time where the ConnectionState is not "free" even if refcount=0.
-    pub refcount: Cell<u8>, // number of existing Connection instances
+    pub refcount: Cell<u8>,   // number of existing Connection instances
+    pub detached: Cell<bool>, // if true, .detach() has been called, so the conn shouldn't be dropped when refcount reaches 0.
     pub conn_handle: Cell<Option<u16>>, // none = not connected
 
     pub disconnecting: Cell<bool>,
@@ -44,7 +45,9 @@ impl ConnectionState {
     const fn new() -> Self {
         Self {
             refcount: Cell::new(0),
+            detached: Cell::new(false),
             conn_handle: Cell::new(None),
+
             disconnecting: Cell::new(false),
             role: Cell::new(Role::whatever()),
             gattc_portal: Portal::new(),
@@ -52,6 +55,7 @@ impl ConnectionState {
     }
 
     fn reset(&self) {
+        self.detached.set(false);
         self.disconnecting.set(false);
     }
 
@@ -94,10 +98,11 @@ impl ConnectionState {
             .get()
             .dexpect(intern!("on_disconnected when already disconnected"));
 
-        deassert!(
-            INDEX_BY_HANDLE.0[conn_handle as usize].get().is_some(),
-            "conn_handle has no index"
-        );
+        let index = INDEX_BY_HANDLE.0[conn_handle as usize]
+            .get()
+            .dexpect(intern!("conn_handle has no index"));
+
+        trace!("conn {:u8}: disconnected", index,);
 
         INDEX_BY_HANDLE.0[conn_handle as usize].set(None);
         self.conn_handle.set(None);
@@ -133,21 +138,18 @@ impl Drop for Connection {
             "bug: dropping a conn which is already at refcount 0"
         ));
         state.refcount.set(new_refcount);
-        trace!(
-            "dropped conn index {:u8}, refcount={:u8}",
-            self.index,
-            new_refcount
-        );
 
         if new_refcount == 0 {
-            if state.conn_handle.get().is_some() {
-                trace!("all refs dropped, disconnecting");
+            if state.detached.get() {
+                trace!("conn {:u8}: dropped, but is detached", self.index);
+            } else if state.conn_handle.get().is_some() {
+                trace!("conn {:u8}: dropped, disconnecting", self.index);
+                // We still leave conn_handle set, because the connection is
+                // not really disconnected until we get GAP_DISCONNECTED event.
                 state.disconnect().dewrap();
             } else {
-                trace!("all refs dropped, already disconnected");
+                trace!("conn {:u8}: dropped, already disconnected", self.index);
             }
-            // We still leave conn_handle set, because the connection is
-            // not really disconnected until we get GAP_DISCONNECTED event.
         }
     }
 }
@@ -163,11 +165,6 @@ impl Clone for Connection {
             .checked_add(1)
             .dexpect(intern!("Too many references to same connection"));
         state.refcount.set(new_refcount);
-        trace!(
-            "cloned conn index {:u8}, refcount={:u8}",
-            self.index,
-            new_refcount
-        );
 
         Self { index: self.index }
     }
@@ -177,6 +174,11 @@ impl Connection {
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {
         let state = self.state();
         state.disconnect()
+    }
+
+    pub fn detach(&self) {
+        let state = self.state();
+        state.detached.set(true)
     }
 
     pub(crate) fn new(conn_handle: u16) -> Result<Self, OutOfConnsError> {
@@ -196,7 +198,7 @@ impl Connection {
                 );
                 INDEX_BY_HANDLE.0[conn_handle as usize].set(Some(index));
 
-                trace!("allocated conn index {:u8}, refcount=1", index);
+                trace!("conn {:u8}: connected", index);
                 return Ok(Self { index });
             }
         }

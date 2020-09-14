@@ -103,6 +103,9 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         .dewrap();
 
         info!("advertising done!");
+
+        // Detach the connection so it isn't disconnected when dropped.
+        conn.detach();
     }
 }
 
