@@ -469,6 +469,30 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
         .await
 }
 
+pub fn write_without_response(
+    conn: &Connection,
+    handle: u16,
+    buf: &[u8],
+) -> Result<(), WriteError> {
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
+
+    deassert!(buf.len() <= u16::MAX as usize);
+    let params = raw::ble_gattc_write_params_t {
+        write_op: raw::BLE_GATT_OP_WRITE_CMD as u8,
+        flags: 0,
+        handle,
+        p_value: buf.as_ptr(),
+        len: buf.len() as u16,
+        offset: 0,
+    };
+
+    let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_write"))?;
+
+    Ok(())
+}
+
 pub(crate) unsafe fn on_write_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
