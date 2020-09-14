@@ -171,7 +171,7 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
 ) {
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverService(ble_evt))
+        .call(PortalMessage::DiscoverService(ble_evt))
 }
 
 // =============================
@@ -219,7 +219,7 @@ pub(crate) unsafe fn on_char_disc_rsp(
 ) {
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverCharacteristics(ble_evt))
+        .call(PortalMessage::DiscoverCharacteristics(ble_evt))
 }
 
 // =============================
@@ -267,7 +267,7 @@ pub(crate) unsafe fn on_desc_disc_rsp(
 ) {
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverDescriptors(ble_evt))
+        .call(PortalMessage::DiscoverDescriptors(ble_evt))
 }
 
 // =============================
@@ -410,7 +410,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::Read(ble_evt))
+        .call(PortalMessage::Read(ble_evt))
 }
 
 unsafe fn check_status(

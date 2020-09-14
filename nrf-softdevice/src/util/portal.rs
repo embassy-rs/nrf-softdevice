@@ -38,7 +38,7 @@ impl<T> Portal<T> {
         }
     }
 
-    pub fn signal(&self, val: T) {
+    pub fn call(&self, val: T) {
         assert_thread_mode();
 
         // safety: this runs from thread mode

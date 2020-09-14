@@ -105,7 +105,7 @@ impl ConnectionState {
         // Signal possible in-progess gattc procedures that the connection
         // has disconnected.
         self.gattc_portal
-            .signal(gatt_client::PortalMessage::Disconnected);
+            .call(gatt_client::PortalMessage::Disconnected);
     }
 }
 
