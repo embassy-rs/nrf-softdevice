@@ -6,9 +6,9 @@
 mod example_common;
 use example_common::*;
 
-use async_flash::Flash;
+use async_flash::Flash as _;
 use cortex_m_rt::entry;
-use nrf_softdevice::Softdevice;
+use nrf_softdevice::{Flash, Softdevice};
 
 #[static_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -17,7 +17,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 
 #[static_executor::task]
 async fn flash_task(sd: &'static Softdevice) {
-    let mut f = sd.take_flash();
+    let mut f = Flash::take(sd);
 
     info!("starting erase");
     match f.erase(0x80000).await {
