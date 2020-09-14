@@ -1,22 +1,20 @@
 use core::cell::UnsafeCell;
 use core::future::Future;
-
+use core::mem;
 use core::mem::MaybeUninit;
-use core::pin::Pin;
-use core::ptr;
-use core::task::{Context, Poll};
 
 use crate::util::*;
 
+/// Utility to call a closure across tasks.
 pub struct Portal<T> {
     inner: UnsafeCell<Inner<T>>,
 }
 
 struct Inner<T> {
-    // This can be optimized a bit by directly using a Waker, since we know
-    // the waker is present iff value is not null
     waker: WakerStore,
-    value: *mut T,
+
+    // Option because you can't have null wide pointers.
+    func: Option<*mut dyn FnMut(T)>,
 }
 
 unsafe impl<T> Send for Portal<T> {}
@@ -35,7 +33,7 @@ impl<T> Portal<T> {
         Self {
             inner: UnsafeCell::new(Inner {
                 waker: WakerStore::new(),
-                value: ptr::null_mut(),
+                func: None,
             }),
         }
     }
@@ -46,78 +44,42 @@ impl<T> Portal<T> {
         // safety: this runs from thread mode
         let this = unsafe { &mut *self.inner.get() };
 
-        if !this.value.is_null() {
-            unsafe { this.value.write(val) };
-            this.value = ptr::null_mut();
+        if let Some(func) = this.func {
+            let func = unsafe { &mut *func };
+            this.func = None; // Remove func before calling it, to avoid reentrant calls.
+            func(val);
             this.waker.wake()
         }
     }
 
-    pub fn signal_with(&self, f: impl FnOnce() -> T) {
+    pub fn wait<'a, R, F>(&'a self, mut func: F) -> impl Future<Output = R> + 'a
+    where
+        F: FnMut(T) -> R + 'a,
+    {
         assert_thread_mode();
 
-        // safety: this runs from thread mode
-        let this = unsafe { &mut *self.inner.get() };
+        async move {
+            let bomb = DropBomb::new();
 
-        if !this.value.is_null() {
-            unsafe { this.value.write(f()) };
-            this.value = ptr::null_mut();
-            this.waker.wake()
-        }
-    }
+            let signal = Signal::new();
+            let mut result: MaybeUninit<R> = MaybeUninit::uninit();
+            let mut call_func = |val: T| {
+                unsafe { result.as_mut_ptr().write(func(val)) };
+                signal.signal(());
+            };
 
-    pub fn wait<'a>(&'a self) -> impl Future<Output = T> + 'a {
-        assert_thread_mode();
-        WaitFuture {
-            linked: false,
-            data: MaybeUninit::uninit(),
-            portal: self,
-        }
-    }
-}
+            // safety: this runs from thread mode
+            let this = unsafe { &mut *self.inner.get() };
 
-struct WaitFuture<'a, T> {
-    linked: bool,
-    data: MaybeUninit<T>,
-    portal: &'a Portal<T>,
-}
+            let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
+            let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
+            this.func = Some(func_ptr);
 
-impl<'a, T> Drop for WaitFuture<'a, T> {
-    fn drop(&mut self) {
-        if self.linked {
-            // safety: this must be from thread mode since Portal.wait runs in
-            // thread mode and the future is not Send.
-            let portal = unsafe { &mut *self.portal.inner.get() };
+            signal.wait().await;
 
-            portal.value = ptr::null_mut()
-        }
-    }
-}
+            bomb.defuse();
 
-impl<'a, T> Future for WaitFuture<'a, T> {
-    type Output = T;
-
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {
-        // safety: this must be from thread mode since Portal.wait runs in
-        // thread mode and the future is not Send.
-        let portal = unsafe { &mut *self.portal.inner.get() };
-
-        let this = unsafe { self.get_unchecked_mut() };
-
-        if !this.linked {
-            if !portal.value.is_null() {
-                depanic!("portal is already in use (another task is waiting)")
-            }
-            portal.value = this.data.as_mut_ptr();
-            portal.waker.store(cx.waker());
-            this.linked = true;
-        }
-
-        if portal.value.is_null() {
-            Poll::Ready(unsafe { this.data.as_mut_ptr().read() })
-        } else {
-            portal.waker.store(cx.waker());
-            Poll::Pending
+            unsafe { result.assume_init() }
         }
     }
 }

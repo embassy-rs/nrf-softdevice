@@ -122,9 +122,9 @@ type DiscCharsMax = U6;
 type DiscDescsMax = U6;
 
 pub(crate) enum PortalMessage {
-    DiscoverService(Result<raw::ble_gattc_service_t, DiscoverError>),
-    DiscoverCharacteristics(Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError>),
-    DiscoverDescriptors(Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError>),
+    DiscoverService(*const raw::ble_evt_t),
+    DiscoverCharacteristics(*const raw::ble_evt_t),
+    DiscoverDescriptors(*const raw::ble_evt_t),
     Disconnected,
 }
 
@@ -138,37 +138,39 @@ pub(crate) async fn discover_service(
         unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
 
-    match state.gattc_portal.wait().await {
-        PortalMessage::DiscoverService(r) => r,
-        PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-        _ => unreachable!(),
-    }
+    state
+        .gattc_portal
+        .wait(|e| match e {
+            PortalMessage::DiscoverService(ble_evt) => unsafe {
+                let gattc_evt = check_status(ble_evt)?;
+                let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
+                let v = get_flexarray(ble_evt, &params.services, params.count as usize);
+
+                match v.len() {
+                    0 => Err(DiscoverError::ServiceNotFound),
+                    1 => Ok(v[0]),
+                    n => {
+                        warn!(
+                            "Found {:u16} services with the same UUID, using the first one",
+                            params.count
+                        );
+                        Ok(v[0])
+                    }
+                }
+            },
+            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
+            _ => unreachable!(),
+        })
+        .await
 }
 
 pub(crate) unsafe fn on_prim_srvc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_status(gattc_evt, || {
-        let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
-        let v = get_flexarray(ble_evt, &params.services, params.count as usize);
-
-        match v.len() {
-            0 => Err(DiscoverError::ServiceNotFound),
-            1 => Ok(v[0]),
-            n => {
-                warn!(
-                    "Found {:u16} services with the same UUID, using the first one",
-                    params.count
-                );
-                Ok(v[0])
-            }
-        }
-    });
-
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverService(val))
+        .signal(PortalMessage::DiscoverService(ble_evt))
 }
 
 // =============================
@@ -192,29 +194,31 @@ async fn discover_characteristics(
     };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
 
-    match state.gattc_portal.wait().await {
-        PortalMessage::DiscoverCharacteristics(r) => r,
-        PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-        _ => unreachable!(),
-    }
+    state
+        .gattc_portal
+        .wait(|e| match e {
+            PortalMessage::DiscoverCharacteristics(ble_evt) => unsafe {
+                let gattc_evt = check_status(ble_evt)?;
+                let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
+                let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
+                let v = Vec::from_slice(v).unwrap_or_else(|_| {
+                    depanic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
+                });
+                Ok(v)
+            },
+            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
+            _ => unreachable!(),
+        })
+        .await
 }
 
 pub(crate) unsafe fn on_char_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_status(gattc_evt, || {
-        let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
-        let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
-        let v = Vec::from_slice(v).unwrap_or_else(|_| {
-            depanic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
-        });
-        Ok(v)
-    });
-
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverCharacteristics(val))
+        .signal(PortalMessage::DiscoverCharacteristics(ble_evt))
 }
 
 // =============================
@@ -238,29 +242,31 @@ async fn discover_descriptors(
     };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
 
-    match state.gattc_portal.wait().await {
-        PortalMessage::DiscoverDescriptors(r) => r,
-        PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-        _ => unreachable!(),
-    }
+    state
+        .gattc_portal
+        .wait(|e| match e {
+            PortalMessage::DiscoverDescriptors(ble_evt) => unsafe {
+                let gattc_evt = check_status(ble_evt)?;
+                let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
+                let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
+                let v = Vec::from_slice(v).unwrap_or_else(|_| {
+                    depanic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
+                });
+                Ok(v)
+            },
+            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
+            _ => unreachable!(),
+        })
+        .await
 }
 
 pub(crate) unsafe fn on_desc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
-    let val = check_status(gattc_evt, || {
-        let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
-        let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
-        let v = Vec::from_slice(v).unwrap_or_else(|_| {
-            depanic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
-        });
-        Ok(v)
-    });
-
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
-        .signal(PortalMessage::DiscoverDescriptors(val))
+        .signal(PortalMessage::DiscoverDescriptors(ble_evt))
 }
 
 // =============================
@@ -272,8 +278,6 @@ async fn discover_inner<T: Client>(
     curr: raw::ble_gattc_char_t,
     next: Option<raw::ble_gattc_char_t>,
 ) -> Result<(), DiscoverError> {
-    let state = conn.state();
-
     // Calcuate range of possible descriptors
     let start_handle = curr.handle_value + 1;
     let end_handle = next
@@ -348,14 +352,13 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     Ok(client)
 }
 
-fn check_status<T, E: From<GattError>>(
-    gattc_evt: &raw::ble_gattc_evt_t,
-    f: impl Fn() -> Result<T, E>,
-) -> Result<T, E> {
-    if gattc_evt.gatt_status as u32 == raw::BLE_GATT_STATUS_SUCCESS {
-        f()
-    } else {
-        Err(GattError::from(gattc_evt.gatt_status as u32).into())
+unsafe fn check_status(
+    ble_evt: *const raw::ble_evt_t,
+) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
+    let gattc_evt = get_union_field(ble_evt, &(*ble_evt).evt.gattc_evt);
+    match gattc_evt.gatt_status as u32 {
+        raw::BLE_GATT_STATUS_SUCCESS => Ok(gattc_evt),
+        err => Err(GattError::from(err as u32)),
     }
 }
 
