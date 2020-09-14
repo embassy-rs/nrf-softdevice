@@ -2,6 +2,7 @@
 #![no_std]
 #![feature(type_alias_impl_trait)]
 
+#[path = "../example_common.rs"]
 mod example_common;
 use example_common::*;
 

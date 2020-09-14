@@ -17,6 +17,7 @@ defmt-error = []
 async-flash = { version = "0.1.0", path = "../async-flash" }
 cortex-m        = { version = "0.6.3" }
 cortex-m-rt = "0.6.12"
+cortex-m-rtic = { version = "0.5.5", optional = true }
 defmt = "0.1.0"
 defmt-rtt = "0.1.0"
 panic-probe = "0.1.0"
@@ -26,3 +27,8 @@ nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140" }
 static-executor  = { version = "0.1.0", features=["defmt"]}
 static-executor-cortex-m  = { version = "0.1.0" }
 futures = { version = "0.3.5", default-features = false }
+
+[[bin]]
+name = "rtic"
+required-features = ["cortex-m-rtic"]
+
