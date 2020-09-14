@@ -1,6 +1,8 @@
+use core::marker::PhantomData;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use crate::ble;
 use crate::interrupt;
 use crate::raw;
 use crate::util::*;
@@ -10,12 +12,20 @@ unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     depanic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
 }
 
+/// Singleton instance of the enabled softdevice.
+///
+/// The `Softdevice` instance can be obtaind by enabling it with [`Softdevice::enable`]. Once
+/// enabled, it can be used to establish Bluetooth connections with [`ble::central`] and [`ble::peripheral`].
+///
+/// Disabling the softdevice is not supported due to the complexity of a safe implementation. Consider resetting the CPU instead.
 pub struct Softdevice {
-    // Dummy private field so client code can't create their
-    // own instances of Softdevice.
-    _private: (),
+    // Prevent Send, Sync
+    _private: PhantomData<*mut ()>,
 }
 
+/// Softdevice configuration.
+///
+/// Fields set to None will use a default configuration.
 #[derive(Default)]
 pub struct Config {
     pub clock: Option<raw::nrf_clock_lf_cfg_t>,
@@ -88,9 +98,17 @@ fn cfg_id_str(id: u32) -> defmt::Str {
 }
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
-static SOFTDEVICE: Softdevice = Softdevice { _private: () };
+static mut SOFTDEVICE: Softdevice = Softdevice {
+    _private: PhantomData,
+};
 
 impl Softdevice {
+    /// Enable the softdevice with the requested configuration.
+    ///
+    /// # Panics
+    /// - Panics if the requested configuration requires more memory than reserved for the softdevice. In that case, you can give more memory to the softdevice by editing the RAM start address in `memory.x`. The required start address is logged using `defmt` prior to panic.
+    /// - Panics if the requested configuration has too high memory requirements for the softdevice. The softdevice supports a maximum dynamic memory size of 64kb.
+    /// - Panics if called multiple times. Must be called at most once.
     pub fn enable(config: &Config) -> &'static Softdevice {
         if ENABLED.compare_and_swap(false, true, Ordering::AcqRel) {
             depanic!("nrf_softdevice::enable() called multiple times.")
@@ -273,6 +291,14 @@ impl Softdevice {
         #[cfg(not(feature = "nrf52810"))]
         interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
 
-        &SOFTDEVICE
+        unsafe { &SOFTDEVICE }
+    }
+
+    /// Runs the softdevice event handling loop.
+    ///
+    /// It must be called in its own async task after enabling the softdevice
+    /// and before doing any operation. Failure to doing so will cause async operations to never finish.
+    pub async fn run(&self) {
+        crate::events::run().await;
     }
 }

@@ -1,3 +1,11 @@
+//! Safe interrupt management
+//!
+//! This module implements functions to manage interrupts that panic when trying
+//! to use softdevice-reserved interrupts and priority levels. Therefore,
+//! they're safe to use in all situations.
+//!
+//! You must NOT use any other crate to manage interrupts, such as `cortex-m`'s `NVIC`.
+
 use bare_metal::Nr;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 

@@ -1,26 +1,35 @@
 use core::future::Future;
+use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::raw;
 use crate::util::*;
 use crate::{Error, Softdevice};
 
+/// Singleton instance of the Flash softdevice functionality.
 pub struct Flash {
-    _private: (),
-}
-
-impl Flash {
-    pub const PAGE_SIZE: usize = 4096;
+    // Prevent Send, Sync
+    _private: PhantomData<*mut ()>,
 }
 
 static FLASH_TAKEN: AtomicBool = AtomicBool::new(false);
-impl Softdevice {
-    pub fn take_flash(&self) -> Flash {
+
+impl Flash {
+    const PAGE_SIZE: usize = 4096;
+
+    /// Takes the Flash instance from the softdevice.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called more than once.
+    pub fn take(sd: &Softdevice) -> Flash {
         if FLASH_TAKEN.compare_and_swap(false, true, Ordering::AcqRel) {
             depanic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
         }
 
-        Flash { _private: () }
+        Flash {
+            _private: PhantomData,
+        }
     }
 }
 

@@ -46,35 +46,32 @@ fn on_soc_evt(evt: u32) {
 // TODO actually derive this from the headers + the ATT_MTU
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
-impl Softdevice {
-    pub async fn run(&self) {
-        loop {
-            SWI2_SIGNAL.wait().await;
+pub(crate) async fn run() {
+    loop {
+        SWI2_SIGNAL.wait().await;
 
-            unsafe {
-                let mut evt: u32 = 0;
-                loop {
-                    match Error::convert(raw::sd_evt_get(&mut evt as _)) {
-                        Ok(()) => on_soc_evt(evt),
-                        Err(Error::NotFound) => break,
-                        Err(err) => depanic!("sd_evt_get err {:?}", err),
-                    }
+        unsafe {
+            let mut evt: u32 = 0;
+            loop {
+                match Error::convert(raw::sd_evt_get(&mut evt as _)) {
+                    Ok(()) => on_soc_evt(evt),
+                    Err(Error::NotFound) => break,
+                    Err(err) => depanic!("sd_evt_get err {:?}", err),
                 }
+            }
 
-                // Using u32 since the buffer has to be aligned to 4
-                let mut evt: MaybeUninit<[u32; BLE_EVT_MAX_SIZE as usize / 4]> =
-                    MaybeUninit::uninit();
+            // Using u32 since the buffer has to be aligned to 4
+            let mut evt: MaybeUninit<[u32; BLE_EVT_MAX_SIZE as usize / 4]> = MaybeUninit::uninit();
 
-                loop {
-                    let mut len: u16 = BLE_EVT_MAX_SIZE;
-                    let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
-                    match Error::convert(ret) {
-                        Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
-                        Err(Error::NotFound) => break,
-                        Err(Error::BleNotEnabled) => break,
-                        Err(Error::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),
-                        Err(err) => depanic!("sd_ble_evt_get err {:?}", err),
-                    }
+            loop {
+                let mut len: u16 = BLE_EVT_MAX_SIZE;
+                let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
+                match Error::convert(ret) {
+                    Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
+                    Err(Error::NotFound) => break,
+                    Err(Error::BleNotEnabled) => break,
+                    Err(Error::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                    Err(err) => depanic!("sd_ble_evt_get err {:?}", err),
                 }
             }
         }

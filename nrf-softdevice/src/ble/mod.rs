@@ -1,3 +1,5 @@
+//! Bluetooth Low Energy
+
 mod connection;
 pub use connection::*;
 mod types;

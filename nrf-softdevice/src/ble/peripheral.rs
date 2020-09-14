@@ -1,3 +1,5 @@
+//! Bluetooth Peripheral operations. Peripheral devices emit advertisements, and optionally accept connections from Central devices.
+
 use core::mem;
 use core::ptr;
 
@@ -25,6 +27,7 @@ pub(crate) unsafe fn on_sec_info_request(
 ) {
 }
 
+/// Connectable advertisement types, which can accept connections from interested Central devices.
 pub enum ConnectableAdvertisement<'a> {
     ScannableUndirected {
         adv_data: &'a [u8],
@@ -44,7 +47,9 @@ pub enum ConnectableAdvertisement<'a> {
     },
 }
 
-enum NonconnectableAdvertisement {
+/// Non-Connectable advertisement types. They cannot accept connections, they can be
+/// only used to broadcast information in the air.
+pub enum NonconnectableAdvertisement {
     ScannableUndirected,
     NonscannableUndirected,
     ExtendedScannableUndirected,
@@ -53,6 +58,7 @@ enum NonconnectableAdvertisement {
     ExtendedNonscannableDirected,
 }
 
+/// Error for [`advertise_start`]
 #[derive(defmt::Format)]
 pub enum AdvertiseError {
     Stopped,

@@ -1,3 +1,8 @@
+//! Bluetooth Central operations. Central devices scan for advertisements from Peripheral devices and connect to them.
+//!
+//! Typically the Central device is the higher-powered device, such as a smartphone or laptop, since scanning is more
+//! power-hungry than advertising.
+
 use core::mem;
 use core::ptr;
 
