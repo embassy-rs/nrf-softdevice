@@ -170,6 +170,11 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_prim_srvc_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .call(PortalMessage::DiscoverService(ble_evt))
@@ -218,6 +223,12 @@ pub(crate) unsafe fn on_char_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_char_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
+
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .call(PortalMessage::DiscoverCharacteristics(ble_evt))
@@ -266,6 +277,12 @@ pub(crate) unsafe fn on_desc_disc_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_desc_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
+
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .call(PortalMessage::DiscoverDescriptors(ble_evt))
@@ -409,6 +426,12 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 }
 
 pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
+    trace!(
+        "gattc on_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
+
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .call(PortalMessage::Read(ble_evt))
@@ -497,6 +520,12 @@ pub(crate) unsafe fn on_write_rsp(
     ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_write_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
+
     ConnectionState::by_conn_handle(gattc_evt.conn_handle)
         .gattc_portal
         .call(PortalMessage::Write(ble_evt))
@@ -514,44 +543,82 @@ unsafe fn check_status(
 
 pub(crate) unsafe fn on_rel_disc_rsp(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_rel_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
 pub(crate) unsafe fn on_attr_info_disc_rsp(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_attr_info_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
 pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_char_val_by_uuid_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
 pub(crate) unsafe fn on_char_vals_read_rsp(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_char_vals_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
-pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gattc_evt_t) {}
+pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
+    trace!(
+        "gattc on_hvx conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
+}
 
 pub(crate) unsafe fn on_exchange_mtu_rsp(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
-pub(crate) unsafe fn on_timeout(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
-) {
+pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
+    trace!(
+        "gattc on_timeout conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }
 
 pub(crate) unsafe fn on_write_cmd_tx_complete(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gattc_evt_t,
+    gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    trace!(
+        "gattc on_write_cmd_tx_complete conn_handle={:u16} gatt_status={:u16}",
+        gattc_evt.conn_handle,
+        gattc_evt.gatt_status,
+    );
 }

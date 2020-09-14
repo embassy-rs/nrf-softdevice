@@ -90,10 +90,16 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     }
 }
 
-fn on_user_mem_request(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {}
-fn on_user_mem_release(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {}
+fn on_user_mem_request(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {
+    trace!("on_user_mem_request");
+}
+fn on_user_mem_release(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_common_evt_t) {
+    trace!("on_user_mem_release");
+}
 
 pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_connected conn_handle={:u16}", gap_evt.conn_handle);
+
     let params = &gap_evt.params.connected;
     let conn_handle = gap_evt.conn_handle;
     let role = Role::from_raw(params.role);
@@ -116,6 +122,7 @@ pub(crate) unsafe fn on_disconnected(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("on_disconnected conn_handle={:u16}", gap_evt.conn_handle);
     let conn_handle = gap_evt.conn_handle;
     let state = ConnectionState::by_conn_handle(conn_handle);
     state.on_disconnected()
@@ -123,52 +130,68 @@ pub(crate) unsafe fn on_disconnected(
 
 pub(crate) unsafe fn on_conn_param_update(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_conn_param_update conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_sec_params_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_sec_params_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_passkey_display(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("on_passkey_display conn_handle={:u16}", gap_evt.conn_handle);
 }
 
-pub(crate) unsafe fn on_key_pressed(
-    _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
-) {
+pub(crate) unsafe fn on_key_pressed(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_key_pressed conn_handle={:u16}", gap_evt.conn_handle);
 }
 pub(crate) unsafe fn on_auth_key_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_auth_key_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_lesc_dhkey_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_lesc_dhkey_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
-pub(crate) unsafe fn on_auth_status(
-    _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
-) {
+pub(crate) unsafe fn on_auth_status(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_auth_status conn_handle={:u16}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_conn_sec_update(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("on_conn_sec_update conn_handle={:u16}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_timeout conn_handle={:u16}", gap_evt.conn_handle);
+
     let params = &gap_evt.params.timeout;
     match params.src as u32 {
         #[cfg(feature = "ble-central")]

@@ -171,43 +171,65 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
     Ok(())
 }
 
-pub(crate) unsafe fn on_write(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gatts_evt_t) {}
+pub(crate) unsafe fn on_write(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
+    trace!("gatts on_write conn_handle={:u16}", gatts_evt.conn_handle);
+}
 
 pub(crate) unsafe fn on_rw_authorize_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gatts_evt_t,
+    gatts_evt: &raw::ble_gatts_evt_t,
 ) {
+    trace!(
+        "gatts on_rw_authorize_request conn_handle={:u16}",
+        gatts_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_sys_attr_missing(
     _ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gatts_evt_t,
+    gatts_evt: &raw::ble_gatts_evt_t,
 ) {
-    raw::sd_ble_gatts_sys_attr_set(gattc_evt.conn_handle, ptr::null(), 0, 0);
+    trace!(
+        "gatts on_sys_attr_missing conn_handle={:u16}",
+        gatts_evt.conn_handle
+    );
+    raw::sd_ble_gatts_sys_attr_set(gatts_evt.conn_handle, ptr::null(), 0, 0);
 }
 
-pub(crate) unsafe fn on_hvc(_ble_evt: *const raw::ble_evt_t, _gattc_evt: &raw::ble_gatts_evt_t) {}
+pub(crate) unsafe fn on_hvc(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
+    trace!("gatts on_hvc conn_handle={:u16}", gatts_evt.conn_handle);
+}
 
 pub(crate) unsafe fn on_sc_confirm(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gatts_evt_t,
+    gatts_evt: &raw::ble_gatts_evt_t,
 ) {
+    trace!(
+        "gatts on_sc_confirm conn_handle={:u16}",
+        gatts_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_exchange_mtu_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gatts_evt_t,
+    gatts_evt: &raw::ble_gatts_evt_t,
 ) {
+    trace!(
+        "gatts on_exchange_mtu_request conn_handle={:u16}",
+        gatts_evt.conn_handle
+    );
 }
 
-pub(crate) unsafe fn on_timeout(
-    _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gatts_evt_t,
-) {
+pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
+    trace!("gatts on_timeout conn_handle={:u16}", gatts_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_hvn_tx_complete(
     _ble_evt: *const raw::ble_evt_t,
-    _gattc_evt: &raw::ble_gatts_evt_t,
+    gatts_evt: &raw::ble_gatts_evt_t,
 ) {
+    trace!(
+        "gatts on_hvn_tx_complete conn_handle={:u16}",
+        gatts_evt.conn_handle
+    );
 }

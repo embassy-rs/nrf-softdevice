@@ -10,21 +10,33 @@ use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_set_terminated(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "peripheral on_adv_set_terminated conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
     ADV_SIGNAL.signal(Err(AdvertiseError::Stopped))
 }
 
 pub(crate) unsafe fn on_scan_req_report(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "peripheral on_scan_req_report conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 pub(crate) unsafe fn on_sec_info_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "peripheral on_sec_info_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 /// Connectable advertisement types, which can accept connections from interested Central devices.

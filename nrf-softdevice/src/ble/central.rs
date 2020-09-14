@@ -12,18 +12,21 @@ use crate::util::*;
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(_ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
+    trace!("central on_adv_report");
 }
 
 pub(crate) unsafe fn on_qos_channel_survey_report(
     _ble_evt: *const raw::ble_evt_t,
     _gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("central on_qos_channel_survey_report");
 }
 
 pub(crate) unsafe fn on_conn_param_update_request(
     _ble_evt: *const raw::ble_evt_t,
     _gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("central on_conn_param_update_request");
 }
 
 #[derive(defmt::Format)]
