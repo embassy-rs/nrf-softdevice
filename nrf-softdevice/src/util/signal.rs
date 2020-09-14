@@ -1,17 +1,19 @@
 use core::cell::UnsafeCell;
 use core::future::Future;
+use core::mem;
 use core::pin::Pin;
-use core::task::{Context, Poll};
+use core::task::{Context, Poll, Waker};
 
 use super::waker_store::WakerStore;
 
 pub struct Signal<T> {
-    inner: UnsafeCell<Inner<T>>,
+    state: UnsafeCell<State<T>>,
 }
 
-struct Inner<T> {
-    waker: WakerStore,
-    value: Option<T>,
+enum State<T> {
+    None,
+    Waiting(Waker),
+    Signaled(T),
 }
 
 unsafe impl<T: Send> Send for Signal<T> {}
@@ -20,19 +22,18 @@ unsafe impl<T: Send> Sync for Signal<T> {}
 impl<T: Send> Signal<T> {
     pub const fn new() -> Self {
         Self {
-            inner: UnsafeCell::new(Inner {
-                waker: WakerStore::new(),
-                value: None,
-            }),
+            state: UnsafeCell::new(State::None),
         }
     }
 
     pub fn signal(&self, val: T) {
         unsafe {
             crate::interrupt::raw_free(|| {
-                let this = &mut *self.inner.get();
-                this.value = Some(val);
-                this.waker.wake();
+                let state = &mut *self.state.get();
+                match mem::replace(state, State::Signaled(val)) {
+                    State::Waiting(waker) => waker.wake(),
+                    _ => {}
+                }
             })
         }
     }
@@ -52,12 +53,18 @@ impl<'a, T: Send> Future for WaitFuture<'a, T> {
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {
         unsafe {
             crate::interrupt::raw_free(|| {
-                let this = &mut *self.signal.inner.get();
-                if let Some(val) = this.value.take() {
-                    Poll::Ready(val)
-                } else {
-                    this.waker.store(cx.waker());
-                    Poll::Pending
+                let state = &mut *self.signal.state.get();
+                match state {
+                    State::None => {
+                        *state = State::Waiting(cx.waker().clone());
+                        Poll::Pending
+                    }
+                    State::Waiting(w) if w.will_wake(cx.waker()) => Poll::Pending,
+                    State::Waiting(_) => depanic!("waker overflow"),
+                    State::Signaled(_) => match mem::replace(state, State::None) {
+                        State::Signaled(res) => Poll::Ready(res),
+                        _ => unreachable!(),
+                    },
                 }
             })
         }
