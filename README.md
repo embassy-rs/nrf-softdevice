@@ -42,6 +42,20 @@ The following nRF chips are supported
 
 Some softdevices support only some chips, check Nordic's documentation for details.
 
+## Running examples
+
+Instructions for S140 and nrf52840-dk. You may have to adjust accordingly.
+
+Flashing the softdevice is required. It is NOT part of the built binary. You only need to do it once at the beginning, or after doing full chip erases.
+
+- Download SoftDevice S140 from Nordic's website [here](https://www.nordicsemi.com/Software-and-tools/Software/S140/Download). Supported versions are 7.x.x
+- Unzip
+- `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
+
+To run an example, simply use `cargo run`:
+
+- `cargo run --bin ble_bas_peripheral`
+
 ## Low-level raw bindings
 
 The `nrf-softdevice-s1xx` crates contain low-level bindings, matching 1-1 with the softdevice C headers.
