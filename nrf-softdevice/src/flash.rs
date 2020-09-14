@@ -4,7 +4,7 @@ use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::raw;
 use crate::util::*;
-use crate::{Error, Softdevice};
+use crate::{RawError, Softdevice};
 
 /// Singleton instance of the Flash softdevice functionality.
 pub struct Flash {
@@ -79,7 +79,7 @@ impl async_flash::Flash for Flash {
 
             let bomb = DropBomb::new();
             let ret = unsafe { raw::sd_flash_write(address as _, words_ptr, words_len) };
-            let ret = match Error::convert(ret) {
+            let ret = match RawError::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {
                     warn!("sd_flash_write err {:?}", e);
@@ -102,7 +102,7 @@ impl async_flash::Flash for Flash {
 
             let bomb = DropBomb::new();
             let ret = unsafe { raw::sd_flash_page_erase(page_number as u32) };
-            let ret = match Error::convert(ret) {
+            let ret = match RawError::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {
                     warn!("sd_flash_page_erase err {:?}", e);

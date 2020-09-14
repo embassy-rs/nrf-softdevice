@@ -11,7 +11,7 @@ use cortex_m_rt::entry;
 use defmt::info;
 
 use nrf_softdevice::ble::{peripheral, Uuid};
-use nrf_softdevice::{raw, Error, Softdevice};
+use nrf_softdevice::{raw, RawError, Softdevice};
 
 #[static_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -34,7 +34,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
             &mut service_handle as _,
         )
     };
-    Error::convert(ret).dewrap();
+    RawError::convert(ret).dewrap();
 
     let mut val: u8 = 123;
 
@@ -78,7 +78,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
             &mut char_handles as _,
         )
     };
-    Error::convert(ret).dewrap();
+    RawError::convert(ret).dewrap();
 
     #[rustfmt::skip]
     let adv_data = &[

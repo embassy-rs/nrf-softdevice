@@ -2,9 +2,9 @@ use core::cell::Cell;
 
 use crate::ble::gatt_client;
 use crate::ble::types::*;
-use crate::error::Error;
 use crate::raw;
 use crate::util::*;
+use crate::RawError;
 
 #[derive(defmt::Format)]
 pub(crate) struct OutOfConnsError;
@@ -82,7 +82,7 @@ impl ConnectionState {
                 raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
             )
         };
-        Error::convert(ret).dexpect(intern!("sd_ble_gap_disconnect"));
+        RawError::convert(ret).dexpect(intern!("sd_ble_gap_disconnect"));
 
         self.disconnecting.set(true);
         Ok(())

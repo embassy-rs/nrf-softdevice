@@ -6,7 +6,7 @@ use crate::ble;
 use crate::interrupt;
 use crate::raw;
 use crate::util::*;
-use crate::Error;
+use crate::RawError;
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     depanic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
@@ -57,9 +57,9 @@ fn get_app_ram_base() -> u32 {
 fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
     let app_ram_base = get_app_ram_base();
     let ret = unsafe { raw::sd_ble_cfg_set(id, cfg, app_ram_base) };
-    match Error::convert(ret) {
+    match RawError::convert(ret) {
         Ok(()) => {}
-        Err(Error::NoMem) => {}
+        Err(RawError::NoMem) => {}
         Err(err) => depanic!("sd_ble_cfg_set {:istr} err {:?}", cfg_id_str(id), err),
     }
 }
@@ -116,7 +116,7 @@ impl Softdevice {
 
         let p_clock_lf_cfg = config.clock.as_ref().map(|x| x as _).unwrap_or(ptr::null());
         let ret = unsafe { raw::sd_softdevice_enable(p_clock_lf_cfg, Some(fault_handler)) };
-        match Error::convert(ret) {
+        match RawError::convert(ret) {
             Ok(()) => {}
             Err(err) => depanic!("sd_softdevice_enable err {:?}", err),
         }
@@ -267,9 +267,9 @@ impl Softdevice {
 
         let mut wanted_app_ram_base = app_ram_base;
         let ret = unsafe { raw::sd_ble_enable(&mut wanted_app_ram_base as _) };
-        match Error::convert(ret) {
+        match RawError::convert(ret) {
             Ok(()) => {}
-            Err(Error::NoMem) => {
+            Err(RawError::NoMem) => {
                 if wanted_app_ram_base <= app_ram_base {
                     depanic!("selected configuration has too high RAM requirements.")
                 } else {

@@ -2,9 +2,9 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
-use crate::error::Error;
 use crate::raw;
 use crate::util::*;
+use crate::RawError;
 
 #[rustfmt::skip]
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {

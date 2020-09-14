@@ -1,5 +1,5 @@
-use crate::error::Error;
 use crate::raw;
+use crate::RawError;
 
 #[repr(transparent)]
 #[derive(Copy, Clone)]
@@ -28,7 +28,7 @@ impl Uuid {
     pub fn new_128(uuid: &[u8; 16]) -> Self {
         let mut uuid_type: u8 = 0;
         let ret = unsafe { raw::sd_ble_uuid_vs_add(uuid.as_ptr() as _, &mut uuid_type as _) };
-        match Error::convert(ret) {
+        match RawError::convert(ret) {
             Ok(()) => {}
             Err(e) => depanic!("sd_ble_uuid_vs_add err {:?}", e),
         }

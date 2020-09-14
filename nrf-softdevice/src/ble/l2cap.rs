@@ -1,3 +1,5 @@
+//! Link-Layer Control and Adaptation Protocol (unimplemented)
+
 use crate::raw;
 
 pub(crate) fn on_ch_setup_request(

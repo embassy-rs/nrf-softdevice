@@ -1,3 +1,8 @@
+//! Generic Attribute server. GATT servers offer functionality to clients. (unimplemented)
+//!
+//! Typically the peripheral device is the GATT server, but it is not necessary.
+//! In a connection any device can be server and client, and even both can be both at the same time.
+
 use core::ptr;
 
 use crate::raw;

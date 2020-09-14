@@ -6,7 +6,7 @@ use core::ptr;
 use crate::ble::*;
 use crate::raw;
 use crate::util::*;
-use crate::{Error, Softdevice};
+use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_set_terminated(
     _ble_evt: *const raw::ble_evt_t,
@@ -62,11 +62,11 @@ pub enum NonconnectableAdvertisement {
 #[derive(defmt::Format)]
 pub enum AdvertiseError {
     Stopped,
-    Raw(Error),
+    Raw(RawError),
 }
 
-impl From<Error> for AdvertiseError {
-    fn from(err: Error) -> Self {
+impl From<RawError> for AdvertiseError {
+    fn from(err: RawError) -> Self {
         AdvertiseError::Raw(err)
     }
 }
@@ -74,11 +74,11 @@ impl From<Error> for AdvertiseError {
 #[derive(defmt::Format)]
 pub enum AdvertiseStopError {
     NotRunning,
-    Raw(Error),
+    Raw(RawError),
 }
 
-impl From<Error> for AdvertiseStopError {
-    fn from(err: Error) -> Self {
+impl From<RawError> for AdvertiseStopError {
+    fn from(err: RawError) -> Self {
         AdvertiseStopError::Raw(err)
     }
 }
@@ -138,10 +138,10 @@ pub async fn advertise(
     let ret = unsafe {
         raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _)
     };
-    Error::convert(ret).dewarn(intern!("sd_ble_gap_adv_set_configure"))?;
+    RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_set_configure"))?;
 
     let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
-    Error::convert(ret).dewarn(intern!("sd_ble_gap_adv_start"))?;
+    RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_start"))?;
 
     // TODO handle future drop
 
@@ -154,9 +154,9 @@ pub async fn advertise(
 
 pub fn advertise_stop(sd: &Softdevice) -> Result<(), AdvertiseStopError> {
     let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
-    match Error::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop")) {
+    match RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop")) {
         Ok(()) => Ok(()),
-        Err(Error::InvalidState) => Err(AdvertiseStopError::NotRunning),
+        Err(RawError::InvalidState) => Err(AdvertiseStopError::NotRunning),
         Err(e) => Err(e.into()),
     }
 }

@@ -2,13 +2,12 @@ use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::raw;
 
+/// All possible errors returned by softdevice calls.
 #[rustfmt::skip]
 #[repr(u32)]
 #[derive(defmt::Format, IntoPrimitive, FromPrimitive)]
-pub enum Error {
-    // This is not really an error, but IMO it's better to add it
-    // anyway, just in case someone mistakenly converts NRF_SUCCESS into Error.
-    // if they see "Success" they'll easily realize their mistake, if they see "Unknown" it'd be confusing.
+pub enum RawError {
+    /// This is not really an error, but is added here anyway, just in case someone mistakenly converts NRF_SUCCESS into RawError.
     Success = raw::NRF_SUCCESS,
 
     #[num_enum(default)]
@@ -64,12 +63,12 @@ pub enum Error {
     BleGattsSysAttrMissing = raw::BLE_ERROR_GATTS_SYS_ATTR_MISSING,
 }
 
-impl Error {
-    pub fn convert(ret: u32) -> Result<(), Error> {
+impl RawError {
+    pub fn convert(ret: u32) -> Result<(), RawError> {
         if ret == raw::NRF_SUCCESS {
             Ok(())
         } else {
-            Err(Error::from(ret))
+            Err(RawError::from(ret))
         }
     }
 }

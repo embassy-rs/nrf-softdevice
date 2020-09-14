@@ -4,7 +4,7 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::util::*;
 use crate::{interrupt, raw};
-use crate::{Error, Softdevice};
+use crate::{RawError, Softdevice};
 
 static SWI2_SIGNAL: Signal<()> = Signal::new();
 
@@ -53,9 +53,9 @@ pub(crate) async fn run() {
         unsafe {
             let mut evt: u32 = 0;
             loop {
-                match Error::convert(raw::sd_evt_get(&mut evt as _)) {
+                match RawError::convert(raw::sd_evt_get(&mut evt as _)) {
                     Ok(()) => on_soc_evt(evt),
-                    Err(Error::NotFound) => break,
+                    Err(RawError::NotFound) => break,
                     Err(err) => depanic!("sd_evt_get err {:?}", err),
                 }
             }
@@ -66,11 +66,11 @@ pub(crate) async fn run() {
             loop {
                 let mut len: u16 = BLE_EVT_MAX_SIZE;
                 let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
-                match Error::convert(ret) {
+                match RawError::convert(ret) {
                     Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
-                    Err(Error::NotFound) => break,
-                    Err(Error::BleNotEnabled) => break,
-                    Err(Error::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                    Err(RawError::NotFound) => break,
+                    Err(RawError::BleNotEnabled) => break,
+                    Err(RawError::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),
                     Err(err) => depanic!("sd_ble_evt_get err {:?}", err),
                 }
             }

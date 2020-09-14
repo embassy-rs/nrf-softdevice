@@ -9,7 +9,7 @@ use core::ptr;
 use crate::ble::{Address, Connection, ConnectionState};
 use crate::raw;
 use crate::util::*;
-use crate::{Error, Softdevice};
+use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(_ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
 }
@@ -29,11 +29,11 @@ pub(crate) unsafe fn on_conn_param_update_request(
 #[derive(defmt::Format)]
 pub enum ConnectError {
     Stopped,
-    Raw(Error),
+    Raw(RawError),
 }
 
-impl From<Error> for ConnectError {
-    fn from(err: Error) -> Self {
+impl From<RawError> for ConnectError {
+    fn from(err: RawError) -> Self {
         ConnectError::Raw(err)
     }
 }
@@ -41,11 +41,11 @@ impl From<Error> for ConnectError {
 #[derive(defmt::Format)]
 pub enum ConnectStopError {
     NotRunning,
-    Raw(Error),
+    Raw(RawError),
 }
 
-impl From<Error> for ConnectStopError {
-    fn from(err: Error) -> Self {
+impl From<RawError> for ConnectStopError {
+    fn from(err: RawError) -> Self {
         ConnectStopError::Raw(err)
     }
 }
@@ -94,7 +94,7 @@ pub async fn connect(sd: &Softdevice, whitelist: &[Address]) -> Result<Connectio
     conn_params.conn_sup_timeout = 400; // 4 s
 
     let ret = unsafe { raw::sd_ble_gap_connect(addr, &mut scan_params, &mut conn_params, 1) };
-    match Error::convert(ret) {
+    match RawError::convert(ret) {
         Ok(()) => {}
         Err(err) => {
             warn!("sd_ble_gap_connect err {:?}", err);
@@ -111,9 +111,9 @@ pub async fn connect(sd: &Softdevice, whitelist: &[Address]) -> Result<Connectio
 
 pub fn connect_stop(sd: &Softdevice) -> Result<(), ConnectStopError> {
     let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
-    match Error::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel")) {
+    match RawError::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel")) {
         Ok(()) => Ok(()),
-        Err(Error::InvalidState) => Err(ConnectStopError::NotRunning),
+        Err(RawError::InvalidState) => Err(ConnectStopError::NotRunning),
         Err(e) => Err(e.into()),
     }
 }

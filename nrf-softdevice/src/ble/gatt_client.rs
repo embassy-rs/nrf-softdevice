@@ -1,12 +1,15 @@
+//! Generic Attribute client. GATT clients consume functionality offered by GATT servers.
+
 use heapless::consts::*;
 use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
-use crate::error::Error;
 use crate::raw;
 use crate::util::*;
+use crate::RawError;
 
+/// Discovered characteristic
 pub struct Characteristic {
     pub uuid: Option<Uuid>,
     pub handle_decl: u16,
@@ -15,19 +18,36 @@ pub struct Characteristic {
     pub has_ext_props: bool,
 }
 
+/// Discovered descriptor
 pub struct Descriptor {
     pub uuid: Option<Uuid>,
     pub handle: u16,
 }
 
+/// Trait for implementing GATT clients.
 pub trait Client {
+    /// Get the UUID of the GATT service. This is used by [`discover`] to search for the
+    /// service in the GATT server.
     fn uuid() -> Uuid;
+
+    /// Create a new instance in a "not-yet-discovered" state.
     fn new_undiscovered(conn: Connection) -> Self;
+
+    /// Called by [`discover`] for every discovered characteristic. Implementations must
+    /// check if they're interested in the UUID of the characteristic, and save their
+    /// handles if needed.
     fn discovered_characteristic(
         &mut self,
         characteristic: &Characteristic,
         descriptors: &[Descriptor],
     );
+
+    /// Called by [`discover`] at the end of the discovery procedure. Implementations must check
+    /// that all required characteristics have been discovered, and return [`DiscoverError::ServiceIncomplete`]
+    /// otherwise.
+    ///
+    /// If no error is returned, this instance is considered ready to use and is returned to
+    /// the caller of [`discover`]
     fn discovery_complete(&mut self) -> Result<(), DiscoverError>;
 }
 
@@ -67,13 +87,17 @@ pub enum GattError {
     AtterrCpsOutOfRange = raw::BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE,
 }
 
+/// Error type for [`discover`]
 #[derive(defmt::Format)]
 pub enum DiscoverError {
+    /// Connection is disconnected.
     Disconnected,
+    /// No service with the given UUID found in the server.
     ServiceNotFound,
+    /// Service with the given UUID found, but it's missing some required characteristics.
     ServiceIncomplete,
     Gatt(GattError),
-    Raw(Error),
+    Raw(RawError),
 }
 
 impl From<DisconnectedError> for DiscoverError {
@@ -88,8 +112,8 @@ impl From<GattError> for DiscoverError {
     }
 }
 
-impl From<Error> for DiscoverError {
-    fn from(err: Error) -> Self {
+impl From<RawError> for DiscoverError {
+    fn from(err: RawError) -> Self {
         DiscoverError::Raw(err)
     }
 }
@@ -112,7 +136,7 @@ pub(crate) async fn discover_service(
     let conn_handle = state.check_connected()?;
     let ret =
         unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
-    Error::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
 
     match state.gattc_portal.wait().await {
         PortalMessage::DiscoverService(r) => r,
@@ -166,7 +190,7 @@ async fn discover_characteristics(
             },
         )
     };
-    Error::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
 
     match state.gattc_portal.wait().await {
         PortalMessage::DiscoverCharacteristics(r) => r,
@@ -212,7 +236,7 @@ async fn discover_descriptors(
             },
         )
     };
-    Error::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
+    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
 
     match state.gattc_portal.wait().await {
         PortalMessage::DiscoverDescriptors(r) => r,
@@ -283,6 +307,8 @@ async fn discover_inner<T: Client>(
     Ok(())
 }
 
+/// Discover a service in the peer's GATT server and construct a Client instance
+/// to use it.
 pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> {
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
