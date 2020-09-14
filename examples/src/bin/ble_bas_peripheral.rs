@@ -10,7 +10,8 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::ble::{peripheral, Uuid};
+use nrf_softdevice::ble::gatt_server::{Characteristic, CharacteristicHandles, RegisterError};
+use nrf_softdevice::ble::{gatt_server, peripheral, Uuid};
 use nrf_softdevice::{raw, RawError, Softdevice};
 
 #[static_executor::task]
@@ -21,64 +22,42 @@ async fn softdevice_task(sd: &'static Softdevice) {
 const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
 const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
 
+struct BatteryServiceServer {
+    battery_level_value_handle: u16,
+    battery_level_cccd_handle: u16,
+}
+
+impl gatt_server::Server for BatteryServiceServer {
+    fn uuid() -> Uuid {
+        GATT_BAS_SVC_UUID
+    }
+
+    fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, RegisterError>
+    where
+        F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>,
+    {
+        let battery_level = register_char(
+            Characteristic {
+                uuid: GATT_BAS_BATTERY_LEVEL_CHAR_UUID,
+                can_indicate: false,
+                can_notify: true,
+                can_read: true,
+                can_write: true,
+                max_len: 1,
+            },
+            &[123],
+        )?;
+
+        Ok(Self {
+            battery_level_cccd_handle: battery_level.cccd_handle,
+            battery_level_value_handle: battery_level.value_handle,
+        })
+    }
+}
+
 #[static_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    // There'll eventually be a safe API for creating GATT servers.
-    // but for now this allows us to test ble_bas_central.
-
-    let mut service_handle: u16 = 0;
-    let ret = unsafe {
-        raw::sd_ble_gatts_service_add(
-            raw::BLE_GATTS_SRVC_TYPE_PRIMARY as u8,
-            GATT_BAS_SVC_UUID.as_raw_ptr(),
-            &mut service_handle as _,
-        )
-    };
-    RawError::convert(ret).dewrap();
-
-    let mut val: u8 = 123;
-
-    let mut cccd_attr_md: raw::ble_gatts_attr_md_t = unsafe { mem::zeroed() };
-    cccd_attr_md.read_perm = raw::ble_gap_conn_sec_mode_t {
-        _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-    };
-    cccd_attr_md.write_perm = raw::ble_gap_conn_sec_mode_t {
-        _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-    };
-    cccd_attr_md.set_vloc(raw::BLE_GATTS_VLOC_STACK as u8);
-
-    let mut attr_md: raw::ble_gatts_attr_md_t = unsafe { mem::zeroed() };
-    attr_md.read_perm = raw::ble_gap_conn_sec_mode_t {
-        _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-    };
-    attr_md.write_perm = raw::ble_gap_conn_sec_mode_t {
-        _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-    };
-    attr_md.set_vloc(raw::BLE_GATTS_VLOC_STACK as u8);
-
-    let mut attr: raw::ble_gatts_attr_t = unsafe { mem::zeroed() };
-    attr.p_uuid = unsafe { GATT_BAS_BATTERY_LEVEL_CHAR_UUID.as_raw_ptr() };
-    attr.p_attr_md = &attr_md as _;
-    attr.init_len = 1;
-    attr.max_len = 1;
-    attr.p_value = &mut val;
-
-    let mut char_md: raw::ble_gatts_char_md_t = unsafe { mem::zeroed() };
-    char_md.char_props.set_read(1);
-    char_md.char_props.set_notify(1);
-    char_md.p_cccd_md = &mut cccd_attr_md;
-
-    let mut char_handles: raw::ble_gatts_char_handles_t = unsafe { mem::zeroed() };
-
-    let ret = unsafe {
-        raw::sd_ble_gatts_characteristic_add(
-            service_handle,
-            &mut char_md as _,
-            &mut attr as _,
-            &mut char_handles as _,
-        )
-    };
-    RawError::convert(ret).dewrap();
+    let server: BatteryServiceServer = gatt_server::register(sd).dewrap();
 
     #[rustfmt::skip]
     let adv_data = &[

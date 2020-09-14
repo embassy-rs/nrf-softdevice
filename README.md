@@ -31,13 +31,13 @@ The following softdevices are supported.
 - S113 (peripheral only)
 - S122 (central only)
 - S132 (central and peripheral)
-- S140 (central and peripheral)
+- S140 v7.x.x (central and peripheral)
 
 The following nRF chips are supported
 
 - nRF52810
 - nRF52832
-- nRF52832
+- nRF52833
 - nRF52840
 
 Some softdevices support only some chips, check Nordic's documentation for details.
