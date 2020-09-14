@@ -11,7 +11,7 @@ members = [
 
     "async-flash",
 
-    "example",
+    "examples",
 ]
 
 exclude = [
