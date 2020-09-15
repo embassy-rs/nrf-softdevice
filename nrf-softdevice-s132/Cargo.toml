@@ -3,11 +3,10 @@ name = "nrf-softdevice-s132"
 version = "0.1.1"
 description = "Low-level bindings for the Nordic nRF SoftDevice S132"
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
-repository = "https://github.com/nrf-rs/nrf-hal"
+repository = "https://github.com/akiles/nrf-softdevice"
 categories = ["embedded", "hardware-support", "no-std"]
 keywords = ["cortex-m", "nrf52", "nrf-softdevice", "bluetooth", "ble"]
 license-file = "LICENSE-NORDIC"
-
 edition = "2018"
 
 [package.metadata.docs.rs]
