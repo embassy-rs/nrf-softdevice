@@ -56,8 +56,14 @@ impl gatt_server::Server for BatteryServiceServer {
 }
 
 #[static_executor::task]
+async fn gatt_server_task(sd: &'static Softdevice, server: BatteryServiceServer) {
+    gatt_server::run(sd, &server).await
+}
+
+#[static_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryServiceServer = gatt_server::register(sd).dewrap();
+    unsafe { gatt_server_task.spawn(sd, server).dewrap() };
 
     #[rustfmt::skip]
     let adv_data = &[

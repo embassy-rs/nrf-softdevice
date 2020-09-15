@@ -115,6 +115,34 @@ pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
     })
 }
 
+static RUN_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
+
+pub async fn run<S: Server>(sd: &Softdevice, server: &S) {
+    RUN_PORTAL
+        .wait_many(|ble_evt| unsafe {
+            let evt = &(*ble_evt);
+            let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
+
+            match evt.header.evt_id as u32 {
+                raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => {
+                    let params = get_union_field(ble_evt, &gatts_evt.params.write);
+                    let v = get_flexarray(ble_evt, &params.data, params.len as usize);
+                    info!("write handle={:u16} data={:[u8]}", params.handle, v);
+                    if params.offset != 0 {
+                        depanic!("gatt_server writes with nonzero offset are not yet supported");
+                    }
+                    if params.auth_required != 0 {
+                        depanic!("gatt_server auth_required not yet supported");
+                    }
+                }
+                _ => depanic!("unexpected evt {:u16}", evt.header.evt_id),
+            }
+
+            Option::<()>::None
+        })
+        .await;
+}
+
 #[derive(defmt::Format)]
 pub enum GetValueError {
     Truncated,
@@ -171,8 +199,9 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
     Ok(())
 }
 
-pub(crate) unsafe fn on_write(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
+pub(crate) unsafe fn on_write(ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
     trace!("gatts on_write conn_handle={:u16}", gatts_evt.conn_handle);
+    RUN_PORTAL.call(ble_evt)
 }
 
 pub(crate) unsafe fn on_rw_authorize_request(
