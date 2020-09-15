@@ -142,7 +142,7 @@ pub(crate) async fn discover_service(
 
     state
         .gattc_portal
-        .wait(|e| match e {
+        .wait_once(|e| match e {
             PortalMessage::DiscoverService(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
                 let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
@@ -203,7 +203,7 @@ async fn discover_characteristics(
 
     state
         .gattc_portal
-        .wait(|e| match e {
+        .wait_once(|e| match e {
             PortalMessage::DiscoverCharacteristics(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
                 let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
@@ -257,7 +257,7 @@ async fn discover_descriptors(
 
     state
         .gattc_portal
-        .wait(|e| match e {
+        .wait_once(|e| match e {
             PortalMessage::DiscoverDescriptors(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
                 let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
@@ -406,7 +406,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 
     state
         .gattc_portal
-        .wait(|e| match e {
+        .wait_once(|e| match e {
             PortalMessage::Read(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
                 let params = get_union_field(ble_evt, &gattc_evt.params.read_rsp);
@@ -481,7 +481,7 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
 
     state
         .gattc_portal
-        .wait(|e| match e {
+        .wait_once(|e| match e {
             PortalMessage::Write(ble_evt) => unsafe {
                 let _gattc_evt = check_status(ble_evt)?;
                 Ok(())
