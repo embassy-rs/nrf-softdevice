@@ -13,6 +13,9 @@ defmt-info = []
 defmt-warn = []
 defmt-error = []
 
+ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
+ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
+
 [dependencies]
 async-flash = { version = "0.1.0", path = "../async-flash" }
 cortex-m        = { version = "0.6.3" }
@@ -31,4 +34,16 @@ futures = { version = "0.3.5", default-features = false }
 [[bin]]
 name = "rtic"
 required-features = ["cortex-m-rtic"]
+
+[[bin]]
+name = "ble_bas_peripheral"
+required-features = ["ble-gatt-server"]
+
+[[bin]]
+name = "ble_bas_central"
+required-features = ["ble-gatt-client"]
+
+[[bin]]
+name = "ble_peripheral_gattspam"
+required-features = ["ble-gatt-client"]
 

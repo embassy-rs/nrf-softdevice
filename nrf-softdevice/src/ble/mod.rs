@@ -13,7 +13,10 @@ pub mod central;
 #[cfg(feature = "ble-peripheral")]
 pub mod peripheral;
 
+#[cfg(feature = "ble-gatt-client")]
 pub mod gatt_client;
+
+#[cfg(feature = "ble-gatt-server")]
 pub mod gatt_server;
 
 #[cfg(feature = "ble-l2cap")]
