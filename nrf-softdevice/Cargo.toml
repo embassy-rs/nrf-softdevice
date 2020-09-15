@@ -26,6 +26,8 @@ s140 = ["nrf-softdevice-s140"]
 ble-peripheral = []
 ble-central = []
 ble-l2cap = []
+ble-gatt-server = []
+ble-gatt-client = []
 
 [dependencies]
 num_enum = { version = "0.5.1", default-features = false }
@@ -49,4 +51,4 @@ nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", opti
 
 [package.metadata.docs.rs]
 targets = ["thumbv7em-none-eabihf"]
-features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap"]
+features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client"]
