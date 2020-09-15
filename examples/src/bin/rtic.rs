@@ -44,7 +44,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
     ];
 
     loop {
-        let _conn = peripheral::advertise(
+        let conn = peripheral::advertise(
             sd,
             peripheral::ConnectableAdvertisement::ScannableUndirected {
                 adv_data,
