@@ -22,7 +22,7 @@ use nrf52840_hal::pac::TIMER1;
 use nrf52840_hal::prelude::*;
 use nrf52840_hal::timer::{Periodic, Timer};
 use nrf_softdevice::ble::peripheral;
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{raw, temperature_celsius, Softdevice};
 use rtic::app;
 
 #[static_executor::task]
@@ -119,6 +119,9 @@ const APP: () = {
         // because RTIC runs init with interrupts disabled, and the
         // softdevice crashes if it's enabled with interrupts disabled.
         let sd = Softdevice::enable(&config);
+
+        let temp = temperature_celsius(&sd).dewrap();
+        info!("{:i32}°C", temp.to_num::<i32>());
 
         unsafe {
             softdevice_task.spawn(sd).dewrap();
