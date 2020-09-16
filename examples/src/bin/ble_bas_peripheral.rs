@@ -96,7 +96,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
         info!("advertising done!");
 
-        // Detach the connection so it isn't disconnected when dropped.
+        // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
             BatteryServiceEvent::BatteryLevelWrite(data) => {
                 info!("wrote battery level: {:u8}", data)
