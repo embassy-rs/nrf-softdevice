@@ -5,7 +5,11 @@ name = "nrf-softdevice-examples"
 version = "0.1.0"
 
 [features]
-default = [ "defmt-default" ]
+default = [
+    "defmt-default",
+    "ble-gatt-server",
+    "ble-gatt-client",
+]
 defmt-default = []
 defmt-trace = []
 defmt-debug = []
