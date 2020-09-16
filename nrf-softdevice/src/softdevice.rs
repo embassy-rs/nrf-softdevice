@@ -273,10 +273,7 @@ impl Softdevice {
                 if wanted_app_ram_base <= app_ram_base {
                     depanic!("selected configuration has too high RAM requirements.")
                 } else {
-                    depanic!(
-                    "too little RAM for softdevice. Change your app's RAM start address to {:u32}",
-                    wanted_app_ram_base
-                );
+                    depanic!("too little RAM for softdevice. Change your app's RAM start address to {:u32}", wanted_app_ram_base);
                 }
             }
             Err(err) => depanic!("sd_ble_enable err {:?}", err),

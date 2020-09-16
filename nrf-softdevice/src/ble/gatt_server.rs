@@ -8,6 +8,8 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::types::*;
+use crate::ble::DisconnectedError;
+use crate::ble::{Connection, ConnectionState};
 use crate::raw;
 use crate::util::*;
 use crate::RawError;
@@ -30,10 +32,14 @@ pub struct CharacteristicHandles {
 }
 
 pub trait Server: Sized {
+    type Event;
+
     fn uuid() -> Uuid;
     fn register<F>(service_handle: u16, register_char: F) -> Result<Self, RegisterError>
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
+
+    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
 #[derive(defmt::Format)]
@@ -115,32 +121,60 @@ pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
     })
 }
 
-static RUN_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
+pub(crate) enum PortalMessage {
+    Write(*const raw::ble_evt_t),
+    Disconnected,
+}
 
-pub async fn run<S: Server>(sd: &Softdevice, server: &S) {
-    RUN_PORTAL
-        .wait_many(|ble_evt| unsafe {
-            let evt = &(*ble_evt);
-            let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
+#[derive(defmt::Format)]
+pub enum RunError {
+    Disconnected,
+    Raw(RawError),
+}
 
-            match evt.header.evt_id as u32 {
-                raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => {
+impl From<RawError> for RunError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+impl From<DisconnectedError> for RunError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+pub async fn run<S: Server, F>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
+where
+    F: FnMut(S::Event),
+{
+    let state = conn.state();
+    state.check_connected()?;
+    state
+        .gatts_portal
+        .wait_many(|m| {
+            match m {
+                PortalMessage::Disconnected => return Some(Err(RunError::Disconnected)),
+                PortalMessage::Write(ble_evt) => unsafe {
+                    let bounded = BoundedLifetime;
+                    let evt = bounded.deref(ble_evt);
+                    let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
                     let params = get_union_field(ble_evt, &gatts_evt.params.write);
                     let v = get_flexarray(ble_evt, &params.data, params.len as usize);
-                    info!("write handle={:u16} data={:[u8]}", params.handle, v);
+                    trace!("gatts write handle={:u16} data={:[u8]}", params.handle, v);
                     if params.offset != 0 {
                         depanic!("gatt_server writes with nonzero offset are not yet supported");
                     }
                     if params.auth_required != 0 {
                         depanic!("gatt_server auth_required not yet supported");
                     }
-                }
-                _ => depanic!("unexpected evt {:u16}", evt.header.evt_id),
-            }
 
-            Option::<()>::None
+                    server.on_write(params.handle, v).map(|e| f(e));
+                },
+            }
+            None
         })
-        .await;
+        .await
 }
 
 #[derive(defmt::Format)]
@@ -201,7 +235,9 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
 
 pub(crate) unsafe fn on_write(ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
     trace!("gatts on_write conn_handle={:u16}", gatts_evt.conn_handle);
-    RUN_PORTAL.call(ble_evt)
+    ConnectionState::by_conn_handle(gatts_evt.conn_handle)
+        .gatts_portal
+        .call(PortalMessage::Write(ble_evt));
 }
 
 pub(crate) unsafe fn on_rw_authorize_request(

@@ -15,6 +15,14 @@ pub(crate) use defmt::{debug, error, info, intern, trace, warn};
 
 use crate::raw;
 
+pub(crate) struct BoundedLifetime;
+
+impl BoundedLifetime {
+    pub(crate) unsafe fn deref<T>(&self, ptr: *const T) -> &T {
+        &*ptr
+    }
+}
+
 pub trait Dewrap<T> {
     /// dewrap = defmt unwrap
     fn dewrap(self) -> T;

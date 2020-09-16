@@ -8,7 +8,8 @@ use crate::RawError;
 
 #[rustfmt::skip]
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
-    let evt = &*ble_evt;
+    let bounded = BoundedLifetime;
+    let evt = bounded.deref(ble_evt);
     //defmt::trace!("ble evt {:istr}", evt_str(evt.header.evt_id as u32));
     match evt.header.evt_id as u32 {
         raw::BLE_COMMON_EVTS_BLE_EVT_USER_MEM_REQUEST => on_user_mem_request(ble_evt, get_union_field(ble_evt, &evt.evt.common_evt)),

@@ -2,6 +2,8 @@ use core::cell::Cell;
 
 #[cfg(feature = "ble-gatt-client")]
 use crate::ble::gatt_client;
+#[cfg(feature = "ble-gatt-server")]
+use crate::ble::gatt_server;
 use crate::ble::types::*;
 use crate::raw;
 use crate::util::*;
@@ -41,6 +43,8 @@ pub(crate) struct ConnectionState {
 
     #[cfg(feature = "ble-gatt-client")]
     pub gattc_portal: Portal<gatt_client::PortalMessage>,
+    #[cfg(feature = "ble-gatt-server")]
+    pub gatts_portal: Portal<gatt_server::PortalMessage>,
 }
 
 impl ConnectionState {
@@ -54,6 +58,7 @@ impl ConnectionState {
             role: Cell::new(Role::whatever()),
             #[cfg(feature = "ble-gatt-client")]
             gattc_portal: Portal::new(),
+            gatts_portal: Portal::new(),
         }
     }
 
@@ -110,11 +115,13 @@ impl ConnectionState {
         INDEX_BY_HANDLE.0[conn_handle as usize].set(None);
         self.conn_handle.set(None);
 
-        // Signal possible in-progess gattc procedures that the connection
-        // has disconnected.
+        // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
         self.gattc_portal
             .call(gatt_client::PortalMessage::Disconnected);
+        #[cfg(feature = "ble-gatt-server")]
+        self.gatts_portal
+            .call(gatt_server::PortalMessage::Disconnected);
     }
 }
 

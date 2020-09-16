@@ -27,7 +27,13 @@ struct BatteryServiceServer {
     battery_level_cccd_handle: u16,
 }
 
+enum BatteryServiceEvent {
+    BatteryLevelWrite(u8),
+}
+
 impl gatt_server::Server for BatteryServiceServer {
+    type Event = BatteryServiceEvent;
+
     fn uuid() -> Uuid {
         GATT_BAS_SVC_UUID
     }
@@ -53,17 +59,18 @@ impl gatt_server::Server for BatteryServiceServer {
             battery_level_value_handle: battery_level.value_handle,
         })
     }
-}
 
-#[static_executor::task]
-async fn gatt_server_task(sd: &'static Softdevice, server: BatteryServiceServer) {
-    gatt_server::run(sd, &server).await
+    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+        if handle == self.battery_level_value_handle {
+            return Some(BatteryServiceEvent::BatteryLevelWrite(data[0]));
+        }
+        None
+    }
 }
 
 #[static_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryServiceServer = gatt_server::register(sd).dewrap();
-    unsafe { gatt_server_task.spawn(sd, server).dewrap() };
 
     #[rustfmt::skip]
     let adv_data = &[
@@ -90,7 +97,16 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         info!("advertising done!");
 
         // Detach the connection so it isn't disconnected when dropped.
-        conn.detach();
+        let res = gatt_server::run(&conn, &server, |e| match e {
+            BatteryServiceEvent::BatteryLevelWrite(data) => {
+                info!("wrote battery level: {:u8}", data)
+            }
+        })
+        .await;
+
+        if let Err(e) = res {
+            info!("gatt_server run exited with error: {:?}", e);
+        }
     }
 }
 
