@@ -225,35 +225,47 @@ pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::
 
 pub(crate) unsafe fn on_rssi_changed(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!("on_rssi_changed conn_handle={:u16}", gap_evt.conn_handle);
 }
 
-pub(crate) unsafe fn on_sec_request(
-    _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
-) {
+pub(crate) unsafe fn on_sec_request(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_sec_request conn_handle={:u16}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_phy_update_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_phy_update_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
-pub(crate) unsafe fn on_phy_update(_ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
+pub(crate) unsafe fn on_phy_update(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    trace!("on_phy_update conn_handle={:u16}", gap_evt.conn_handle);
 }
 
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 pub(crate) unsafe fn on_data_length_update_request(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_data_length_update_request conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
 
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 pub(crate) unsafe fn on_data_length_update(
     _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
+    gap_evt: &raw::ble_gap_evt_t,
 ) {
+    trace!(
+        "on_data_length_update conn_handle={:u16}",
+        gap_evt.conn_handle
+    );
 }
