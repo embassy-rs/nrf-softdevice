@@ -233,6 +233,46 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
     Ok(())
 }
 
+#[derive(defmt::Format)]
+pub enum SendNotificationError {
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<RawError> for SendNotificationError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+impl From<DisconnectedError> for SendNotificationError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+pub fn send_notification(
+    conn: &Connection,
+    handle: u16,
+    val: &[u8],
+) -> Result<(), SendNotificationError> {
+    let state = conn.state();
+    let conn_handle = state.check_connected()?;
+
+    let mut len: u16 = val.len() as _;
+    let params = raw::ble_gatts_hvx_params_t {
+        handle,
+        type_: raw::BLE_GATT_HVX_NOTIFICATION as u8,
+        offset: 0,
+        p_data: val.as_ptr() as _,
+        p_len: &mut len,
+    };
+    let ret = unsafe { raw::sd_ble_gatts_hvx(conn_handle, &params) };
+    RawError::convert(ret)?;
+
+    Ok(())
+}
+
 pub(crate) unsafe fn on_write(ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
     trace!("gatts on_write conn_handle={:u16}", gatts_evt.conn_handle);
     ConnectionState::by_conn_handle(gatts_evt.conn_handle)
