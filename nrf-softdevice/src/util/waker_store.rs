@@ -11,7 +11,7 @@ impl WakerStore {
 
     pub fn store(&mut self, w: &Waker) {
         match self.waker {
-            Some(ref w) if (w.will_wake(w)) => {}
+            Some(ref w2) if (w2.will_wake(w)) => {}
             Some(_) => panic!("Waker overflow"),
             None => self.waker = Some(w.clone()),
         }
