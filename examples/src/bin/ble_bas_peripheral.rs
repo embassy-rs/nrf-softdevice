@@ -11,7 +11,7 @@ use cortex_m_rt::entry;
 use defmt::info;
 
 use nrf_softdevice::ble::gatt_server::{Characteristic, CharacteristicHandles, RegisterError};
-use nrf_softdevice::ble::{gatt_server, peripheral, Uuid};
+use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, RawError, Softdevice};
 
 #[static_executor::task]
@@ -33,6 +33,32 @@ enum BatteryServiceEvent {
     BatteryLevelNotificationsDisabled,
 }
 
+// This is boilerplate, ideally it'll be generated with a proc macro in the future.
+impl BatteryServiceServer {
+    fn battery_level_get(&self, sd: &Softdevice) -> Result<u8, gatt_server::GetValueError> {
+        let buf = &mut [0u8; 0];
+        gatt_server::get_value(sd, self.battery_level_value_handle, buf)?;
+        Ok(buf[0])
+    }
+
+    fn battery_level_set(
+        &self,
+        sd: &Softdevice,
+        val: u8,
+    ) -> Result<(), gatt_server::SetValueError> {
+        gatt_server::set_value(sd, self.battery_level_value_handle, &[val])
+    }
+
+    fn battery_level_notify(
+        &self,
+        conn: &Connection,
+        val: u8,
+    ) -> Result<(), gatt_server::NotifyValueError> {
+        gatt_server::notify_value(conn, self.battery_level_value_handle, &[val])
+    }
+}
+
+// This is boilerplate, ideally it'll be generated with a proc macro in the future.
 impl gatt_server::Server for BatteryServiceServer {
     type Event = BatteryServiceEvent;
 
@@ -107,14 +133,9 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
-            BatteryServiceEvent::BatteryLevelWrite(data) => {
-                info!("wrote battery level: {:u8}", data);
-                let res = gatt_server::send_notification(
-                    &conn,
-                    server.battery_level_value_handle,
-                    &[data + 1],
-                );
-                if let Err(e) = res {
+            BatteryServiceEvent::BatteryLevelWrite(val) => {
+                info!("wrote battery level: {:u8}", val);
+                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }

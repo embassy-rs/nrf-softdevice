@@ -234,28 +234,24 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
 }
 
 #[derive(defmt::Format)]
-pub enum SendNotificationError {
+pub enum NotifyValueError {
     Disconnected,
     Raw(RawError),
 }
 
-impl From<RawError> for SendNotificationError {
+impl From<RawError> for NotifyValueError {
     fn from(err: RawError) -> Self {
         Self::Raw(err)
     }
 }
 
-impl From<DisconnectedError> for SendNotificationError {
+impl From<DisconnectedError> for NotifyValueError {
     fn from(_: DisconnectedError) -> Self {
         Self::Disconnected
     }
 }
 
-pub fn send_notification(
-    conn: &Connection,
-    handle: u16,
-    val: &[u8],
-) -> Result<(), SendNotificationError> {
+pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), NotifyValueError> {
     let state = conn.state();
     let conn_handle = state.check_connected()?;
 
