@@ -102,19 +102,19 @@ pub enum DiscoverError {
 
 impl From<DisconnectedError> for DiscoverError {
     fn from(_: DisconnectedError) -> Self {
-        DiscoverError::Disconnected
+        Self::Disconnected
     }
 }
 
 impl From<GattError> for DiscoverError {
     fn from(err: GattError) -> Self {
-        DiscoverError::Gatt(err)
+        Self::Gatt(err)
     }
 }
 
 impl From<RawError> for DiscoverError {
     fn from(err: RawError) -> Self {
-        DiscoverError::Raw(err)
+        Self::Raw(err)
     }
 }
 
@@ -127,6 +127,7 @@ pub(crate) enum PortalMessage {
     DiscoverDescriptors(*const raw::ble_evt_t),
     Read(*const raw::ble_evt_t),
     Write(*const raw::ble_evt_t),
+    WriteTxComplete(*const raw::ble_evt_t),
     Disconnected,
 }
 
@@ -381,19 +382,19 @@ pub enum ReadError {
 
 impl From<DisconnectedError> for ReadError {
     fn from(_: DisconnectedError) -> Self {
-        ReadError::Disconnected
+        Self::Disconnected
     }
 }
 
 impl From<GattError> for ReadError {
     fn from(err: GattError) -> Self {
-        ReadError::Gatt(err)
+        Self::Gatt(err)
     }
 }
 
 impl From<RawError> for ReadError {
     fn from(err: RawError) -> Self {
-        ReadError::Raw(err)
+        Self::Raw(err)
     }
 }
 
@@ -406,21 +407,24 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 
     state
         .gattc_portal
-        .wait_once(|e| match e {
+        .wait_many(|e| match e {
             PortalMessage::Read(ble_evt) => unsafe {
-                let gattc_evt = check_status(ble_evt)?;
+                let gattc_evt = match check_status(ble_evt) {
+                    Ok(evt) => evt,
+                    Err(e) => return Some(Err(e.into())),
+                };
                 let params = get_union_field(ble_evt, &gattc_evt.params.read_rsp);
                 let v = get_flexarray(ble_evt, &params.data, params.len as usize);
                 let len = core::cmp::min(v.len(), buf.len());
                 buf[..len].copy_from_slice(&v[..len]);
 
                 if v.len() > buf.len() {
-                    return Err(ReadError::Truncated);
+                    return Some(Err(ReadError::Truncated));
                 }
-                Ok(len)
+                Some(Ok(len))
             },
-            PortalMessage::Disconnected => Err(ReadError::Disconnected),
-            _ => unreachable!(),
+            PortalMessage::Disconnected => Some(Err(ReadError::Disconnected)),
+            _ => None,
         })
         .await
 }
@@ -452,13 +456,13 @@ impl From<DisconnectedError> for WriteError {
 
 impl From<GattError> for WriteError {
     fn from(err: GattError) -> Self {
-        WriteError::Gatt(err)
+        Self::Gatt(err)
     }
 }
 
 impl From<RawError> for WriteError {
     fn from(err: RawError) -> Self {
-        WriteError::Raw(err)
+        Self::Raw(err)
     }
 }
 
@@ -481,22 +485,89 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
 
     state
         .gattc_portal
-        .wait_once(|e| match e {
+        .wait_many(|e| match e {
             PortalMessage::Write(ble_evt) => unsafe {
-                let _gattc_evt = check_status(ble_evt)?;
-                Ok(())
+                match check_status(ble_evt) {
+                    Ok(_) => {}
+                    Err(e) => return Some(Err(e.into())),
+                };
+                Some(Ok(()))
             },
-            PortalMessage::Disconnected => Err(WriteError::Disconnected),
-            _ => unreachable!(),
+            PortalMessage::Disconnected => Some(Err(WriteError::Disconnected)),
+            _ => None,
         })
         .await
 }
 
-pub fn write_without_response(
+pub async fn write_without_response(
     conn: &Connection,
     handle: u16,
     buf: &[u8],
 ) -> Result<(), WriteError> {
+    let state = conn.state();
+
+    loop {
+        let conn_handle = state.check_connected()?;
+
+        deassert!(buf.len() <= u16::MAX as usize);
+        let params = raw::ble_gattc_write_params_t {
+            write_op: raw::BLE_GATT_OP_WRITE_CMD as u8,
+            flags: 0,
+            handle,
+            p_value: buf.as_ptr(),
+            len: buf.len() as u16,
+            offset: 0,
+        };
+
+        let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
+        match RawError::convert(ret) {
+            Err(RawError::Resources) => {}
+            Err(e) => return Err(e.into()),
+            Ok(()) => return Ok(()),
+        }
+
+        state
+            .gattc_portal
+            .wait_many(|e| match e {
+                PortalMessage::WriteTxComplete(_) => Some(Ok(())),
+                PortalMessage::Disconnected => Some(Err(WriteError::Disconnected)),
+                _ => None,
+            })
+            .await?;
+    }
+}
+
+#[derive(defmt::Format)]
+pub enum TryWriteError {
+    Disconnected,
+    BufferFull,
+    Gatt(GattError),
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for TryWriteError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+impl From<GattError> for TryWriteError {
+    fn from(err: GattError) -> Self {
+        Self::Gatt(err)
+    }
+}
+
+impl From<RawError> for TryWriteError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+pub fn try_write_without_response(
+    conn: &Connection,
+    handle: u16,
+    buf: &[u8],
+) -> Result<(), TryWriteError> {
     let state = conn.state();
     let conn_handle = state.check_connected()?;
 
@@ -511,9 +582,11 @@ pub fn write_without_response(
     };
 
     let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_write"))?;
-
-    Ok(())
+    match RawError::convert(ret) {
+        Err(RawError::Resources) => Err(TryWriteError::BufferFull),
+        Err(e) => Err(e.into()),
+        Ok(()) => Ok(()),
+    }
 }
 
 pub(crate) unsafe fn on_write_rsp(
@@ -613,7 +686,7 @@ pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw
 }
 
 pub(crate) unsafe fn on_write_cmd_tx_complete(
-    _ble_evt: *const raw::ble_evt_t,
+    ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
@@ -621,4 +694,8 @@ pub(crate) unsafe fn on_write_cmd_tx_complete(
         gattc_evt.conn_handle,
         gattc_evt.gatt_status,
     );
+
+    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
+        .gattc_portal
+        .call(PortalMessage::WriteTxComplete(ble_evt))
 }
