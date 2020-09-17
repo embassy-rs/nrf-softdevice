@@ -28,7 +28,6 @@ struct BatteryServiceServer {
 }
 
 enum BatteryServiceEvent {
-    BatteryLevelWrite(u8),
     BatteryLevelNotificationsEnabled,
     BatteryLevelNotificationsDisabled,
 }
@@ -76,7 +75,7 @@ impl gatt_server::Server for BatteryServiceServer {
                 can_indicate: false,
                 can_notify: true,
                 can_read: true,
-                can_write: true,
+                can_write: false,
                 max_len: 1,
             },
             &[123],
@@ -89,11 +88,8 @@ impl gatt_server::Server for BatteryServiceServer {
     }
 
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
-        if handle == self.battery_level_value_handle {
-            return Some(BatteryServiceEvent::BatteryLevelWrite(data[0]));
-        }
         if handle == self.battery_level_cccd_handle {
-            if data.len() != 0 && data[0] & 0x01 != 0 {
+            if !data.is_empty() && data[0] & 0x01 != 0 {
                 return Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled);
             } else {
                 return Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled);
@@ -133,12 +129,6 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
-            BatteryServiceEvent::BatteryLevelWrite(val) => {
-                info!("wrote battery level: {:u8}", val);
-                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
-                }
-            }
             BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
                 info!("battery notifications enabled")
             }
