@@ -5,5 +5,10 @@
   "rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
   "rust-analyzer.checkOnSave.allTargets": false,
   "rust-analyzer.cargo.loadOutDirsFromCheck": true,
-  "rust-analyzer.procMacro.enable": true
+  "rust-analyzer.procMacro.enable": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/target/**": true,
+  }
 }
