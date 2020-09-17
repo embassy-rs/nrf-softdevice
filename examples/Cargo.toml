@@ -7,6 +7,7 @@ version = "0.1.0"
 [features]
 default = [
     "defmt-default",
+    "ble-l2cap",
     "ble-gatt-server",
     "ble-gatt-client",
 ]
@@ -17,6 +18,7 @@ defmt-info = []
 defmt-warn = []
 defmt-error = []
 
+ble-l2cap = ["nrf-softdevice/ble-l2cap"]
 ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
 ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
 
