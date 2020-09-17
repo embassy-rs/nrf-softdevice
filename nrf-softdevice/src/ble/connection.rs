@@ -58,6 +58,7 @@ impl ConnectionState {
             role: Cell::new(Role::whatever()),
             #[cfg(feature = "ble-gatt-client")]
             gattc_portal: Portal::new(),
+            #[cfg(feature = "ble-gatt-server")]
             gatts_portal: Portal::new(),
         }
     }
