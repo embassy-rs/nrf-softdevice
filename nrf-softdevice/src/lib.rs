@@ -54,6 +54,49 @@ compile_error!("No chip feature activated. You must activate exactly one of the 
 ))]
 compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52832, nrf52833, nrf52840");
 
+// https://www.nordicsemi.com/Software-and-tools/Software/Bluetooth-Software
+//
+//      | Central  Peripheral  L2CAP-CoC | nrf52805  nrf52810  nrf52811  nrf52820  nrf52832  nrf52833, nrf52840
+// -----|--------------------------------|--------------------------------------------------------------------------
+// s112 |              X                 |    X         X         X         X         X
+// s113 |              X           X     |    X         X         X         X         X         X         X
+// s122 |    X                           |                                  X                   X
+// s132 |    X         X           X     |              X                             X
+// s140 |    X         X           X     |                        X         X                   X         X
+
+#[cfg(not(any(
+    all(feature = "s112", feature = "nrf52810"),
+    all(feature = "s112", feature = "nrf52832"),
+    all(feature = "s113", feature = "nrf52810"),
+    all(feature = "s113", feature = "nrf52832"),
+    all(feature = "s113", feature = "nrf52833"),
+    all(feature = "s113", feature = "nrf52840"),
+    all(feature = "s122", feature = "nrf52833"),
+    all(feature = "s132", feature = "nrf52810"),
+    all(feature = "s132", feature = "nrf52832"),
+    all(feature = "s140", feature = "nrf52833"),
+    all(feature = "s140", feature = "nrf52840"),
+)))]
+compile_error!("The selected chip and softdevice are not compatible.");
+
+#[cfg(all(
+    feature = "ble-central",
+    not(any(feature = "s122", feature = "s132", feature = "s140"))
+))]
+compile_error!("The selected softdevice does not support ble-central.");
+
+#[cfg(all(
+    feature = "ble-peripheral",
+    not(any(feature = "s112", feature = "s113", feature = "s132", feature = "s140"))
+))]
+compile_error!("The selected softdevice does not support ble-peripheral.");
+
+#[cfg(all(
+    feature = "ble-l2cap",
+    not(any(feature = "s113", feature = "s132", feature = "s140"))
+))]
+compile_error!("The selected softdevice does not support ble-l2cap.");
+
 #[cfg(feature = "nrf52810")]
 pub use nrf52810_pac as pac;
 #[cfg(feature = "nrf52832")]
