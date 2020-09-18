@@ -43,3 +43,5 @@ pub use cortex_m_rt::interrupt;
 
 mod temperature;
 pub use temperature::temperature_celsius;
+
+pub use nrf_softdevice_macro::*;

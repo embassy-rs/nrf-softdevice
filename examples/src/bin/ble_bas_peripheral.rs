@@ -22,90 +22,15 @@ async fn softdevice_task(sd: &'static Softdevice) {
 const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
 const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
 
-struct BatteryServiceServer {
-    battery_level_value_handle: u16,
-    battery_level_cccd_handle: u16,
-}
-
-enum BatteryServiceEvent {
-    BatteryLevelWrite(u8),
-    BatteryLevelNotificationsEnabled,
-    BatteryLevelNotificationsDisabled,
-}
-
-// This is boilerplate, ideally it'll be generated with a proc macro in the future.
-impl BatteryServiceServer {
-    fn battery_level_get(&self, sd: &Softdevice) -> Result<u8, gatt_server::GetValueError> {
-        let buf = &mut [0u8; 0];
-        gatt_server::get_value(sd, self.battery_level_value_handle, buf)?;
-        Ok(buf[0])
-    }
-
-    fn battery_level_set(
-        &self,
-        sd: &Softdevice,
-        val: u8,
-    ) -> Result<(), gatt_server::SetValueError> {
-        gatt_server::set_value(sd, self.battery_level_value_handle, &[val])
-    }
-
-    fn battery_level_notify(
-        &self,
-        conn: &Connection,
-        val: u8,
-    ) -> Result<(), gatt_server::NotifyValueError> {
-        gatt_server::notify_value(conn, self.battery_level_value_handle, &[val])
-    }
-}
-
-// This is boilerplate, ideally it'll be generated with a proc macro in the future.
-impl gatt_server::Server for BatteryServiceServer {
-    type Event = BatteryServiceEvent;
-
-    fn uuid() -> Uuid {
-        GATT_BAS_SVC_UUID
-    }
-
-    fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, RegisterError>
-    where
-        F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>,
-    {
-        let battery_level = register_char(
-            Characteristic {
-                uuid: GATT_BAS_BATTERY_LEVEL_CHAR_UUID,
-                can_indicate: false,
-                can_notify: true,
-                can_read: true,
-                can_write: true,
-                max_len: 1,
-            },
-            &[123],
-        )?;
-
-        Ok(Self {
-            battery_level_cccd_handle: battery_level.cccd_handle,
-            battery_level_value_handle: battery_level.value_handle,
-        })
-    }
-
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
-        if handle == self.battery_level_value_handle {
-            return Some(BatteryServiceEvent::BatteryLevelWrite(data[0]));
-        }
-        if handle == self.battery_level_cccd_handle {
-            if data.len() != 0 && data[0] & 0x01 != 0 {
-                return Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled);
-            } else {
-                return Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled);
-            }
-        }
-        None
-    }
+#[nrf_softdevice::gatt_server(uuid = "180f")]
+struct BatteryService {
+    #[characteristic(uuid = "2a19", read, write, notify)]
+    battery_level: u8,
 }
 
 #[static_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    let server: BatteryServiceServer = gatt_server::register(sd).dewrap();
+    let server: BatteryService = gatt_server::register(sd).dewrap();
 
     #[rustfmt::skip]
     let adv_data = &[

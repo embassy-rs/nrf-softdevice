@@ -291,6 +291,13 @@ impl Softdevice {
         unsafe { &SOFTDEVICE }
     }
 
+    /// Return an instance to the softdevice without checking whether
+    /// it is enabled or not. This is only safe if the softdevice is enabled
+    /// (a call to [`enable`] has returned without error)
+    pub unsafe fn steal() -> &'static Softdevice {
+        &SOFTDEVICE
+    }
+
     /// Runs the softdevice event handling loop.
     ///
     /// It must be called in its own async task after enabling the softdevice

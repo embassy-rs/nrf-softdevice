@@ -50,6 +50,8 @@ nrf-softdevice-s122 = { version = "0.1.1", path = "../nrf-softdevice-s122", opti
 nrf-softdevice-s132 = { version = "0.1.1", path = "../nrf-softdevice-s132", optional = true }
 nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", optional = true }
 
+nrf-softdevice-macro = { version = "0.1.0", path = "../nrf-softdevice-macro" }
+
 [package.metadata.docs.rs]
 targets = ["thumbv7em-none-eabihf"]
 features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client"]

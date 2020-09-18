@@ -8,6 +8,7 @@ members = [
     "nrf-softdevice-s122",
     "nrf-softdevice-s132",
     "nrf-softdevice-s140",
+    "nrf-softdevice-macro",
 
     "async-flash",
 
