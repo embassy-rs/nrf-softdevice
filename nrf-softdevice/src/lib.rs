@@ -7,6 +7,53 @@
 
 pub(crate) mod util;
 
+#[cfg(not(any(feature = "ble-central", feature = "ble-peripheral",)))]
+compile_error!(
+    "You must activate at least one of the following features: ble-central, ble-peripheral"
+);
+
+#[cfg(not(any(
+    feature = "s112",
+    feature = "s113",
+    feature = "s122",
+    feature = "s132",
+    feature = "s140"
+)))]
+compile_error!("No softdevice feature activated. You must activate exactly one of the following features: s112, s113, s122, s132, s140");
+
+// I don't know how to do this with less than O(n^2)... :(
+#[cfg(any(
+    all(feature = "s112", feature = "s113"),
+    all(feature = "s112", feature = "s122"),
+    all(feature = "s112", feature = "s132"),
+    all(feature = "s112", feature = "s140"),
+    all(feature = "s113", feature = "s122"),
+    all(feature = "s113", feature = "s132"),
+    all(feature = "s113", feature = "s140"),
+    all(feature = "s122", feature = "s132"),
+    all(feature = "s122", feature = "s140"),
+    all(feature = "s132", feature = "s140"),
+))]
+compile_error!("Multiple softdevice features activated. You must activate exactly one of the following features: s112, s113, s122, s132, s140");
+
+#[cfg(not(any(
+    feature = "nrf52810",
+    feature = "nrf52832",
+    feature = "nrf52833",
+    feature = "nrf52840",
+)))]
+compile_error!("No chip feature activated. You must activate exactly one of the following features: nrf52810, nrf52832, nrf52833, nrf52840");
+
+#[cfg(any(
+    all(feature = "nrf52810", feature = "nrf52832"),
+    all(feature = "nrf52810", feature = "nrf52833"),
+    all(feature = "nrf52810", feature = "nrf52840"),
+    all(feature = "nrf52832", feature = "nrf52833"),
+    all(feature = "nrf52832", feature = "nrf52840"),
+    all(feature = "nrf52833", feature = "nrf52840"),
+))]
+compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52832, nrf52833, nrf52840");
+
 #[cfg(feature = "nrf52810")]
 pub use nrf52810_pac as pac;
 #[cfg(feature = "nrf52832")]
