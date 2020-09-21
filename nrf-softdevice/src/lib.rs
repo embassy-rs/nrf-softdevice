@@ -38,21 +38,26 @@ compile_error!("Multiple softdevice features activated. You must activate exactl
 
 #[cfg(not(any(
     feature = "nrf52810",
+    feature = "nrf52811",
     feature = "nrf52832",
     feature = "nrf52833",
     feature = "nrf52840",
 )))]
-compile_error!("No chip feature activated. You must activate exactly one of the following features: nrf52810, nrf52832, nrf52833, nrf52840");
+compile_error!("No chip feature activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
 
 #[cfg(any(
+    all(feature = "nrf52810", feature = "nrf52811"),
     all(feature = "nrf52810", feature = "nrf52832"),
     all(feature = "nrf52810", feature = "nrf52833"),
     all(feature = "nrf52810", feature = "nrf52840"),
+    all(feature = "nrf52811", feature = "nrf52832"),
+    all(feature = "nrf52811", feature = "nrf52833"),
+    all(feature = "nrf52811", feature = "nrf52840"),
     all(feature = "nrf52832", feature = "nrf52833"),
     all(feature = "nrf52832", feature = "nrf52840"),
     all(feature = "nrf52833", feature = "nrf52840"),
 ))]
-compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52832, nrf52833, nrf52840");
+compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
 
 // https://www.nordicsemi.com/Software-and-tools/Software/Bluetooth-Software
 //
@@ -65,17 +70,20 @@ compile_error!("Multile chip features activated. You must activate exactly one o
 // s140 |    X         X           X     |                        X         X                   X         X
 
 #[cfg(not(any(
-    all(feature = "s112", feature = "nrf52810"),
-    all(feature = "s112", feature = "nrf52832"),
-    all(feature = "s113", feature = "nrf52810"),
-    all(feature = "s113", feature = "nrf52832"),
-    all(feature = "s113", feature = "nrf52833"),
-    all(feature = "s113", feature = "nrf52840"),
-    all(feature = "s122", feature = "nrf52833"),
-    all(feature = "s132", feature = "nrf52810"),
-    all(feature = "s132", feature = "nrf52832"),
-    all(feature = "s140", feature = "nrf52833"),
-    all(feature = "s140", feature = "nrf52840"),
+    all(feature = "nrf52810", feature = "s112"),
+    all(feature = "nrf52810", feature = "s113"),
+    all(feature = "nrf52810", feature = "s132"),
+    all(feature = "nrf52811", feature = "s112"),
+    all(feature = "nrf52811", feature = "s113"),
+    all(feature = "nrf52811", feature = "s140"),
+    all(feature = "nrf52832", feature = "s112"),
+    all(feature = "nrf52832", feature = "s113"),
+    all(feature = "nrf52832", feature = "s132"),
+    all(feature = "nrf52833", feature = "s113"),
+    all(feature = "nrf52833", feature = "s122"),
+    all(feature = "nrf52833", feature = "s140"),
+    all(feature = "nrf52840", feature = "s113"),
+    all(feature = "nrf52840", feature = "s140"),
 )))]
 compile_error!("The selected chip and softdevice are not compatible.");
 
@@ -99,6 +107,8 @@ compile_error!("The selected softdevice does not support ble-l2cap.");
 
 #[cfg(feature = "nrf52810")]
 pub use nrf52810_pac as pac;
+#[cfg(feature = "nrf52811")]
+pub use nrf52811_pac as pac;
 #[cfg(feature = "nrf52832")]
 pub use nrf52832_pac as pac;
 #[cfg(feature = "nrf52833")]

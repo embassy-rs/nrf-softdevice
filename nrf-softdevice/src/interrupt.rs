@@ -16,7 +16,7 @@ pub use crate::pac::Interrupt;
 pub use crate::pac::Interrupt::*; // needed for cortex-m-rt #[interrupt]
 pub use bare_metal::{CriticalSection, Mutex};
 
-#[cfg(feature = "nrf52810")]
+#[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
 const RESERVED_IRQS: [u32; 2] = [
     (1 << (Interrupt::POWER_CLOCK as u8))
         | (1 << (Interrupt::RADIO as u8))
@@ -30,7 +30,7 @@ const RESERVED_IRQS: [u32; 2] = [
     0,
 ];
 
-#[cfg(not(feature = "nrf52810"))]
+#[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
 const RESERVED_IRQS: [u32; 2] = [
     (1 << (Interrupt::POWER_CLOCK as u8))
         | (1 << (Interrupt::RADIO as u8))
@@ -273,6 +273,39 @@ fn irq_str(irq: Interrupt) -> defmt::Str {
         RADIO => defmt::intern!("RADIO"),
         UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
         TWIM0_TWIS0_TWI0 => defmt::intern!("TWIM0_TWIS0_TWI0"),
+        SPIM0_SPIS0_SPI0 => defmt::intern!("SPIM0_SPIS0_SPI0"),
+        GPIOTE => defmt::intern!("GPIOTE"),
+        SAADC => defmt::intern!("SAADC"),
+        TIMER0 => defmt::intern!("TIMER0"),
+        TIMER1 => defmt::intern!("TIMER1"),
+        TIMER2 => defmt::intern!("TIMER2"),
+        RTC0 => defmt::intern!("RTC0"),
+        TEMP => defmt::intern!("TEMP"),
+        RNG => defmt::intern!("RNG"),
+        ECB => defmt::intern!("ECB"),
+        CCM_AAR => defmt::intern!("CCM_AAR"),
+        WDT => defmt::intern!("WDT"),
+        RTC1 => defmt::intern!("RTC1"),
+        QDEC => defmt::intern!("QDEC"),
+        COMP => defmt::intern!("COMP"),
+        SWI0_EGU0 => defmt::intern!("SWI0_EGU0"),
+        SWI1_EGU1 => defmt::intern!("SWI1_EGU1"),
+        SWI2 => defmt::intern!("SWI2"),
+        SWI3 => defmt::intern!("SWI3"),
+        SWI4 => defmt::intern!("SWI4"),
+        SWI5 => defmt::intern!("SWI5"),
+        PWM0 => defmt::intern!("PWM0"),
+        PDM => defmt::intern!("PDM"),
+    }
+}
+
+#[cfg(feature = "nrf52811")]
+fn irq_str(irq: Interrupt) -> defmt::Str {
+    match irq {
+        POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
+        RADIO => defmt::intern!("RADIO"),
+        UARTE0_UART0 => defmt::intern!("UARTE0_UART0"),
+        TWIM0_TWIS0_TWI0_SPIM1_SPIS1_SPI1 => defmt::intern!("TWIM0_TWIS0_TWI0_SPIM1_SPIS1_SPI1"),
         SPIM0_SPIS0_SPI0 => defmt::intern!("SPIM0_SPIS0_SPI0"),
         GPIOTE => defmt::intern!("GPIOTE"),
         SAADC => defmt::intern!("SAADC"),

@@ -13,6 +13,7 @@ defmt-warn = []
 defmt-error = []
 
 nrf52810 = ["nrf52810-pac"]
+nrf52811 = ["nrf52811-pac"]
 nrf52832 = ["nrf52832-pac"]
 nrf52833 = ["nrf52833-pac"]
 nrf52840 = ["nrf52840-pac"]
@@ -40,6 +41,7 @@ defmt = "0.1.0"
 fixed = "1.2.0"
 
 nrf52810-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+nrf52811-pac  = { version = "0.9.0", features = ["rt"], optional = true }
 nrf52832-pac  = { version = "0.9.0", features = ["rt"], optional = true }
 nrf52833-pac  = { version = "0.9.0", features = ["rt"], optional = true }
 nrf52840-pac  = { version = "0.9.0", features = ["rt"], optional = true }

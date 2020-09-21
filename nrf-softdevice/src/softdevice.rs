@@ -283,9 +283,9 @@ impl Softdevice {
             warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:u32}", wanted_app_ram_base);
         }
 
-        #[cfg(feature = "nrf52810")]
+        #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
         interrupt::enable(interrupt::Interrupt::SWI2);
-        #[cfg(not(feature = "nrf52810"))]
+        #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
         interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
 
         unsafe { &SOFTDEVICE }
