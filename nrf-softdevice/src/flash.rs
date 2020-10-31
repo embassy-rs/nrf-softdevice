@@ -1,6 +1,7 @@
 use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
+use embassy::flash::Error as FlashError;
 
 use crate::raw;
 use crate::util::*;
@@ -33,20 +34,20 @@ impl Flash {
     }
 }
 
-static SIGNAL: Signal<Result<(), async_flash::Error>> = Signal::new();
+static SIGNAL: Signal<Result<(), FlashError>> = Signal::new();
 
 pub(crate) fn on_flash_success() {
     SIGNAL.signal(Ok(()))
 }
 
 pub(crate) fn on_flash_error() {
-    SIGNAL.signal(Err(async_flash::Error::Failed))
+    SIGNAL.signal(Err(FlashError::Failed))
 }
 
-impl async_flash::Flash for Flash {
-    type ReadFuture<'a> = impl Future<Output = Result<(), async_flash::Error>> + 'a;
-    type WriteFuture<'a> = impl Future<Output = Result<(), async_flash::Error>> + 'a;
-    type ErasePageFuture<'a> = impl Future<Output = Result<(), async_flash::Error>> + 'a;
+impl embassy::flash::Flash for Flash {
+    type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
+    type WriteFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
+    type ErasePageFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
 
     fn read<'a>(&'a mut self, address: usize, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
         async move {
@@ -67,10 +68,10 @@ impl async_flash::Flash for Flash {
             let data_len = data.len() as u32;
 
             if address % 4 != 0 {
-                return Err(async_flash::Error::AddressMisaligned);
+                return Err(FlashError::AddressMisaligned);
             }
             if (data_ptr as u32) % 4 != 0 || data_len % 4 != 0 {
-                return Err(async_flash::Error::BufferMisaligned);
+                return Err(FlashError::BufferMisaligned);
             }
 
             // This is safe because we've checked ptr and len is aligned above
@@ -83,7 +84,7 @@ impl async_flash::Flash for Flash {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {
                     warn!("sd_flash_write err {:?}", e);
-                    Err(async_flash::Error::Failed)
+                    Err(FlashError::Failed)
                 }
             };
 
@@ -95,7 +96,7 @@ impl async_flash::Flash for Flash {
     fn erase<'a>(&'a mut self, address: usize) -> Self::ErasePageFuture<'a> {
         async move {
             if address % Self::PAGE_SIZE != 0 {
-                return Err(async_flash::Error::AddressMisaligned);
+                return Err(FlashError::AddressMisaligned);
             }
 
             let page_number = address / Self::PAGE_SIZE;
@@ -106,7 +107,7 @@ impl async_flash::Flash for Flash {
                 Ok(()) => SIGNAL.wait().await,
                 Err(e) => {
                     warn!("sd_flash_page_erase err {:?}", e);
-                    Err(async_flash::Error::Failed)
+                    Err(FlashError::Failed)
                 }
             };
 

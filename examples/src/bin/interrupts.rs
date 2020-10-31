@@ -7,15 +7,20 @@ mod example_common;
 use example_common::*;
 
 use cortex_m_rt::entry;
+use embassy::executor::{task, Executor};
+use embassy::util::Forever;
+
 use nrf_softdevice::interrupt;
 use nrf_softdevice::Softdevice;
 
-#[static_executor::task]
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[static_executor::task]
+#[task]
 async fn interrupt_task(sd: &'static Softdevice) {
     let enabled = interrupt::is_enabled(interrupt::SWI0_EGU0);
     info!("enabled: {:?}", enabled);
@@ -84,10 +89,12 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&Default::default());
 
-    unsafe {
-        softdevice_task.spawn(sd).dewrap();
-        interrupt_task.spawn(sd).dewrap();
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    executor.spawn(softdevice_task(sd)).dewrap();
+    executor.spawn(interrupt_task(sd)).dewrap();
 
-        static_executor::run();
+    loop {
+        executor.run();
+        cortex_m::asm::wfe();
     }
 }

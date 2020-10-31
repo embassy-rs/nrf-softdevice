@@ -32,7 +32,7 @@ ble-gatt-client = []
 
 [dependencies]
 num_enum = { version = "0.5.1", default-features = false }
-async-flash = { version = "0.1.0", path = "../async-flash" }
+embassy = { version = "0.1.0" }
 cortex-m = "0.6.2"
 cortex-m-rt = "0.6.12"
 bare-metal = { version = "0.2.0", features = ["const-fn"] }

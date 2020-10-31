@@ -18,19 +18,24 @@ mod example_common;
 use example_common::*;
 
 use core::mem;
+use embassy::executor::{task, Executor};
+use embassy::util::Forever;
 use nrf52840_hal::pac::TIMER1;
 use nrf52840_hal::prelude::*;
 use nrf52840_hal::timer::{Periodic, Timer};
-use nrf_softdevice::ble::peripheral;
-use nrf_softdevice::{raw, temperature_celsius, Softdevice};
 use rtic::app;
 
-#[static_executor::task]
+use nrf_softdevice::ble::peripheral;
+use nrf_softdevice::{raw, temperature_celsius, Softdevice};
+
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[static_executor::task]
+#[task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     #[rustfmt::skip]
     let adv_data = &[
@@ -123,11 +128,13 @@ const APP: () = {
         let temp = temperature_celsius(&sd).dewrap();
         info!("{:i32}°C", temp.to_num::<i32>());
 
-        unsafe {
-            softdevice_task.spawn(sd).dewrap();
-            bluetooth_task.spawn(sd).dewrap();
+        let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+        executor.spawn(softdevice_task(sd)).dewrap();
+        executor.spawn(bluetooth_task(sd)).dewrap();
 
-            static_executor::run();
+        loop {
+            executor.run();
+            cortex_m::asm::wfe();
         }
     }
 

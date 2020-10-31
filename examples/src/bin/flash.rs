@@ -6,16 +6,21 @@
 mod example_common;
 use example_common::*;
 
-use async_flash::Flash as _;
 use cortex_m_rt::entry;
+use embassy::executor::{task, Executor};
+use embassy::flash::Flash as _;
+use embassy::util::Forever;
+
 use nrf_softdevice::{Flash, Softdevice};
 
-#[static_executor::task]
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[static_executor::task]
+#[task]
 async fn flash_task(sd: &'static Softdevice) {
     let mut f = Flash::take(sd);
 
@@ -38,10 +43,12 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&Default::default());
 
-    unsafe {
-        softdevice_task.spawn(sd).dewrap();
-        flash_task.spawn(sd).dewrap();
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    executor.spawn(softdevice_task(sd)).dewrap();
+    executor.spawn(flash_task(sd)).dewrap();
 
-        static_executor::run();
+    loop {
+        executor.run();
+        cortex_m::asm::wfe();
     }
 }

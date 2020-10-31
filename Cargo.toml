@@ -10,8 +10,6 @@ members = [
     "nrf-softdevice-s140",
     "nrf-softdevice-macro",
 
-    "async-flash",
-
     "examples",
 ]
 
@@ -23,8 +21,9 @@ exclude = [
 panic-probe = { git = "https://github.com/knurling-rs/probe-run", branch="main" }
 defmt-rtt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
 defmt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
-static-executor = { git = "https://github.com/Dirbaio/static-executor" }
-static-executor-cortex-m = { git = "https://github.com/Dirbaio/static-executor" }
+embassy = { git = "https://github.com/akiles/embassy" }
+embassy-nrf = { git = "https://github.com/akiles/embassy" }
+embassy-macros = { git = "https://github.com/akiles/embassy" }
 
 [profile.dev]
 codegen-units = 1

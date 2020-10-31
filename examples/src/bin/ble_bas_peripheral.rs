@@ -14,7 +14,11 @@ use nrf_softdevice::ble::gatt_server::{Characteristic, CharacteristicHandles, Re
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, RawError, Softdevice};
 
-#[static_executor::task]
+use embassy::executor::{task, Executor};
+use embassy::util::Forever;
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -28,7 +32,7 @@ struct BatteryService {
     battery_level: u8,
 }
 
-#[static_executor::task]
+#[task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryService = gatt_server::register(sd).dewrap();
 
@@ -119,10 +123,12 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&config);
 
-    unsafe {
-        softdevice_task.spawn(sd).dewrap();
-        bluetooth_task.spawn(sd).dewrap();
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    executor.spawn(softdevice_task(sd)).dewrap();
+    executor.spawn(bluetooth_task(sd)).dewrap();
 
-        static_executor::run();
+    loop {
+        executor.run();
+        cortex_m::asm::wfe();
     }
 }

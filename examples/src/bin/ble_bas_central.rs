@@ -9,12 +9,16 @@ use example_common::*;
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
+use embassy::executor::{task, Executor};
+use embassy::util::Forever;
 
 use nrf_softdevice::ble::{central, gatt_client, Address, Connection, Uuid};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
-#[static_executor::task]
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -72,7 +76,7 @@ impl gatt_client::Client for BatteryServiceClient {
     }
 }
 
-#[static_executor::task]
+#[task]
 async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[Address::new_random_static([
         0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
@@ -154,10 +158,12 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&config);
 
-    unsafe {
-        softdevice_task.spawn(sd).dewrap();
-        ble_central_task.spawn(sd).dewrap();
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    executor.spawn(softdevice_task(sd)).dewrap();
+    executor.spawn(ble_central_task(sd)).dewrap();
 
-        static_executor::run();
+    loop {
+        executor.run();
+        cortex_m::asm::wfe();
     }
 }

@@ -9,16 +9,20 @@ use example_common::*;
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
+use embassy::executor::{task, Executor};
+use embassy::util::Forever;
 
 use nrf_softdevice::ble::{peripheral, Uuid};
 use nrf_softdevice::{raw, RawError, Softdevice};
 
-#[static_executor::task]
+static EXECUTOR: Forever<Executor> = Forever::new();
+
+#[task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[static_executor::task]
+#[task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     for i in 0..24 {
         let service_uuid = Uuid::new_16(0x4200 + i);
@@ -153,10 +157,12 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&config);
 
-    unsafe {
-        softdevice_task.spawn(sd).dewrap();
-        bluetooth_task.spawn(sd).dewrap();
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    executor.spawn(softdevice_task(sd)).dewrap();
+    executor.spawn(bluetooth_task(sd)).dewrap();
 
-        static_executor::run();
+    loop {
+        executor.run();
+        cortex_m::asm::wfe();
     }
 }
