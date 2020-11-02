@@ -89,7 +89,7 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&Default::default());
 
-    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();
     executor.spawn(interrupt_task(sd)).dewrap();
 

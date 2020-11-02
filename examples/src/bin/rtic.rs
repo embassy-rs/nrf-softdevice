@@ -128,7 +128,7 @@ const APP: () = {
         let temp = temperature_celsius(&sd).dewrap();
         info!("{:i32}°C", temp.to_num::<i32>());
 
-        let executor = EXECUTOR.put(Executor::new(cortex_m::asm::wfi));
+        let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
         executor.spawn(softdevice_task(sd)).dewrap();
         executor.spawn(bluetooth_task(sd)).dewrap();
 
