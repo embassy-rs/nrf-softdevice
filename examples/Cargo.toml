@@ -23,7 +23,7 @@ ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
 ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
 
 [dependencies]
-embassy = { version = "0.1.0" }
+embassy = { version = "0.1.0", features = ["defmt"]}
 embassy-nrf = { version = "0.1.0", features = [ "52840" ]}
 cortex-m        = { version = "0.6.3" }
 cortex-m-rt = "0.6.12"
