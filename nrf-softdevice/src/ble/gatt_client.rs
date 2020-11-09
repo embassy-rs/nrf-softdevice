@@ -694,15 +694,6 @@ pub(crate) unsafe fn on_exchange_mtu_rsp(
         server_rx_mtu,
         link.att_mtu_effective
     );
-
-    // Trigger an event indicating that the ATT MTU size has changed.
-    // TODO Send an event to the application only if an ATT MTU exchange was requested.
-    match state.role.get() {
-        #[cfg(feature = "ble-central")]
-        Role::Central => central::MTU_UPDATED_SIGNAL.signal(Ok(())),
-        #[cfg(feature = "ble-peripheral")]
-        Role::Peripheral => peripheral::MTU_UPDATED_SIGNAL.signal(Ok(())),
-    }
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {

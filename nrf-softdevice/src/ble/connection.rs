@@ -1,4 +1,5 @@
 use core::cell::Cell;
+use core::ptr;
 
 #[cfg(feature = "ble-gatt-client")]
 use crate::ble::gatt_client;
@@ -173,6 +174,56 @@ impl ConnectionState {
         #[cfg(feature = "ble-gatt-server")]
         self.gatts_portal
             .call(gatt_server::PortalMessage::Disconnected);
+    }
+
+    pub(crate) fn set_att_mtu_desired(&self, mtu: u16) {
+        let link = self.link.update(|mut link| {
+            link.att_mtu_desired = mtu;
+            link
+        });
+
+        // Begin an ATT MTU exchange if necessary.
+        if link.att_mtu_desired > link.att_mtu_effective as u16 {
+            let ret = unsafe {
+                raw::sd_ble_gattc_exchange_mtu_request(
+                    self.conn_handle.get().unwrap(), //todo
+                    link.att_mtu_desired,
+                )
+            };
+            // TODO handle busy
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gattc_exchange_mtu_request err {:?}", err);
+            }
+        }
+    }
+
+    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+    pub(crate) fn set_data_length_desired(&self, len: u8) {
+        let link = self.link.update(|mut link| {
+            link.data_length_desired = len;
+            link
+        });
+
+        if link.data_length_desired > link.data_length_effective {
+            let dl_params = raw::ble_gap_data_length_params_t {
+                max_rx_octets: link.data_length_desired.into(),
+                max_tx_octets: link.data_length_desired.into(),
+                max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+                max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+            };
+
+            let ret = unsafe {
+                raw::sd_ble_gap_data_length_update(
+                    self.conn_handle.get().unwrap(), //todo
+                    &dl_params as *const raw::ble_gap_data_length_params_t,
+                    ptr::null_mut(),
+                )
+            };
+
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_data_length_update err {:?}", err);
+            }
+        }
     }
 }
 

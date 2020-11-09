@@ -97,7 +97,6 @@ impl From<RawError> for AdvertiseStopError {
 
 static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 pub(crate) static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
-pub(crate) static MTU_UPDATED_SIGNAL: Signal<Result<(), AdvertiseError>> = Signal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn advertise(
@@ -167,57 +166,9 @@ pub async fn advertise(
     let conn = ADV_SIGNAL.wait().await?;
 
     let state = conn.state();
-
-    let link = state.link.update(|mut link| {
-        link.att_mtu_desired = config.att_mtu_desired;
-        link
-    });
-
-    // Begin an ATT MTU exchange if necessary.
-    if link.att_mtu_desired > link.att_mtu_effective as u16 {
-        let ret = unsafe {
-            raw::sd_ble_gattc_exchange_mtu_request(
-                state.conn_handle.get().unwrap(), //todo
-                link.att_mtu_desired,
-            )
-        };
-
-        MTU_UPDATED_SIGNAL.wait().await?;
-
-        if let Err(err) = RawError::convert(ret) {
-            warn!("sd_ble_gattc_exchange_mtu_request err {:?}", err);
-        }
-    }
-
-    // Send a data length update request if necessary.
+    state.set_att_mtu_desired(config.att_mtu_desired);
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    {
-        let link = state.link.update(|mut link| {
-            link.data_length_desired = config.data_length_desired;
-            link
-        });
-
-        if link.data_length_desired > link.data_length_effective {
-            let dl_params = raw::ble_gap_data_length_params_t {
-                max_rx_octets: link.data_length_desired.into(),
-                max_tx_octets: link.data_length_desired.into(),
-                max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-                max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-            };
-
-            let ret = unsafe {
-                raw::sd_ble_gap_data_length_update(
-                    state.conn_handle.get().unwrap(), //todo
-                    &dl_params as *const raw::ble_gap_data_length_params_t,
-                    mem::zeroed(),
-                )
-            };
-
-            if let Err(err) = RawError::convert(ret) {
-                warn!("sd_ble_gap_data_length_update err {:?}", err);
-            }
-        }
-    }
+    state.set_data_length_desired(config.data_length_desired);
 
     Ok(conn)
 }
