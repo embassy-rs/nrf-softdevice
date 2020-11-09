@@ -10,8 +10,7 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 
-use nrf_softdevice::ble::gatt_server::{Characteristic, CharacteristicHandles, RegisterError};
-use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
+use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
 use nrf_softdevice::{raw, RawError, Softdevice};
 
 use embassy::executor::{task, Executor};

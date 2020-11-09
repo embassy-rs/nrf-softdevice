@@ -113,6 +113,8 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
     let mut code_on_write = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
 
+    let ble = quote!(::nrf_softdevice::ble);
+
     for ch in &chars {
         let name_pascal = inflector::cases::pascalcase::to_pascal_case(&ch.name);
         let char_name = format_ident!("{}", ch.name);
@@ -128,7 +130,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
         let ty = &ch.ty;
-        let ty_as_val = quote!(<#ty as ::nrf_softdevice::ble::GattValue>);
+        let ty_as_val = quote!(<#ty as #ble::GattValue>);
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
@@ -140,7 +142,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
 
         code_register_chars.extend(quote_spanned!(ch.span=>
             let #char_name = register_char(
-                Characteristic {
+                #ble::gatt_server::Characteristic {
                     uuid: #uuid,
                     can_read: #read,
                     can_write: #write,
@@ -157,17 +159,17 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         ));
 
         code_impl.extend(quote_spanned!(ch.span=>
-            fn #get_fn(&self) -> Result<#ty, gatt_server::GetValueError> {
+            fn #get_fn(&self) -> Result<#ty, #ble::gatt_server::GetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = &mut [0u8; #ty_as_val::MAX_SIZE];
-                let size = gatt_server::get_value(sd, self.#value_handle, buf)?;
+                let size = #ble::gatt_server::get_value(sd, self.#value_handle, buf)?;
                 Ok(#ty_as_val::from_gatt(&buf[..size]))
             }
 
-            fn #set_fn(&self, val: #ty) -> Result<(), gatt_server::SetValueError> {
+            fn #set_fn(&self, val: #ty) -> Result<(), #ble::gatt_server::SetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = #ty_as_val::to_gatt(&val);
-                gatt_server::set_value(sd, self.#value_handle, buf)
+                #ble::gatt_server::set_value(sd, self.#value_handle, buf)
             }
         ));
 
@@ -204,9 +206,9 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                     &self,
                     conn: &Connection,
                     val: #ty,
-                ) -> Result<(), gatt_server::NotifyValueError> {
+                ) -> Result<(), #ble::gatt_server::NotifyValueError> {
                     let buf = #ty_as_val::to_gatt(&val);
-                    gatt_server::notify_value(conn, self.#value_handle, buf)
+                    #ble::gatt_server::notify_value(conn, self.#value_handle, buf)
                 }
             ));
 
@@ -236,16 +238,16 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_impl
         }
 
-        impl ::nrf_softdevice::ble::gatt_server::Server for #struct_name {
+        impl #ble::gatt_server::Server for #struct_name {
             type Event = #event_enum_name;
 
-            fn uuid() -> Uuid {
+            fn uuid() -> #ble::Uuid {
                 #uuid
             }
 
-            fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, RegisterError>
+            fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, #ble::gatt_server::RegisterError>
             where
-                F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>,
+                F: FnMut(#ble::gatt_server::Characteristic, &[u8]) -> Result<#ble::gatt_server::CharacteristicHandles, #ble::gatt_server::RegisterError>,
             {
                 #code_register_chars
 
