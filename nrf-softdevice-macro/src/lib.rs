@@ -2,20 +2,25 @@
 
 extern crate proc_macro;
 
+use core::str::FromStr;
 use darling::FromMeta;
-use proc_macro::{TokenStream};
-use proc_macro2::{TokenStream as TokenStream2};
+use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote};
 use std::iter::FromIterator;
 use syn::spanned::Spanned;
 
+mod uuid;
+
+use crate::uuid::Uuid;
+
 #[derive(Debug, FromMeta)]
 struct ServerArgs {
-    uuid: String,
+    uuid: Uuid,
 }
 #[derive(Debug, FromMeta)]
 struct CharacteristicArgs {
-    uuid: String,
+    uuid: Uuid,
     #[darling(default)]
     read: bool,
     #[darling(default)]
@@ -38,7 +43,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
-    let _args = match ServerArgs::from_list(&args) {
+    let args = match ServerArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
             return e.write_errors().into();
@@ -115,6 +120,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let set_fn = format_ident!("{}_set", ch.name);
         let notify_fn = format_ident!("{}_notify", ch.name);
 
+        let uuid = ch.args.uuid;
         let read = ch.args.read;
         let write = ch.args.write;
         let notify = ch.args.notify;
@@ -132,7 +138,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         code_register_chars.extend(quote!(
             let #char_name = register_char(
                 Characteristic {
-                    uuid: GATT_BAS_BATTERY_LEVEL_CHAR_UUID,
+                    uuid: #uuid,
                     can_read: #read,
                     can_write: #write,
                     can_notify: #notify,
@@ -220,6 +226,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         //panic!();
     }
 
+    let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
 
     let result = quote! {
@@ -233,7 +240,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             type Event = #event_enum_name;
 
             fn uuid() -> Uuid {
-                GATT_BAS_SVC_UUID
+                #uuid
             }
 
             fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, RegisterError>

@@ -10,6 +10,7 @@ quote = "1.0.7"
 darling = "0.10.2"
 proc-macro2 = "1.0.18"
 Inflector = "0.11.4"
+uuid = "0.8.1"
 
 [lib]
 proc-macro = true

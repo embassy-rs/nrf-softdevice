@@ -23,9 +23,6 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
-const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
-
 #[nrf_softdevice::gatt_server(uuid = "180f")]
 struct BatteryService {
     #[characteristic(uuid = "2a19", read, write, notify)]
@@ -35,7 +32,6 @@ struct BatteryService {
 #[task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryService = gatt_server::register(sd).dewrap();
-
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
