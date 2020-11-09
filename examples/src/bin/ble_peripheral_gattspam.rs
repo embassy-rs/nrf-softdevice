@@ -155,7 +155,8 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let sd = Softdevice::enable(&config);
+    let (sdp, p) = take_peripherals();
+    let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();

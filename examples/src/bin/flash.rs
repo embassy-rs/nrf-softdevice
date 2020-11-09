@@ -41,7 +41,8 @@ async fn flash_task(sd: &'static Softdevice) {
 fn main() -> ! {
     info!("Hello World!");
 
-    let sd = Softdevice::enable(&Default::default());
+    let (sdp, p) = take_peripherals();
+    let sd = Softdevice::enable(sdp, &Default::default());
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();

@@ -4,12 +4,42 @@ use core::sync::atomic::{AtomicBool, Ordering};
 
 use crate::ble;
 use crate::interrupt;
+use crate::pac;
 use crate::raw;
 use crate::util::*;
 use crate::RawError;
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     depanic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
+}
+
+#[allow(non_snake_case)]
+pub struct Peripherals {
+    pub AAR: pac::AAR,
+    #[cfg(not(any(feature = "nrf52810", feature = "nrf52811", feature = "nrf52832")))]
+    pub ACL: pac::ACL,
+    #[cfg(any(feature = "nrf52810", feature = "nrf52811", feature = "nrf52832"))]
+    pub BPROT: pac::BPROT,
+    pub CCM: pac::CCM,
+    pub CLOCK: pac::CLOCK,
+    pub ECB: pac::ECB,
+    pub EGU1: pac::EGU1,
+    #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
+    pub EGU2: pac::EGU2,
+    #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
+    pub EGU5: pac::EGU5,
+    #[cfg(any(feature = "nrf52832", feature = "nrf52833", feature = "nrf52840"))]
+    pub MWU: pac::MWU,
+    pub NVMC: pac::NVMC,
+    pub POWER: pac::POWER,
+    pub RADIO: pac::RADIO,
+    pub RNG: pac::RNG,
+    pub RTC0: pac::RTC0,
+    pub SWI1: pac::SWI1,
+    pub SWI2: pac::SWI2,
+    pub SWI5: pac::SWI5,
+    pub TEMP: pac::TEMP,
+    pub TIMER0: pac::TIMER0,
 }
 
 /// Singleton instance of the enabled softdevice.
@@ -103,13 +133,15 @@ static mut SOFTDEVICE: Softdevice = Softdevice {
 };
 
 impl Softdevice {
-    /// Enable the softdevice with the requested configuration.
+    /// Enable the softdevice.
+    ///
+    /// This function takes ownership of the softdevice-reserved peripherals to ensure application code doesn't attempt to use them after enabling.
     ///
     /// # Panics
-    /// - Panics if the requested configuration requires more memory than reserved for the softdevice. In that case, you can give more memory to the softdevice by editing the RAM start address in `memory.x`. The required start address is logged using `defmt` prior to panic.
+    /// - Panics if the requested configuration requires more memory than reserved for the softdevice. In that case, you can give more memory to the softdevice by editing the RAM start address in `memory.x`. The required start address is logged prior to panic.
     /// - Panics if the requested configuration has too high memory requirements for the softdevice. The softdevice supports a maximum dynamic memory size of 64kb.
     /// - Panics if called multiple times. Must be called at most once.
-    pub fn enable(config: &Config) -> &'static Softdevice {
+    pub fn enable(_peripherals: Peripherals, config: &Config) -> &'static Softdevice {
         if ENABLED.compare_and_swap(false, true, Ordering::AcqRel) {
             depanic!("nrf_softdevice::enable() called multiple times.")
         }
