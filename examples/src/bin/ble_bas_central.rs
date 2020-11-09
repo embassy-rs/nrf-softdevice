@@ -23,63 +23,16 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
+#[nrf_softdevice::gatt_client(uuid = "180f")]
 struct BatteryServiceClient {
-    conn: Connection,
-    battery_level_value_handle: u16,
-    battery_level_cccd_handle: u16,
-}
-
-const GATT_BAS_SVC_UUID: Uuid = Uuid::new_16(0x180F);
-const GATT_BAS_BATTERY_LEVEL_CHAR_UUID: Uuid = Uuid::new_16(0x2A19);
-
-// This is mostly boilerplate, ideally it'll be generated with a proc macro in the future.
-impl gatt_client::Client for BatteryServiceClient {
-    fn uuid() -> Uuid {
-        return GATT_BAS_SVC_UUID;
-    }
-
-    fn new_undiscovered(conn: Connection) -> Self {
-        Self {
-            conn,
-            battery_level_value_handle: 0,
-            battery_level_cccd_handle: 0,
-        }
-    }
-
-    fn discovered_characteristic(
-        &mut self,
-        characteristic: &gatt_client::Characteristic,
-        descriptors: &[gatt_client::Descriptor],
-    ) {
-        if let Some(char_uuid) = characteristic.uuid {
-            if char_uuid == GATT_BAS_BATTERY_LEVEL_CHAR_UUID {
-                // TODO maybe check the char_props have the necessary operations allowed? read/write/notify/etc
-                self.battery_level_value_handle = characteristic.handle_value;
-                for desc in descriptors {
-                    if let Some(desc_uuid) = desc.uuid {
-                        if desc_uuid
-                            == Uuid::new_16(raw::BLE_UUID_DESCRIPTOR_CLIENT_CHAR_CONFIG as u16)
-                        {
-                            self.battery_level_cccd_handle = desc.handle;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fn discovery_complete(&mut self) -> Result<(), gatt_client::DiscoverError> {
-        if self.battery_level_cccd_handle == 0 || self.battery_level_value_handle == 0 {
-            return Err(gatt_client::DiscoverError::ServiceIncomplete);
-        }
-        Ok(())
-    }
+    #[characteristic(uuid = "2a19", read, write, notify)]
+    battery_level: u8,
 }
 
 #[task]
 async fn ble_central_task(sd: &'static Softdevice, config: central::Config) {
     let addrs = &[Address::new_random_static([
-        0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
+        0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0,
     ])];
 
     let conn = central::connect(sd, addrs, config)
@@ -91,31 +44,20 @@ async fn ble_central_task(sd: &'static Softdevice, config: central::Config) {
         .await
         .dexpect(intern!("discover"));
 
-    info!(
-        "discovered! {:u16} {:u16}",
-        client.battery_level_value_handle, client.battery_level_cccd_handle
-    );
-
     // Read
-    let buf = &mut [0; 16];
-    let len = gatt_client::read(&conn, client.battery_level_value_handle, buf)
-        .await
-        .dexpect(intern!("read"));
-    info!("read battery level: {:[u8]}", &buf[..len]);
+    let val = client.battery_level_read().await.dexpect(intern!("read"));
+    info!("read battery level: {:u8}", val);
 
     // Write, set it to 42
-    buf[0] = 42;
-    gatt_client::write(&conn, client.battery_level_value_handle, &buf[..1])
+    client
+        .battery_level_write(42)
         .await
         .dexpect(intern!("write"));
     info!("Wrote battery level!");
 
     // Read to check it's changed
-    let buf = &mut [0; 16];
-    let len = gatt_client::read(&conn, client.battery_level_value_handle, buf)
-        .await
-        .dexpect(intern!("read"));
-    info!("read battery level: {:[u8]}", &buf[..len]);
+    let val = client.battery_level_read().await.dexpect(intern!("read"));
+    info!("read battery level: {:u8}", val);
 }
 
 #[entry]
