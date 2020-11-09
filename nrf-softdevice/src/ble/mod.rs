@@ -6,6 +6,8 @@ mod types;
 pub use types::*;
 mod events;
 pub use events::*;
+mod gatt_traits;
+pub use gatt_traits::*;
 
 #[cfg(feature = "ble-central")]
 pub mod central;

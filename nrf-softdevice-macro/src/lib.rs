@@ -5,8 +5,8 @@ extern crate proc_macro;
 use core::str::FromStr;
 use darling::FromMeta;
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
-use quote::{format_ident, quote};
+use proc_macro2::{Span, TokenStream as TokenStream2};
+use quote::{format_ident, quote, quote_spanned};
 use std::iter::FromIterator;
 use syn::spanned::Spanned;
 
@@ -36,6 +36,7 @@ struct Characteristic {
     name: String,
     ty: syn::Type,
     args: CharacteristicArgs,
+    span: Span,
 }
 
 #[proc_macro_attribute]
@@ -89,6 +90,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 name: field.ident.as_ref().unwrap().to_string(),
                 ty: field.ty.clone(),
                 args,
+                span: field.ty.span(),
             });
 
             false
@@ -126,6 +128,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
         let ty = &ch.ty;
+        let ty_as_val = quote!(<#ty as ::nrf_softdevice::ble::GattValue>);
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
@@ -135,7 +138,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             vis: syn::Visibility::Inherited,
         });
 
-        code_register_chars.extend(quote!(
+        code_register_chars.extend(quote_spanned!(ch.span=>
             let #char_name = register_char(
                 Characteristic {
                     uuid: #uuid,
@@ -143,27 +146,28 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                     can_write: #write,
                     can_notify: #notify,
                     can_indicate: #indicate,
-                    max_len: 1,
+                    max_len: #ty_as_val::MAX_SIZE as _,
                 },
                 &[123],
             )?;
         ));
 
-        code_register_init.extend(quote!(
+        code_register_init.extend(quote_spanned!(ch.span=>
             #value_handle: #char_name.value_handle,
         ));
 
-        code_impl.extend(quote!(
-            fn #get_fn(&self) -> Result<u8, gatt_server::GetValueError> {
+        code_impl.extend(quote_spanned!(ch.span=>
+            fn #get_fn(&self) -> Result<#ty, gatt_server::GetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
-                let buf = &mut [0u8; 1];
-                gatt_server::get_value(sd, self.#value_handle, buf)?;
-                Ok(buf[0])
+                let buf = &mut [0u8; #ty_as_val::MAX_SIZE];
+                let size = gatt_server::get_value(sd, self.#value_handle, buf)?;
+                Ok(#ty_as_val::from_gatt(&buf[..size]))
             }
 
-            fn #set_fn(&self, val: u8) -> Result<(), gatt_server::SetValueError> {
+            fn #set_fn(&self, val: #ty) -> Result<(), gatt_server::SetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
-                gatt_server::set_value(sd, self.#value_handle, &[val])
+                let buf = #ty_as_val::to_gatt(&val);
+                gatt_server::set_value(sd, self.#value_handle, buf)
             }
         ));
 
@@ -175,20 +179,19 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 colon_token: Default::default(),
                 vis: syn::Visibility::Inherited,
             });
-            code_register_init.extend(quote!(
+            code_register_init.extend(quote_spanned!(ch.span=>
                 #cccd_handle: #char_name.cccd_handle,
             ));
         }
 
         if ch.args.write {
             let case_write = format_ident!("{}Write", name_pascal);
-            code_event_enum.extend(quote!(
+            code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_write(#ty),
             ));
-            #[rustfmt::skip]
-            code_on_write.extend(quote!(
+            code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#value_handle {
-                    return Some(#event_enum_name::#case_write(data[0]));
+                    return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(&data)));
                 }
             ));
         }
@@ -196,23 +199,22 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             let case_enabled = format_ident!("{}NotificationsEnabled", name_pascal);
             let case_disabled = format_ident!("{}NotificationsDisabled", name_pascal);
 
-            code_impl.extend(quote!(
+            code_impl.extend(quote_spanned!(ch.span=>
                 fn #notify_fn(
                     &self,
                     conn: &Connection,
-                    val: u8,
+                    val: #ty,
                 ) -> Result<(), gatt_server::NotifyValueError> {
-                    gatt_server::notify_value(conn, self.#value_handle, &[val])
+                    let buf = #ty_as_val::to_gatt(&val);
+                    gatt_server::notify_value(conn, self.#value_handle, buf)
                 }
             ));
 
-            code_event_enum.extend(quote!(
+            code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_enabled,
                 #case_disabled,
             ));
-            #[rustfmt::skip]
-            code_on_write.extend(quote!(
-
+            code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#cccd_handle {
                     if data.len() != 0 && data[0] & 0x01 != 0 {
                         return Some(#event_enum_name::#case_enabled);
@@ -222,8 +224,6 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 }
             ));
         }
-
-        //panic!();
     }
 
     let uuid = args.uuid;
@@ -258,7 +258,6 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 #code_on_write
                 None
             }
-
         }
 
         enum #event_enum_name {
