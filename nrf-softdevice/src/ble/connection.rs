@@ -60,9 +60,7 @@ pub struct GattLink {
     pub att_mtu_exchange_pending: bool, // Indicates that an ATT_MTU exchange request is pending (the call to @ref sd_ble_gattc_exchange_mtu_request returned @ref NRF_ERROR_BUSY).
     pub att_mtu_exchange_requested: bool, // Indicates that an ATT_MTU exchange request was made.
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    pub data_length_desired: u8, // Desired data length (in bytes).
-    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    pub data_length_effective: u8, // Requested data length (in bytes).
+    pub data_length_effective: u8, // Effective data length (in bytes).
 }
 
 impl GattLink {
@@ -72,8 +70,6 @@ impl GattLink {
             att_mtu_effective: raw::BLE_GATT_ATT_MTU_DEFAULT as u16,
             att_mtu_exchange_pending: false,   // TODO do we need this
             att_mtu_exchange_requested: false, // TODO do we need this
-            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-            data_length_desired: BLE_GAP_DATA_LENGTH_DEFAULT,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
         }
@@ -193,35 +189,6 @@ impl ConnectionState {
             // TODO handle busy
             if let Err(err) = RawError::convert(ret) {
                 warn!("sd_ble_gattc_exchange_mtu_request err {:?}", err);
-            }
-        }
-    }
-
-    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    pub(crate) fn set_data_length_desired(&self, len: u8) {
-        let link = self.link.update(|mut link| {
-            link.data_length_desired = len;
-            link
-        });
-
-        if link.data_length_desired > link.data_length_effective {
-            let dl_params = raw::ble_gap_data_length_params_t {
-                max_rx_octets: link.data_length_desired.into(),
-                max_tx_octets: link.data_length_desired.into(),
-                max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-                max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-            };
-
-            let ret = unsafe {
-                raw::sd_ble_gap_data_length_update(
-                    self.conn_handle.get().unwrap(), //todo
-                    &dl_params as *const raw::ble_gap_data_length_params_t,
-                    ptr::null_mut(),
-                )
-            };
-
-            if let Err(err) = RawError::convert(ret) {
-                warn!("sd_ble_gap_data_length_update err {:?}", err);
             }
         }
     }

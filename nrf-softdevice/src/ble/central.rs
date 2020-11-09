@@ -125,8 +125,6 @@ pub async fn connect(
     });
 
     state.set_att_mtu_desired(config.att_mtu_desired);
-    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    state.set_data_length_desired(config.data_length_desired);
 
     Ok(conn)
 }
@@ -144,9 +142,6 @@ pub fn connect_stop(sd: &Softdevice) -> Result<(), ConnectStopError> {
 pub struct Config {
     /// Requested ATT_MTU size for the next connection that is established.
     att_mtu_desired: u16,
-    /// The stack's default data length. <27-251>
-    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-    data_length_desired: u8,
     // bits of BLE_GAP_PHY_
     tx_phys: u8,
     // bits of BLE_GAP_PHY_
@@ -156,11 +151,9 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            att_mtu_desired: 32,
-            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-            data_length_desired: 27,
-            tx_phys: raw::BLE_GAP_PHY_AUTO as u8,
-            rx_phys: raw::BLE_GAP_PHY_AUTO as u8,
+            att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
+            tx_phys: raw::BLE_GAP_PHY_AUTO as _,
+            rx_phys: raw::BLE_GAP_PHY_AUTO as _,
         }
     }
 }

@@ -126,17 +126,29 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
     let conn_handle = gap_evt.conn_handle;
     let role = Role::from_raw(params.role);
 
-    // TODO what to do if new fails because no free con indexes?
-    let conn = Connection::new(conn_handle).dewrap();
-    let state = conn.state();
+    let res = match Connection::new(conn_handle) {
+        Ok(conn) => {
+            let state = conn.state();
+            state.role.set(role);
 
-    state.role.set(role);
+            do_data_length_update(conn_handle, ptr::null());
+
+            Ok(conn)
+        }
+        Err(_) => {
+            raw::sd_ble_gap_disconnect(
+                conn_handle,
+                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
+            );
+            Err(RawError::Busy)
+        }
+    };
 
     match role {
         #[cfg(feature = "ble-central")]
-        Role::Central => central::CONNECT_SIGNAL.signal(Ok(conn)),
+        Role::Central => central::CONNECT_SIGNAL.signal(res.map_err(|e| e.into())),
         #[cfg(feature = "ble-peripheral")]
-        Role::Peripheral => peripheral::ADV_SIGNAL.signal(Ok(conn)),
+        Role::Peripheral => peripheral::ADV_SIGNAL.signal(res.map_err(|e| e.into())),
     }
 }
 
@@ -301,33 +313,10 @@ pub(crate) unsafe fn on_data_length_update_request(
     );
 
     let conn_handle = gap_evt.conn_handle;
-
-    let state = ConnectionState::by_conn_handle(conn_handle);
-    let link = state.link.get();
-
-    // The SoftDevice only supports symmetric RX/TX data length settings so use tx for both
-    // The SDK does a min on desired provided by user, and peer_params.max_tx_octets
-    let data_length: u8 = core::cmp::min(link.data_length_desired, peer_params.max_tx_octets as u8);
-
-    let dl_params = raw::ble_gap_data_length_params_t {
-        max_rx_octets: data_length.into(),
-        max_tx_octets: data_length.into(),
-        max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-        max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
-    };
-
-    let ret = raw::sd_ble_gap_data_length_update(
-        conn_handle,
-        &dl_params as *const raw::ble_gap_data_length_params_t,
-        mem::zeroed(),
-    );
-
-    if let Err(err) = RawError::convert(ret) {
-        warn!("sd_ble_gap_data_length_update err {:?}", err);
-    }
+    do_data_length_update(conn_handle, ptr::null());
 }
 
-/// Called when a data length update was completed (sucessfully?)
+/// Called when a data length update was completed sucessfully
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 pub(crate) unsafe fn on_data_length_update(
     _ble_evt: *const raw::ble_evt_t,
@@ -350,6 +339,31 @@ pub(crate) unsafe fn on_data_length_update(
         effective_params.max_tx_octets,
         effective_params.max_tx_time_us,
     );
+}
 
-    // TODO implement data_length_update user call and signal NRF_BLE_GATT_EVT_DATA_LENGTH_UPDATED to it and or app
+unsafe fn do_data_length_update(
+    conn_handle: u16,
+    params: *const raw::ble_gap_data_length_params_t,
+) {
+    let mut dl_limitation = mem::zeroed();
+    let ret = raw::sd_ble_gap_data_length_update(conn_handle, params, &mut dl_limitation);
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_data_length_update err {:?}", err);
+
+        if dl_limitation.tx_payload_limited_octets != 0
+            || dl_limitation.rx_payload_limited_octets != 0
+        {
+            warn!(
+                "The requested TX/RX packet length is too long by {:u16}/{:u16} octets.",
+                dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets
+            );
+        }
+
+        if dl_limitation.tx_rx_time_limited_us != 0 {
+            warn!(
+                "The requested combination of TX and RX packet lengths is too long by {:u16} us",
+                dl_limitation.tx_rx_time_limited_us
+            );
+        }
+    }
 }
