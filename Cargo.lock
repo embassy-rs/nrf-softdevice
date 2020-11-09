@@ -12,9 +12,9 @@ dependencies = [
 
 [[package]]
 name = "aho-corasick"
-version = "0.7.14"
+version = "0.7.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b476ce7103678b0c6d3d395dbbae31d48ff910bd28be979ba5d48c6351131d0d"
+checksum = "7404febffaa47dac81aa44dba71523c9d069b1bdc50a77db41195149e17f68e5"
 dependencies = [
  "memchr",
 ]
@@ -31,7 +31,7 @@ dependencies = [
 [[package]]
 name = "anyfmt"
 version = "0.1.0"
-source = "git+https://github.com/akiles/embassy#0a3590566d839fc32963d4756d99aa79917a1934"
+source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
 
 [[package]]
 name = "as-slice"
@@ -184,7 +184,7 @@ dependencies = [
 [[package]]
 name = "defmt"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#a6dc0904872cd3f4aee5125dffc17723df3c9393"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
 dependencies = [
  "defmt-macros",
  "semver 0.11.0",
@@ -193,7 +193,7 @@ dependencies = [
 [[package]]
 name = "defmt-macros"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#a6dc0904872cd3f4aee5125dffc17723df3c9393"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -204,12 +204,12 @@ dependencies = [
 [[package]]
 name = "defmt-parser"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#a6dc0904872cd3f4aee5125dffc17723df3c9393"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
 
 [[package]]
 name = "defmt-rtt"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#a6dc0904872cd3f4aee5125dffc17723df3c9393"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
 dependencies = [
  "cortex-m",
  "defmt",
@@ -229,7 +229,7 @@ dependencies = [
 [[package]]
 name = "embassy"
 version = "0.1.0"
-source = "git+https://github.com/akiles/embassy#0a3590566d839fc32963d4756d99aa79917a1934"
+source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
 dependencies = [
  "anyfmt",
  "cortex-m",
@@ -243,7 +243,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "git+https://github.com/akiles/embassy#0a3590566d839fc32963d4756d99aa79917a1934"
+source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
 dependencies = [
  "darling",
  "quote",
@@ -253,7 +253,7 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/akiles/embassy#0a3590566d839fc32963d4756d99aa79917a1934"
+source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
 dependencies = [
  "anyfmt",
  "bare-metal",
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "fixed"
-version = "1.4.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7199a77adc07a67f7946fc69f1ff2f37651190949af1496506230b30e4c8784"
+checksum = "ac9066245905bb98fca1671fe6fbb1ae7f6083e824d2411c4d0f5663fec466d8"
 dependencies = [
  "typenum",
 ]
@@ -292,9 +292,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "futures"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "95314d38584ffbfda215621d723e0a3906f032e03ae5551e650058dac83d4797"
+checksum = "9b3b0c040a1fe6529d30b3c5944b280c7f0dcb2930d2c3062bca967b602583d0"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -306,9 +306,9 @@ dependencies = [
 
 [[package]]
 name = "futures-channel"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0448174b01148032eed37ac4aed28963aaaa8cfa93569a08e5b479bbc6c2c151"
+checksum = "4b7109687aa4e177ef6fe84553af6280ef2778bdb7783ba44c9dc3399110fe64"
 dependencies = [
  "futures-core",
  "futures-sink",
@@ -316,9 +316,9 @@ dependencies = [
 
 [[package]]
 name = "futures-core"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18eaa56102984bed2c88ea39026cff3ce3b4c7f508ca970cedf2450ea10d4e46"
+checksum = "847ce131b72ffb13b6109a221da9ad97a64cbe48feb1028356b836b47b8f1748"
 
 [[package]]
 name = "futures-intrusive"
@@ -332,27 +332,27 @@ dependencies = [
 
 [[package]]
 name = "futures-io"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e1798854a4727ff944a7b12aa999f58ce7aa81db80d2dfaaf2ba06f065ddd2b"
+checksum = "611834ce18aaa1bd13c4b374f5d653e1027cf99b6b502584ff8c9a64413b30bb"
 
 [[package]]
 name = "futures-sink"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e3ca3f17d6e8804ae5d3df7a7d35b2b3a6fe89dac84b31872720fc3060a0b11"
+checksum = "f878195a49cee50e006b02b93cf7e0a95a38ac7b776b4c4d9cc1207cd20fcb3d"
 
 [[package]]
 name = "futures-task"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96d502af37186c4fef99453df03e374683f8a1eec9dcc1e66b3b82dc8278ce3c"
+checksum = "7c554eb5bf48b2426c4771ab68c6b14468b6e76cc90996f528c3338d761a4d0d"
 
 [[package]]
 name = "futures-util"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abcb44342f62e6f3e8ac427b8aa815f724fd705dfad060b18ac7866c15bb8e34"
+checksum = "d304cff4a7b99cfb7986f7d43fbe93d175e72e704a8860787cc95e9ffd85cbd2"
 dependencies = [
  "futures-core",
  "futures-sink",
@@ -660,7 +660,7 @@ dependencies = [
 [[package]]
 name = "panic-probe"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/probe-run?branch=main#554db6b50e8048df6bd679533cd01fca1a00b570"
+source = "git+https://github.com/knurling-rs/probe-run?branch=main#50b598205c817066ba0166e34e30a6e16d52b010"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",

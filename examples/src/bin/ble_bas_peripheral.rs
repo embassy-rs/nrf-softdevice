@@ -30,7 +30,7 @@ struct BatteryService {
 }
 
 #[task]
-async fn bluetooth_task(sd: &'static Softdevice) {
+async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
     let server: BatteryService = gatt_server::register(sd).dewrap();
     #[rustfmt::skip]
     let adv_data = &[
@@ -50,6 +50,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
                 adv_data,
                 scan_data,
             },
+            config,
         )
         .await
         .dewrap();
@@ -122,7 +123,9 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();
-    executor.spawn(bluetooth_task(sd)).dewrap();
+    executor
+        .spawn(bluetooth_task(sd, peripheral::Config::default()))
+        .dewrap();
 
     loop {
         executor.run();

@@ -667,14 +667,42 @@ pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::bl
 }
 
 pub(crate) unsafe fn on_exchange_mtu_rsp(
-    _ble_evt: *const raw::ble_evt_t,
+    ble_evt: *const raw::ble_evt_t,
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
+    let conn_handle = gattc_evt.conn_handle;
+    let state = ConnectionState::by_conn_handle(conn_handle);
+
+    // TODO can probably get it from gattc_evt directly?
+    let exchange_mtu_rsp = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
+    let server_rx_mtu = exchange_mtu_rsp.server_rx_mtu;
+
+    // Determine the lowest MTU between our own desired MTU and the peer's.
+    // The MTU may not be less than BLE_GATT_ATT_MTU_DEFAULT.
+    let att_mtu_effective = core::cmp::min(server_rx_mtu, state.link.get().att_mtu_desired);
+    let att_mtu_effective = core::cmp::max(att_mtu_effective, raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+
+    let link = state.link.update(|mut link| {
+        link.att_mtu_effective = att_mtu_effective;
+        link
+    });
+
     trace!(
-        "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16} server_rx_mtu={:u16} att_mtu_effective=={:u16}",
         gattc_evt.conn_handle,
         gattc_evt.gatt_status,
+        server_rx_mtu,
+        link.att_mtu_effective
     );
+
+    // Trigger an event indicating that the ATT MTU size has changed.
+    // TODO Send an event to the application only if an ATT MTU exchange was requested.
+    match state.role.get() {
+        #[cfg(feature = "ble-central")]
+        Role::Central => central::MTU_UPDATED_SIGNAL.signal(Ok(())),
+        #[cfg(feature = "ble-peripheral")]
+        Role::Peripheral => peripheral::MTU_UPDATED_SIGNAL.signal(Ok(())),
+    }
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
