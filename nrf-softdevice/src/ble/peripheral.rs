@@ -97,10 +97,13 @@ impl From<RawError> for AdvertiseStopError {
 
 static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 pub(crate) static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
+pub(crate) static MTU_UPDATED_SIGNAL: Signal<Result<(), AdvertiseError>> = Signal::new();
 
+// Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn advertise(
     sd: &Softdevice,
     adv: ConnectableAdvertisement<'_>,
+    config: Config,
 ) -> Result<Connection, AdvertiseError> {
     // TODO make these configurable, only the right params based on type?
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
@@ -161,7 +164,62 @@ pub async fn advertise(
 
     // The advertising data needs to be kept alive for the entire duration of the advertising procedure.
 
-    ADV_SIGNAL.wait().await
+    let conn = ADV_SIGNAL.wait().await?;
+
+    let state = conn.state();
+
+    let link = state.link.update(|mut link| {
+        link.att_mtu_desired = config.att_mtu_desired;
+        link
+    });
+
+    // Begin an ATT MTU exchange if necessary.
+    if link.att_mtu_desired > link.att_mtu_effective as u16 {
+        let ret = unsafe {
+            raw::sd_ble_gattc_exchange_mtu_request(
+                state.conn_handle.get().unwrap(), //todo
+                link.att_mtu_desired,
+            )
+        };
+
+        MTU_UPDATED_SIGNAL.wait().await?;
+
+        if let Err(err) = RawError::convert(ret) {
+            warn!("sd_ble_gattc_exchange_mtu_request err {:?}", err);
+        }
+    }
+
+    // Send a data length update request if necessary.
+    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+    {
+        let link = state.link.update(|mut link| {
+            link.data_length_desired = config.data_length_desired;
+            link
+        });
+
+        if link.data_length_desired > link.data_length_effective {
+            let dl_params = raw::ble_gap_data_length_params_t {
+                max_rx_octets: link.data_length_desired.into(),
+                max_tx_octets: link.data_length_desired.into(),
+                max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+                max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+            };
+
+            let ret = unsafe {
+                raw::sd_ble_gap_data_length_update(
+                    state.conn_handle.get().unwrap(), //todo
+                    &dl_params as *const raw::ble_gap_data_length_params_t,
+                    mem::zeroed(),
+                )
+            };
+
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_data_length_update err {:?}", err);
+            }
+        }
+    }
+
+    Ok(conn)
 }
 
 pub fn advertise_stop(sd: &Softdevice) -> Result<(), AdvertiseStopError> {
@@ -170,5 +228,30 @@ pub fn advertise_stop(sd: &Softdevice) -> Result<(), AdvertiseStopError> {
         Ok(()) => Ok(()),
         Err(RawError::InvalidState) => Err(AdvertiseStopError::NotRunning),
         Err(e) => Err(e.into()),
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct Config {
+    /// Requested ATT_MTU size for the next connection that is established.
+    att_mtu_desired: u16,
+    /// The stack's default data length. <27-251>
+    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+    data_length_desired: u8,
+    // bits of BLE_GAP_PHY_
+    tx_phys: u8,
+    // bits of BLE_GAP_PHY_
+    rx_phys: u8,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            att_mtu_desired: 32,
+            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+            data_length_desired: 27,
+            tx_phys: raw::BLE_GAP_PHY_AUTO as u8,
+            rx_phys: raw::BLE_GAP_PHY_AUTO as u8,
+        }
     }
 }

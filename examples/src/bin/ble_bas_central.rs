@@ -77,12 +77,12 @@ impl gatt_client::Client for BatteryServiceClient {
 }
 
 #[task]
-async fn ble_central_task(sd: &'static Softdevice) {
+async fn ble_central_task(sd: &'static Softdevice, config: central::Config) {
     let addrs = &[Address::new_random_static([
         0x59, 0xf9, 0xb1, 0x9c, 0x01, 0xf5,
     ])];
 
-    let conn = central::connect(sd, addrs)
+    let conn = central::connect(sd, addrs, config)
         .await
         .dexpect(intern!("connect"));
     info!("connected");
@@ -161,7 +161,9 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();
-    executor.spawn(ble_central_task(sd)).dewrap();
+    executor
+        .spawn(ble_central_task(sd, central::Config::default()))
+        .dewrap();
 
     loop {
         executor.run();

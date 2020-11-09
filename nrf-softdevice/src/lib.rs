@@ -4,6 +4,7 @@
 #![feature(const_in_array_repeat_expressions)]
 #![feature(type_alias_impl_trait)]
 #![feature(const_fn)]
+#![feature(cell_update)]
 
 pub(crate) mod util;
 

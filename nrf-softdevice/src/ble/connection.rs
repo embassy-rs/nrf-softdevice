@@ -9,6 +9,8 @@ use crate::raw;
 use crate::util::*;
 use crate::RawError;
 
+const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
+
 #[derive(defmt::Format)]
 pub(crate) struct OutOfConnsError;
 
@@ -45,6 +47,51 @@ pub(crate) struct ConnectionState {
     pub gattc_portal: Portal<gatt_client::PortalMessage>,
     #[cfg(feature = "ble-gatt-server")]
     pub gatts_portal: Portal<gatt_server::PortalMessage>,
+
+    pub link: Cell<GattLink>,
+    pub gap: Cell<GapPhy>,
+}
+
+#[derive(Clone, Copy)]
+pub struct GattLink {
+    pub att_mtu_desired: u16,             // Requested ATT_MTU size (in bytes).
+    pub att_mtu_effective: u16,           // Effective ATT_MTU size (in bytes).
+    pub att_mtu_exchange_pending: bool, // Indicates that an ATT_MTU exchange request is pending (the call to @ref sd_ble_gattc_exchange_mtu_request returned @ref NRF_ERROR_BUSY).
+    pub att_mtu_exchange_requested: bool, // Indicates that an ATT_MTU exchange request was made.
+    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+    pub data_length_desired: u8, // Desired data length (in bytes).
+    #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+    pub data_length_effective: u8, // Requested data length (in bytes).
+}
+
+impl GattLink {
+    pub const fn new() -> Self {
+        Self {
+            att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as u16,
+            att_mtu_effective: raw::BLE_GATT_ATT_MTU_DEFAULT as u16,
+            att_mtu_exchange_pending: false,   // TODO do we need this
+            att_mtu_exchange_requested: false, // TODO do we need this
+            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+            data_length_desired: BLE_GAP_DATA_LENGTH_DEFAULT,
+            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+            data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct GapPhy {
+    pub rx_phys: u8,
+    pub tx_phys: u8,
+}
+
+impl GapPhy {
+    const fn new() -> Self {
+        Self {
+            rx_phys: raw::BLE_GAP_PHY_AUTO as u8,
+            tx_phys: raw::BLE_GAP_PHY_AUTO as u8,
+        }
+    }
 }
 
 impl ConnectionState {
@@ -60,6 +107,9 @@ impl ConnectionState {
             gattc_portal: Portal::new(),
             #[cfg(feature = "ble-gatt-server")]
             gatts_portal: Portal::new(),
+
+            link: Cell::new(GattLink::new()),
+            gap: Cell::new(GapPhy::new()),
         }
     }
 

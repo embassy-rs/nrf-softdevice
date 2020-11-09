@@ -23,7 +23,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 }
 
 #[task]
-async fn bluetooth_task(sd: &'static Softdevice) {
+async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
     for i in 0..24 {
         let service_uuid = Uuid::new_16(0x4200 + i);
 
@@ -106,6 +106,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
                 adv_data,
                 scan_data,
             },
+            config,
         )
         .await
         .dewrap();
@@ -160,7 +161,9 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     executor.spawn(softdevice_task(sd)).dewrap();
-    executor.spawn(bluetooth_task(sd)).dewrap();
+    executor
+        .spawn(bluetooth_task(sd, peripheral::Config::default()))
+        .dewrap();
 
     loop {
         executor.run();

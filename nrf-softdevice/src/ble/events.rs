@@ -154,9 +154,15 @@ pub(crate) unsafe fn on_conn_param_update(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
+    let conn_params = gap_evt.params.conn_param_update.conn_params;
+
     trace!(
-        "on_conn_param_update conn_handle={:u16}",
-        gap_evt.conn_handle
+        "on_conn_param_update conn_handle={:u16} conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
+        gap_evt.conn_handle,
+        conn_params.conn_sup_timeout,
+        conn_params.max_conn_interval,
+        conn_params.min_conn_interval,
+        conn_params.slave_latency,
     );
 }
 
@@ -235,38 +241,115 @@ pub(crate) unsafe fn on_sec_request(_ble_evt: *const raw::ble_evt_t, gap_evt: &r
     trace!("on_sec_request conn_handle={:u16}", gap_evt.conn_handle);
 }
 
+/// Called when a phy update has been requested by peer
 pub(crate) unsafe fn on_phy_update_request(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
+    let peer_preferred_phys = gap_evt.params.phy_update_request.peer_preferred_phys;
+    let conn_handle = gap_evt.conn_handle;
+
     trace!(
-        "on_phy_update_request conn_handle={:u16}",
-        gap_evt.conn_handle
+        "on_phy_update_request conn_handle={:u16} rx_phys={:u8} tx_phys={:u8}",
+        conn_handle,
+        peer_preferred_phys.rx_phys,
+        peer_preferred_phys.tx_phys
+    );
+
+    let state = ConnectionState::by_conn_handle(conn_handle);
+    let gap = state.gap.get();
+    let p_gap_phys = raw::ble_gap_phys_t {
+        rx_phys: gap.rx_phys,
+        tx_phys: gap.tx_phys,
+    };
+
+    let ret = raw::sd_ble_gap_phy_update(conn_handle, &p_gap_phys as *const raw::ble_gap_phys_t);
+
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_phy_update err {:?}", err);
+    }
+}
+
+/// Called when a phy update was completed with status phy_update.status
+pub(crate) unsafe fn on_phy_update(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+    let phy_update = gap_evt.params.phy_update;
+
+    trace!(
+        "on_phy_update conn_handle={:u16} status={:u8} rx_phy={:u8} tx_phy={:u8}",
+        gap_evt.conn_handle,
+        phy_update.status,
+        phy_update.rx_phy,
+        phy_update.tx_phy
     );
 }
 
-pub(crate) unsafe fn on_phy_update(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_phy_update conn_handle={:u16}", gap_evt.conn_handle);
-}
-
+/// Called when a data length update has been requested by peer
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 pub(crate) unsafe fn on_data_length_update_request(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
+    let peer_params = gap_evt.params.data_length_update_request.peer_params;
+
     trace!(
-        "on_data_length_update_request conn_handle={:u16}",
-        gap_evt.conn_handle
+        "on_data_length_update_request conn_handle={:u16} max_rx_octets={:u16} max_rx_time_us={:u16} max_tx_octets={:u16} max_tx_time_us={:u16}",
+        gap_evt.conn_handle,
+        peer_params.max_rx_octets,
+        peer_params.max_rx_time_us,
+        peer_params.max_tx_octets,
+        peer_params.max_tx_time_us,
     );
+
+    let conn_handle = gap_evt.conn_handle;
+
+    let state = ConnectionState::by_conn_handle(conn_handle);
+    let link = state.link.get();
+
+    // The SoftDevice only supports symmetric RX/TX data length settings so use tx for both
+    // The SDK does a min on desired provided by user, and peer_params.max_tx_octets
+    let data_length: u8 = core::cmp::min(link.data_length_desired, peer_params.max_tx_octets as u8);
+
+    let dl_params = raw::ble_gap_data_length_params_t {
+        max_rx_octets: data_length.into(),
+        max_tx_octets: data_length.into(),
+        max_rx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+        max_tx_time_us: raw::BLE_GAP_DATA_LENGTH_AUTO as u16,
+    };
+
+    let ret = raw::sd_ble_gap_data_length_update(
+        conn_handle,
+        &dl_params as *const raw::ble_gap_data_length_params_t,
+        mem::zeroed(),
+    );
+
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_data_length_update err {:?}", err);
+    }
 }
 
+/// Called when a data length update was completed (sucessfully?)
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 pub(crate) unsafe fn on_data_length_update(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
+    let effective_params = gap_evt.params.data_length_update.effective_params;
+
+    let state = ConnectionState::by_conn_handle(gap_evt.conn_handle);
+
+    state.link.update(|mut link| {
+        link.data_length_effective = effective_params.max_tx_octets as u8;
+        link
+    });
+
     trace!(
-        "on_data_length_update conn_handle={:u16}",
-        gap_evt.conn_handle
+        "on_data_length_update conn_handle={:u16} max_rx_octets={:u16} max_rx_time_us={:u16} max_tx_octets={:u16} max_tx_time_us={:u16}",
+        gap_evt.conn_handle,
+        effective_params.max_rx_octets,
+        effective_params.max_rx_time_us,
+        effective_params.max_tx_octets,
+        effective_params.max_tx_time_us,
     );
+
+    // TODO implement data_length_update user call and signal NRF_BLE_GATT_EVT_DATA_LENGTH_UPDATED to it and or app
 }
