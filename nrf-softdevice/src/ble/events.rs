@@ -131,6 +131,7 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
             let state = conn.state();
             state.role.set(role);
 
+            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             do_data_length_update(conn_handle, ptr::null());
 
             Ok(conn)
@@ -341,6 +342,7 @@ pub(crate) unsafe fn on_data_length_update(
     );
 }
 
+#[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 unsafe fn do_data_length_update(
     conn_handle: u16,
     params: *const raw::ble_gap_data_length_params_t,
