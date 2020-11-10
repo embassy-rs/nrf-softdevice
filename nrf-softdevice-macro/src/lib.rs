@@ -204,7 +204,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             code_impl.extend(quote_spanned!(ch.span=>
                 fn #notify_fn(
                     &self,
-                    conn: &Connection,
+                    conn: &#ble::Connection,
                     val: #ty,
                 ) -> Result<(), #ble::gatt_server::NotifyValueError> {
                     let buf = #ty_as_val::to_gatt(&val);
