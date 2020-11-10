@@ -37,8 +37,7 @@ pub(crate) struct ConnectionState {
     // When client code drops all instances, refcount becomes 0 and disconnection is initiated.
     // However, disconnection is not complete until the event GAP_DISCONNECTED.
     // so there's a small gap of time where the ConnectionState is not "free" even if refcount=0.
-    pub refcount: Cell<u8>,   // number of existing Connection instances
-    pub detached: Cell<bool>, // if true, .detach() has been called, so the conn shouldn't be dropped when refcount reaches 0.
+    pub refcount: Cell<u8>, // number of existing Connection instances
     pub conn_handle: Cell<Option<u16>>, // none = not connected
 
     pub disconnecting: Cell<bool>,
@@ -95,7 +94,6 @@ impl ConnectionState {
     const fn new() -> Self {
         Self {
             refcount: Cell::new(0),
-            detached: Cell::new(false),
             conn_handle: Cell::new(None),
 
             disconnecting: Cell::new(false),
@@ -111,7 +109,6 @@ impl ConnectionState {
     }
 
     fn reset(&self) {
-        self.detached.set(false);
         self.disconnecting.set(false);
     }
 
@@ -220,9 +217,7 @@ impl Drop for Connection {
         state.refcount.set(new_refcount);
 
         if new_refcount == 0 {
-            if state.detached.get() {
-                trace!("conn {:u8}: dropped, but is detached", self.index);
-            } else if state.conn_handle.get().is_some() {
+            if state.conn_handle.get().is_some() {
                 trace!("conn {:u8}: dropped, disconnecting", self.index);
                 // We still leave conn_handle set, because the connection is
                 // not really disconnected until we get GAP_DISCONNECTED event.
@@ -254,11 +249,6 @@ impl Connection {
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {
         let state = self.state();
         state.disconnect()
-    }
-
-    pub fn detach(&self) {
-        let state = self.state();
-        state.detached.set(true)
     }
 
     pub(crate) fn new(conn_handle: u16) -> Result<Self, OutOfConnsError> {
