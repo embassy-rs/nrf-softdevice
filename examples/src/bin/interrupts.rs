@@ -6,6 +6,7 @@
 mod example_common;
 use example_common::*;
 
+use anyfmt::{panic, *};
 use cortex_m_rt::entry;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
@@ -91,8 +92,8 @@ fn main() -> ! {
     let sd = Softdevice::enable(sdp, &Default::default());
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    executor.spawn(softdevice_task(sd)).dewrap();
-    executor.spawn(interrupt_task(sd)).dewrap();
+    unwrap!(executor.spawn(softdevice_task(sd)));
+    unwrap!(executor.spawn(interrupt_task(sd)));
 
     loop {
         executor.run();

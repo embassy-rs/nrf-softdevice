@@ -32,6 +32,9 @@ dependencies = [
 name = "anyfmt"
 version = "0.1.0"
 source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
+dependencies = [
+ "defmt",
+]
 
 [[package]]
 name = "as-slice"
@@ -259,6 +262,7 @@ dependencies = [
  "bare-metal",
  "cortex-m",
  "cortex-m-rt",
+ "defmt",
  "embassy",
  "embedded-hal",
  "nrf52840-hal",
@@ -514,6 +518,7 @@ dependencies = [
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
+ "anyfmt",
  "cortex-m",
  "cortex-m-rt",
  "cortex-m-rtic",

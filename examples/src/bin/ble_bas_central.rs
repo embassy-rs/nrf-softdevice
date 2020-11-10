@@ -6,6 +6,7 @@
 mod example_common;
 use example_common::*;
 
+use anyfmt::{panic, *};
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
@@ -35,28 +36,21 @@ async fn ble_central_task(sd: &'static Softdevice, config: central::Config) {
         0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0,
     ])];
 
-    let conn = central::connect(sd, addrs, config)
-        .await
-        .dexpect(intern!("connect"));
+    let conn = unwrap!(central::connect(sd, addrs, config).await);
     info!("connected");
 
-    let client: BatteryServiceClient = gatt_client::discover(&conn)
-        .await
-        .dexpect(intern!("discover"));
+    let client: BatteryServiceClient = unwrap!(gatt_client::discover(&conn).await);
 
     // Read
-    let val = client.battery_level_read().await.dexpect(intern!("read"));
+    let val = unwrap!(client.battery_level_read().await);
     info!("read battery level: {:u8}", val);
 
     // Write, set it to 42
-    client
-        .battery_level_write(42)
-        .await
-        .dexpect(intern!("write"));
+    unwrap!(client.battery_level_write(42).await);
     info!("Wrote battery level!");
 
     // Read to check it's changed
-    let val = client.battery_level_read().await.dexpect(intern!("read"));
+    let val = unwrap!(client.battery_level_read().await);
     info!("read battery level: {:u8}", val);
 }
 
@@ -102,10 +96,8 @@ fn main() -> ! {
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    executor.spawn(softdevice_task(sd)).dewrap();
-    executor
-        .spawn(ble_central_task(sd, central::Config::default()))
-        .dewrap();
+    unwrap!(executor.spawn(softdevice_task(sd)));
+    unwrap!(executor.spawn(ble_central_task(sd, central::Config::default())));
 
     loop {
         executor.run();

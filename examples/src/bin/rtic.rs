@@ -17,6 +17,7 @@
 mod example_common;
 use example_common::*;
 
+use anyfmt::{panic, *};
 use core::mem;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
@@ -49,15 +50,17 @@ async fn bluetooth_task(sd: &'static Softdevice) {
     ];
 
     loop {
-        let conn = peripheral::advertise(
-            sd,
-            peripheral::ConnectableAdvertisement::ScannableUndirected {
-                adv_data,
-                scan_data,
-            },
-        )
-        .await
-        .dewrap();
+        let conn = unwrap!(
+            peripheral::advertise(
+                sd,
+                peripheral::ConnectableAdvertisement::ScannableUndirected {
+                    adv_data,
+                    scan_data,
+                },
+                peripheral::Config::default()
+            )
+            .await
+        );
 
         info!("advertising done!");
 
@@ -120,17 +123,19 @@ const APP: () = {
             ..Default::default()
         };
 
+        let (sdp, p) = take_peripherals();
+
         // Softdevice enable must not be done in RTIC init
         // because RTIC runs init with interrupts disabled, and the
         // softdevice crashes if it's enabled with interrupts disabled.
-        let sd = Softdevice::enable(&config);
+        let sd = Softdevice::enable(sdp, &config);
 
-        let temp = temperature_celsius(&sd).dewrap();
+        let temp = unwrap!(temperature_celsius(&sd));
         info!("{:i32}°C", temp.to_num::<i32>());
 
         let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-        executor.spawn(softdevice_task(sd)).dewrap();
-        executor.spawn(bluetooth_task(sd)).dewrap();
+        unwrap!(executor.spawn(softdevice_task(sd)));
+        unwrap!(executor.spawn(bluetooth_task(sd)));
 
         loop {
             executor.run();

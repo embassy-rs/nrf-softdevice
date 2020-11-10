@@ -23,8 +23,9 @@ ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
 ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
 
 [dependencies]
+anyfmt = {version = "0.1.0", features = ["defmt"] }
 embassy = { version = "0.1.0", features = ["defmt"]}
-embassy-nrf = { version = "0.1.0", features = [ "52840" ]}
+embassy-nrf = { version = "0.1.0", features = [ "defmt", "52840" ]}
 cortex-m        = { version = "0.6.3" }
 cortex-m-rt = "0.6.12"
 cortex-m-rtic = { version = "0.5.5", optional = true }
@@ -51,6 +52,9 @@ name = "ble_bas_central"
 required-features = ["ble-gatt-client"]
 
 [[bin]]
-name = "ble_peripheral_gattspam"
-required-features = ["ble-gatt-client"]
+name = "flash"
+required-features = []
 
+[[bin]]
+name = "interrupts"
+required-features = []

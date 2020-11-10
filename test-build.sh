@@ -5,7 +5,7 @@ set -euxo pipefail
 # build examples
 #==================
 
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice-examples --bins
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice-examples --features cortex-m-rtic --bins
 
 
 # build all softdevice+chip combinations (with all supported features enabled)

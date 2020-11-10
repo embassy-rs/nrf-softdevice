@@ -6,6 +6,7 @@
 mod example_common;
 use example_common::*;
 
+use anyfmt::{panic, *};
 use cortex_m_rt::entry;
 use embassy::executor::{task, Executor};
 use embassy::flash::Flash as _;
@@ -25,16 +26,12 @@ async fn flash_task(sd: &'static Softdevice) {
     let mut f = Flash::take(sd);
 
     info!("starting erase");
-    match f.erase(0x80000).await {
-        Ok(()) => info!("erased!"),
-        Err(e) => depanic!("erase failed: {:?}", e),
-    }
+    unwrap!(f.erase(0x80000).await);
+    info!("erased!");
 
     info!("starting write");
-    match f.write(0x80000, &[1, 2, 3, 4]).await {
-        Ok(()) => info!("write done!"),
-        Err(e) => depanic!("write failed: {:?}", e),
-    }
+    unwrap!(f.write(0x80000, &[1, 2, 3, 4]).await);
+    info!("write done!");
 }
 
 #[entry]
@@ -45,8 +42,8 @@ fn main() -> ! {
     let sd = Softdevice::enable(sdp, &Default::default());
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    executor.spawn(softdevice_task(sd)).dewrap();
-    executor.spawn(flash_task(sd)).dewrap();
+    unwrap!(executor.spawn(softdevice_task(sd)));
+    unwrap!(executor.spawn(flash_task(sd)));
 
     loop {
         executor.run();

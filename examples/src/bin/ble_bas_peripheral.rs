@@ -6,6 +6,7 @@
 mod example_common;
 use example_common::*;
 
+use anyfmt::{panic, *};
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
@@ -26,11 +27,13 @@ async fn softdevice_task(sd: &'static Softdevice) {
 struct BatteryService {
     #[characteristic(uuid = "2a19", read, write, notify)]
     battery_level: u8,
+    #[characteristic(uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d", read, write, notify)]
+    foo: u16,
 }
 
 #[task]
 async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
-    let server: BatteryService = gatt_server::register(sd).dewrap();
+    let server: BatteryService = unwrap!(gatt_server::register(sd));
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -43,16 +46,17 @@ async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
     ];
 
     loop {
-        let conn = peripheral::advertise(
-            sd,
-            peripheral::ConnectableAdvertisement::ScannableUndirected {
-                adv_data,
-                scan_data,
-            },
-            config,
-        )
-        .await
-        .dewrap();
+        let conn = unwrap!(
+            peripheral::advertise(
+                sd,
+                peripheral::ConnectableAdvertisement::ScannableUndirected {
+                    adv_data,
+                    scan_data,
+                },
+                config,
+            )
+            .await
+        );
 
         info!("advertising done!");
 
@@ -64,12 +68,20 @@ async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
                     info!("send notification error: {:?}", e);
                 }
             }
+            BatteryServiceEvent::FooWrite(val) => {
+                info!("wrote battery level: {:u16}", val);
+                if let Err(e) = server.foo_notify(&conn, val + 1) {
+                    info!("send notification error: {:?}", e);
+                }
+            }
             BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
                 info!("battery notifications enabled")
             }
             BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
                 info!("battery notifications disabled")
             }
+            BatteryServiceEvent::FooNotificationsEnabled => info!("foo notifications enabled"),
+            BatteryServiceEvent::FooNotificationsDisabled => info!("foo notifications disabled"),
         })
         .await;
 
@@ -92,9 +104,9 @@ fn main() -> ! {
         }),
         conn_gap: Some(raw::ble_gap_conn_cfg_t {
             conn_count: 6,
-            event_length: 6,
+            event_length: 24,
         }),
-        conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 128 }),
+        conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
         gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
             attr_tab_size: 32768,
         }),
@@ -121,10 +133,8 @@ fn main() -> ! {
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    executor.spawn(softdevice_task(sd)).dewrap();
-    executor
-        .spawn(bluetooth_task(sd, peripheral::Config::default()))
-        .dewrap();
+    unwrap!(executor.spawn(softdevice_task(sd)));
+    unwrap!(executor.spawn(bluetooth_task(sd, peripheral::Config::default())));
 
     loop {
         executor.run();
