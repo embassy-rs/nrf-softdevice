@@ -147,9 +147,9 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
 
     match role {
         #[cfg(feature = "ble-central")]
-        Role::Central => central::CONNECT_SIGNAL.signal(res.map_err(|e| e.into())),
+        Role::Central => central::CONNECT_PORTAL.call(res.map_err(|e| e.into())),
         #[cfg(feature = "ble-peripheral")]
-        Role::Peripheral => peripheral::ADV_SIGNAL.signal(res.map_err(|e| e.into())),
+        Role::Peripheral => peripheral::ADV_PORTAL.call(res.map_err(|e| e.into())),
     }
 }
 
@@ -237,7 +237,7 @@ pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::
     match params.src as u32 {
         #[cfg(feature = "ble-central")]
         raw::BLE_GAP_TIMEOUT_SRC_CONN => {
-            central::CONNECT_SIGNAL.signal(Err(central::ConnectError::Stopped))
+            central::CONNECT_PORTAL.call(Err(central::ConnectError::Stopped))
         }
         x => depanic!("unknown timeout src {:u32}", x),
     }

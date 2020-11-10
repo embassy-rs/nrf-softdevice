@@ -10,6 +10,8 @@ mod waker_store;
 pub use waker_store::*;
 mod drop_bomb;
 pub use drop_bomb::*;
+mod on_drop;
+pub use on_drop::*;
 
 pub(crate) use defmt::{debug, error, info, intern, trace, warn};
 

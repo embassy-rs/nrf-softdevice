@@ -53,7 +53,7 @@ impl From<RawError> for ConnectStopError {
     }
 }
 
-pub(crate) static CONNECT_SIGNAL: Signal<Result<Connection, ConnectError>> = Signal::new();
+pub(crate) static CONNECT_PORTAL: Portal<Result<Connection, ConnectError>> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn connect(
@@ -94,6 +94,11 @@ pub async fn connect(
         scan_params.window_us = scan_window * 625;
     }
 
+    let d = OnDrop::new(|| {
+        let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
+        let _ = RawError::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel"));
+    });
+
     // TODO make configurable
     let mut conn_params: raw::ble_gap_conn_params_t = unsafe { mem::zeroed() };
     conn_params.min_conn_interval = 50;
@@ -112,9 +117,7 @@ pub async fn connect(
 
     info!("connect started");
 
-    // TODO handle future drop
-
-    let conn = CONNECT_SIGNAL.wait().await?;
+    let conn = CONNECT_PORTAL.wait_once(|res| res).await?;
 
     let state = conn.state();
 
@@ -126,16 +129,9 @@ pub async fn connect(
 
     state.set_att_mtu_desired(config.att_mtu_desired);
 
-    Ok(conn)
-}
+    d.defuse();
 
-pub fn connect_stop(sd: &Softdevice) -> Result<(), ConnectStopError> {
-    let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
-    match RawError::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel")) {
-        Ok(()) => Ok(()),
-        Err(RawError::InvalidState) => Err(ConnectStopError::NotRunning),
-        Err(e) => Err(e.into()),
-    }
+    Ok(conn)
 }
 
 #[derive(Copy, Clone)]

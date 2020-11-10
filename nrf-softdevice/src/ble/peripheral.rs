@@ -16,7 +16,7 @@ pub(crate) unsafe fn on_adv_set_terminated(
         "peripheral on_adv_set_terminated conn_handle={:u16}",
         gap_evt.conn_handle
     );
-    ADV_SIGNAL.signal(Err(AdvertiseError::Stopped))
+    ADV_PORTAL.call(Err(AdvertiseError::Stopped))
 }
 
 pub(crate) unsafe fn on_scan_req_report(
@@ -96,7 +96,7 @@ impl From<RawError> for AdvertiseStopError {
 }
 
 static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
-pub(crate) static ADV_SIGNAL: Signal<Result<Connection, AdvertiseError>> = Signal::new();
+pub(crate) static ADV_PORTAL: Portal<Result<Connection, AdvertiseError>> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn advertise(
@@ -149,6 +149,11 @@ pub async fn advertise(
         scan_rsp_data: map_data(scan_data),
     };
 
+    let d = OnDrop::new(|| {
+        let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
+        let _ = RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop"));
+    });
+
     let ret = unsafe {
         raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _)
     };
@@ -157,27 +162,18 @@ pub async fn advertise(
     let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
     RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_start"))?;
 
-    // TODO handle future drop
-
     info!("Advertising started!");
 
     // The advertising data needs to be kept alive for the entire duration of the advertising procedure.
 
-    let conn = ADV_SIGNAL.wait().await?;
+    let conn = ADV_PORTAL.wait_once(|res| res).await?;
 
     let state = conn.state();
     state.set_att_mtu_desired(config.att_mtu_desired);
 
-    Ok(conn)
-}
+    d.defuse();
 
-pub fn advertise_stop(sd: &Softdevice) -> Result<(), AdvertiseStopError> {
-    let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
-    match RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop")) {
-        Ok(()) => Ok(()),
-        Err(RawError::InvalidState) => Err(AdvertiseStopError::NotRunning),
-        Err(e) => Err(e.into()),
-    }
+    Ok(conn)
 }
 
 #[derive(Copy, Clone)]

@@ -14,6 +14,7 @@ enum State<T> {
     None,
     Running,
     Waiting(*mut dyn FnMut(T)),
+    Done,
 }
 
 unsafe impl<T> Send for Portal<T> {}
@@ -41,6 +42,7 @@ impl<T> Portal<T> {
         unsafe {
             match *self.state.get() {
                 State::None => {}
+                State::Done => {}
                 State::Running => depanic!("Portall::call() called reentrantly"),
                 State::Waiting(func) => (*func)(val),
             }
@@ -54,21 +56,26 @@ impl<T> Portal<T> {
         assert_thread_mode();
 
         async move {
-            let bomb = DropBomb::new();
-
             let signal = Signal::new();
             let mut result: MaybeUninit<R> = MaybeUninit::uninit();
-            let mut call_func = |val: T| {
-                unsafe {
-                    let state = &mut *self.state.get();
-                    *state = State::None;
-                    result.as_mut_ptr().write(func(val))
-                };
+            let mut call_func = |val: T| unsafe {
+                let state = &mut *self.state.get();
+
+                // Set state to Running while running the function to avoid reentrancy.
+                *state = State::Running;
+                result.as_mut_ptr().write(func(val));
+
+                *state = State::Done;
                 signal.signal(());
             };
 
             let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
             let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
+
+            let _bomb = OnDrop::new(|| unsafe {
+                let state = &mut *self.state.get();
+                *state = State::None;
+            });
 
             // safety: this runs from thread mode
             unsafe {
@@ -82,9 +89,8 @@ impl<T> Portal<T> {
 
             signal.wait().await;
 
-            bomb.defuse();
-
             unsafe { result.assume_init() }
+            // dropbomb sets self.state = None
         }
     }
 
@@ -95,8 +101,6 @@ impl<T> Portal<T> {
         assert_thread_mode();
 
         async move {
-            let bomb = DropBomb::new();
-
             let signal = Signal::new();
             let mut result: MaybeUninit<R> = MaybeUninit::uninit();
             let mut call_func = |val: T| {
@@ -116,7 +120,7 @@ impl<T> Portal<T> {
                         Some(res) => {
                             result.as_mut_ptr().write(res);
                             signal.signal(());
-                            State::None
+                            State::Done
                         }
                     };
                 };
@@ -124,6 +128,11 @@ impl<T> Portal<T> {
 
             let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
             let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
+
+            let _bomb = OnDrop::new(|| unsafe {
+                let state = &mut *self.state.get();
+                *state = State::None;
+            });
 
             // safety: this runs from thread mode
             unsafe {
@@ -137,9 +146,8 @@ impl<T> Portal<T> {
 
             signal.wait().await;
 
-            bomb.defuse();
-
             unsafe { result.assume_init() }
+            // dropbomb sets self.state = None
         }
     }
 }
