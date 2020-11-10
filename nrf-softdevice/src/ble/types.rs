@@ -75,14 +75,6 @@ impl Role {
             _ => depanic!("unknown role {:u8}", raw),
         }
     }
-
-    pub(crate) const fn whatever() -> Self {
-        #[cfg(not(feature = "ble-peripheral"))]
-        return Self::Central;
-
-        #[cfg(feature = "ble-peripheral")]
-        return Self::Peripheral;
-    }
 }
 
 #[repr(transparent)]

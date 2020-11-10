@@ -187,7 +187,7 @@ dependencies = [
 [[package]]
 name = "defmt"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
 dependencies = [
  "defmt-macros",
  "semver 0.11.0",
@@ -196,7 +196,7 @@ dependencies = [
 [[package]]
 name = "defmt-macros"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -207,12 +207,12 @@ dependencies = [
 [[package]]
 name = "defmt-parser"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
 
 [[package]]
 name = "defmt-rtt"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#144184a6ac614146c45122ece7c9fc698b749719"
+source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
 dependencies = [
  "cortex-m",
  "defmt",
@@ -665,7 +665,7 @@ dependencies = [
 [[package]]
 name = "panic-probe"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/probe-run?branch=main#50b598205c817066ba0166e34e30a6e16d52b010"
+source = "git+https://github.com/knurling-rs/probe-run?branch=main#749e0a30c62d9e005f3c497ba5854d41ff17800b"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",

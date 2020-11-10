@@ -168,8 +168,9 @@ pub async fn advertise(
 
     let conn = ADV_PORTAL.wait_once(|res| res).await?;
 
-    let state = conn.state();
-    state.set_att_mtu_desired(config.att_mtu_desired);
+    conn.with_state(|state| {
+        state.set_att_mtu_desired(config.att_mtu_desired);
+    });
 
     d.defuse();
 

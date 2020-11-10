@@ -126,11 +126,8 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
     let conn_handle = gap_evt.conn_handle;
     let role = Role::from_raw(params.role);
 
-    let res = match Connection::new(conn_handle) {
+    let res = match Connection::new(conn_handle, role) {
         Ok(conn) => {
-            let state = conn.state();
-            state.role.set(role);
-
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             do_data_length_update(conn_handle, ptr::null());
 
@@ -159,8 +156,7 @@ pub(crate) unsafe fn on_disconnected(
 ) {
     trace!("on_disconnected conn_handle={:u16}", gap_evt.conn_handle);
     let conn_handle = gap_evt.conn_handle;
-    let state = ConnectionState::by_conn_handle(conn_handle);
-    state.on_disconnected()
+    connection::with_state_by_conn_handle(conn_handle, |state| state.on_disconnected());
 }
 
 pub(crate) unsafe fn on_conn_param_update(
@@ -269,14 +265,12 @@ pub(crate) unsafe fn on_phy_update_request(
         peer_preferred_phys.tx_phys
     );
 
-    let state = ConnectionState::by_conn_handle(conn_handle);
-    let gap = state.gap.get();
-    let p_gap_phys = raw::ble_gap_phys_t {
-        rx_phys: gap.rx_phys,
-        tx_phys: gap.tx_phys,
-    };
+    let phys = connection::with_state_by_conn_handle(conn_handle, |state| raw::ble_gap_phys_t {
+        rx_phys: state.rx_phys,
+        tx_phys: state.tx_phys,
+    });
 
-    let ret = raw::sd_ble_gap_phy_update(conn_handle, &p_gap_phys as *const raw::ble_gap_phys_t);
+    let ret = raw::sd_ble_gap_phy_update(conn_handle, &phys as *const raw::ble_gap_phys_t);
 
     if let Err(err) = RawError::convert(ret) {
         warn!("sd_ble_gap_phy_update err {:?}", err);
@@ -325,11 +319,8 @@ pub(crate) unsafe fn on_data_length_update(
 ) {
     let effective_params = gap_evt.params.data_length_update.effective_params;
 
-    let state = ConnectionState::by_conn_handle(gap_evt.conn_handle);
-
-    state.link.update(|mut link| {
-        link.data_length_effective = effective_params.max_tx_octets as u8;
-        link
+    connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+        state.data_length_effective = effective_params.max_tx_octets as u8;
     });
 
     trace!(

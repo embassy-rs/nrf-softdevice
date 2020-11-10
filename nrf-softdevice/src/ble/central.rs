@@ -119,15 +119,11 @@ pub async fn connect(
 
     let conn = CONNECT_PORTAL.wait_once(|res| res).await?;
 
-    let state = conn.state();
-
-    state.gap.update(|mut gap| {
-        gap.rx_phys = config.tx_phys;
-        gap.tx_phys = config.rx_phys;
-        gap
+    conn.with_state(|state| {
+        state.rx_phys = config.tx_phys;
+        state.tx_phys = config.rx_phys;
+        state.set_att_mtu_desired(config.att_mtu_desired);
     });
-
-    state.set_att_mtu_desired(config.att_mtu_desired);
 
     d.defuse();
 

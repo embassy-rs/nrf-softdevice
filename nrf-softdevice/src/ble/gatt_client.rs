@@ -135,14 +135,12 @@ pub(crate) async fn discover_service(
     conn: &Connection,
     uuid: Uuid,
 ) -> Result<raw::ble_gattc_service_t, DiscoverError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
     let ret =
         unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
 
-    state
-        .gattc_portal
+    portal(conn_handle)
         .wait_once(|e| match e {
             PortalMessage::DiscoverService(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
@@ -176,9 +174,7 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
         gattc_evt.conn_handle,
         gattc_evt.gatt_status,
     );
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::DiscoverService(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverService(ble_evt))
 }
 
 // =============================
@@ -188,8 +184,7 @@ async fn discover_characteristics(
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe {
         raw::sd_ble_gattc_characteristics_discover(
@@ -202,8 +197,7 @@ async fn discover_characteristics(
     };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
 
-    state
-        .gattc_portal
+    portal(conn_handle)
         .wait_once(|e| match e {
             PortalMessage::DiscoverCharacteristics(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
@@ -230,9 +224,7 @@ pub(crate) unsafe fn on_char_disc_rsp(
         gattc_evt.gatt_status,
     );
 
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::DiscoverCharacteristics(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverCharacteristics(ble_evt))
 }
 
 // =============================
@@ -242,8 +234,7 @@ async fn discover_descriptors(
     start_handle: u16,
     end_handle: u16,
 ) -> Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe {
         raw::sd_ble_gattc_descriptors_discover(
@@ -256,8 +247,7 @@ async fn discover_descriptors(
     };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
 
-    state
-        .gattc_portal
+    portal(conn_handle)
         .wait_once(|e| match e {
             PortalMessage::DiscoverDescriptors(ble_evt) => unsafe {
                 let gattc_evt = check_status(ble_evt)?;
@@ -284,9 +274,7 @@ pub(crate) unsafe fn on_desc_disc_rsp(
         gattc_evt.gatt_status,
     );
 
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::DiscoverDescriptors(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverDescriptors(ble_evt))
 }
 
 // =============================
@@ -399,14 +387,12 @@ impl From<RawError> for ReadError {
 }
 
 pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usize, ReadError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe { raw::sd_ble_gattc_read(conn_handle, handle, 0) };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_read"))?;
 
-    state
-        .gattc_portal
+    portal(conn_handle)
         .wait_many(|e| match e {
             PortalMessage::Read(ble_evt) => unsafe {
                 let gattc_evt = match check_status(ble_evt) {
@@ -436,9 +422,7 @@ pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw
         gattc_evt.gatt_status,
     );
 
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::Read(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::Read(ble_evt))
 }
 
 #[derive(defmt::Format)]
@@ -467,8 +451,7 @@ impl From<RawError> for WriteError {
 }
 
 pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), WriteError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     deassert!(buf.len() <= u16::MAX as usize);
     let params = raw::ble_gattc_write_params_t {
@@ -483,8 +466,7 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
     let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
     RawError::convert(ret).dewarn(intern!("sd_ble_gattc_write"))?;
 
-    state
-        .gattc_portal
+    portal(conn_handle)
         .wait_many(|e| match e {
             PortalMessage::Write(ble_evt) => unsafe {
                 match check_status(ble_evt) {
@@ -504,10 +486,8 @@ pub async fn write_without_response(
     handle: u16,
     buf: &[u8],
 ) -> Result<(), WriteError> {
-    let state = conn.state();
-
     loop {
-        let conn_handle = state.check_connected()?;
+        let conn_handle = conn.with_state(|state| state.check_connected())?;
 
         deassert!(buf.len() <= u16::MAX as usize);
         let params = raw::ble_gattc_write_params_t {
@@ -526,8 +506,7 @@ pub async fn write_without_response(
             Ok(()) => return Ok(()),
         }
 
-        state
-            .gattc_portal
+        portal(conn_handle)
             .wait_many(|e| match e {
                 PortalMessage::WriteTxComplete(_) => Some(Ok(())),
                 PortalMessage::Disconnected => Some(Err(WriteError::Disconnected)),
@@ -568,8 +547,7 @@ pub fn try_write_without_response(
     handle: u16,
     buf: &[u8],
 ) -> Result<(), TryWriteError> {
-    let state = conn.state();
-    let conn_handle = state.check_connected()?;
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     deassert!(buf.len() <= u16::MAX as usize);
     let params = raw::ble_gattc_write_params_t {
@@ -599,9 +577,7 @@ pub(crate) unsafe fn on_write_rsp(
         gattc_evt.gatt_status,
     );
 
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::Write(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::Write(ble_evt))
 }
 
 unsafe fn check_status(
@@ -671,29 +647,27 @@ pub(crate) unsafe fn on_exchange_mtu_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     let conn_handle = gattc_evt.conn_handle;
-    let state = ConnectionState::by_conn_handle(conn_handle);
+    connection::with_state_by_conn_handle(conn_handle, |state| {
+        // TODO can probably get it from gattc_evt directly?
+        let exchange_mtu_rsp = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
+        let server_rx_mtu = exchange_mtu_rsp.server_rx_mtu;
 
-    // TODO can probably get it from gattc_evt directly?
-    let exchange_mtu_rsp = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
-    let server_rx_mtu = exchange_mtu_rsp.server_rx_mtu;
+        // Determine the lowest MTU between our own desired MTU and the peer's.
+        // The MTU may not be less than BLE_GATT_ATT_MTU_DEFAULT.
+        let att_mtu_effective = core::cmp::min(server_rx_mtu, state.att_mtu_desired);
+        let att_mtu_effective =
+            core::cmp::max(att_mtu_effective, raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
 
-    // Determine the lowest MTU between our own desired MTU and the peer's.
-    // The MTU may not be less than BLE_GATT_ATT_MTU_DEFAULT.
-    let att_mtu_effective = core::cmp::min(server_rx_mtu, state.link.get().att_mtu_desired);
-    let att_mtu_effective = core::cmp::max(att_mtu_effective, raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+        state.att_mtu_effective = att_mtu_effective;
 
-    let link = state.link.update(|mut link| {
-        link.att_mtu_effective = att_mtu_effective;
-        link
-    });
-
-    trace!(
-        "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16} server_rx_mtu={:u16} att_mtu_effective=={:u16}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
-        server_rx_mtu,
-        link.att_mtu_effective
-    );
+        trace!(
+            "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16} server_rx_mtu={:u16} att_mtu_effective=={:u16}",
+            gattc_evt.conn_handle,
+            gattc_evt.gatt_status,
+            server_rx_mtu,
+            state.att_mtu_effective
+        );
+    })
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
@@ -714,7 +688,10 @@ pub(crate) unsafe fn on_write_cmd_tx_complete(
         gattc_evt.gatt_status,
     );
 
-    ConnectionState::by_conn_handle(gattc_evt.conn_handle)
-        .gattc_portal
-        .call(PortalMessage::WriteTxComplete(ble_evt))
+    portal(gattc_evt.conn_handle).call(PortalMessage::WriteTxComplete(ble_evt))
+}
+
+static PORTALS: [Portal<PortalMessage>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
+pub(crate) fn portal(conn_handle: u16) -> &'static Portal<PortalMessage> {
+    unsafe { &PORTALS[conn_handle as usize] }
 }
