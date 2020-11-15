@@ -56,6 +56,27 @@ pub(crate) struct ConnectionState {
 }
 
 impl ConnectionState {
+    const fn dummy() -> Self {
+        // The returned value should have bit pattern 0, so that STATES
+        // can go into .bss instead of .data, which saves flash space.
+        Self {
+            refcount: 0,
+            conn_handle: None,
+            #[cfg(feature = "ble-central")]
+            role: Role::Central,
+            #[cfg(not(feature = "ble-central"))]
+            role: Role::Peripheral,
+            disconnecting: false,
+            att_mtu_desired: 0,
+            att_mtu_effective: 0,
+            att_mtu_exchange_pending: false,
+            att_mtu_exchange_requested: false,
+            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+            data_length_effective: 0,
+            rx_phys: 0,
+            tx_phys: 0,
+        }
+    }
     pub(crate) fn check_connected(&mut self) -> Result<u16, DisconnectedError> {
         self.conn_handle.ok_or(DisconnectedError)
     }
@@ -163,37 +184,35 @@ impl Connection {
     }
 
     pub(crate) fn new(conn_handle: u16, role: Role) -> Result<Self, OutOfConnsError> {
-        let index = find_free_index().ok_or(OutOfConnsError)?;
+        allocate_index(|index, state| {
+            // Initialize
+            *state = ConnectionState {
+                refcount: 1,
+                conn_handle: Some(conn_handle),
+                role,
 
-        let state = unsafe { &mut *STATES[index as usize].get() };
+                disconnecting: false,
 
-        // Initialize
-        *state = Some(ConnectionState {
-            refcount: 1,
-            conn_handle: Some(conn_handle),
-            role,
+                att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
+                att_mtu_effective: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
+                att_mtu_exchange_pending: false,
+                att_mtu_exchange_requested: false,
 
-            disconnecting: false,
+                #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+                data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
 
-            att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
-            att_mtu_effective: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
-            att_mtu_exchange_pending: false,
-            att_mtu_exchange_requested: false,
+                rx_phys: 0,
+                tx_phys: 0,
+            };
 
-            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-            data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
+            // Update index_by_handle
+            let ibh = index_by_handle(conn_handle);
+            deassert!(ibh.get().is_none(), "bug: conn_handle already has index");
+            ibh.set(Some(index));
 
-            rx_phys: 0,
-            tx_phys: 0,
-        });
-
-        // Update index_by_handle
-        let ibh = index_by_handle(conn_handle);
-        deassert!(ibh.get().is_none(), "bug: conn_handle already has index");
-        ibh.set(Some(index));
-
-        trace!("conn {:u8}: connected", index);
-        return Ok(Self { index });
+            trace!("conn {:u8}: connected", index);
+            Self { index }
+        })
     }
 
     pub(crate) fn with_state<T>(&self, f: impl FnOnce(&mut ConnectionState) -> T) -> T {
@@ -202,8 +221,8 @@ impl Connection {
 }
 
 // ConnectionStates by index.
-static mut STATES: [UnsafeCell<Option<ConnectionState>>; CONNS_MAX] =
-    [UnsafeCell::new(None); CONNS_MAX];
+static mut STATES: [UnsafeCell<ConnectionState>; CONNS_MAX] =
+    [UnsafeCell::new(ConnectionState::dummy()); CONNS_MAX];
 
 pub(crate) fn with_state_by_conn_handle<T>(
     conn_handle: u16,
@@ -216,33 +235,19 @@ pub(crate) fn with_state_by_conn_handle<T>(
 }
 
 pub(crate) fn with_state<T>(index: u8, f: impl FnOnce(&mut ConnectionState) -> T) -> T {
-    unsafe {
-        let state_opt = &mut *STATES[index as usize].get();
-        let (erase, res) = {
-            let state = state_opt.as_mut().unwrap();
-            let res = f(state);
-            let erase = state.refcount == 0 && state.conn_handle.is_none();
-            (erase, res)
-        };
-
-        if erase {
-            trace!("conn {:u8}: index freed", index);
-            *state_opt = None
-        }
-
-        res
-    }
+    let state = unsafe { &mut *STATES[index as usize].get() };
+    f(state)
 }
 
-fn find_free_index() -> Option<u8> {
+fn allocate_index<T>(f: impl FnOnce(u8, &mut ConnectionState) -> T) -> Result<T, OutOfConnsError> {
     unsafe {
         for (i, s) in STATES.iter().enumerate() {
             let state = &mut *s.get();
-            if state.is_none() {
-                return Some(i as u8);
+            if state.refcount == 0 && state.conn_handle.is_none() {
+                return Ok(f(i as u8, state));
             }
         }
-        None
+        Err(OutOfConnsError)
     }
 }
 
