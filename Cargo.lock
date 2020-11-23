@@ -186,8 +186,9 @@ dependencies = [
 
 [[package]]
 name = "defmt"
-version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ba72139b69a8bbaff8985e22137cf1cd27e5edef9e420c3db78a11a46c39a36"
 dependencies = [
  "defmt-macros",
  "semver 0.11.0",
@@ -196,7 +197,8 @@ dependencies = [
 [[package]]
 name = "defmt-macros"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2729f0cc744f582a84097e9fd40afc13d1689713fee19895f0bcf35bc294439"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -207,12 +209,14 @@ dependencies = [
 [[package]]
 name = "defmt-parser"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "812b30ff14930407c86a23e256ac050b8e6913f597adcc88e29d40517f7a16de"
 
 [[package]]
 name = "defmt-rtt"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/defmt?branch=main#2cd3004272734bca06c9023a12f2c7b6d14f3e45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a3b88b3d83d73d910738feb4bb91543f61622420dab760c769f4111b379e354"
 dependencies = [
  "cortex-m",
  "defmt",
@@ -493,7 +497,6 @@ dependencies = [
 name = "nrf-softdevice"
 version = "0.1.0"
 dependencies = [
- "bare-metal",
  "cortex-m",
  "cortex-m-rt",
  "defmt",
@@ -665,7 +668,8 @@ dependencies = [
 [[package]]
 name = "panic-probe"
 version = "0.1.0"
-source = "git+https://github.com/knurling-rs/probe-run?branch=main#749e0a30c62d9e005f3c497ba5854d41ff17800b"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0de06adf67ed4f46572b31ac5340b8137f8a37d5e89fd68101d92767c9feb5f0"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",

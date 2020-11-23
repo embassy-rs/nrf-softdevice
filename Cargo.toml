@@ -20,9 +20,6 @@ exclude = [
 ]
 
 [patch.crates-io]
-panic-probe = { git = "https://github.com/knurling-rs/probe-run", branch="main" }
-defmt-rtt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
-defmt = { git = "https://github.com/knurling-rs/defmt", branch="main" }
 anyfmt = { git = "https://github.com/akiles/embassy" }
 embassy = { git = "https://github.com/akiles/embassy" }
 embassy-nrf = { git = "https://github.com/akiles/embassy" }

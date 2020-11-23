@@ -6,15 +6,13 @@
 //!
 //! You must NOT use any other crate to manage interrupts, such as `cortex-m`'s `NVIC`.
 
-use bare_metal::Nr;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
-
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
 
 // Re-exports
 pub use crate::pac::Interrupt;
 pub use crate::pac::Interrupt::*; // needed for cortex-m-rt #[interrupt]
-pub use bare_metal::{CriticalSection, Mutex};
+pub use cortex_m::interrupt::{CriticalSection, Mutex, Nr};
 
 #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
 const RESERVED_IRQS: [u32; 2] = [
