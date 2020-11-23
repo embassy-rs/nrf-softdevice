@@ -83,18 +83,6 @@ impl From<RawError> for AdvertiseError {
     }
 }
 
-#[derive(defmt::Format)]
-pub enum AdvertiseStopError {
-    NotRunning,
-    Raw(RawError),
-}
-
-impl From<RawError> for AdvertiseStopError {
-    fn from(err: RawError) -> Self {
-        AdvertiseStopError::Raw(err)
-    }
-}
-
 static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 pub(crate) static ADV_PORTAL: Portal<Result<Connection, AdvertiseError>> = Portal::new();
 

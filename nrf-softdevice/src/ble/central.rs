@@ -41,18 +41,6 @@ impl From<RawError> for ConnectError {
     }
 }
 
-#[derive(defmt::Format)]
-pub enum ConnectStopError {
-    NotRunning,
-    Raw(RawError),
-}
-
-impl From<RawError> for ConnectStopError {
-    fn from(err: RawError) -> Self {
-        ConnectStopError::Raw(err)
-    }
-}
-
 pub(crate) static CONNECT_PORTAL: Portal<Result<Connection, ConnectError>> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
