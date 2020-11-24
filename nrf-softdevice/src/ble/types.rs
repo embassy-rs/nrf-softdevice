@@ -1,6 +1,8 @@
 use crate::raw;
 use crate::RawError;
 
+use crate::util::{panic, *};
+
 #[repr(transparent)]
 #[derive(Copy, Clone)]
 pub struct Uuid {
@@ -30,7 +32,7 @@ impl Uuid {
         let ret = unsafe { raw::sd_ble_uuid_vs_add(uuid.as_ptr() as _, &mut uuid_type as _) };
         match RawError::convert(ret) {
             Ok(()) => {}
-            Err(e) => depanic!("sd_ble_uuid_vs_add err {:?}", e),
+            Err(e) => panic!("sd_ble_uuid_vs_add err {:?}", e),
         }
 
         Self {
@@ -72,7 +74,7 @@ impl Role {
             raw::BLE_GAP_ROLE_CENTRAL => Self::Central,
             #[cfg(feature = "ble-peripheral")]
             raw::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
-            _ => depanic!("unknown role {:u8}", raw),
+            _ => panic!("unknown role {:u8}", raw),
         }
     }
 }

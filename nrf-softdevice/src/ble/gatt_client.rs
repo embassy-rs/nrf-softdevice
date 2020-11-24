@@ -6,7 +6,7 @@ use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
 use crate::raw;
-use crate::util::*;
+use crate::util::{assert, assert_ne, panic, unreachable, *};
 use crate::RawError;
 
 /// Discovered characteristic
@@ -138,7 +138,10 @@ pub(crate) async fn discover_service(
     let conn_handle = conn.with_state(|state| state.check_connected())?;
     let ret =
         unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_primary_services_discover"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gattc_primary_services_discover err {:?}", err);
+        err
+    })?;
 
     portal(conn_handle)
         .wait_once(|e| match e {
@@ -195,7 +198,10 @@ async fn discover_characteristics(
             },
         )
     };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_characteristics_discover"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gattc_characteristics_discover err {:?}", err);
+        err
+    })?;
 
     portal(conn_handle)
         .wait_once(|e| match e {
@@ -204,7 +210,7 @@ async fn discover_characteristics(
                 let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
                 let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
                 let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                    depanic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
+                    panic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
                 });
                 Ok(v)
             },
@@ -245,7 +251,10 @@ async fn discover_descriptors(
             },
         )
     };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_descriptors_discover"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gattc_descriptors_discover err {:?}", err);
+        err
+    })?;
 
     portal(conn_handle)
         .wait_once(|e| match e {
@@ -254,7 +263,7 @@ async fn discover_descriptors(
                 let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
                 let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
                 let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                    depanic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
+                    panic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
                 });
                 Ok(v)
             },
@@ -310,7 +319,7 @@ async fn discover_inner<T: Client>(
                     uuid: Uuid::from_raw(desc.uuid),
                     handle: desc.handle,
                 })
-                .unwrap_or_else(|_| depanic!("no size in descriptors"));
+                .unwrap_or_else(|_| panic!("no size in descriptors"));
         }
     }
 
@@ -342,7 +351,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
             Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => break,
             x => x,
         }?;
-        deassert!(chars.len() != 0);
+        assert_ne!(chars.len(), 0);
         for curr in chars {
             if let Some(prev) = prev_char {
                 discover_inner(conn, &mut client, &svc, prev, Some(curr)).await?;
@@ -390,7 +399,10 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe { raw::sd_ble_gattc_read(conn_handle, handle, 0) };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_read"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gattc_read err {:?}", err);
+        err
+    })?;
 
     portal(conn_handle)
         .wait_many(|e| match e {
@@ -453,7 +465,7 @@ impl From<RawError> for WriteError {
 pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), WriteError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
-    deassert!(buf.len() <= u16::MAX as usize);
+    assert!(buf.len() <= u16::MAX as usize);
     let params = raw::ble_gattc_write_params_t {
         write_op: raw::BLE_GATT_OP_WRITE_REQ as u8,
         flags: 0,
@@ -464,7 +476,10 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
     };
 
     let ret = unsafe { raw::sd_ble_gattc_write(conn_handle, &params) };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gattc_write"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gattc_write err {:?}", err);
+        err
+    })?;
 
     portal(conn_handle)
         .wait_many(|e| match e {
@@ -489,7 +504,7 @@ pub async fn write_without_response(
     loop {
         let conn_handle = conn.with_state(|state| state.check_connected())?;
 
-        deassert!(buf.len() <= u16::MAX as usize);
+        assert!(buf.len() <= u16::MAX as usize);
         let params = raw::ble_gattc_write_params_t {
             write_op: raw::BLE_GATT_OP_WRITE_CMD as u8,
             flags: 0,
@@ -549,7 +564,7 @@ pub fn try_write_without_response(
 ) -> Result<(), TryWriteError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
-    deassert!(buf.len() <= u16::MAX as usize);
+    assert!(buf.len() <= u16::MAX as usize);
     let params = raw::ble_gattc_write_params_t {
         write_op: raw::BLE_GATT_OP_WRITE_CMD as u8,
         flags: 0,

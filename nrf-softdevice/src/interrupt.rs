@@ -6,8 +6,9 @@
 //!
 //! You must NOT use any other crate to manage interrupts, such as `cortex-m`'s `NVIC`.
 
-use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
+use crate::util::{assert, unreachable, *};
+use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 
 // Re-exports
 pub use crate::pac::Interrupt;
@@ -118,34 +119,42 @@ where
     unsafe {
         let nvic = &*NVIC::ptr();
 
-        let nested_cs = CS_FLAG.load(Ordering::SeqCst);
-
-        if !nested_cs {
-            raw_free(|| {
-                CS_FLAG.store(true, Ordering::Relaxed);
-
-                // Store the state of irqs.
-                CS_MASK[0] = nvic.icer[0].read();
-                CS_MASK[1] = nvic.icer[1].read();
-
-                // Disable only not-reserved irqs.
-                nvic.icer[0].write(!RESERVED_IRQS[0]);
-                nvic.icer[1].write(!RESERVED_IRQS[1]);
-            });
-        }
-
+        let token = disable_all();
         let r = f(&CriticalSection::new());
-
-        if !nested_cs {
-            raw_free(|| {
-                CS_FLAG.store(false, Ordering::Relaxed);
-                // restore only non-reserved irqs.
-                nvic.iser[0].write(CS_MASK[0] & !RESERVED_IRQS[0]);
-                nvic.iser[1].write(CS_MASK[1] & !RESERVED_IRQS[1]);
-            });
-        }
-
+        enable_all(token);
         r
+    }
+}
+
+pub unsafe fn disable_all() -> u8 {
+    let nvic = &*NVIC::ptr();
+    let nested_cs = CS_FLAG.load(Ordering::SeqCst);
+
+    if !nested_cs {
+        raw_free(|| {
+            CS_FLAG.store(true, Ordering::Relaxed);
+
+            // Store the state of irqs.
+            CS_MASK[0] = nvic.icer[0].read();
+            CS_MASK[1] = nvic.icer[1].read();
+
+            // Disable only not-reserved irqs.
+            nvic.icer[0].write(!RESERVED_IRQS[0]);
+            nvic.icer[1].write(!RESERVED_IRQS[1]);
+        });
+    }
+    return nested_cs as u8;
+}
+
+pub unsafe fn enable_all(token: u8) {
+    let nvic = &*NVIC::ptr();
+    if token == 0 {
+        raw_free(|| {
+            CS_FLAG.store(false, Ordering::Relaxed);
+            // restore only non-reserved irqs.
+            nvic.iser[0].write(CS_MASK[0] & !RESERVED_IRQS[0]);
+            nvic.iser[1].write(CS_MASK[1] & !RESERVED_IRQS[1]);
+        });
     }
 }
 
@@ -165,7 +174,7 @@ fn is_app_accessible_priority(priority: Priority) -> bool {
 
 macro_rules! assert_app_accessible_irq {
     ($irq:ident) => {
-        deassert!(
+        assert!(
             is_app_accessible_irq($irq),
             "irq {:istr} is reserved for the softdevice",
             irq_str($irq)
@@ -177,7 +186,7 @@ macro_rules! assert_app_accessible_irq {
 pub fn enable(irq: Interrupt) {
     assert_app_accessible_irq!(irq);
     let prio = get_priority(irq);
-    deassert!(
+    assert!(
         is_app_accessible_priority(prio),
         "irq {:istr} has priority {:?} which is reserved for the softdevice. Set another prority before enabling it.",
         irq_str(irq),
@@ -252,7 +261,7 @@ pub fn get_priority(irq: Interrupt) -> Priority {
 #[inline]
 pub fn set_priority(irq: Interrupt, prio: Priority) {
     assert_app_accessible_irq!(irq);
-    deassert!(
+    assert!(
         is_app_accessible_priority(prio),
         "priority level {:?} is reserved for the softdevice",
         prio

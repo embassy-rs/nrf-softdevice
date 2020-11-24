@@ -32,9 +32,6 @@ dependencies = [
 name = "anyfmt"
 version = "0.1.0"
 source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
-dependencies = [
- "defmt",
-]
 
 [[package]]
 name = "as-slice"
@@ -187,8 +184,7 @@ dependencies = [
 [[package]]
 name = "defmt"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ba72139b69a8bbaff8985e22137cf1cd27e5edef9e420c3db78a11a46c39a36"
+source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
 dependencies = [
  "defmt-macros",
  "semver 0.11.0",
@@ -197,8 +193,7 @@ dependencies = [
 [[package]]
 name = "defmt-macros"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2729f0cc744f582a84097e9fd40afc13d1689713fee19895f0bcf35bc294439"
+source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -209,18 +204,7 @@ dependencies = [
 [[package]]
 name = "defmt-parser"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "812b30ff14930407c86a23e256ac050b8e6913f597adcc88e29d40517f7a16de"
-
-[[package]]
-name = "defmt-rtt"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a3b88b3d83d73d910738feb4bb91543f61622420dab760c769f4111b379e354"
-dependencies = [
- "cortex-m",
- "defmt",
-]
+source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
 
 [[package]]
 name = "derivative"
@@ -518,20 +502,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "nrf-softdevice-defmt-rtt"
+version = "0.1.0"
+dependencies = [
+ "cortex-m",
+ "defmt",
+ "nrf-softdevice",
+]
+
+[[package]]
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
- "anyfmt",
  "cortex-m",
  "cortex-m-rt",
  "cortex-m-rtic",
  "defmt",
- "defmt-rtt",
  "embassy",
  "embassy-nrf",
  "fixed",
  "futures",
  "nrf-softdevice",
+ "nrf-softdevice-defmt-rtt",
  "nrf-softdevice-s140",
  "nrf52840-hal",
  "panic-probe",

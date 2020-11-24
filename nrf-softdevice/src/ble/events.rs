@@ -3,7 +3,7 @@ use core::ptr;
 
 use crate::ble::*;
 use crate::raw;
-use crate::util::*;
+use crate::util::{panic, *};
 use crate::RawError;
 
 #[rustfmt::skip]
@@ -108,7 +108,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
         #[cfg(feature="ble-gatt-server")]
         raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => gatt_server::on_hvn_tx_complete(ble_evt, get_union_field(ble_evt, &evt.evt.gatts_evt)),
 
-        x => depanic!("Unknown ble evt {:u32}", x),
+        x => panic!("Unknown ble evt {:u32}", x),
     }
 }
 
@@ -226,16 +226,16 @@ pub(crate) unsafe fn on_conn_sec_update(
     trace!("on_conn_sec_update conn_handle={:u16}", gap_evt.conn_handle);
 }
 
-pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
+pub(crate) unsafe fn on_timeout(ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
     trace!("on_timeout conn_handle={:u16}", gap_evt.conn_handle);
 
     let params = &gap_evt.params.timeout;
     match params.src as u32 {
         #[cfg(feature = "ble-central")]
         raw::BLE_GAP_TIMEOUT_SRC_CONN => {
-            central::CONNECT_PORTAL.call(Err(central::ConnectError::Stopped))
+            central::CONNECT_PORTAL.call(Err(central::ConnectError::Timeout))
         }
-        x => depanic!("unknown timeout src {:u32}", x),
+        x => panic!("unknown timeout src {:u32}", x),
     }
 }
 

@@ -4,7 +4,7 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::flash::Error as FlashError;
 
 use crate::raw;
-use crate::util::*;
+use crate::util::{panic, *};
 use crate::{RawError, Softdevice};
 
 /// Singleton instance of the Flash softdevice functionality.
@@ -25,7 +25,7 @@ impl Flash {
     /// Panics if called more than once.
     pub fn take(sd: &Softdevice) -> Flash {
         if FLASH_TAKEN.compare_and_swap(false, true, Ordering::AcqRel) {
-            depanic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
+            panic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
         }
 
         Flash {

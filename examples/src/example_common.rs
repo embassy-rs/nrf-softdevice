@@ -1,12 +1,12 @@
 #![macro_use]
 
-use defmt_rtt as _; // global logger
 use nrf52840_hal as _;
 use nrf_softdevice::pac;
+use nrf_softdevice_defmt_rtt as _; // global logger
 use panic_probe as _;
 
-use anyfmt::{panic, *};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use defmt::{panic, *};
 
 #[defmt::timestamp]
 fn timestamp() -> u64 {

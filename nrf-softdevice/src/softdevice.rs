@@ -6,11 +6,11 @@ use crate::ble;
 use crate::interrupt;
 use crate::pac;
 use crate::raw;
-use crate::util::*;
+use crate::util::{panic, *};
 use crate::RawError;
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
-    depanic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
+    panic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
 }
 
 #[allow(non_snake_case)]
@@ -90,7 +90,7 @@ fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
     match RawError::convert(ret) {
         Ok(()) => {}
         Err(RawError::NoMem) => {}
-        Err(err) => depanic!("sd_ble_cfg_set {:istr} err {:?}", cfg_id_str(id), err),
+        Err(err) => panic!("sd_ble_cfg_set {:istr} err {:?}", cfg_id_str(id), err),
     }
 }
 
@@ -143,14 +143,14 @@ impl Softdevice {
     /// - Panics if called multiple times. Must be called at most once.
     pub fn enable(_peripherals: Peripherals, config: &Config) -> &'static Softdevice {
         if ENABLED.compare_and_swap(false, true, Ordering::AcqRel) {
-            depanic!("nrf_softdevice::enable() called multiple times.")
+            panic!("nrf_softdevice::enable() called multiple times.")
         }
 
         let p_clock_lf_cfg = config.clock.as_ref().map(|x| x as _).unwrap_or(ptr::null());
         let ret = unsafe { raw::sd_softdevice_enable(p_clock_lf_cfg, Some(fault_handler)) };
         match RawError::convert(ret) {
             Ok(()) => {}
-            Err(err) => depanic!("sd_softdevice_enable err {:?}", err),
+            Err(err) => panic!("sd_softdevice_enable err {:?}", err),
         }
 
         let app_ram_base = get_app_ram_base();
@@ -303,12 +303,12 @@ impl Softdevice {
             Ok(()) => {}
             Err(RawError::NoMem) => {
                 if wanted_app_ram_base <= app_ram_base {
-                    depanic!("selected configuration has too high RAM requirements.")
+                    panic!("selected configuration has too high RAM requirements.")
                 } else {
-                    depanic!("too little RAM for softdevice. Change your app's RAM start address to {:u32}", wanted_app_ram_base);
+                    panic!("too little RAM for softdevice. Change your app's RAM start address to {:u32}", wanted_app_ram_base);
                 }
             }
-            Err(err) => depanic!("sd_ble_enable err {:?}", err),
+            Err(err) => panic!("sd_ble_enable err {:?}", err),
         }
 
         if wanted_app_ram_base < app_ram_base {

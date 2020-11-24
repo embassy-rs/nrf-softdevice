@@ -6,8 +6,8 @@
 mod example_common;
 use example_common::*;
 
-use anyfmt::{panic, *};
 use cortex_m_rt::entry;
+use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 

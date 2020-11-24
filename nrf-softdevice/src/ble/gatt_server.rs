@@ -8,7 +8,7 @@ use core::ptr;
 
 use crate::ble::*;
 use crate::raw;
-use crate::util::*;
+use crate::util::{panic, *};
 use crate::RawError;
 use crate::Softdevice;
 
@@ -156,10 +156,10 @@ where
                     let v = get_flexarray(ble_evt, &params.data, params.len as usize);
                     trace!("gatts write handle={:u16} data={:[u8]}", params.handle, v);
                     if params.offset != 0 {
-                        depanic!("gatt_server writes with nonzero offset are not yet supported");
+                        panic!("gatt_server writes with nonzero offset are not yet supported");
                     }
                     if params.auth_required != 0 {
-                        depanic!("gatt_server auth_required not yet supported");
+                        panic!("gatt_server auth_required not yet supported");
                     }
 
                     server.on_write(params.handle, v).map(|e| f(e));

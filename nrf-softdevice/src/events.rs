@@ -2,7 +2,7 @@ use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::util::*;
+use crate::util::{panic, unreachable, *};
 use crate::{interrupt, raw};
 use crate::{RawError, Softdevice};
 
@@ -32,7 +32,7 @@ enum SocEvent {
 fn on_soc_evt(evt: u32) {
     let evt = match SocEvent::try_from(evt) {
         Ok(evt) => evt,
-        Err(_) => depanic!("Unknown soc evt {:u32}", evt),
+        Err(_) => panic!("Unknown soc evt {:u32}", evt),
     };
 
     info!("soc evt {:?}", evt);
@@ -56,7 +56,7 @@ pub(crate) async fn run() {
                 match RawError::convert(raw::sd_evt_get(&mut evt as _)) {
                     Ok(()) => on_soc_evt(evt),
                     Err(RawError::NotFound) => break,
-                    Err(err) => depanic!("sd_evt_get err {:?}", err),
+                    Err(err) => panic!("sd_evt_get err {:?}", err),
                 }
             }
 
@@ -70,8 +70,8 @@ pub(crate) async fn run() {
                     Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
                     Err(RawError::NotFound) => break,
                     Err(RawError::BleNotEnabled) => break,
-                    Err(RawError::NoMem) => depanic!("BUG: BLE_EVT_MAX_SIZE is too low"),
-                    Err(err) => depanic!("sd_ble_evt_get err {:?}", err),
+                    Err(RawError::NoMem) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                    Err(err) => panic!("sd_ble_evt_get err {:?}", err),
                 }
             }
         }

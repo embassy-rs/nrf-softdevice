@@ -17,8 +17,8 @@
 mod example_common;
 use example_common::*;
 
-use anyfmt::{panic, *};
 use core::mem;
+use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 use nrf52840_hal::pac::TIMER1;

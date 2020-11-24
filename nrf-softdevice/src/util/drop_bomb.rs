@@ -1,5 +1,7 @@
 use core::mem;
 
+use crate::util::{panic, *};
+
 pub struct DropBomb {
     _private: (),
 }
@@ -16,6 +18,6 @@ impl DropBomb {
 
 impl Drop for DropBomb {
     fn drop(&mut self) {
-        depanic!("boom")
+        panic!("boom")
     }
 }

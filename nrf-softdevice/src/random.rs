@@ -1,6 +1,7 @@
-use crate::{raw, RawError, Softdevice};
-use defmt::info;
 use fixed::types::I30F2;
+
+use crate::util::*;
+use crate::{raw, RawError, Softdevice};
 
 #[derive(defmt::Format)]
 pub enum RandomError {

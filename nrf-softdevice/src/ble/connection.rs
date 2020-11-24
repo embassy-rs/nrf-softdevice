@@ -7,7 +7,7 @@ use crate::ble::gatt_client;
 use crate::ble::gatt_server;
 use crate::ble::types::*;
 use crate::raw;
-use crate::util::*;
+use crate::util::{assert, *};
 use crate::RawError;
 
 const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
@@ -94,19 +94,20 @@ impl ConnectionState {
                 raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
             )
         };
-        RawError::convert(ret).dexpect(intern!("sd_ble_gap_disconnect"));
+        unwrap!(RawError::convert(ret), "sd_ble_gap_disconnect");
 
         self.disconnecting = true;
         Ok(())
     }
 
     pub(crate) fn on_disconnected(&mut self) {
-        let conn_handle = self
-            .conn_handle
-            .dexpect(intern!("bug: on_disconnected when already disconnected"));
+        let conn_handle = unwrap!(
+            self.conn_handle,
+            "bug: on_disconnected when already disconnected"
+        );
 
         let ibh = index_by_handle(conn_handle);
-        let index = ibh.get().dexpect(intern!("conn_handle has no index"));
+        let index = unwrap!(ibh.get(), "bug: conn_handle has no index");
         ibh.set(None);
 
         self.conn_handle = None;
@@ -147,16 +148,17 @@ pub struct Connection {
 impl Drop for Connection {
     fn drop(&mut self) {
         self.with_state(|state| {
-            state.refcount = state.refcount.checked_sub(1).dexpect(intern!(
+            state.refcount = unwrap!(
+                state.refcount.checked_sub(1),
                 "bug: dropping a conn which is already at refcount 0"
-            ));
+            );
 
             if state.refcount == 0 {
                 if state.conn_handle.is_some() {
                     trace!("conn {:u8}: dropped, disconnecting", self.index);
                     // We still leave conn_handle set, because the connection is
                     // not really disconnected until we get GAP_DISCONNECTED event.
-                    state.disconnect().dewrap();
+                    unwrap!(state.disconnect());
                 } else {
                     trace!("conn {:u8}: dropped, already disconnected", self.index);
                 }
@@ -168,10 +170,10 @@ impl Drop for Connection {
 impl Clone for Connection {
     fn clone(&self) -> Self {
         self.with_state(|state| {
-            state.refcount = state
-                .refcount
-                .checked_add(1)
-                .dexpect(intern!("Too many references to same connection"));
+            state.refcount = unwrap!(
+                state.refcount.checked_add(1),
+                "Too many references to same connection"
+            );
         });
 
         Self { index: self.index }
@@ -207,7 +209,7 @@ impl Connection {
 
             // Update index_by_handle
             let ibh = index_by_handle(conn_handle);
-            deassert!(ibh.get().is_none(), "bug: conn_handle already has index");
+            assert!(ibh.get().is_none(), "bug: conn_handle already has index");
             ibh.set(Some(index));
 
             trace!("conn {:u8}: connected", index);
@@ -228,9 +230,10 @@ pub(crate) fn with_state_by_conn_handle<T>(
     conn_handle: u16,
     f: impl FnOnce(&mut ConnectionState) -> T,
 ) -> T {
-    let index = index_by_handle(conn_handle).get().dexpect(intern!(
+    let index = unwrap!(
+        index_by_handle(conn_handle).get(),
         "bug: with_state_by_conn_handle on conn_handle that has no state"
-    ));
+    );
     with_state(index, f)
 }
 

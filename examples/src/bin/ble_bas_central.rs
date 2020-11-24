@@ -6,10 +6,10 @@
 mod example_common;
 use example_common::*;
 
-use anyfmt::{panic, *};
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
+use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 

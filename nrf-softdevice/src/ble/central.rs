@@ -5,10 +5,11 @@
 
 use core::mem;
 use core::ptr;
+use core::slice;
 
 use crate::ble::{Address, Connection, ConnectionState};
 use crate::raw;
-use crate::util::*;
+use crate::util::{panic, *};
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(_ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
@@ -31,7 +32,7 @@ pub(crate) unsafe fn on_conn_param_update_request(
 
 #[derive(defmt::Format)]
 pub enum ConnectError {
-    Stopped,
+    Timeout,
     Raw(RawError),
 }
 
@@ -50,12 +51,12 @@ pub async fn connect(
     config: Config,
 ) -> Result<Connection, ConnectError> {
     let (addr, fp) = match whitelist.len() {
-        0 => depanic!("zero-length whitelist"),
+        0 => panic!("zero-length whitelist"),
         1 => (
             &whitelist[0] as *const Address as *const raw::ble_gap_addr_t,
             raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as u8,
         ),
-        _ => depanic!("todo"),
+        _ => panic!("todo"),
     };
 
     // in units of 625us
@@ -68,7 +69,7 @@ pub async fn connect(
     scan_params.set_active(1);
     scan_params.scan_phys = raw::BLE_GAP_PHY_1MBPS as u8;
     scan_params.set_filter_policy(fp);
-    scan_params.timeout = 123;
+    scan_params.timeout = raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _;
 
     // s122 has these in us instead of 625us :shrug:
     #[cfg(not(feature = "s122"))]
@@ -84,7 +85,9 @@ pub async fn connect(
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
-        let _ = RawError::convert(ret).dewarn(intern!("sd_ble_gap_connect_cancel"));
+        if let Err(e) = RawError::convert(ret) {
+            warn!("sd_ble_gap_connect_cancel: {:?}", e);
+        }
     });
 
     // TODO make configurable

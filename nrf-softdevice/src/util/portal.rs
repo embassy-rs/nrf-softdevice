@@ -3,7 +3,7 @@ use core::future::Future;
 use core::mem;
 use core::mem::MaybeUninit;
 
-use crate::util::*;
+use crate::util::{assert, panic, unreachable, *};
 
 /// Utility to call a closure across tasks.
 pub struct Portal<T> {
@@ -21,7 +21,7 @@ unsafe impl<T> Send for Portal<T> {}
 unsafe impl<T> Sync for Portal<T> {}
 
 fn assert_thread_mode() {
-    deassert!(
+    assert!(
         cortex_m::peripheral::SCB::vect_active()
             == cortex_m::peripheral::scb::VectActive::ThreadMode,
         "portals are not usable from interrupts"
@@ -43,7 +43,7 @@ impl<T> Portal<T> {
             match *self.state.get() {
                 State::None => {}
                 State::Done => {}
-                State::Running => depanic!("Portall::call() called reentrantly"),
+                State::Running => panic!("Portall::call() called reentrantly"),
                 State::Waiting(func) => (*func)(val),
             }
         }
@@ -82,7 +82,7 @@ impl<T> Portal<T> {
                 let state = &mut *self.state.get();
                 match state {
                     State::None => {}
-                    _ => depanic!("Multiple tasks waiting on same portal"),
+                    _ => panic!("Multiple tasks waiting on same portal"),
                 }
                 *state = State::Waiting(func_ptr);
             }
@@ -139,7 +139,7 @@ impl<T> Portal<T> {
                 let state = &mut *self.state.get();
                 match *state {
                     State::None => {}
-                    _ => depanic!("Multiple tasks waiting on same portal"),
+                    _ => panic!("Multiple tasks waiting on same portal"),
                 }
                 *state = State::Waiting(func_ptr);
             }

@@ -6,10 +6,10 @@
 mod example_common;
 use example_common::*;
 
-use anyfmt::{panic, *};
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
+use defmt::{panic, *};
 
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
 use nrf_softdevice::{raw, RawError, Softdevice};

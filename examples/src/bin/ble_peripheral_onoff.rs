@@ -6,9 +6,9 @@
 mod example_common;
 use example_common::*;
 
-use anyfmt::{panic, *};
 use core::mem;
 use cortex_m_rt::entry;
+use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 use embassy_nrf::gpiote::{Gpiote, PortInputPolarity};

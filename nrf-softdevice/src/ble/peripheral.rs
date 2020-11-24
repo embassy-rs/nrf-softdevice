@@ -5,7 +5,7 @@ use core::ptr;
 
 use crate::ble::*;
 use crate::raw;
-use crate::util::*;
+use crate::util::{assert, *};
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_set_terminated(
@@ -139,16 +139,24 @@ pub async fn advertise(
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
-        let _ = RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_stop"));
+        if let Err(e) = RawError::convert(ret) {
+            warn!("sd_ble_gap_adv_stop: {:?}", e);
+        }
     });
 
     let ret = unsafe {
         raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _)
     };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_set_configure"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gap_adv_set_configure err {:?}", err);
+        err
+    })?;
 
     let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
-    RawError::convert(ret).dewarn(intern!("sd_ble_gap_adv_start"))?;
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gap_adv_start err {:?}", err);
+        err
+    })?;
 
     info!("Advertising started!");
 
