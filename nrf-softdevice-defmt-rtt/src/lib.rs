@@ -52,7 +52,7 @@ unsafe impl defmt::Logger for Logger {
 
     unsafe fn release(_: NonNull<dyn defmt::Write>) {
         TAKEN.store(false, Ordering::Relaxed);
-        unsafe { interrupt::enable_all(INTERRUPTS_TOKEN.load(Ordering::Relaxed)) };
+        interrupt::enable_all(INTERRUPTS_TOKEN.load(Ordering::Relaxed));
     }
 }
 

@@ -4,6 +4,7 @@ runner = "probe-run --chip nRF52840_xxAA --defmt"
 rustflags = [
   # LLD (shipped with the Rust toolchain) is used as the default linker
   "-C", "link-arg=--nmagic",
+  "-Z", "trap-unreachable=no",
   "-C", "link-arg=-Tlink.x",
   "-C", "link-arg=-Tdefmt.x",
 

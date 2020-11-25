@@ -143,10 +143,15 @@ pub unsafe fn disable_all() -> u8 {
             nvic.icer[1].write(!RESERVED_IRQS[1]);
         });
     }
+
+    compiler_fence(Ordering::SeqCst);
+
     return nested_cs as u8;
 }
 
 pub unsafe fn enable_all(token: u8) {
+    compiler_fence(Ordering::SeqCst);
+
     let nvic = &*NVIC::ptr();
     if token == 0 {
         raw_free(|| {
