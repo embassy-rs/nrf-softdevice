@@ -235,6 +235,9 @@ pub(crate) unsafe fn on_timeout(ble_evt: *const raw::ble_evt_t, gap_evt: &raw::b
         raw::BLE_GAP_TIMEOUT_SRC_CONN => {
             central::CONNECT_PORTAL.call(Err(central::ConnectError::Timeout))
         }
+        raw::BLE_GAP_TIMEOUT_SRC_SCAN => {
+            central::SCAN_PORTAL.call(central::ScanPortalMessage::Timeout(ble_evt))
+        }
         x => panic!("unknown timeout src {:u32}", x),
     }
 }
