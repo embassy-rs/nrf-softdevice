@@ -12,7 +12,9 @@ pub enum Uuid {
 impl FromMeta for Uuid {
     fn from_string(value: &str) -> darling::Result<Self> {
         if let Ok(u) = uuid::Uuid::from_str(value) {
-            return Ok(Uuid::Uuid128(*u.as_bytes()));
+            let mut bytes = *u.as_bytes();
+            bytes.reverse(); // Softdevice uses uuids in little endian format.
+            return Ok(Uuid::Uuid128(bytes));
         }
 
         if value.len() == 4 {

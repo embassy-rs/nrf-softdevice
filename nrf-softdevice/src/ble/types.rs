@@ -27,6 +27,10 @@ impl Uuid {
         }
     }
 
+    // Create a new 128-bit UUID.
+    //
+    // Note that `uuid` needs to be in little-endian format, i.e. opposite to what you would
+    // normally write UUIDs.
     pub fn new_128(uuid: &[u8; 16]) -> Self {
         let mut uuid_type: u8 = 0;
         let ret = unsafe { raw::sd_ble_uuid_vs_add(uuid.as_ptr() as _, &mut uuid_type as _) };
