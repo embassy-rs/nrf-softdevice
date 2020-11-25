@@ -44,7 +44,22 @@ async fn ble_task(sd: &'static Softdevice) {
             params.peer_addr.addr_type(),
             params.peer_addr.addr
         );
-        info!("data: {:[u8]}", slice::from_raw_parts(params.data.p_data, params.data.len as usize));
+        let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
+        while data.len() != 0 {
+            let len = data[0] as usize;
+            if data.len() < len+1 {
+                warn!("Advertisement data truncated?");
+                break;
+            }
+            if len < 1 {
+                warn!("Advertisement data malformed?");
+                break;
+            }
+            let key = data[1];
+            let value = &data[2..len+1];
+            info!("value {:u8}: {:[u8]}", key, value);
+            data = &data[len+1..];
+        }
         None
     })
     .await;
