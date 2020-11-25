@@ -1,6 +1,7 @@
 use core::convert::TryInto;
 use core::mem;
 use core::slice;
+use heapless::{ArrayLength, Vec};
 
 use crate::util::{panic, *};
 
@@ -70,5 +71,21 @@ impl<T: Primitive> FixedGattValue for T {
 
     fn to_gatt(&self) -> &[u8] {
         unsafe { slice::from_raw_parts(self as *const Self as *const u8, Self::SIZE) }
+    }
+}
+
+impl<N> GattValue for Vec<u8, N>
+where
+    N: ArrayLength<u8>,
+{
+    const MIN_SIZE: usize = 0;
+    const MAX_SIZE: usize = N::USIZE;
+
+    fn from_gatt(data: &[u8]) -> Self {
+        Self::from_slice(data).unwrap()
+    }
+
+    fn to_gatt(&self) -> &[u8] {
+        &self
     }
 }
