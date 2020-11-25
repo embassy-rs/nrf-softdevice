@@ -112,3 +112,9 @@ impl Address {
         }
     }
 }
+
+impl defmt::Format for Address {
+    fn format(&self, fmt: &mut defmt::Formatter) {
+        defmt::write!(fmt, "{:[u8;6]}", self.inner.addr)
+    }
+}
