@@ -360,6 +360,8 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         let cccd_handle = format_ident!("{}_cccd_handle", ch.name);
         let read_fn = format_ident!("{}_read", ch.name);
         let write_fn = format_ident!("{}_write", ch.name);
+        let write_wor_fn = format_ident!("{}_write_without_response", ch.name);
+        let write_try_wor_fn = format_ident!("{}_try_write_without_response", ch.name);
 
         let uuid = ch.args.uuid;
         let read = ch.args.read;
@@ -434,6 +436,14 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                 async fn #write_fn(&self, val: #ty) -> Result<(), #ble::gatt_client::WriteError> {
                     let buf = #ty_as_val::to_gatt(&val);
                     #ble::gatt_client::write(&self.conn, self.#value_handle, buf).await
+                }
+                async fn #write_wor_fn(&self, val: #ty) -> Result<(), #ble::gatt_client::WriteError> {
+                    let buf = #ty_as_val::to_gatt(&val);
+                    #ble::gatt_client::write_without_response(&self.conn, self.#value_handle, buf).await
+                }
+                fn #write_try_wor_fn(&self, val: #ty) -> Result<(), #ble::gatt_client::TryWriteError> {
+                    let buf = #ty_as_val::to_gatt(&val);
+                    #ble::gatt_client::try_write_without_response(&self.conn, self.#value_handle, buf)
                 }
             ));
         }
