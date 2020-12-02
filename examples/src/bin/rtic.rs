@@ -12,6 +12,7 @@
 #![no_main]
 #![no_std]
 #![feature(type_alias_impl_trait)]
+#![feature(alloc_error_handler)]
 
 #[path = "../example_common.rs"]
 mod example_common;

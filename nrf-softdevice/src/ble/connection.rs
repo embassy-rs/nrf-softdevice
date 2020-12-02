@@ -108,6 +108,8 @@ impl ConnectionState {
         gatt_client::portal(conn_handle).call(gatt_client::PortalMessage::Disconnected);
         #[cfg(feature = "ble-gatt-server")]
         gatt_server::portal(conn_handle).call(gatt_server::PortalMessage::Disconnected);
+        #[cfg(feature = "ble-l2cap")]
+        l2cap::portal(conn_handle).call(l2cap::PortalMessage::Disconnected);
 
         trace!("conn {:u8}: disconnected", index);
     }

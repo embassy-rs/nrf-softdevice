@@ -48,21 +48,21 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_SET_TERMINATED => peripheral::on_adv_set_terminated(ble_evt, get_union_field(ble_evt, &evt.evt.gap_evt)),
 
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => l2cap::on_ch_setup_request(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => l2cap::on_ch_setup_request(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REFUSED => l2cap::on_ch_setup_refused(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REFUSED => l2cap::on_ch_setup_refused(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => l2cap::on_ch_setup(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => l2cap::on_ch_setup(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => l2cap::on_ch_released(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => l2cap::on_ch_released(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SDU_BUF_RELEASED => l2cap::on_ch_sdu_buf_released(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SDU_BUF_RELEASED => l2cap::on_ch_sdu_buf_released(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_CREDIT => l2cap::on_ch_credit(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_CREDIT => l2cap::on_ch_credit(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => l2cap::on_ch_rx(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => l2cap::on_ch_rx(ble_evt),
         #[cfg(feature="ble-l2cap")]
-        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => l2cap::on_ch_tx(ble_evt, get_union_field(ble_evt, &evt.evt.l2cap_evt)),
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => l2cap::on_ch_tx(ble_evt),
 
         #[cfg(feature="ble-gatt-client")]
         raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => gatt_client::on_prim_srvc_disc_rsp(ble_evt, get_union_field(ble_evt, &evt.evt.gattc_evt)),
@@ -165,7 +165,7 @@ pub(crate) unsafe fn on_conn_param_update(
 ) {
     let conn_params = gap_evt.params.conn_param_update.conn_params;
 
-    trace!(
+    debug!(
         "on_conn_param_update conn_handle={:u16} conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
         gap_evt.conn_handle,
         conn_params.conn_sup_timeout,
@@ -327,7 +327,7 @@ pub(crate) unsafe fn on_data_length_update(
         state.data_length_effective = effective_params.max_tx_octets as u8;
     });
 
-    trace!(
+    debug!(
         "on_data_length_update conn_handle={:u16} max_rx_octets={:u16} max_rx_time_us={:u16} max_tx_octets={:u16} max_tx_time_us={:u16}",
         gap_evt.conn_handle,
         effective_params.max_rx_octets,

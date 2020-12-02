@@ -29,6 +29,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloc-cortex-m"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c46567ff10c713079e2b9ee67638073471a6b265e22c0bcd8ca96f63545cc90b"
+dependencies = [
+ "cortex-m",
+ "linked_list_allocator",
+]
+
+[[package]]
 name = "anyfmt"
 version = "0.1.0"
 source = "git+https://github.com/akiles/embassy#2e062f562773f4f4ff978e7976c2d4b08b968a6c"
@@ -431,6 +441,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
+name = "linked_list_allocator"
+version = "0.8.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84565678e403453d1a27a0886882b3b271701e65146d972d9d7d9a4c4a0ff498"
+
+[[package]]
 name = "lock_api"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -514,6 +530,7 @@ dependencies = [
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
+ "alloc-cortex-m",
  "cortex-m",
  "cortex-m-rt",
  "cortex-m-rtic",
@@ -522,6 +539,7 @@ dependencies = [
  "embassy-nrf",
  "fixed",
  "futures",
+ "heapless",
  "nrf-softdevice",
  "nrf-softdevice-defmt-rtt",
  "nrf-softdevice-s140",

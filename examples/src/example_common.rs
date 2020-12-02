@@ -5,8 +5,23 @@ use nrf_softdevice::pac;
 use nrf_softdevice_defmt_rtt as _; // global logger
 use panic_probe as _;
 
+use alloc_cortex_m::CortexMHeap;
+use core::alloc::Layout;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use defmt::{panic, *};
+
+// this is the allocator the application will use
+#[global_allocator]
+static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
+
+// define what happens in an Out Of Memory (OOM) condition
+#[alloc_error_handler]
+fn alloc_error(_layout: Layout) -> ! {
+    panic!("Alloc error");
+    loop {}
+}
+
+const HEAP_SIZE: usize = 32 * 1024; // in bytes
 
 #[defmt::timestamp]
 fn timestamp() -> u64 {
@@ -19,6 +34,9 @@ fn timestamp() -> u64 {
 
 // Take peripherals, split by softdevice and application
 pub fn take_peripherals() -> (nrf_softdevice::Peripherals, Peripherals) {
+    // Initialize the allocator BEFORE you use it
+    unsafe { ALLOCATOR.init(cortex_m_rt::heap_start() as usize, HEAP_SIZE) }
+
     let p = unwrap!(pac::Peripherals::take());
 
     (
