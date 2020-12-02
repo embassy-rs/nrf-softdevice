@@ -10,15 +10,14 @@ Working:
 
 - Safe interrupt management
 - Async flash API
-- Bluetooth central (scanning)
+- Bluetooth central (scanning and connecting)
 - Bluetooth peripheral (advertising, connectable-only for now)
 - GATT client
-
-Work in progress:
-
-- GATT servers
+- GATT server
+- L2CAP Connection-Oriented channels
 - Data length extension
 - ATT MTU extension
+- Get/set own BLE address
 
 To use it you must specify the following Cargo features:
 
