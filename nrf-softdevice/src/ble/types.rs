@@ -85,7 +85,7 @@ impl Role {
 
 #[repr(transparent)]
 pub struct Address {
-    inner: raw::ble_gap_addr_t,
+    pub(crate) inner: raw::ble_gap_addr_t,
 }
 
 impl Address {

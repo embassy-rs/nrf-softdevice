@@ -23,3 +23,24 @@ pub mod gatt_server;
 
 #[cfg(feature = "ble-l2cap")]
 pub mod l2cap;
+
+use core::mem;
+
+use crate::util::*;
+use crate::{raw, RawError, Softdevice};
+
+pub fn get_address(sd: &Softdevice) -> Address {
+    unsafe {
+        let mut addr: raw::ble_gap_addr_t = mem::zeroed();
+        let ret = raw::sd_ble_gap_addr_get(&mut addr);
+        unwrap!(RawError::convert(ret), "sd_ble_gap_addr_get");
+        Address { inner: addr }
+    }
+}
+
+pub fn set_address(sd: &Softdevice, addr: &Address) {
+    unsafe {
+        let ret = raw::sd_ble_gap_addr_set(&addr.inner);
+        unwrap!(RawError::convert(ret), "sd_ble_gap_addr_set");
+    }
+}
