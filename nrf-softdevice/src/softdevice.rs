@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
+use embassy::util::Forever;
 
 use crate::ble;
 use crate::interrupt;
@@ -51,6 +52,9 @@ pub struct Peripherals {
 pub struct Softdevice {
     // Prevent Send, Sync
     _private: PhantomData<*mut ()>,
+    pub(crate) att_mtu: u16,
+    #[cfg(feature = "ble-l2cap")]
+    pub(crate) l2cap_rx_mps: u16,
 }
 
 /// Softdevice configuration.
@@ -128,9 +132,7 @@ fn cfg_id_str(id: u32) -> defmt::Str {
 }
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
-static mut SOFTDEVICE: Softdevice = Softdevice {
-    _private: PhantomData,
-};
+static SOFTDEVICE: Forever<Softdevice> = Forever::new();
 
 impl Softdevice {
     /// Enable the softdevice.
@@ -299,6 +301,10 @@ impl Softdevice {
 
         let mut wanted_app_ram_base = app_ram_base;
         let ret = unsafe { raw::sd_ble_enable(&mut wanted_app_ram_base as _) };
+        info!(
+            "softdevice RAM: {:u32} bytes",
+            wanted_app_ram_base - 0x20000000
+        );
         match RawError::convert(ret) {
             Ok(()) => {}
             Err(RawError::NoMem) => {
@@ -320,14 +326,30 @@ impl Softdevice {
         #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
         interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
 
-        unsafe { &SOFTDEVICE }
+        let att_mtu = config
+            .conn_gatt
+            .map(|x| x.att_mtu)
+            .unwrap_or(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+
+        #[cfg(feature = "ble-l2cap")]
+        let l2cap_rx_mps = config
+            .conn_l2cap
+            .map(|x| x.rx_mps)
+            .unwrap_or(raw::BLE_L2CAP_MPS_MIN as u16);
+
+        SOFTDEVICE.put(Softdevice {
+            _private: PhantomData,
+            att_mtu,
+            #[cfg(feature = "ble-l2cap")]
+            l2cap_rx_mps,
+        })
     }
 
     /// Return an instance to the softdevice without checking whether
     /// it is enabled or not. This is only safe if the softdevice is enabled
     /// (a call to [`enable`] has returned without error)
     pub unsafe fn steal() -> &'static Softdevice {
-        &SOFTDEVICE
+        SOFTDEVICE.steal()
     }
 
     /// Runs the softdevice event handling loop.

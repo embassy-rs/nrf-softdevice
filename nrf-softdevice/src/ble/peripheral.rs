@@ -164,10 +164,6 @@ pub async fn advertise(
 
     let conn = ADV_PORTAL.wait_once(|res| res).await?;
 
-    conn.with_state(|state| {
-        state.set_att_mtu_desired(config.att_mtu_desired);
-    });
-
     d.defuse();
 
     Ok(conn)
@@ -175,8 +171,6 @@ pub async fn advertise(
 
 #[derive(Copy, Clone)]
 pub struct Config {
-    /// Requested ATT_MTU size for the next connection that is established.
-    att_mtu_desired: u16,
     // bits of BLE_GAP_PHY_
     tx_phys: u8,
     // bits of BLE_GAP_PHY_
@@ -186,7 +180,6 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
             tx_phys: raw::BLE_GAP_PHY_AUTO as _,
             rx_phys: raw::BLE_GAP_PHY_AUTO as _,
         }

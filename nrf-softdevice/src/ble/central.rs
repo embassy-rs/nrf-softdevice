@@ -7,6 +7,8 @@ use core::mem;
 use core::ptr;
 use core::slice;
 
+#[cfg(feature = "ble-gatt-client")]
+use crate::ble::gatt_client;
 use crate::ble::{Address, Connection, ConnectionState};
 use crate::raw;
 use crate::util::{panic, *};
@@ -91,20 +93,10 @@ pub async fn connect(
         }
     });
 
-    // TODO make configurable
-    let mut conn_params: raw::ble_gap_conn_params_t = unsafe { mem::zeroed() };
-    conn_params.min_conn_interval = 50;
-    conn_params.max_conn_interval = 200;
-    conn_params.slave_latency = 4;
-    conn_params.conn_sup_timeout = 400; // 4 s
-
-    let ret = unsafe { raw::sd_ble_gap_connect(addr, &mut scan_params, &mut conn_params, 1) };
-    match RawError::convert(ret) {
-        Ok(()) => {}
-        Err(err) => {
-            warn!("sd_ble_gap_connect err {:?}", err);
-            return Err(ConnectError::Raw(err));
-        }
+    let ret = unsafe { raw::sd_ble_gap_connect(addr, &mut scan_params, &config.conn_params, 1) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_connect err {:?}", err);
+        return Err(err.into());
     }
 
     info!("connect started");
@@ -114,10 +106,15 @@ pub async fn connect(
     conn.with_state(|state| {
         state.rx_phys = config.tx_phys;
         state.tx_phys = config.rx_phys;
-        state.set_att_mtu_desired(config.att_mtu_desired);
     });
 
     d.defuse();
+
+    #[cfg(feature = "ble-gatt-client")]
+    {
+        let mtu = config.att_mtu.unwrap_or(sd.att_mtu);
+        unwrap!(crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await);
+    }
 
     Ok(conn)
 }
@@ -125,19 +122,29 @@ pub async fn connect(
 #[derive(Copy, Clone)]
 pub struct Config {
     /// Requested ATT_MTU size for the next connection that is established.
-    att_mtu_desired: u16,
+    #[cfg(feature = "ble-gatt-client")]
+    pub att_mtu: Option<u16>,
     // bits of BLE_GAP_PHY_
-    tx_phys: u8,
+    pub tx_phys: u8,
     // bits of BLE_GAP_PHY_
-    rx_phys: u8,
+    pub rx_phys: u8,
+
+    pub conn_params: raw::ble_gap_conn_params_t,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
+            #[cfg(feature = "ble-gatt-client")]
+            att_mtu: None,
             tx_phys: raw::BLE_GAP_PHY_AUTO as _,
             rx_phys: raw::BLE_GAP_PHY_AUTO as _,
+            conn_params: raw::ble_gap_conn_params_t {
+                min_conn_interval: 40,
+                max_conn_interval: 200,
+                slave_latency: 0,
+                conn_sup_timeout: 400, // 4s
+            },
         }
     }
 }

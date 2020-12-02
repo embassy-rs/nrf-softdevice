@@ -306,46 +306,27 @@ pub(crate) unsafe fn on_exchange_mtu_request(
     gatts_evt: &raw::ble_gatts_evt_t,
 ) {
     let conn_handle = gatts_evt.conn_handle;
+    let params = get_union_field(ble_evt, &gatts_evt.params.exchange_mtu_request);
+    let want_mtu = params.client_rx_mtu;
+    let max_mtu = crate::Softdevice::steal().att_mtu;
+    let mtu = want_mtu
+        .min(max_mtu)
+        .max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+    trace!(
+        "att mtu exchange: peer wants mtu {:u16}, granting {:u16}",
+        want_mtu,
+        mtu
+    );
+
+    let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, mtu) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", err);
+        return;
+    }
+
     connection::with_state_by_conn_handle(conn_handle, |state| {
-        // TODO can probably get it from gattc_evt directly?
-        let exchange_mtu_request = get_union_field(ble_evt, &gatts_evt.params.exchange_mtu_request);
-        let client_rx_mtu = exchange_mtu_request.client_rx_mtu;
-
-        let att_mtu_effective = core::cmp::max(client_rx_mtu, raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
-        let att_mtu_effective = core::cmp::min(att_mtu_effective, state.att_mtu_desired);
-
-        state.att_mtu_effective = att_mtu_effective;
-
-        trace!(
-            "gatts on_exchange_mtu_request conn_handle={:u16} client_rx_mtu={:u16} att_mtu_effective={:u16}",
-            gatts_evt.conn_handle,
-            client_rx_mtu,
-            att_mtu_effective
-        );
-
-        // TODO this should be att_mtu_effective right? but SDK uses att_mtu_desired??
-        // https://github.com/akiles/nrf5_sdk/blob/aa64d9218502933316e22c570b789b4a4c83de5b/components/ble/nrf_ble_gatt/nrf_ble_gatt.c#L260
-        let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, state.att_mtu_desired) };
-
-        match RawError::convert(ret) {
-            Ok(()) => {}
-            Err(err) => {
-                warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", err);
-            }
-        }
-
-        // If an ATT_MTU exchange was requested to the peer, defer sending
-        // the data length update request and the event to the application until
-        // the response for that request is received.
-        // if (p_link->att_mtu_exchange_requested)
-        // {
-        //     return;
-        // }
-
-        // The ATT MTU exchange has finished. Send an event to the application.
-        // if (p_gatt->evt_handler != NULL)
-        // TODO signal NRF_BLE_GATT_EVT_ATT_MTU_UPDATED?
-    })
+        state.att_mtu = mtu;
+    });
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {

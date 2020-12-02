@@ -1,11 +1,8 @@
 use core::cell::Cell;
 use core::cell::UnsafeCell;
 
-#[cfg(feature = "ble-gatt-client")]
-use crate::ble::gatt_client;
-#[cfg(feature = "ble-gatt-server")]
-use crate::ble::gatt_server;
 use crate::ble::types::*;
+use crate::ble::*;
 use crate::raw;
 use crate::util::{assert, *};
 use crate::RawError;
@@ -44,10 +41,7 @@ pub(crate) struct ConnectionState {
     pub disconnecting: bool,
     pub role: Role,
 
-    pub att_mtu_desired: u16,           // Requested ATT_MTU size (in bytes).
-    pub att_mtu_effective: u16,         // Effective ATT_MTU size (in bytes).
-    pub att_mtu_exchange_pending: bool, // Indicates that an ATT_MTU exchange request is pending (the call to @ref sd_ble_gattc_exchange_mtu_request returned @ref NRF_ERROR_BUSY).
-    pub att_mtu_exchange_requested: bool, // Indicates that an ATT_MTU exchange request was made.
+    pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
     pub data_length_effective: u8, // Effective data length (in bytes).
 
@@ -67,10 +61,7 @@ impl ConnectionState {
             #[cfg(not(feature = "ble-central"))]
             role: Role::Peripheral,
             disconnecting: false,
-            att_mtu_desired: 0,
-            att_mtu_effective: 0,
-            att_mtu_exchange_pending: false,
-            att_mtu_exchange_requested: false,
+            att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
             rx_phys: 0,
@@ -120,25 +111,6 @@ impl ConnectionState {
 
         trace!("conn {:u8}: disconnected", index);
     }
-
-    pub(crate) fn set_att_mtu_desired(&mut self, mtu: u16) {
-        self.att_mtu_desired = mtu;
-
-        // Begin an ATT MTU exchange if necessary.
-        if self.att_mtu_desired > self.att_mtu_effective as u16 {
-            let ret = unsafe {
-                raw::sd_ble_gattc_exchange_mtu_request(
-                    self.conn_handle.unwrap(), //todo
-                    self.att_mtu_desired,
-                )
-            };
-
-            // TODO handle busy
-            if let Err(err) = RawError::convert(ret) {
-                warn!("sd_ble_gattc_exchange_mtu_request err {:?}", err);
-            }
-        }
-    }
 }
 
 pub struct Connection {
@@ -181,6 +153,10 @@ impl Clone for Connection {
 }
 
 impl Connection {
+    pub fn role(&self) -> Role {
+        self.with_state(|state| state.role)
+    }
+
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {
         self.with_state(|state| state.disconnect())
     }
@@ -195,10 +171,7 @@ impl Connection {
 
                 disconnecting: false,
 
-                att_mtu_desired: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
-                att_mtu_effective: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
-                att_mtu_exchange_pending: false,
-                att_mtu_exchange_requested: false,
+                att_mtu: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
 
                 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                 data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
