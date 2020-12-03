@@ -51,7 +51,7 @@ pub(crate) static CONNECT_PORTAL: Portal<Result<Connection, ConnectError>> = Por
 pub async fn connect(
     sd: &Softdevice,
     whitelist: &[Address],
-    config: Config,
+    config: &Config,
 ) -> Result<Connection, ConnectError> {
     let (addr, fp) = match whitelist.len() {
         0 => panic!("zero-length whitelist"),
@@ -170,7 +170,7 @@ pub(crate) static SCAN_PORTAL: Portal<ScanPortalMessage> = Portal::new();
 
 pub async fn scan<'a, F, R>(
     sd: &Softdevice,
-    config: ScanConfig<'a>,
+    config: &ScanConfig<'a>,
     mut f: F,
 ) -> Result<R, ScanError>
 where

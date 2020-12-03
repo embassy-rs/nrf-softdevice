@@ -51,17 +51,12 @@ async fn bluetooth_task(sd: &'static Softdevice) {
     ];
 
     loop {
-        let conn = unwrap!(
-            peripheral::advertise(
-                sd,
-                peripheral::ConnectableAdvertisement::ScannableUndirected {
-                    adv_data,
-                    scan_data,
-                },
-                peripheral::Config::default()
-            )
-            .await
-        );
+        let config = peripheral::Config::default();
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data,
+            scan_data,
+        };
+        let conn = unwrap!(peripheral::advertise(sd, adv, &config).await);
 
         info!("advertising done!");
     }

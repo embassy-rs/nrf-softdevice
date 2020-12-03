@@ -90,7 +90,7 @@ pub(crate) static ADV_PORTAL: Portal<Result<Connection, AdvertiseError>> = Porta
 pub async fn advertise(
     sd: &Softdevice,
     adv: ConnectableAdvertisement<'_>,
-    config: Config,
+    config: &Config,
 ) -> Result<Connection, AdvertiseError> {
     // TODO make these configurable, only the right params based on type?
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };

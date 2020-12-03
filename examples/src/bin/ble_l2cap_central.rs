@@ -37,7 +37,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
     info!("Scanning for peer...");
 
     let config = central::ScanConfig { whitelist: None };
-    let res = central::scan(sd, config, |params| unsafe {
+    let res = central::scan(sd, &config, |params| unsafe {
         let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
         while data.len() != 0 {
             let len = data[0] as usize;
@@ -70,7 +70,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[address];
 
     let config = central::Config::default();
-    let conn = unwrap!(central::connect(sd, addrs, config).await);
+    let conn = unwrap!(central::connect(sd, addrs, &config).await);
     info!("connected");
 
     let l = l2cap::L2cap::<Packet>::init(sd);

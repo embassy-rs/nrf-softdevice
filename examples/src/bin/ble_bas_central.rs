@@ -32,12 +32,13 @@ struct BatteryServiceClient {
 }
 
 #[task]
-async fn ble_central_task(sd: &'static Softdevice, config: central::Config) {
+async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[Address::new_random_static([
         0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0,
     ])];
 
-    let conn = unwrap!(central::connect(sd, addrs, config).await);
+    let config = central::Config::default();
+    let conn = unwrap!(central::connect(sd, addrs, &config).await);
     info!("connected");
 
     let client: BatteryServiceClient = unwrap!(gatt_client::discover(&conn).await);
@@ -98,7 +99,7 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
     unwrap!(executor.spawn(softdevice_task(sd)));
-    unwrap!(executor.spawn(ble_central_task(sd, central::Config::default())));
+    unwrap!(executor.spawn(ble_central_task(sd)));
 
     loop {
         executor.run();

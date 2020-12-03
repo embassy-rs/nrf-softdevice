@@ -28,7 +28,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 #[task]
 async fn ble_task(sd: &'static Softdevice) {
     let config = central::ScanConfig { whitelist: None };
-    let res = central::scan(sd, config, |params| unsafe {
+    let res = central::scan(sd, &config, |params| unsafe {
         info!("AdvReport!");
         info!(
             "type: connectable={:u16} scannable={:u16} directed={:u16} scan_response={:u16} extended_pdu={:u16} status={:u16}",
