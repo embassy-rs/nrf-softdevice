@@ -172,9 +172,9 @@ pub async fn advertise(
 #[derive(Copy, Clone)]
 pub struct Config {
     // bits of BLE_GAP_PHY_
-    tx_phys: u8,
+    pub tx_phys: u8,
     // bits of BLE_GAP_PHY_
-    rx_phys: u8,
+    pub rx_phys: u8,
 }
 
 impl Default for Config {
