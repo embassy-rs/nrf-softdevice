@@ -21,12 +21,9 @@ exclude = [
 ]
 
 [patch.crates-io]
-anyfmt = { git = "https://github.com/akiles/embassy" }
 embassy = { git = "https://github.com/akiles/embassy" }
 embassy-nrf = { git = "https://github.com/akiles/embassy" }
 embassy-macros = { git = "https://github.com/akiles/embassy" }
-defmt = { git = "https://github.com/Dirbaio/defmt", rev="23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827" }
-defmt-macros = { git = "https://github.com/Dirbaio/defmt", rev="23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827" }
 
 [profile.dev]
 codegen-units = 1

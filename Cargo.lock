@@ -193,17 +193,20 @@ dependencies = [
 
 [[package]]
 name = "defmt"
-version = "0.1.1"
-source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4160ab978165ef486b79dca2156cf91f28156e696600c158bac179e957c0f618"
 dependencies = [
  "defmt-macros",
+ "heapless",
  "semver 0.11.0",
 ]
 
 [[package]]
 name = "defmt-macros"
-version = "0.1.0"
-source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "925bb4a9cfaee4555fa533582032be2b121a11c1c203bc0dd17065497738ffb3"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -214,7 +217,8 @@ dependencies = [
 [[package]]
 name = "defmt-parser"
 version = "0.1.0"
-source = "git+https://github.com/Dirbaio/defmt?rev=23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827#23b2cfd9fe5481d6845f848f86b4ca0b5cfdb827"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "812b30ff14930407c86a23e256ac050b8e6913f597adcc88e29d40517f7a16de"
 
 [[package]]
 name = "derivative"
