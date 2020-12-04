@@ -54,7 +54,11 @@ async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
 
         info!("advertising done!");
 
-        let ch = unwrap!(l.listen(&conn, PSM).await);
+        let config = l2cap::Config {
+            psm: PSM,
+            credits: 8,
+        };
+        let ch = unwrap!(l.listen(&conn, &config).await);
         info!("l2cap connected");
 
         loop {

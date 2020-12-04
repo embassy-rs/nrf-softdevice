@@ -74,7 +74,11 @@ async fn ble_central_task(sd: &'static Softdevice) {
     info!("connected");
 
     let l = l2cap::L2cap::<Packet>::init(sd);
-    let ch = unwrap!(l.setup(&conn, PSM).await);
+    let config = l2cap::Config {
+        psm: PSM,
+        credits: 8,
+    };
+    let ch = unwrap!(l.setup(&conn, &config).await);
     info!("l2cap connected");
 
     for i in 0..10 {

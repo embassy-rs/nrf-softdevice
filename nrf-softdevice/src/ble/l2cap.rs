@@ -170,13 +170,17 @@ impl<P: Packet> L2cap<P> {
         }
     }
 
-    pub async fn setup(&self, conn: &Connection, psm: u16) -> Result<Channel<P>, SetupError> {
+    pub async fn setup(
+        &self,
+        conn: &Connection,
+        config: &Config,
+    ) -> Result<Channel<P>, SetupError> {
         let sd = unsafe { Softdevice::steal() };
 
         let conn_handle = conn.with_state(|state| state.check_connected())?;
         let mut cid: u16 = raw::BLE_L2CAP_CID_INVALID as _;
         let params = raw::ble_l2cap_ch_setup_params_t {
-            le_psm: psm,
+            le_psm: config.psm,
             status: 0, // only used when responding
             rx_params: raw::ble_l2cap_ch_rx_params_t {
                 rx_mps: sd.l2cap_rx_mps,
@@ -200,6 +204,23 @@ impl<P: Packet> L2cap<P> {
                 PortalMessage::SetupDone(ble_evt) => unsafe {
                     let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
                     let evt = &l2cap_evt.params.ch_setup;
+
+                    // default is 1
+                    if config.credits != 1 {
+                        let ret = unsafe {
+                            raw::sd_ble_l2cap_ch_flow_control(
+                                conn_handle,
+                                cid,
+                                config.credits,
+                                ptr::null_mut(),
+                            )
+                        };
+                        if let Err(err) = RawError::convert(ret) {
+                            warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
+                            return Err(err.into());
+                        }
+                    }
+
                     Ok(Channel {
                         conn: conn.clone(),
                         cid,
@@ -216,7 +237,11 @@ impl<P: Packet> L2cap<P> {
             .await
     }
 
-    pub async fn listen(&self, conn: &Connection, psm: u16) -> Result<Channel<P>, SetupError> {
+    pub async fn listen(
+        &self,
+        conn: &Connection,
+        config: &Config,
+    ) -> Result<Channel<P>, SetupError> {
         let sd = unsafe { Softdevice::steal() };
         let conn_handle = conn.with_state(|state| state.check_connected())?;
 
@@ -228,7 +253,7 @@ impl<P: Packet> L2cap<P> {
                     let evt = &l2cap_evt.params.ch_setup_request;
 
                     let mut cid: u16 = l2cap_evt.local_cid;
-                    if evt.le_psm == psm {
+                    if evt.le_psm == config.psm {
                         let params = raw::ble_l2cap_ch_setup_params_t {
                             le_psm: evt.le_psm,
                             status: raw::BLE_L2CAP_CH_STATUS_CODE_SUCCESS as _,
@@ -248,7 +273,22 @@ impl<P: Packet> L2cap<P> {
                             return Some(Err(err.into()));
                         }
 
-                        info!("cid {:u16}", cid);
+                        // default is 1
+                        if config.credits != 1 {
+                            let ret = unsafe {
+                                raw::sd_ble_l2cap_ch_flow_control(
+                                    conn_handle,
+                                    cid,
+                                    config.credits,
+                                    ptr::null_mut(),
+                                )
+                            };
+                            if let Err(err) = RawError::convert(ret) {
+                                warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
+                                return Some(Err(err.into()));
+                            }
+                        }
+
                         Some(Ok(Channel {
                             _private: PhantomData,
                             cid,
@@ -273,6 +313,11 @@ impl<P: Packet> L2cap<P> {
             })
             .await
     }
+}
+
+pub struct Config {
+    pub psm: u16,
+    pub credits: u16,
 }
 
 pub struct Channel<P: Packet> {
