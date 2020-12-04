@@ -142,6 +142,14 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
         }
     };
 
+    debug!(
+        "connected conn_params conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
+        params.conn_params.conn_sup_timeout,
+        params.conn_params.max_conn_interval,
+        params.conn_params.min_conn_interval,
+        params.conn_params.slave_latency,
+    );
+
     match role {
         #[cfg(feature = "ble-central")]
         Role::Central => central::CONNECT_PORTAL.call(res.map_err(|e| e.into())),
