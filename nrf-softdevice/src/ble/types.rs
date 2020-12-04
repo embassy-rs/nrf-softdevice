@@ -118,3 +118,30 @@ impl defmt::Format for Address {
         defmt::write!(fmt, "{:[u8;6]}", self.inner.addr)
     }
 }
+
+#[derive(defmt::Format, Eq, PartialEq, Copy, Clone)]
+#[repr(i8)]
+pub enum TxPower {
+    Minus40dBm = -40,
+    Minus20dBm = -20,
+    Minus16dBm = -16,
+    Minus12dBm = -12,
+    Minus8dBm = -8,
+    Minus4dBm = -4,
+    ZerodBm = 0,
+    Plus2dBm = 2,
+    Plus3dBm = 3,
+    Plus4dBm = 4,
+    Plus5dBm = 5,
+    Plus6dBm = 6,
+    Plus7dBm = 7,
+    Plus8dBm = 8,
+}
+
+#[derive(defmt::Format, Eq, PartialEq, Copy, Clone)]
+#[repr(u8)]
+pub enum Phy {
+    _1M = 1,
+    _2M = 2,
+    Coded = 4,
+}

@@ -16,7 +16,7 @@ pub(crate) unsafe fn on_adv_set_terminated(
         "peripheral on_adv_set_terminated conn_handle={:u16}",
         gap_evt.conn_handle
     );
-    ADV_PORTAL.call(Err(AdvertiseError::Stopped))
+    ADV_PORTAL.call(Err(AdvertiseError::Timeout))
 }
 
 pub(crate) unsafe fn on_scan_req_report(
@@ -51,12 +51,51 @@ pub enum ConnectableAdvertisement<'a> {
     NonscannableDirectedHighDuty {
         scan_data: &'a [u8],
     },
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableUndirected {
         adv_data: &'a [u8],
     },
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableDirected {
         adv_data: &'a [u8],
     },
+}
+
+impl<'a> ConnectableAdvertisement<'a> {
+    fn convert(&self) -> (u8, Option<&[u8]>, Option<&[u8]>) {
+        match self {
+            ConnectableAdvertisement::ScannableUndirected {
+                adv_data,
+                scan_data,
+            } => (
+                raw::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8,
+                Some(adv_data),
+                Some(scan_data),
+            ),
+            ConnectableAdvertisement::NonscannableDirected { scan_data } => (
+                raw::BLE_GAP_ADV_TYPE_CONNECTABLE_NONSCANNABLE_DIRECTED as u8,
+                None,
+                Some(scan_data),
+            ),
+            ConnectableAdvertisement::NonscannableDirectedHighDuty { scan_data } => (
+                raw::BLE_GAP_ADV_TYPE_CONNECTABLE_NONSCANNABLE_DIRECTED_HIGH_DUTY_CYCLE as u8,
+                None,
+                Some(scan_data),
+            ),
+            #[cfg(any(feature = "s132", feature = "s140"))]
+            ConnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => (
+                raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_UNDIRECTED as u8,
+                Some(adv_data),
+                None,
+            ),
+            #[cfg(any(feature = "s132", feature = "s140"))]
+            ConnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => (
+                raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_DIRECTED as u8,
+                Some(adv_data),
+                None,
+            ),
+        }
+    }
 }
 
 /// Non-Connectable advertisement types. They cannot accept connections, they can be
@@ -64,16 +103,20 @@ pub enum ConnectableAdvertisement<'a> {
 pub enum NonconnectableAdvertisement {
     ScannableUndirected,
     NonscannableUndirected,
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedScannableUndirected,
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedScannableDirected,
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableUndirected,
+    #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableDirected,
 }
 
 /// Error for [`advertise_start`]
 #[derive(defmt::Format)]
 pub enum AdvertiseError {
-    Stopped,
+    Timeout,
     Raw(RawError),
 }
 
@@ -92,30 +135,16 @@ pub async fn advertise(
     adv: ConnectableAdvertisement<'_>,
     config: &Config,
 ) -> Result<Connection, AdvertiseError> {
+    let (adv_type, adv_data, scan_data) = adv.convert();
+
     // TODO make these configurable, only the right params based on type?
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
-    adv_params.properties.type_ = raw::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8;
-    adv_params.primary_phy = raw::BLE_GAP_PHY_1MBPS as u8;
-    adv_params.secondary_phy = raw::BLE_GAP_PHY_1MBPS as u8;
-    adv_params.duration = raw::BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED as u16;
-    adv_params.interval = 100;
-
-    let (adv_data, scan_data) = match adv {
-        ConnectableAdvertisement::ScannableUndirected {
-            adv_data,
-            scan_data,
-        } => (Some(adv_data), Some(scan_data)),
-        ConnectableAdvertisement::NonscannableDirected { scan_data } => (None, Some(scan_data)),
-        ConnectableAdvertisement::NonscannableDirectedHighDuty { scan_data } => {
-            (None, Some(scan_data))
-        }
-        ConnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => {
-            (Some(adv_data), None)
-        }
-        ConnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => {
-            (Some(adv_data), None)
-        }
-    };
+    adv_params.properties.type_ = adv_type;
+    adv_params.primary_phy = config.primary_phy as u8;
+    adv_params.secondary_phy = config.secondary_phy as u8;
+    adv_params.duration = config.timeout.map(|t| t.max(1)).unwrap_or(0);
+    adv_params.max_adv_evts = config.max_events.map(|t| t.max(1)).unwrap_or(0);
+    adv_params.interval = config.interval;
 
     let map_data = |data: Option<&[u8]>| {
         if let Some(data) = data {
@@ -152,36 +181,62 @@ pub async fn advertise(
         err
     })?;
 
+    let ret = unsafe {
+        raw::sd_ble_gap_tx_power_set(
+            raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_ADV as _,
+            ADV_HANDLE as _,
+            config.tx_power as i8,
+        )
+    };
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gap_tx_power_set err {:?}", err);
+        err
+    })?;
+
     let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
     RawError::convert(ret).map_err(|err| {
         warn!("sd_ble_gap_adv_start err {:?}", err);
         err
     })?;
 
-    info!("Advertising started!");
-
     // The advertising data needs to be kept alive for the entire duration of the advertising procedure.
 
-    let conn = ADV_PORTAL.wait_once(|res| res).await?;
-
-    d.defuse();
-
-    Ok(conn)
+    match ADV_PORTAL.wait_once(|res| res).await {
+        Ok(conn) => {
+            d.defuse();
+            Ok(conn)
+        }
+        Err(AdvertiseError::Timeout) => {
+            d.defuse();
+            Err(AdvertiseError::Timeout)
+        }
+        Err(e) => Err(e),
+    }
 }
 
 #[derive(Copy, Clone)]
 pub struct Config {
-    // bits of BLE_GAP_PHY_
-    pub tx_phys: u8,
-    // bits of BLE_GAP_PHY_
-    pub rx_phys: u8,
+    pub primary_phy: Phy,
+    pub secondary_phy: Phy,
+    pub tx_power: TxPower,
+
+    /// Timeout duration, in 10ms units
+    pub timeout: Option<u16>,
+    pub max_events: Option<u8>,
+
+    /// Advertising interval, in 0.625us units
+    pub interval: u32,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            tx_phys: raw::BLE_GAP_PHY_AUTO as _,
-            rx_phys: raw::BLE_GAP_PHY_AUTO as _,
+            primary_phy: Phy::_1M,
+            secondary_phy: Phy::_1M,
+            tx_power: TxPower::ZerodBm,
+            timeout: None,
+            max_events: None,
+            interval: 400, // 250ms
         }
     }
 }
