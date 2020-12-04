@@ -11,7 +11,7 @@ use core::slice;
 use crate::ble::gatt_client;
 use crate::ble::{Address, Connection, ConnectionState};
 use crate::raw;
-use crate::util::{panic, *};
+use crate::util::{assert, panic, *};
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
@@ -36,6 +36,7 @@ pub(crate) unsafe fn on_conn_param_update_request(
 #[derive(defmt::Format)]
 pub enum ConnectError {
     Timeout,
+    NoAddresses,
     Raw(RawError),
 }
 
@@ -50,17 +51,12 @@ pub(crate) static CONNECT_PORTAL: Portal<Result<Connection, ConnectError>> = Por
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn connect(
     sd: &Softdevice,
-    whitelist: &[Address],
+    addresses: &[&Address],
     config: &Config,
 ) -> Result<Connection, ConnectError> {
-    let (addr, fp) = match whitelist.len() {
-        0 => panic!("zero-length whitelist"),
-        1 => (
-            &whitelist[0] as *const Address as *const raw::ble_gap_addr_t,
-            raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as u8,
-        ),
-        _ => panic!("todo"),
-    };
+    if addresses.len() == 0 {
+        return Err(ConnectError::NoAddresses);
+    }
 
     // in units of 625us
     let scan_interval: u32 = 2732;
@@ -71,7 +67,7 @@ pub async fn connect(
     scan_params.set_extended(1);
     scan_params.set_active(1);
     scan_params.scan_phys = raw::BLE_GAP_PHY_1MBPS as u8;
-    scan_params.set_filter_policy(fp);
+    scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_WHITELIST as _);
     scan_params.timeout = raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _;
 
     // s122 has these in us instead of 625us :shrug:
@@ -93,7 +89,16 @@ pub async fn connect(
         }
     });
 
-    let ret = unsafe { raw::sd_ble_gap_connect(addr, &mut scan_params, &config.conn_params, 1) };
+    assert!(addresses.len() <= u8::MAX as usize);
+    let ret =
+        unsafe { raw::sd_ble_gap_whitelist_set(addresses.as_ptr() as _, addresses.len() as u8) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_connect err {:?}", err);
+        return Err(err.into());
+    }
+
+    let ret =
+        unsafe { raw::sd_ble_gap_connect(ptr::null(), &mut scan_params, &config.conn_params, 1) };
     if let Err(err) = RawError::convert(ret) {
         warn!("sd_ble_gap_connect err {:?}", err);
         return Err(err.into());

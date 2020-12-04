@@ -67,7 +67,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
     let address = unwrap!(res);
     info!("Scan found address {:?}", address);
 
-    let addrs = &[address];
+    let addrs = &[&address];
 
     let config = central::Config::default();
     let conn = unwrap!(central::connect(sd, addrs, &config).await);

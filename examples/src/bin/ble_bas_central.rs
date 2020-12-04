@@ -33,7 +33,7 @@ struct BatteryServiceClient {
 
 #[task]
 async fn ble_central_task(sd: &'static Softdevice) {
-    let addrs = &[Address::new(
+    let addrs = &[&Address::new(
         AddressType::RandomStatic,
         [0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0],
     )];

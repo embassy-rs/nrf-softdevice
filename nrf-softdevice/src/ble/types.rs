@@ -120,6 +120,7 @@ impl Address {
     pub fn address_type(&self) -> AddressType {
         unsafe { mem::transmute(self.flags >> 1) }
     }
+
     pub fn bytes(&self) -> [u8; 6] {
         self.bytes
     }
