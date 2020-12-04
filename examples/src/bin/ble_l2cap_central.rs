@@ -57,7 +57,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
                         0x18, 0xce, 0x9c, 0x82,
                     ]
             {
-                return Some(Address::new_random_static(params.peer_addr.addr));
+                return Some(Address::from_raw(params.peer_addr));
             }
             data = &data[len + 1..];
         }

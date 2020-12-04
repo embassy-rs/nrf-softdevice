@@ -34,13 +34,14 @@ pub fn get_address(sd: &Softdevice) -> Address {
         let mut addr: raw::ble_gap_addr_t = mem::zeroed();
         let ret = raw::sd_ble_gap_addr_get(&mut addr);
         unwrap!(RawError::convert(ret), "sd_ble_gap_addr_get");
-        Address { inner: addr }
+        Address::from_raw(addr)
     }
 }
 
 pub fn set_address(sd: &Softdevice, addr: &Address) {
     unsafe {
-        let ret = raw::sd_ble_gap_addr_set(&addr.inner);
+        let addr = addr.into_raw();
+        let ret = raw::sd_ble_gap_addr_set(&addr);
         unwrap!(RawError::convert(ret), "sd_ble_gap_addr_set");
     }
 }

@@ -1,7 +1,8 @@
-use crate::raw;
-use crate::RawError;
+use core::mem;
 
+use crate::raw;
 use crate::util::{panic, *};
+use crate::RawError;
 
 #[repr(transparent)]
 #[derive(Copy, Clone)]
@@ -83,39 +84,58 @@ impl Role {
     }
 }
 
-#[repr(transparent)]
+#[repr(u8)]
+#[derive(defmt::Format, Debug, Copy, Clone, Eq, PartialEq)]
+pub enum AddressType {
+    /// Public (identity) address
+    Public = 0x00,
+    /// Random static (identity) address.
+    RandomStatic = 0x01,
+    /// Random private resolvable address.
+    RandomPrivateResolvable = 0x02,
+    /// Random private non-resolvable address.
+    RandomPrivateNonResolvable = 0x03,
+    /// An advertiser may advertise without its address. This type of advertising is called anonymous.
+    Anonymous = 0x7F,
+}
+
+// Note: this type MUST be layout-compatible with raw::ble_gap_addr_t
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct Address {
-    pub(crate) inner: raw::ble_gap_addr_t,
+    // bit 0: is resolved private address
+    // bits 7-1: type
+    pub flags: u8,
+    pub bytes: [u8; 6],
 }
 
 impl Address {
-    pub fn new_public(address: [u8; 6]) -> Self {
+    pub fn new(address_type: AddressType, bytes: [u8; 6]) -> Self {
         Self {
-            inner: raw::ble_gap_addr_t {
-                addr: address,
-                _bitfield_1: raw::ble_gap_addr_t::new_bitfield_1(
-                    0,
-                    raw::BLE_GAP_ADDR_TYPE_PUBLIC as u8,
-                ),
-            },
+            flags: (address_type as u8) << 1,
+            bytes,
         }
     }
-    pub fn new_random_static(address: [u8; 6]) -> Self {
-        Self {
-            inner: raw::ble_gap_addr_t {
-                addr: address,
-                _bitfield_1: raw::ble_gap_addr_t::new_bitfield_1(
-                    0,
-                    raw::BLE_GAP_ADDR_TYPE_RANDOM_STATIC as u8,
-                ),
-            },
-        }
+
+    pub fn address_type(&self) -> AddressType {
+        unsafe { mem::transmute(self.flags >> 1) }
+    }
+    pub fn bytes(&self) -> [u8; 6] {
+        self.bytes
+    }
+
+    pub fn into_raw(&self) -> raw::ble_gap_addr_t {
+        unsafe { mem::transmute(*self) }
+    }
+
+    pub unsafe fn from_raw(raw: raw::ble_gap_addr_t) -> Self {
+        mem::transmute(raw)
     }
 }
 
 impl defmt::Format for Address {
     fn format(&self, fmt: &mut defmt::Formatter) {
-        defmt::write!(fmt, "{:[u8;6]}", self.inner.addr)
+        defmt::write!(fmt, "{:?}:{:[u8;6]}", self.address_type(), self.bytes())
     }
 }
 

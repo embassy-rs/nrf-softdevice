@@ -14,7 +14,7 @@ use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::{central, gatt_client, Address, Connection, Uuid};
+use nrf_softdevice::ble::{central, gatt_client, Address, AddressType, Connection, Uuid};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
@@ -33,9 +33,10 @@ struct BatteryServiceClient {
 
 #[task]
 async fn ble_central_task(sd: &'static Softdevice) {
-    let addrs = &[Address::new_random_static([
-        0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0,
-    ])];
+    let addrs = &[Address::new(
+        AddressType::RandomStatic,
+        [0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0],
+    )];
 
     let config = central::Config::default();
     let conn = unwrap!(central::connect(sd, addrs, &config).await);
