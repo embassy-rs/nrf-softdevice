@@ -114,7 +114,7 @@ pub enum NonconnectableAdvertisement {
 }
 
 /// Error for [`advertise_start`]
-#[derive(defmt::Format)]
+#[derive(Debug, defmt::Format)]
 pub enum AdvertiseError {
     Timeout,
     Raw(RawError),

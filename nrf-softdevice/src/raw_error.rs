@@ -5,7 +5,7 @@ use crate::raw;
 /// All possible errors returned by softdevice calls.
 #[rustfmt::skip]
 #[repr(u32)]
-#[derive(defmt::Format, IntoPrimitive, FromPrimitive)]
+#[derive(Debug, defmt::Format, IntoPrimitive, FromPrimitive)]
 pub enum RawError {
     /// This is not really an error, but is added here anyway, just in case someone mistakenly converts NRF_SUCCESS into RawError.
     Success = raw::NRF_SUCCESS,
