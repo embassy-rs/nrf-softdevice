@@ -101,7 +101,7 @@ pub enum AddressType {
 
 // Note: this type MUST be layout-compatible with raw::ble_gap_addr_t
 #[repr(C)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Address {
     // bit 0: is resolved private address
     // bits 7-1: type
@@ -110,7 +110,7 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn new(address_type: AddressType, bytes: [u8; 6]) -> Self {
+    pub const fn new(address_type: AddressType, bytes: [u8; 6]) -> Self {
         Self {
             flags: (address_type as u8) << 1,
             bytes,

@@ -40,6 +40,7 @@ pub(crate) struct ConnectionState {
 
     pub disconnecting: bool,
     pub role: Role,
+    pub peer_address: Address,
 
     pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -60,6 +61,7 @@ impl ConnectionState {
             role: Role::Central,
             #[cfg(not(feature = "ble-central"))]
             role: Role::Peripheral,
+            peer_address: Address::new(AddressType::Public, [0; 6]),
             disconnecting: false,
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -159,17 +161,26 @@ impl Connection {
         self.with_state(|state| state.role)
     }
 
+    pub fn peer_address(&self) -> Address {
+        self.with_state(|state| state.peer_address)
+    }
+
     pub fn disconnect(&self) -> Result<(), DisconnectedError> {
         self.with_state(|state| state.disconnect())
     }
 
-    pub(crate) fn new(conn_handle: u16, role: Role) -> Result<Self, OutOfConnsError> {
+    pub(crate) fn new(
+        conn_handle: u16,
+        role: Role,
+        peer_address: Address,
+    ) -> Result<Self, OutOfConnsError> {
         allocate_index(|index, state| {
             // Initialize
             *state = ConnectionState {
                 refcount: 1,
                 conn_handle: Some(conn_handle),
                 role,
+                peer_address,
 
                 disconnecting: false,
 

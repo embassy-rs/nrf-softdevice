@@ -126,7 +126,10 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
     let conn_handle = gap_evt.conn_handle;
     let role = Role::from_raw(params.role);
 
-    let res = match Connection::new(conn_handle, role) {
+    let peer_address = Address::from_raw(params.peer_addr);
+    debug!("connected role={:?} peer_addr={:?}", role, peer_address);
+
+    let res = match Connection::new(conn_handle, role, peer_address) {
         Ok(conn) => {
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             do_data_length_update(conn_handle, ptr::null());
@@ -143,7 +146,7 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
     };
 
     debug!(
-        "connected conn_params conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
+        "conn_params conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
         params.conn_params.conn_sup_timeout,
         params.conn_params.max_conn_interval,
         params.conn_params.min_conn_interval,
