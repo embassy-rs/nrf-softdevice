@@ -32,7 +32,7 @@ ble-gatt-client = []
 
 [dependencies]
 num_enum = { version = "0.5.1", default-features = false }
-embassy = { version = "0.1.0" }
+embassy = { version = "0.1.0", git = "https://github.com/akiles/embassy" }
 cortex-m = "0.6.4"
 cortex-m-rt = "0.6.13"
 heapless = "0.5.6"

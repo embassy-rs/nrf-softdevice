@@ -39,7 +39,7 @@ pub trait Server: Sized {
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
-#[derive(defmt::Format)]
+#[derive(Debug, defmt::Format)]
 pub enum RegisterError {
     Raw(RawError),
 }
