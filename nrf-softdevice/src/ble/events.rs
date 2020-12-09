@@ -2,8 +2,9 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
+use crate::fmt::{panic, *};
 use crate::raw;
-use crate::util::{panic, *};
+use crate::util::{get_union_field, BoundedLifetime};
 use crate::RawError;
 
 #[rustfmt::skip]
@@ -108,7 +109,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
         #[cfg(feature="ble-gatt-server")]
         raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_HVN_TX_COMPLETE => gatt_server::on_hvn_tx_complete(ble_evt, get_union_field(ble_evt, &evt.evt.gatts_evt)),
 
-        x => panic!("Unknown ble evt {:u32}", x),
+        x => panic!("Unknown ble evt {:?}", x),
     }
 }
 
@@ -120,7 +121,7 @@ fn on_user_mem_release(_ble_evt: *const raw::ble_evt_t, _common_evt: &raw::ble_c
 }
 
 pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_connected conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_connected conn_handle={:?}", gap_evt.conn_handle);
 
     let params = &gap_evt.params.connected;
     let conn_handle = gap_evt.conn_handle;
@@ -146,7 +147,7 @@ pub(crate) unsafe fn on_connected(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw
     };
 
     debug!(
-        "conn_params conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
+        "conn_params conn_sup_timeout={:?} max_conn_interval={:?} min_conn_interval={:?} slave_latency={:?}",
         params.conn_params.conn_sup_timeout,
         params.conn_params.max_conn_interval,
         params.conn_params.min_conn_interval,
@@ -165,7 +166,7 @@ pub(crate) unsafe fn on_disconnected(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
-    trace!("on_disconnected conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_disconnected conn_handle={:?}", gap_evt.conn_handle);
     let conn_handle = gap_evt.conn_handle;
     connection::with_state_by_conn_handle(conn_handle, |state| state.on_disconnected());
 }
@@ -177,7 +178,7 @@ pub(crate) unsafe fn on_conn_param_update(
     let conn_params = gap_evt.params.conn_param_update.conn_params;
 
     debug!(
-        "on_conn_param_update conn_handle={:u16} conn_sup_timeout={:u16} max_conn_interval={:u16} min_conn_interval={:u16} slave_latency={:u16}",
+        "on_conn_param_update conn_handle={:?} conn_sup_timeout={:?} max_conn_interval={:?} min_conn_interval={:?} slave_latency={:?}",
         gap_evt.conn_handle,
         conn_params.conn_sup_timeout,
         conn_params.max_conn_interval,
@@ -191,7 +192,7 @@ pub(crate) unsafe fn on_sec_params_request(
     gap_evt: &raw::ble_gap_evt_t,
 ) {
     trace!(
-        "on_sec_params_request conn_handle={:u16}",
+        "on_sec_params_request conn_handle={:?}",
         gap_evt.conn_handle
     );
 }
@@ -200,20 +201,17 @@ pub(crate) unsafe fn on_passkey_display(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
-    trace!("on_passkey_display conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_passkey_display conn_handle={:?}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_key_pressed(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_key_pressed conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_key_pressed conn_handle={:?}", gap_evt.conn_handle);
 }
 pub(crate) unsafe fn on_auth_key_request(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
-    trace!(
-        "on_auth_key_request conn_handle={:u16}",
-        gap_evt.conn_handle
-    );
+    trace!("on_auth_key_request conn_handle={:?}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_lesc_dhkey_request(
@@ -221,24 +219,24 @@ pub(crate) unsafe fn on_lesc_dhkey_request(
     gap_evt: &raw::ble_gap_evt_t,
 ) {
     trace!(
-        "on_lesc_dhkey_request conn_handle={:u16}",
+        "on_lesc_dhkey_request conn_handle={:?}",
         gap_evt.conn_handle
     );
 }
 
 pub(crate) unsafe fn on_auth_status(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_auth_status conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_auth_status conn_handle={:?}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_conn_sec_update(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
-    trace!("on_conn_sec_update conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_conn_sec_update conn_handle={:?}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_timeout(ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_timeout conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_timeout conn_handle={:?}", gap_evt.conn_handle);
 
     let params = &gap_evt.params.timeout;
     match params.src as u32 {
@@ -250,7 +248,7 @@ pub(crate) unsafe fn on_timeout(ble_evt: *const raw::ble_evt_t, gap_evt: &raw::b
         raw::BLE_GAP_TIMEOUT_SRC_SCAN => {
             central::SCAN_PORTAL.call(central::ScanPortalMessage::Timeout(ble_evt))
         }
-        x => panic!("unknown timeout src {:u32}", x),
+        x => panic!("unknown timeout src {:?}", x),
     }
 }
 
@@ -258,11 +256,11 @@ pub(crate) unsafe fn on_rssi_changed(
     _ble_evt: *const raw::ble_evt_t,
     gap_evt: &raw::ble_gap_evt_t,
 ) {
-    trace!("on_rssi_changed conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_rssi_changed conn_handle={:?}", gap_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_sec_request(_ble_evt: *const raw::ble_evt_t, gap_evt: &raw::ble_gap_evt_t) {
-    trace!("on_sec_request conn_handle={:u16}", gap_evt.conn_handle);
+    trace!("on_sec_request conn_handle={:?}", gap_evt.conn_handle);
 }
 
 /// Called when a phy update has been requested by peer
@@ -274,7 +272,7 @@ pub(crate) unsafe fn on_phy_update_request(
     let conn_handle = gap_evt.conn_handle;
 
     trace!(
-        "on_phy_update_request conn_handle={:u16} rx_phys={:u8} tx_phys={:u8}",
+        "on_phy_update_request conn_handle={:?} rx_phys={:?} tx_phys={:?}",
         conn_handle,
         peer_preferred_phys.rx_phys,
         peer_preferred_phys.tx_phys
@@ -297,7 +295,7 @@ pub(crate) unsafe fn on_phy_update(_ble_evt: *const raw::ble_evt_t, gap_evt: &ra
     let phy_update = gap_evt.params.phy_update;
 
     trace!(
-        "on_phy_update conn_handle={:u16} status={:u8} rx_phy={:u8} tx_phy={:u8}",
+        "on_phy_update conn_handle={:?} status={:?} rx_phy={:?} tx_phy={:?}",
         gap_evt.conn_handle,
         phy_update.status,
         phy_update.rx_phy,
@@ -314,7 +312,7 @@ pub(crate) unsafe fn on_data_length_update_request(
     let peer_params = gap_evt.params.data_length_update_request.peer_params;
 
     trace!(
-        "on_data_length_update_request conn_handle={:u16} max_rx_octets={:u16} max_rx_time_us={:u16} max_tx_octets={:u16} max_tx_time_us={:u16}",
+        "on_data_length_update_request conn_handle={:?} max_rx_octets={:?} max_rx_time_us={:?} max_tx_octets={:?} max_tx_time_us={:?}",
         gap_evt.conn_handle,
         peer_params.max_rx_octets,
         peer_params.max_rx_time_us,
@@ -339,7 +337,7 @@ pub(crate) unsafe fn on_data_length_update(
     });
 
     debug!(
-        "on_data_length_update conn_handle={:u16} max_rx_octets={:u16} max_rx_time_us={:u16} max_tx_octets={:u16} max_tx_time_us={:u16}",
+        "on_data_length_update conn_handle={:?} max_rx_octets={:?} max_rx_time_us={:?} max_tx_octets={:?} max_tx_time_us={:?}",
         gap_evt.conn_handle,
         effective_params.max_rx_octets,
         effective_params.max_rx_time_us,
@@ -362,14 +360,14 @@ unsafe fn do_data_length_update(
             || dl_limitation.rx_payload_limited_octets != 0
         {
             warn!(
-                "The requested TX/RX packet length is too long by {:u16}/{:u16} octets.",
+                "The requested TX/RX packet length is too long by {:?}/{:?} octets.",
                 dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets
             );
         }
 
         if dl_limitation.tx_rx_time_limited_us != 0 {
             warn!(
-                "The requested combination of TX and RX packet lengths is too long by {:u16} us",
+                "The requested combination of TX and RX packet lengths is too long by {:?} us",
                 dl_limitation.tx_rx_time_limited_us
             );
         }

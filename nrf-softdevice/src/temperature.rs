@@ -1,8 +1,9 @@
-use crate::{raw, RawError, Softdevice};
-use defmt::info;
 use fixed::types::I30F2;
 
-#[derive(defmt::Format)]
+use crate::fmt::*;
+use crate::{raw, RawError, Softdevice};
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TempError {
     Raw(RawError),
 }

@@ -3,7 +3,8 @@ use core::future::Future;
 use core::mem;
 use core::mem::MaybeUninit;
 
-use crate::util::{assert, panic, unreachable, *};
+use crate::fmt::{assert, panic, unreachable, *};
+use crate::util::{OnDrop, Signal};
 
 /// Utility to call a closure across tasks.
 pub struct Portal<T> {

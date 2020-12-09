@@ -1,7 +1,7 @@
 use core::mem;
 
+use crate::fmt::{panic, *};
 use crate::raw;
-use crate::util::{panic, *};
 use crate::RawError;
 
 #[repr(transparent)]
@@ -64,7 +64,8 @@ impl PartialEq for Uuid {
     }
 }
 
-#[derive(defmt::Format, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Role {
     #[cfg(feature = "ble-central")]
     Central,
@@ -79,13 +80,14 @@ impl Role {
             raw::BLE_GAP_ROLE_CENTRAL => Self::Central,
             #[cfg(feature = "ble-peripheral")]
             raw::BLE_GAP_ROLE_PERIPH => Self::Peripheral,
-            _ => panic!("unknown role {:u8}", raw),
+            _ => panic!("unknown role {:?}", raw),
         }
     }
 }
 
 #[repr(u8)]
-#[derive(defmt::Format, Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum AddressType {
     /// Public (identity) address
     Public = 0x00,
@@ -134,13 +136,15 @@ impl Address {
     }
 }
 
+#[cfg(feature = "defmt")]
 impl defmt::Format for Address {
     fn format(&self, fmt: &mut defmt::Formatter) {
         defmt::write!(fmt, "{:?}:{:[u8;6]}", self.address_type(), self.bytes())
     }
 }
 
-#[derive(defmt::Format, Eq, PartialEq, Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(i8)]
 pub enum TxPower {
     Minus40dBm = -40,
@@ -159,7 +163,8 @@ pub enum TxPower {
     Plus8dBm = 8,
 }
 
-#[derive(defmt::Format, Eq, PartialEq, Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum Phy {
     _1M = 1,

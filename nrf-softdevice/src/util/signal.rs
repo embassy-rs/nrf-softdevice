@@ -4,7 +4,7 @@ use core::mem;
 use core::pin::Pin;
 use core::task::{Context, Poll, Waker};
 
-use crate::util::{panic, unreachable, *};
+use crate::fmt::{panic, unreachable, *};
 
 pub struct Signal<T> {
     state: UnsafeCell<State<T>>,

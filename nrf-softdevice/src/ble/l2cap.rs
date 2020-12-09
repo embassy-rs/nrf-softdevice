@@ -8,8 +8,9 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use core::u16;
 
 use crate::ble::*;
+use crate::fmt::{assert, panic, unreachable, *};
 use crate::raw;
-use crate::util::{assert, panic, unreachable, *};
+use crate::util::{get_union_field, Portal};
 use crate::{RawError, Softdevice};
 
 fn evt_conn_handle(ble_evt: *const raw::ble_evt_t) -> u16 {
@@ -71,7 +72,7 @@ pub(crate) fn on_ch_tx(ble_evt: *const raw::ble_evt_t) {
     }
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TxError {
     Disconnected,
     Raw(RawError),
@@ -88,7 +89,7 @@ impl From<RawError> for TxError {
         TxError::Raw(err)
     }
 }
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RxError {
     Disconnected,
     Raw(RawError),
@@ -106,7 +107,7 @@ impl From<RawError> for RxError {
     }
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetupError {
     Disconnected,
     Refused,
@@ -196,7 +197,7 @@ impl<P: Packet> L2cap<P> {
             warn!("sd_ble_l2cap_ch_setup err {:?}", err);
             return Err(err.into());
         }
-        info!("cid {:u16}", cid);
+        info!("cid {:?}", cid);
 
         portal(conn_handle)
             .wait_once(|msg| match msg {

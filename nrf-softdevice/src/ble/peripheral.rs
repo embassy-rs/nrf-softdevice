@@ -4,8 +4,9 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
+use crate::fmt::{assert, *};
 use crate::raw;
-use crate::util::{assert, *};
+use crate::util::{OnDrop, Portal};
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_set_terminated(
@@ -13,7 +14,7 @@ pub(crate) unsafe fn on_adv_set_terminated(
     gap_evt: &raw::ble_gap_evt_t,
 ) {
     trace!(
-        "peripheral on_adv_set_terminated conn_handle={:u16}",
+        "peripheral on_adv_set_terminated conn_handle={:?}",
         gap_evt.conn_handle
     );
     ADV_PORTAL.call(Err(AdvertiseError::Timeout))
@@ -24,7 +25,7 @@ pub(crate) unsafe fn on_scan_req_report(
     gap_evt: &raw::ble_gap_evt_t,
 ) {
     trace!(
-        "peripheral on_scan_req_report conn_handle={:u16}",
+        "peripheral on_scan_req_report conn_handle={:?}",
         gap_evt.conn_handle
     );
 }
@@ -34,7 +35,7 @@ pub(crate) unsafe fn on_sec_info_request(
     gap_evt: &raw::ble_gap_evt_t,
 ) {
     trace!(
-        "peripheral on_sec_info_request conn_handle={:u16}",
+        "peripheral on_sec_info_request conn_handle={:?}",
         gap_evt.conn_handle
     );
 }
@@ -114,7 +115,8 @@ pub enum NonconnectableAdvertisement {
 }
 
 /// Error for [`advertise_start`]
-#[derive(Debug, defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Debug)]
 pub enum AdvertiseError {
     Timeout,
     Raw(RawError),

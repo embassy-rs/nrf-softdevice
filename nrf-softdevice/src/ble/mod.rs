@@ -26,7 +26,7 @@ pub mod l2cap;
 
 use core::mem;
 
-use crate::util::*;
+use crate::fmt::*;
 use crate::{raw, RawError, Softdevice};
 
 pub fn get_address(sd: &Softdevice) -> Address {

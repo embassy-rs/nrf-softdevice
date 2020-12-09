@@ -2,7 +2,8 @@ use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::util::{panic, unreachable, *};
+use crate::fmt::{panic, unreachable, *};
+use crate::util::Signal;
 use crate::{interrupt, raw};
 use crate::{RawError, Softdevice};
 
@@ -10,7 +11,8 @@ static SWI2_SIGNAL: Signal<()> = Signal::new();
 
 #[rustfmt::skip]
 #[repr(u32)]
-#[derive(defmt::Format, IntoPrimitive, TryFromPrimitive)]
+#[derive(IntoPrimitive, TryFromPrimitive, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 enum SocEvent {
     Hfclkstarted = raw::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,
     PowerFailureWarning = raw::NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING,
@@ -32,7 +34,7 @@ enum SocEvent {
 fn on_soc_evt(evt: u32) {
     let evt = match SocEvent::try_from(evt) {
         Ok(evt) => evt,
-        Err(_) => panic!("Unknown soc evt {:u32}", evt),
+        Err(_) => panic!("Unknown soc evt {:?}", evt),
     };
 
     info!("soc evt {:?}", evt);

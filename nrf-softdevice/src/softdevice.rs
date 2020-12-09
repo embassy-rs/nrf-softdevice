@@ -4,14 +4,14 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::util::Forever;
 
 use crate::ble;
+use crate::fmt::{panic, *};
 use crate::interrupt;
 use crate::pac;
 use crate::raw;
-use crate::util::{panic, *};
 use crate::RawError;
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
-    panic!("fault_handler {:u32} {:u32} {:u32}", id, pc, info);
+    panic!("fault_handler {:?} {:?} {:?}", id, pc, info);
 }
 
 #[allow(non_snake_case)]
@@ -94,40 +94,7 @@ fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
     match RawError::convert(ret) {
         Ok(()) => {}
         Err(RawError::NoMem) => {}
-        Err(err) => panic!("sd_ble_cfg_set {:istr} err {:?}", cfg_id_str(id), err),
-    }
-}
-
-fn cfg_id_str(id: u32) -> defmt::Str {
-    match id {
-        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GAP"),
-        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTC => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTC"),
-        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATTS => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATTS"),
-        raw::BLE_CONN_CFGS_BLE_CONN_CFG_GATT => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_GATT"),
-        #[cfg(feature = "ble-l2cap")]
-        raw::BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP => defmt::intern!("BLE_CONN_CFGS_BLE_CONN_CFG_L2CAP"),
-        raw::BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID => {
-            defmt::intern!("BLE_COMMON_CFGS_BLE_COMMON_CFG_VS_UUID")
-        }
-        raw::BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT => {
-            defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_ROLE_COUNT")
-        }
-        raw::BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME => {
-            defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_DEVICE_NAME")
-        }
-        raw::BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG => {
-            defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_PPCP_INCL_CONFIG")
-        }
-        raw::BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG => {
-            defmt::intern!("BLE_GAP_CFGS_BLE_GAP_CFG_CAR_INCL_CONFIG")
-        }
-        raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED => {
-            defmt::intern!("BLE_GATTS_CFGS_BLE_GATTS_CFG_SERVICE_CHANGED")
-        }
-        raw::BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE => {
-            defmt::intern!("BLE_GATTS_CFGS_BLE_GATTS_CFG_ATTR_TAB_SIZE")
-        }
-        _ => defmt::intern!("(unknown)"),
+        Err(err) => panic!("sd_ble_cfg_set {:?} err {:?}", id, err),
     }
 }
 
@@ -302,7 +269,7 @@ impl Softdevice {
         let mut wanted_app_ram_base = app_ram_base;
         let ret = unsafe { raw::sd_ble_enable(&mut wanted_app_ram_base as _) };
         info!(
-            "softdevice RAM: {:u32} bytes",
+            "softdevice RAM: {:?} bytes",
             wanted_app_ram_base - 0x20000000
         );
         match RawError::convert(ret) {
@@ -311,14 +278,14 @@ impl Softdevice {
                 if wanted_app_ram_base <= app_ram_base {
                     panic!("selected configuration has too high RAM requirements.")
                 } else {
-                    panic!("too little RAM for softdevice. Change your app's RAM start address to {:u32}", wanted_app_ram_base);
+                    panic!("too little RAM for softdevice. Change your app's RAM start address to {:?}", wanted_app_ram_base);
                 }
             }
             Err(err) => panic!("sd_ble_enable err {:?}", err),
         }
 
         if wanted_app_ram_base < app_ram_base {
-            warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:u32}", wanted_app_ram_base);
+            warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:?}", wanted_app_ram_base);
         }
 
         #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]

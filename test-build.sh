@@ -8,10 +8,17 @@ set -euxo pipefail
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice-examples --features cortex-m-rtic --bins
 
 
-# build all softdevice+chip combinations (with all supported features enabled)
+# build with log/defmt combinations
 #================================================================================
 
 cd nrf-softdevice
+
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,defmt
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,log
+
+# build all softdevice+chip combinations (with all supported features enabled)
+#================================================================================
 
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52810,ble-peripheral,ble-gatt-client,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52811,ble-peripheral,ble-gatt-client,ble-gatt-server

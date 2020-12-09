@@ -3,16 +3,16 @@ use core::cell::UnsafeCell;
 
 use crate::ble::types::*;
 use crate::ble::*;
+use crate::fmt::{assert, *};
 use crate::raw;
-use crate::util::{assert, *};
 use crate::RawError;
 
 const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub(crate) struct OutOfConnsError;
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct DisconnectedError;
 
 // Highest ever the softdevice can support.
@@ -113,7 +113,7 @@ impl ConnectionState {
         #[cfg(feature = "ble-l2cap")]
         l2cap::portal(conn_handle).call(l2cap::PortalMessage::Disconnected);
 
-        trace!("conn {:u8}: disconnected", index);
+        trace!("conn {:?}: disconnected", index);
     }
 }
 
@@ -131,12 +131,12 @@ impl Drop for Connection {
 
             if state.refcount == 0 {
                 if state.conn_handle.is_some() {
-                    trace!("conn {:u8}: dropped, disconnecting", self.index);
+                    trace!("conn {:?}: dropped, disconnecting", self.index);
                     // We still leave conn_handle set, because the connection is
                     // not really disconnected until we get GAP_DISCONNECTED event.
                     unwrap!(state.disconnect());
                 } else {
-                    trace!("conn {:u8}: dropped, already disconnected", self.index);
+                    trace!("conn {:?}: dropped, already disconnected", self.index);
                 }
             }
         });
@@ -198,7 +198,7 @@ impl Connection {
             assert!(ibh.get().is_none(), "bug: conn_handle already has index");
             ibh.set(Some(index));
 
-            trace!("conn {:u8}: connected", index);
+            trace!("conn {:?}: connected", index);
             Self { index }
         })
     }

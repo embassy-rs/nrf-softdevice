@@ -10,8 +10,9 @@ use core::slice;
 #[cfg(feature = "ble-gatt-client")]
 use crate::ble::gatt_client;
 use crate::ble::{Address, Connection, ConnectionState};
+use crate::fmt::{assert, panic, *};
 use crate::raw;
-use crate::util::{assert, panic, *};
+use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{RawError, Softdevice};
 
 pub(crate) unsafe fn on_adv_report(ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
@@ -33,7 +34,7 @@ pub(crate) unsafe fn on_conn_param_update_request(
     trace!("central on_conn_param_update_request");
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConnectError {
     Timeout,
     NoAddresses,
@@ -154,7 +155,7 @@ impl Default for Config {
     }
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ScanError {
     Timeout,
     Raw(RawError),

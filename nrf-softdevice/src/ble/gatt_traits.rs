@@ -3,7 +3,7 @@ use core::mem;
 use core::slice;
 use heapless::{ArrayLength, Vec};
 
-use crate::util::{panic, *};
+use crate::fmt::{panic, *};
 
 pub enum FromGattError {
     InvalidLength,

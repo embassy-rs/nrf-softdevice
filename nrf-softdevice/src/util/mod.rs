@@ -12,10 +12,6 @@ mod on_drop;
 pub use on_drop::*;
 
 use crate::raw;
-pub use defmt::{
-    assert, assert_eq, assert_ne, debug, debug_assert, debug_assert_eq, debug_assert_ne, error,
-    info, intern, panic, trace, unimplemented, unreachable, unwrap, warn,
-};
 
 pub(crate) struct BoundedLifetime;
 

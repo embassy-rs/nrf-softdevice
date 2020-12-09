@@ -6,8 +6,8 @@
 //!
 //! You must NOT use any other crate to manage interrupts, such as `cortex-m`'s `NVIC`.
 
+use crate::fmt::{assert, unreachable, *};
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
-use crate::util::{assert, unreachable, *};
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 
 // Re-exports
@@ -43,7 +43,8 @@ const RESERVED_IRQS: [u32; 2] = [
     0,
 ];
 
-#[derive(defmt::Format, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[repr(u8)]
 pub enum Priority {
     Level0 = 0,
@@ -181,7 +182,7 @@ macro_rules! assert_app_accessible_irq {
     ($irq:ident) => {
         assert!(
             is_app_accessible_irq($irq),
-            "irq {:istr} is reserved for the softdevice",
+            "irq {:?} is reserved for the softdevice",
             irq_str($irq)
         );
     };
@@ -193,7 +194,7 @@ pub fn enable(irq: Interrupt) {
     let prio = get_priority(irq);
     assert!(
         is_app_accessible_priority(prio),
-        "irq {:istr} has priority {:?} which is reserved for the softdevice. Set another prority before enabling it.",
+        "irq {:?} has priority {:?} which is reserved for the softdevice. Set another prority before enabling it.",
         irq_str(irq),
         prio
     );
@@ -278,7 +279,13 @@ pub fn set_priority(irq: Interrupt, prio: Priority) {
     }
 }
 
-#[cfg(feature = "nrf52810")]
+// For non-defmt, Interrupt implements Debug, so we can just use it as-is
+#[cfg(not(feature = "defmt"))]
+fn irq_str(irq: Interrupt) -> Interrupt {
+    irq
+}
+
+#[cfg(all(feature = "defmt", feature = "nrf52810"))]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
@@ -311,7 +318,7 @@ fn irq_str(irq: Interrupt) -> defmt::Str {
     }
 }
 
-#[cfg(feature = "nrf52811")]
+#[cfg(all(feature = "defmt", feature = "nrf52811"))]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
@@ -344,7 +351,7 @@ fn irq_str(irq: Interrupt) -> defmt::Str {
     }
 }
 
-#[cfg(feature = "nrf52832")]
+#[cfg(all(feature = "defmt", feature = "nrf52832"))]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
@@ -387,7 +394,7 @@ fn irq_str(irq: Interrupt) -> defmt::Str {
     }
 }
 
-#[cfg(feature = "nrf52833")]
+#[cfg(all(feature = "defmt", feature = "nrf52833"))]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),
@@ -434,7 +441,7 @@ fn irq_str(irq: Interrupt) -> defmt::Str {
     }
 }
 
-#[cfg(feature = "nrf52840")]
+#[cfg(all(feature = "defmt", feature = "nrf52840"))]
 fn irq_str(irq: Interrupt) -> defmt::Str {
     match irq {
         POWER_CLOCK => defmt::intern!("POWER_CLOCK"),

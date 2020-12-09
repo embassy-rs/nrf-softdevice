@@ -128,6 +128,9 @@ pub use nrf_softdevice_s132 as raw;
 #[cfg(feature = "s140")]
 pub use nrf_softdevice_s140 as raw;
 
+// This mod MUST go first, so that the others see its macros.
+pub(crate) mod fmt;
+
 pub mod interrupt;
 
 mod events;

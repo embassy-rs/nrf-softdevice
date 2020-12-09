@@ -7,8 +7,9 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
+use crate::fmt::{panic, *};
 use crate::raw;
-use crate::util::{panic, *};
+use crate::util::{get_flexarray, get_union_field, BoundedLifetime, Portal};
 use crate::RawError;
 use crate::Softdevice;
 
@@ -39,7 +40,8 @@ pub trait Server: Sized {
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
-#[derive(Debug, defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Debug)]
 pub enum RegisterError {
     Raw(RawError),
 }
@@ -121,7 +123,7 @@ pub(crate) enum PortalMessage {
     Disconnected,
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RunError {
     Disconnected,
     Raw(RawError),
@@ -154,7 +156,7 @@ where
                     let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
                     let params = get_union_field(ble_evt, &gatts_evt.params.write);
                     let v = get_flexarray(ble_evt, &params.data, params.len as usize);
-                    trace!("gatts write handle={:u16} data={:[u8]}", params.handle, v);
+                    trace!("gatts write handle={:?} data={:?}", params.handle, v);
                     if params.offset != 0 {
                         panic!("gatt_server writes with nonzero offset are not yet supported");
                     }
@@ -170,7 +172,7 @@ where
         .await
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum GetValueError {
     Truncated,
     Raw(RawError),
@@ -200,7 +202,7 @@ pub fn get_value(_sd: &Softdevice, handle: u16, buf: &mut [u8]) -> Result<usize,
     Ok(value.len as _)
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetValueError {
     Truncated,
     Raw(RawError),
@@ -226,7 +228,7 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
     Ok(())
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum NotifyValueError {
     Disconnected,
     Raw(RawError),
@@ -262,7 +264,7 @@ pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), No
 }
 
 pub(crate) unsafe fn on_write(ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_write conn_handle={:u16}", gatts_evt.conn_handle);
+    trace!("gatts on_write conn_handle={:?}", gatts_evt.conn_handle);
     portal(gatts_evt.conn_handle).call(PortalMessage::Write(ble_evt));
 }
 
@@ -271,7 +273,7 @@ pub(crate) unsafe fn on_rw_authorize_request(
     gatts_evt: &raw::ble_gatts_evt_t,
 ) {
     trace!(
-        "gatts on_rw_authorize_request conn_handle={:u16}",
+        "gatts on_rw_authorize_request conn_handle={:?}",
         gatts_evt.conn_handle
     );
 }
@@ -281,14 +283,14 @@ pub(crate) unsafe fn on_sys_attr_missing(
     gatts_evt: &raw::ble_gatts_evt_t,
 ) {
     trace!(
-        "gatts on_sys_attr_missing conn_handle={:u16}",
+        "gatts on_sys_attr_missing conn_handle={:?}",
         gatts_evt.conn_handle
     );
     raw::sd_ble_gatts_sys_attr_set(gatts_evt.conn_handle, ptr::null(), 0, 0);
 }
 
 pub(crate) unsafe fn on_hvc(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_hvc conn_handle={:u16}", gatts_evt.conn_handle);
+    trace!("gatts on_hvc conn_handle={:?}", gatts_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_sc_confirm(
@@ -296,7 +298,7 @@ pub(crate) unsafe fn on_sc_confirm(
     gatts_evt: &raw::ble_gatts_evt_t,
 ) {
     trace!(
-        "gatts on_sc_confirm conn_handle={:u16}",
+        "gatts on_sc_confirm conn_handle={:?}",
         gatts_evt.conn_handle
     );
 }
@@ -313,7 +315,7 @@ pub(crate) unsafe fn on_exchange_mtu_request(
         .min(max_mtu)
         .max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
     trace!(
-        "att mtu exchange: peer wants mtu {:u16}, granting {:u16}",
+        "att mtu exchange: peer wants mtu {:?}, granting {:?}",
         want_mtu,
         mtu
     );
@@ -330,7 +332,7 @@ pub(crate) unsafe fn on_exchange_mtu_request(
 }
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_timeout conn_handle={:u16}", gatts_evt.conn_handle);
+    trace!("gatts on_timeout conn_handle={:?}", gatts_evt.conn_handle);
 }
 
 pub(crate) unsafe fn on_hvn_tx_complete(
@@ -338,7 +340,7 @@ pub(crate) unsafe fn on_hvn_tx_complete(
     gatts_evt: &raw::ble_gatts_evt_t,
 ) {
     trace!(
-        "gatts on_hvn_tx_complete conn_handle={:u16}",
+        "gatts on_hvn_tx_complete conn_handle={:?}",
         gatts_evt.conn_handle
     );
 }

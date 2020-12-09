@@ -3,8 +3,9 @@ use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::flash::Error as FlashError;
 
+use crate::fmt::{panic, *};
 use crate::raw;
-use crate::util::{panic, *};
+use crate::util::{DropBomb, Signal};
 use crate::{RawError, Softdevice};
 
 /// Singleton instance of the Flash softdevice functionality.

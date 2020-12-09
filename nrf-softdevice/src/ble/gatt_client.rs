@@ -5,8 +5,9 @@ use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
+use crate::fmt::{assert, assert_ne, panic, unreachable, *};
 use crate::raw;
-use crate::util::{assert, assert_ne, panic, unreachable, *};
+use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;
 
 /// Discovered characteristic
@@ -53,7 +54,8 @@ pub trait Client {
 
 #[rustfmt::skip]
 #[repr(u32)]
-#[derive(defmt::Format, IntoPrimitive, FromPrimitive)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(IntoPrimitive, FromPrimitive)]
 pub enum GattError {
     // This is not really an error, but IMO it's better to add it
     // anyway, just in case someone mistakenly converts BLE_GATT_STATUS_SUCCESS into GattError.
@@ -88,7 +90,7 @@ pub enum GattError {
 }
 
 /// Error type for [`discover`]
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DiscoverError {
     /// Connection is disconnected.
     Disconnected,
@@ -156,7 +158,7 @@ pub(crate) async fn discover_service(
                     1 => Ok(v[0]),
                     n => {
                         warn!(
-                            "Found {:u16} services with the same UUID, using the first one",
+                            "Found {:?} services with the same UUID, using the first one",
                             params.count
                         );
                         Ok(v[0])
@@ -174,9 +176,9 @@ pub(crate) unsafe fn on_prim_srvc_disc_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_prim_srvc_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_prim_srvc_disc_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
     portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverService(ble_evt))
 }
@@ -226,9 +228,9 @@ pub(crate) unsafe fn on_char_disc_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_char_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_char_disc_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverCharacteristics(ble_evt))
@@ -279,9 +281,9 @@ pub(crate) unsafe fn on_desc_disc_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_desc_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_desc_disc_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverDescriptors(ble_evt))
@@ -370,7 +372,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     Ok(client)
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ReadError {
     Disconnected,
     Truncated,
@@ -430,15 +432,15 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 
 pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
     trace!(
-        "gattc on_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_read_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     portal(gattc_evt.conn_handle).call(PortalMessage::Read(ble_evt))
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WriteError {
     Disconnected,
     Gatt(GattError),
@@ -532,7 +534,7 @@ pub async fn write_without_response(
     }
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TryWriteError {
     Disconnected,
     BufferFull,
@@ -588,9 +590,9 @@ pub(crate) unsafe fn on_write_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_write_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_write_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     portal(gattc_evt.conn_handle).call(PortalMessage::Write(ble_evt))
@@ -611,9 +613,9 @@ pub(crate) unsafe fn on_rel_disc_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_rel_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_rel_disc_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
@@ -622,9 +624,9 @@ pub(crate) unsafe fn on_attr_info_disc_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_attr_info_disc_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_attr_info_disc_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
@@ -633,9 +635,9 @@ pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_char_val_by_uuid_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_char_val_by_uuid_read_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
@@ -644,17 +646,17 @@ pub(crate) unsafe fn on_char_vals_read_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_char_vals_read_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_char_vals_read_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
 pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
     trace!(
-        "gattc on_hvx conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_hvx conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
@@ -663,9 +665,9 @@ pub(crate) unsafe fn on_exchange_mtu_rsp(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_exchange_mtu_rsp conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_exchange_mtu_rsp conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     let conn_handle = gattc_evt.conn_handle;
@@ -674,9 +676,9 @@ pub(crate) unsafe fn on_exchange_mtu_rsp(
 
 pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
     trace!(
-        "gattc on_timeout conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_timeout conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 }
 
@@ -685,15 +687,15 @@ pub(crate) unsafe fn on_write_cmd_tx_complete(
     gattc_evt: &raw::ble_gattc_evt_t,
 ) {
     trace!(
-        "gattc on_write_cmd_tx_complete conn_handle={:u16} gatt_status={:u16}",
+        "gattc on_write_cmd_tx_complete conn_handle={:?} gatt_status={:?}",
         gattc_evt.conn_handle,
-        gattc_evt.gatt_status,
+        gattc_evt.gatt_status
     );
 
     portal(gattc_evt.conn_handle).call(PortalMessage::WriteTxComplete(ble_evt))
 }
 
-#[derive(defmt::Format)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum MtuExchangeError {
     /// Connection is disconnected.
     Disconnected,
@@ -726,14 +728,14 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
 
     if current_mtu >= mtu {
         info!(
-            "att mtu exchange: want mtu {:u16}, already got {:u16}. Doing nothing.",
+            "att mtu exchange: want mtu {:?}, already got {:?}. Doing nothing.",
             mtu, current_mtu
         );
         return Ok(());
     }
 
     info!(
-        "att mtu exchange: want mtu {:u16}, got only {:u16}, doing exchange...",
+        "att mtu exchange: want mtu {:?}, got only {:?}, doing exchange...",
         mtu, current_mtu
     );
 
@@ -753,7 +755,7 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
                 };
                 let params = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
                 let mtu = params.server_rx_mtu;
-                info!("att mtu exchange: got mtu {:u16}", mtu);
+                info!("att mtu exchange: got mtu {:?}", mtu);
                 conn.with_state(|state| state.att_mtu = mtu);
 
                 Ok(())
