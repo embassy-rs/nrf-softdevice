@@ -354,9 +354,11 @@ impl<P: Packet> Channel<P> {
 
         let ret = unsafe { raw::sd_ble_l2cap_ch_tx(conn_handle, self.cid, &data) };
         if let Err(err) = RawError::convert(ret) {
-            // todo handle error
-            // probably free the packet because the SD didn't take ownership of it
-            panic!("sd_ble_l2cap_ch_tx err {:?}", err);
+            warn!("sd_ble_l2cap_ch_tx err {:?}", err);
+            // The SD didn't take ownership of the buffer, so it's on us to free it.
+            // Reconstruct the P and let it get dropped.
+            unsafe { P::from_raw_parts(ptr, len) };
+            return Err(err.into());
         }
 
         Ok(())
@@ -373,7 +375,11 @@ impl<P: Packet> Channel<P> {
 
         let ret = unsafe { raw::sd_ble_l2cap_ch_rx(conn_handle, self.cid, &data) };
         if let Err(err) = RawError::convert(ret) {
-            panic!("sd_ble_l2cap_ch_rx err {:?}", err);
+            warn!("sd_ble_l2cap_ch_rx err {:?}", err);
+            // The SD didn't take ownership of the buffer, so it's on us to free it.
+            // Reconstruct the P and let it get dropped.
+            unsafe { P::from_raw_parts(ptr, 0) };
+            return Err(err.into());
         }
 
         portal(conn_handle)
