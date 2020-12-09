@@ -35,7 +35,7 @@ defmt = { version = "0.1.3", optional = true }
 log = { version = "0.4.11", optional = true }
 
 num_enum = { version = "0.5.1", default-features = false }
-embassy = { version = "0.1.0", git = "https://github.com/akiles/embassy" }
+embassy = { version = "0.1.0" }
 cortex-m = "0.6.4"
 cortex-m-rt = "0.6.13"
 heapless = "0.5.6"
