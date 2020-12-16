@@ -254,7 +254,7 @@ typedef struct
  * @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided
  * @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given.
 */
-uint32_t sd_mbr_command(sd_mbr_command_t* param);
+SVCALL(SD_MBR_COMMAND, uint32_t, sd_mbr_command(sd_mbr_command_t* param));
 
 /** @} */
 

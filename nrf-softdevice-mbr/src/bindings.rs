@@ -596,3 +596,39 @@ fn bindgen_test_layout_sd_mbr_command_t() {
     );
 }
 
+    #[doc = "@brief Issue Master Boot Record commands"]
+    #[doc = ""]
+    #[doc = " Commands used when updating a SoftDevice and bootloader."]
+    #[doc = ""]
+    #[doc = " The @ref SD_MBR_COMMAND_COPY_BL and @ref SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET requires"]
+    #[doc = " parameters to be retained by the MBR when resetting the IC. This is done in a separate flash"]
+    #[doc = " page. The location of the flash page should be provided by the application in either"]
+    #[doc = " @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR. If both addresses are set, the MBR"]
+    #[doc = " will prioritize @ref MBR_PARAM_PAGE_ADDR. This page will be cleared by the MBR and is used to"]
+    #[doc = " store the command before reset. When an address is specified, the page it refers to must not be"]
+    #[doc = " used by the application. If no address is provided by the application, i.e. both"]
+    #[doc = " @ref MBR_PARAM_PAGE_ADDR and @ref MBR_UICR_PARAM_PAGE_ADDR is 0xFFFFFFFF, MBR commands which use"]
+    #[doc = " flash will be unavailable and return @ref NRF_ERROR_NO_MEM."]
+    #[doc = ""]
+    #[doc = " @param[in]  param Pointer to a struct describing the command."]
+    #[doc = ""]
+    #[doc = " @note For a complete set of return values, see ::sd_mbr_command_copy_sd_t,"]
+    #[doc = "       ::sd_mbr_command_copy_bl_t, ::sd_mbr_command_compare_t,"]
+    #[doc = "       ::sd_mbr_command_vector_table_base_set_t, ::sd_mbr_command_irq_forward_address_set_t"]
+    #[doc = ""]
+    #[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided"]
+    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given."]
+    
+#[inline(always)]
+pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
+    let ret: u32;
+    asm!("svc 24",
+        inout("r0") to_asm(param) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
