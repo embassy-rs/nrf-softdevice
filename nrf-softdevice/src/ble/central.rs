@@ -7,8 +7,7 @@ use core::mem;
 use core::ptr;
 use core::slice;
 
-#[cfg(feature = "ble-gatt-client")]
-use crate::ble::gatt_client;
+use crate::ble::types::*;
 use crate::ble::{Address, Connection, ConnectionState};
 use crate::fmt::{assert, panic, *};
 use crate::raw;
@@ -58,6 +57,19 @@ pub async fn connect(
     if addresses.len() == 0 {
         return Err(ConnectError::NoAddresses);
     }
+
+    // Set tx power
+    let ret = unsafe {
+        raw::sd_ble_gap_tx_power_set(
+            raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
+            0,
+            config.tx_power as i8,
+        )
+    };
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gap_tx_power_set err {:?}", err);
+        err
+    })?;
 
     // in units of 625us
     let scan_interval: u32 = 2732;
@@ -127,6 +139,8 @@ pub async fn connect(
 
 #[derive(Copy, Clone)]
 pub struct Config {
+    pub tx_power: TxPower,
+
     /// Requested ATT_MTU size for the next connection that is established.
     #[cfg(feature = "ble-gatt-client")]
     pub att_mtu: Option<u16>,
@@ -141,6 +155,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            tx_power: TxPower::ZerodBm,
             #[cfg(feature = "ble-gatt-client")]
             att_mtu: None,
             tx_phys: raw::BLE_GAP_PHY_AUTO as _,
@@ -182,6 +197,19 @@ pub async fn scan<'a, F, R>(
 where
     F: for<'b> FnMut(&'b raw::ble_gap_evt_adv_report_t) -> Option<R>,
 {
+    // Set tx power
+    let ret = unsafe {
+        raw::sd_ble_gap_tx_power_set(
+            raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
+            0,
+            config.tx_power as i8,
+        )
+    };
+    RawError::convert(ret).map_err(|err| {
+        warn!("sd_ble_gap_tx_power_set err {:?}", err);
+        err
+    })?;
+
     // in units of 625us
     let scan_interval: u32 = 2732;
     let scan_window: u32 = 500;
@@ -261,10 +289,14 @@ where
 #[derive(Copy, Clone)]
 pub struct ScanConfig<'a> {
     pub whitelist: Option<&'a [Address]>,
+    pub tx_power: TxPower,
 }
 
 impl<'a> Default for ScanConfig<'a> {
     fn default() -> Self {
-        Self { whitelist: None }
+        Self {
+            whitelist: None,
+            tx_power: TxPower::ZerodBm,
+        }
     }
 }
