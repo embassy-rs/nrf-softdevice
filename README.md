@@ -41,9 +41,24 @@ The following nRF chips are supported
 
 Some softdevices support only some chips, check Nordic's documentation for details.
 
+## Setting up your build environment
+
+This project uses new toolchain features, often only to be found in nightly. Please ensure that your toolchains are up to date:
+
+```
+rustup update
+```
+
+You will also need [`probe-run`](https://ferrous-systems.com/blog/probe-run/) - a utility to enable `cargo run` to run embedded applications on a device:
+
+```
+cargo install probe-run
+```
+
 ## Running examples
 
-Instructions for S140 and nrf52840-dk. You may have to adjust accordingly.
+The following instructions are for the S140 and nRF52840-DK. You may have to adjust accordingly and can do so by modifying the `cargo.toml` of the examples folder - 
+please check out the `nrf-softdevice` and `nrf-softdevice-s140` dependency declarations.
 
 Flashing the softdevice is required. It is NOT part of the built binary. You only need to do it once at the beginning, or after doing full chip erases.
 
@@ -51,9 +66,9 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 - Unzip
 - `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
 
-To run an example, simply use `cargo run`:
+To run an example, simply use `cargo run` from the `examples` folder:
 
-- `cargo run --bin ble_bas_peripheral`
+- `cd examples && cargo run --bin ble_bas_peripheral`
 
 ## Low-level raw bindings
 

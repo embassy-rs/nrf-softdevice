@@ -10,5 +10,6 @@
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/target/**": true,
-  }
+  },
+  "cmake.configureOnOpen": false
 }
