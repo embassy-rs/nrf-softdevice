@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2012 - 2019, Nordic Semiconductor ASA
  * All rights reserved.
@@ -1630,12 +1629,11 @@ fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
     );
 }
 
-    #[doc = "@brief Initialize a mutex."]
-    #[doc = ""]
-    #[doc = " @param[in] p_mutex Pointer to the mutex to initialize."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Initialize a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to initialize."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
@@ -1649,14 +1647,12 @@ pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Attempt to acquire a mutex."]
-    #[doc = ""]
-    #[doc = " @param[in] p_mutex Pointer to the mutex to acquire."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The mutex was successfully acquired."]
-    #[doc = " @retval ::NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN The mutex could not be acquired."]
-    
+#[doc = "@brief Attempt to acquire a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to acquire."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The mutex was successfully acquired."]
+#[doc = " @retval ::NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN The mutex could not be acquired."]
 #[inline(always)]
 pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
@@ -1670,13 +1666,11 @@ pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Release a mutex."]
-    #[doc = ""]
-    #[doc = " @param[in] p_mutex Pointer to the mutex to release."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Release a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to release."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
@@ -1690,13 +1684,11 @@ pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Query the capacity of the application random pool."]
-    #[doc = ""]
-    #[doc = " @param[out] p_pool_capacity The capacity of the pool."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Query the capacity of the application random pool."]
+#[doc = ""]
+#[doc = " @param[out] p_pool_capacity The capacity of the pool."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) -> u32 {
     let ret: u32;
@@ -1710,13 +1702,11 @@ pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) ->
     ret
 }
 
-
-    #[doc = "@brief Get number of random bytes available to the application."]
-    #[doc = ""]
-    #[doc = " @param[out] p_bytes_available The number of bytes currently available in the pool."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Get number of random bytes available to the application."]
+#[doc = ""]
+#[doc = " @param[out] p_bytes_available The number of bytes currently available in the pool."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8) -> u32 {
     let ret: u32;
@@ -1730,15 +1720,13 @@ pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8
     ret
 }
 
-
-    #[doc = "@brief Get random bytes from the application pool."]
-    #[doc = ""]
-    #[doc = " @param[out]  p_buff  Pointer to unit8_t buffer for storing the bytes."]
-    #[doc = " @param[in]   length  Number of bytes to take from pool and place in p_buff."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The requested bytes were written to p_buff."]
-    #[doc = " @retval ::NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES No bytes were written to the buffer, because there were not enough bytes available."]
-    
+#[doc = "@brief Get random bytes from the application pool."]
+#[doc = ""]
+#[doc = " @param[out]  p_buff  Pointer to unit8_t buffer for storing the bytes."]
+#[doc = " @param[in]   length  Number of bytes to take from pool and place in p_buff."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The requested bytes were written to p_buff."]
+#[doc = " @retval ::NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES No bytes were written to the buffer, because there were not enough bytes available."]
 #[inline(always)]
 pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32 {
     let ret: u32;
@@ -1752,13 +1740,11 @@ pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32
     ret
 }
 
-
-    #[doc = "@brief Gets the reset reason register."]
-    #[doc = ""]
-    #[doc = " @param[out]  p_reset_reason  Contents of the NRF_POWER->RESETREAS register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Gets the reset reason register."]
+#[doc = ""]
+#[doc = " @param[out]  p_reset_reason  Contents of the NRF_POWER->RESETREAS register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
     let ret: u32;
@@ -1772,13 +1758,11 @@ pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Clears the bits of the reset reason register."]
-    #[doc = ""]
-    #[doc = " @param[in] reset_reason_clr_msk Contains the bits to clear from the reset reason register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Clears the bits of the reset reason register."]
+#[doc = ""]
+#[doc = " @param[in] reset_reason_clr_msk Contains the bits to clear from the reset reason register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
     let ret: u32;
@@ -1792,14 +1776,12 @@ pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Sets the power mode when in CPU sleep."]
-    #[doc = ""]
-    #[doc = " @param[in] power_mode The power mode to use when in CPU sleep, see @ref NRF_POWER_MODES. @sa sd_app_evt_wait"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The power mode was set."]
-    #[doc = " @retval ::NRF_ERROR_SOC_POWER_MODE_UNKNOWN The power mode was unknown."]
-    
+#[doc = "@brief Sets the power mode when in CPU sleep."]
+#[doc = ""]
+#[doc = " @param[in] power_mode The power mode to use when in CPU sleep, see @ref NRF_POWER_MODES. @sa sd_app_evt_wait"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The power mode was set."]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_MODE_UNKNOWN The power mode was unknown."]
 #[inline(always)]
 pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
     let ret: u32;
@@ -1813,11 +1795,9 @@ pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Puts the chip in System OFF mode."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN"]
-    
+#[doc = "@brief Puts the chip in System OFF mode."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN"]
 #[inline(always)]
 pub unsafe fn sd_power_system_off() -> u32 {
     let ret: u32;
@@ -1831,16 +1811,14 @@ pub unsafe fn sd_power_system_off() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Enables or disables the power-fail comparator."]
-    #[doc = ""]
-    #[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_FAILURE_WARNING) when the power failure warning occurs."]
-    #[doc = " The event can be retrieved with sd_evt_get();"]
-    #[doc = ""]
-    #[doc = " @param[in] pof_enable    True if the power-fail comparator should be enabled, false if it should be disabled."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Enables or disables the power-fail comparator."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_FAILURE_WARNING) when the power failure warning occurs."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] pof_enable    True if the power-fail comparator should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
     let ret: u32;
@@ -1854,18 +1832,16 @@ pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Enables or disables the USB power ready event."]
-    #[doc = ""]
-    #[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_POWER_READY) when a USB 3.3 V supply is ready."]
-    #[doc = " The event can be retrieved with sd_evt_get();"]
-    #[doc = ""]
-    #[doc = " @param[in] usbpwrrdy_enable    True if the power ready event should be enabled, false if it should be disabled."]
-    #[doc = ""]
-    #[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Enables or disables the USB power ready event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_POWER_READY) when a USB 3.3 V supply is ready."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbpwrrdy_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_usbpwrrdy_enable(usbpwrrdy_enable: u8) -> u32 {
     let ret: u32;
@@ -1879,18 +1855,16 @@ pub unsafe fn sd_power_usbpwrrdy_enable(usbpwrrdy_enable: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Enables or disables the power USB-detected event."]
-    #[doc = ""]
-    #[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_DETECTED) when a voltage supply is detected on VBUS."]
-    #[doc = " The event can be retrieved with sd_evt_get();"]
-    #[doc = ""]
-    #[doc = " @param[in] usbdetected_enable    True if the power ready event should be enabled, false if it should be disabled."]
-    #[doc = ""]
-    #[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Enables or disables the power USB-detected event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_DETECTED) when a voltage supply is detected on VBUS."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbdetected_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_usbdetected_enable(usbdetected_enable: u8) -> u32 {
     let ret: u32;
@@ -1904,18 +1878,16 @@ pub unsafe fn sd_power_usbdetected_enable(usbdetected_enable: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Enables or disables the power USB-removed event."]
-    #[doc = ""]
-    #[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_REMOVED) when a voltage supply is removed from VBUS."]
-    #[doc = " The event can be retrieved with sd_evt_get();"]
-    #[doc = ""]
-    #[doc = " @param[in] usbremoved_enable    True if the power ready event should be enabled, false if it should be disabled."]
-    #[doc = ""]
-    #[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Enables or disables the power USB-removed event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_REMOVED) when a voltage supply is removed from VBUS."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbremoved_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_usbremoved_enable(usbremoved_enable: u8) -> u32 {
     let ret: u32;
@@ -1929,15 +1901,13 @@ pub unsafe fn sd_power_usbremoved_enable(usbremoved_enable: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get USB supply status register content."]
-    #[doc = ""]
-    #[doc = " @param[out] usbregstatus    The content of USBREGSTATUS register."]
-    #[doc = ""]
-    #[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Get USB supply status register content."]
+#[doc = ""]
+#[doc = " @param[out] usbregstatus    The content of USBREGSTATUS register."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_usbregstatus_get(usbregstatus: *mut u32) -> u32 {
     let ret: u32;
@@ -1951,15 +1921,13 @@ pub unsafe fn sd_power_usbregstatus_get(usbregstatus: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Sets the power failure comparator threshold value."]
-    #[doc = ""]
-    #[doc = ""]
-    #[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDS."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
-    #[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
-    
+#[doc = "@brief Sets the power failure comparator threshold value."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDS."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
 #[inline(always)]
 pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
     let ret: u32;
@@ -1973,14 +1941,12 @@ pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Writes the NRF_POWER->RAM[index].POWERSET register."]
-    #[doc = ""]
-    #[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERSET register to write to."]
-    #[doc = " @param[in] ram_powerset Contains the word to write to the NRF_POWER->RAM[index].POWERSET register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERSET register."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERSET register to write to."]
+#[doc = " @param[in] ram_powerset Contains the word to write to the NRF_POWER->RAM[index].POWERSET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
     let ret: u32;
@@ -1994,14 +1960,12 @@ pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Writes the NRF_POWER->RAM[index].POWERCLR register."]
-    #[doc = ""]
-    #[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERCLR register to write to."]
-    #[doc = " @param[in] ram_powerclr Contains the word to write to the NRF_POWER->RAM[index].POWERCLR register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERCLR register."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERCLR register to write to."]
+#[doc = " @param[in] ram_powerclr Contains the word to write to the NRF_POWER->RAM[index].POWERCLR register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
     let ret: u32;
@@ -2015,14 +1979,12 @@ pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get contents of NRF_POWER->RAM[index].POWER register, indicates power status of RAM[index] blocks."]
-    #[doc = ""]
-    #[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWER register to read from."]
-    #[doc = " @param[out] p_ram_power Content of NRF_POWER->RAM[index].POWER register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Get contents of NRF_POWER->RAM[index].POWER register, indicates power status of RAM[index] blocks."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWER register to read from."]
+#[doc = " @param[out] p_ram_power Content of NRF_POWER->RAM[index].POWER register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
     let ret: u32;
@@ -2036,14 +1998,12 @@ pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Set bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-    #[doc = ""]
-    #[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-    #[doc = " @param[in] gpregret_msk Bits to be set in the GPREGRET register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Set bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[in] gpregret_msk Bits to be set in the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 {
     let ret: u32;
@@ -2057,14 +2017,12 @@ pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 
     ret
 }
 
-
-    #[doc = "@brief Clear bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-    #[doc = ""]
-    #[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-    #[doc = " @param[in] gpregret_msk Bits to be clear in the GPREGRET register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Clear bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[in] gpregret_msk Bits to be clear in the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 {
     let ret: u32;
@@ -2078,14 +2036,12 @@ pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 
     ret
 }
 
-
-    #[doc = "@brief Get contents of the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-    #[doc = ""]
-    #[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-    #[doc = " @param[out] p_gpregret Contents of the GPREGRET register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Get contents of the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[out] p_gpregret Contents of the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u32 {
     let ret: u32;
@@ -2099,14 +2055,12 @@ pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u
     ret
 }
 
-
-    #[doc = "@brief Enable or disable the DC/DC regulator."]
-    #[doc = ""]
-    #[doc = " @param[in] dcdc_mode The mode of the DCDC, see @ref NRF_POWER_DCDC_MODES."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM The DCDC mode is invalid."]
-    
+#[doc = "@brief Enable or disable the DC/DC regulator."]
+#[doc = ""]
+#[doc = " @param[in] dcdc_mode The mode of the DCDC, see @ref NRF_POWER_DCDC_MODES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The DCDC mode is invalid."]
 #[inline(always)]
 pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
     let ret: u32;
@@ -2120,17 +2074,15 @@ pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Request the high frequency crystal oscillator."]
-    #[doc = ""]
-    #[doc = " Will start the high frequency crystal oscillator, the startup time of the crystal varies"]
-    #[doc = " and the ::sd_clock_hfclk_is_running function can be polled to check if it has started."]
-    #[doc = ""]
-    #[doc = " @see sd_clock_hfclk_is_running"]
-    #[doc = " @see sd_clock_hfclk_release"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Request the high frequency crystal oscillator."]
+#[doc = ""]
+#[doc = " Will start the high frequency crystal oscillator, the startup time of the crystal varies"]
+#[doc = " and the ::sd_clock_hfclk_is_running function can be polled to check if it has started."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_is_running"]
+#[doc = " @see sd_clock_hfclk_release"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_request() -> u32 {
     let ret: u32;
@@ -2144,16 +2096,14 @@ pub unsafe fn sd_clock_hfclk_request() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Releases the high frequency crystal oscillator."]
-    #[doc = ""]
-    #[doc = " Will stop the high frequency crystal oscillator, this happens immediately."]
-    #[doc = ""]
-    #[doc = " @see sd_clock_hfclk_is_running"]
-    #[doc = " @see sd_clock_hfclk_request"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Releases the high frequency crystal oscillator."]
+#[doc = ""]
+#[doc = " Will stop the high frequency crystal oscillator, this happens immediately."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_is_running"]
+#[doc = " @see sd_clock_hfclk_request"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_release() -> u32 {
     let ret: u32;
@@ -2167,16 +2117,14 @@ pub unsafe fn sd_clock_hfclk_release() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Checks if the high frequency crystal oscillator is running."]
-    #[doc = ""]
-    #[doc = " @see sd_clock_hfclk_request"]
-    #[doc = " @see sd_clock_hfclk_release"]
-    #[doc = ""]
-    #[doc = " @param[out] p_is_running 1 if the external crystal oscillator is running, 0 if not."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Checks if the high frequency crystal oscillator is running."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_request"]
+#[doc = " @see sd_clock_hfclk_release"]
+#[doc = ""]
+#[doc = " @param[out] p_is_running 1 if the external crystal oscillator is running, 0 if not."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
     let ret: u32;
@@ -2190,33 +2138,31 @@ pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Waits for an application event."]
-    #[doc = ""]
-    #[doc = " An application event is either an application interrupt or a pended interrupt when the interrupt"]
-    #[doc = " is disabled."]
-    #[doc = ""]
-    #[doc = " When the application waits for an application event by calling this function, an interrupt that"]
-    #[doc = " is enabled will be taken immediately on pending since this function will wait in thread mode,"]
-    #[doc = " then the execution will return in the application's main thread."]
-    #[doc = ""]
-    #[doc = " In order to wake up from disabled interrupts, the SEVONPEND flag has to be set in the Cortex-M"]
-    #[doc = " MCU's System Control Register (SCR), CMSIS_SCB. In that case, when a disabled interrupt gets"]
-    #[doc = " pended, this function will return to the application's main thread."]
-    #[doc = ""]
-    #[doc = " @note The application must ensure that the pended flag is cleared using ::sd_nvic_ClearPendingIRQ"]
-    #[doc = "       in order to sleep using this function. This is only necessary for disabled interrupts, as"]
-    #[doc = "       the interrupt handler will clear the pending flag automatically for enabled interrupts."]
-    #[doc = ""]
-    #[doc = " @note If an application interrupt has happened since the last time sd_app_evt_wait was"]
-    #[doc = "       called this function will return immediately and not go to sleep. This is to avoid race"]
-    #[doc = "       conditions that can occur when a flag is updated in the interrupt handler and processed"]
-    #[doc = "       in the main loop."]
-    #[doc = ""]
-    #[doc = " @post An application interrupt has happened or a interrupt pending flag is set."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Waits for an application event."]
+#[doc = ""]
+#[doc = " An application event is either an application interrupt or a pended interrupt when the interrupt"]
+#[doc = " is disabled."]
+#[doc = ""]
+#[doc = " When the application waits for an application event by calling this function, an interrupt that"]
+#[doc = " is enabled will be taken immediately on pending since this function will wait in thread mode,"]
+#[doc = " then the execution will return in the application's main thread."]
+#[doc = ""]
+#[doc = " In order to wake up from disabled interrupts, the SEVONPEND flag has to be set in the Cortex-M"]
+#[doc = " MCU's System Control Register (SCR), CMSIS_SCB. In that case, when a disabled interrupt gets"]
+#[doc = " pended, this function will return to the application's main thread."]
+#[doc = ""]
+#[doc = " @note The application must ensure that the pended flag is cleared using ::sd_nvic_ClearPendingIRQ"]
+#[doc = "       in order to sleep using this function. This is only necessary for disabled interrupts, as"]
+#[doc = "       the interrupt handler will clear the pending flag automatically for enabled interrupts."]
+#[doc = ""]
+#[doc = " @note If an application interrupt has happened since the last time sd_app_evt_wait was"]
+#[doc = "       called this function will return immediately and not go to sleep. This is to avoid race"]
+#[doc = "       conditions that can occur when a flag is updated in the interrupt handler and processed"]
+#[doc = "       in the main loop."]
+#[doc = ""]
+#[doc = " @post An application interrupt has happened or a interrupt pending flag is set."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_app_evt_wait() -> u32 {
     let ret: u32;
@@ -2230,13 +2176,11 @@ pub unsafe fn sd_app_evt_wait() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get PPI channel enable register contents."]
-    #[doc = ""]
-    #[doc = " @param[out] p_channel_enable The contents of the PPI CHEN register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Get PPI channel enable register contents."]
+#[doc = ""]
+#[doc = " @param[out] p_channel_enable The contents of the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
     let ret: u32;
@@ -2250,13 +2194,11 @@ pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Set PPI channel enable register."]
-    #[doc = ""]
-    #[doc = " @param[in] channel_enable_set_msk Mask containing the bits to set in the PPI CHEN register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Set PPI channel enable register."]
+#[doc = ""]
+#[doc = " @param[in] channel_enable_set_msk Mask containing the bits to set in the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
     let ret: u32;
@@ -2270,13 +2212,11 @@ pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Clear PPI channel enable register."]
-    #[doc = ""]
-    #[doc = " @param[in] channel_enable_clr_msk Mask containing the bits to clear in the PPI CHEN register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Clear PPI channel enable register."]
+#[doc = ""]
+#[doc = " @param[in] channel_enable_clr_msk Mask containing the bits to clear in the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_clr(channel_enable_clr_msk: u32) -> u32 {
     let ret: u32;
@@ -2290,22 +2230,20 @@ pub unsafe fn sd_ppi_channel_enable_clr(channel_enable_clr_msk: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Assign endpoints to a PPI channel."]
-    #[doc = ""]
-    #[doc = " @param[in] channel_num Number of the PPI channel to assign."]
-    #[doc = " @param[in] evt_endpoint Event endpoint of the PPI channel."]
-    #[doc = " @param[in] task_endpoint Task endpoint of the PPI channel."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_CHANNEL The channel number is invalid."]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Assign endpoints to a PPI channel."]
+#[doc = ""]
+#[doc = " @param[in] channel_num Number of the PPI channel to assign."]
+#[doc = " @param[in] evt_endpoint Event endpoint of the PPI channel."]
+#[doc = " @param[in] task_endpoint Task endpoint of the PPI channel."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_CHANNEL The channel number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_assign(
-        channel_num: u8,
-        evt_endpoint: *const self::c_void,
-        task_endpoint: *const self::c_void,
-    ) -> u32 {
+    channel_num: u8,
+    evt_endpoint: *const self::c_void,
+    task_endpoint: *const self::c_void,
+) -> u32 {
     let ret: u32;
     asm!("svc 35",
         inout("r0") to_asm(channel_num) => ret,
@@ -2317,14 +2255,12 @@ pub unsafe fn sd_ppi_channel_assign(
     ret
 }
 
-
-    #[doc = "@brief Task to enable a channel group."]
-    #[doc = ""]
-    #[doc = " @param[in] group_num Number of the channel group."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid"]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Task to enable a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the channel group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid"]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
     let ret: u32;
@@ -2338,14 +2274,12 @@ pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Task to disable a channel group."]
-    #[doc = ""]
-    #[doc = " @param[in] group_num Number of the PPI group."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Task to disable a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the PPI group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
     let ret: u32;
@@ -2359,15 +2293,13 @@ pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Assign PPI channels to a channel group."]
-    #[doc = ""]
-    #[doc = " @param[in] group_num Number of the channel group."]
-    #[doc = " @param[in] channel_msk Mask of the channels to assign to the group."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Assign PPI channels to a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the channel group."]
+#[doc = " @param[in] channel_msk Mask of the channels to assign to the group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
     let ret: u32;
@@ -2381,15 +2313,13 @@ pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Gets the PPI channels of a channel group."]
-    #[doc = ""]
-    #[doc = " @param[in]   group_num Number of the channel group."]
-    #[doc = " @param[out]  p_channel_msk Mask of the channels assigned to the group."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Gets the PPI channels of a channel group."]
+#[doc = ""]
+#[doc = " @param[in]   group_num Number of the channel group."]
+#[doc = " @param[out]  p_channel_msk Mask of the channels assigned to the group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
     let ret: u32;
@@ -2403,36 +2333,34 @@ pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Configures the Radio Notification signal."]
-    #[doc = ""]
-    #[doc = " @note"]
-    #[doc = "      - The notification signal latency depends on the interrupt priority settings of SWI used"]
-    #[doc = "        for notification signal."]
-    #[doc = "      - To ensure that the radio notification signal behaves in a consistent way, the radio"]
-    #[doc = "        notifications must be configured when there is no protocol stack or other SoftDevice"]
-    #[doc = "        activity in progress. It is recommended that the radio notification signal is"]
-    #[doc = "        configured directly after the SoftDevice has been enabled."]
-    #[doc = "      - In the period between the ACTIVE signal and the start of the Radio Event, the SoftDevice"]
-    #[doc = "        will interrupt the application to do Radio Event preparation."]
-    #[doc = "      - Using the Radio Notification feature may limit the bandwidth, as the SoftDevice may have"]
-    #[doc = "        to shorten the connection events to have time for the Radio Notification signals."]
-    #[doc = ""]
-    #[doc = " @param[in]  type      Type of notification signal, see @ref NRF_RADIO_NOTIFICATION_TYPES."]
-    #[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE shall be used to turn off radio"]
-    #[doc = "                       notification. Using @ref NRF_RADIO_NOTIFICATION_DISTANCE_NONE is"]
-    #[doc = "                       recommended (but not required) to be used with"]
-    #[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE."]
-    #[doc = ""]
-    #[doc = " @param[in]  distance  Distance between the notification signal and start of radio activity, see @ref NRF_RADIO_NOTIFICATION_DISTANCES."]
-    #[doc = "                       This parameter is ignored when @ref NRF_RADIO_NOTIFICATION_TYPE_NONE or"]
-    #[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE is used."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM The group number is invalid."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE A protocol stack or other SoftDevice is running. Stop all"]
-    #[doc = "                                   running activities and retry."]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Configures the Radio Notification signal."]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - The notification signal latency depends on the interrupt priority settings of SWI used"]
+#[doc = "        for notification signal."]
+#[doc = "      - To ensure that the radio notification signal behaves in a consistent way, the radio"]
+#[doc = "        notifications must be configured when there is no protocol stack or other SoftDevice"]
+#[doc = "        activity in progress. It is recommended that the radio notification signal is"]
+#[doc = "        configured directly after the SoftDevice has been enabled."]
+#[doc = "      - In the period between the ACTIVE signal and the start of the Radio Event, the SoftDevice"]
+#[doc = "        will interrupt the application to do Radio Event preparation."]
+#[doc = "      - Using the Radio Notification feature may limit the bandwidth, as the SoftDevice may have"]
+#[doc = "        to shorten the connection events to have time for the Radio Notification signals."]
+#[doc = ""]
+#[doc = " @param[in]  type      Type of notification signal, see @ref NRF_RADIO_NOTIFICATION_TYPES."]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE shall be used to turn off radio"]
+#[doc = "                       notification. Using @ref NRF_RADIO_NOTIFICATION_DISTANCE_NONE is"]
+#[doc = "                       recommended (but not required) to be used with"]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE."]
+#[doc = ""]
+#[doc = " @param[in]  distance  Distance between the notification signal and start of radio activity, see @ref NRF_RADIO_NOTIFICATION_DISTANCES."]
+#[doc = "                       This parameter is ignored when @ref NRF_RADIO_NOTIFICATION_TYPE_NONE or"]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE is used."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The group number is invalid."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE A protocol stack or other SoftDevice is running. Stop all"]
+#[doc = "                                   running activities and retry."]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
     let ret: u32;
@@ -2446,21 +2374,19 @@ pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Encrypts a block according to the specified parameters."]
-    #[doc = ""]
-    #[doc = " 128-bit AES encryption."]
-    #[doc = ""]
-    #[doc = " @note:"]
-    #[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
-    #[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
-    #[doc = "      main or low interrupt level."]
-    #[doc = ""]
-    #[doc = " @param[in, out] p_ecb_data Pointer to the ECB parameters' struct (two input"]
-    #[doc = "                            parameters and one output parameter)."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Encrypts a block according to the specified parameters."]
+#[doc = ""]
+#[doc = " 128-bit AES encryption."]
+#[doc = ""]
+#[doc = " @note:"]
+#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
+#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
+#[doc = "      main or low interrupt level."]
+#[doc = ""]
+#[doc = " @param[in, out] p_ecb_data Pointer to the ECB parameters' struct (two input"]
+#[doc = "                            parameters and one output parameter)."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
     let ret: u32;
@@ -2474,27 +2400,25 @@ pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Encrypts multiple data blocks provided as an array of data block structures."]
-    #[doc = ""]
-    #[doc = " @details: Performs 128-bit AES encryption on multiple data blocks"]
-    #[doc = ""]
-    #[doc = " @note:"]
-    #[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
-    #[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
-    #[doc = "      main or low interrupt level."]
-    #[doc = ""]
-    #[doc = " @param[in]     block_count     Count of blocks in the p_data_blocks array."]
-    #[doc = " @param[in,out] p_data_blocks   Pointer to the first entry in a contiguous array of"]
-    #[doc = "                                @ref nrf_ecb_hal_data_block_t structures."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Encrypts multiple data blocks provided as an array of data block structures."]
+#[doc = ""]
+#[doc = " @details: Performs 128-bit AES encryption on multiple data blocks"]
+#[doc = ""]
+#[doc = " @note:"]
+#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
+#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
+#[doc = "      main or low interrupt level."]
+#[doc = ""]
+#[doc = " @param[in]     block_count     Count of blocks in the p_data_blocks array."]
+#[doc = " @param[in,out] p_data_blocks   Pointer to the first entry in a contiguous array of"]
+#[doc = "                                @ref nrf_ecb_hal_data_block_t structures."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_ecb_blocks_encrypt(
-        block_count: u8,
-        p_data_blocks: *mut nrf_ecb_hal_data_block_t,
-    ) -> u32 {
+    block_count: u8,
+    p_data_blocks: *mut nrf_ecb_hal_data_block_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 71",
         inout("r0") to_asm(block_count) => ret,
@@ -2506,16 +2430,14 @@ pub unsafe fn sd_ecb_blocks_encrypt(
     ret
 }
 
-
-    #[doc = "@brief Gets any pending events generated by the SoC API."]
-    #[doc = ""]
-    #[doc = " The application should keep calling this function to get events, until ::NRF_ERROR_NOT_FOUND is returned."]
-    #[doc = ""]
-    #[doc = " @param[out] p_evt_id Set to one of the values in @ref NRF_SOC_EVTS, if any events are pending."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS An event was pending. The event id is written in the p_evt_id parameter."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND No pending events."]
-    
+#[doc = "@brief Gets any pending events generated by the SoC API."]
+#[doc = ""]
+#[doc = " The application should keep calling this function to get events, until ::NRF_ERROR_NOT_FOUND is returned."]
+#[doc = ""]
+#[doc = " @param[out] p_evt_id Set to one of the values in @ref NRF_SOC_EVTS, if any events are pending."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS An event was pending. The event id is written in the p_evt_id parameter."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND No pending events."]
 #[inline(always)]
 pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
     let ret: u32;
@@ -2529,16 +2451,14 @@ pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get the temperature measured on the chip"]
-    #[doc = ""]
-    #[doc = " This function will block until the temperature measurement is done."]
-    #[doc = " It takes around 50 us from call to return."]
-    #[doc = ""]
-    #[doc = " @param[out] p_temp Result of temperature measurement. Die temperature in 0.25 degrees Celsius."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS A temperature measurement was done, and the temperature was written to temp"]
-    
+#[doc = "@brief Get the temperature measured on the chip"]
+#[doc = ""]
+#[doc = " This function will block until the temperature measurement is done."]
+#[doc = " It takes around 50 us from call to return."]
+#[doc = ""]
+#[doc = " @param[out] p_temp Result of temperature measurement. Die temperature in 0.25 degrees Celsius."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS A temperature measurement was done, and the temperature was written to temp"]
 #[inline(always)]
 pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
     let ret: u32;
@@ -2552,42 +2472,40 @@ pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Flash Write"]
-    #[doc = ""]
-    #[doc = " Commands to write a buffer to flash"]
-    #[doc = ""]
-    #[doc = " If the SoftDevice is enabled:"]
-    #[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
-    #[doc = "  application with exactly one of the following events:"]
-    #[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
-    #[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
-    #[doc = ""]
-    #[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
-    #[doc = " write has been completed"]
-    #[doc = ""]
-    #[doc = " @note"]
-    #[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
-    #[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
-    #[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
-    #[doc = "        and the command parameters)."]
-    #[doc = "      - The data in the p_src buffer should not be modified before the @ref NRF_EVT_FLASH_OPERATION_SUCCESS"]
-    #[doc = "        or the @ref NRF_EVT_FLASH_OPERATION_ERROR have been received if the SoftDevice is enabled."]
-    #[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is written, if it is"]
-    #[doc = "        protected."]
-    #[doc = ""]
-    #[doc = ""]
-    #[doc = " @param[in]  p_dst Pointer to start of flash location to be written."]
-    #[doc = " @param[in]  p_src Pointer to buffer with data to be written."]
-    #[doc = " @param[in]  size  Number of 32-bit words to write. Maximum size is the number of words in one"]
-    #[doc = "                   flash page. See the device's Product Specification for details."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Tried to write to a non existing flash address, or p_dst or p_src was unaligned."]
-    #[doc = " @retval ::NRF_ERROR_BUSY           The previous command has not yet completed."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Size was 0, or higher than the maximum allowed size."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN      Tried to write to an address outside the application flash area."]
-    #[doc = " @retval ::NRF_SUCCESS              The command was accepted."]
-    
+#[doc = "@brief Flash Write"]
+#[doc = ""]
+#[doc = " Commands to write a buffer to flash"]
+#[doc = ""]
+#[doc = " If the SoftDevice is enabled:"]
+#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
+#[doc = "  application with exactly one of the following events:"]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
+#[doc = ""]
+#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
+#[doc = " write has been completed"]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
+#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
+#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
+#[doc = "        and the command parameters)."]
+#[doc = "      - The data in the p_src buffer should not be modified before the @ref NRF_EVT_FLASH_OPERATION_SUCCESS"]
+#[doc = "        or the @ref NRF_EVT_FLASH_OPERATION_ERROR have been received if the SoftDevice is enabled."]
+#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is written, if it is"]
+#[doc = "        protected."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in]  p_dst Pointer to start of flash location to be written."]
+#[doc = " @param[in]  p_src Pointer to buffer with data to be written."]
+#[doc = " @param[in]  size  Number of 32-bit words to write. Maximum size is the number of words in one"]
+#[doc = "                   flash page. See the device's Product Specification for details."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Tried to write to a non existing flash address, or p_dst or p_src was unaligned."]
+#[doc = " @retval ::NRF_ERROR_BUSY           The previous command has not yet completed."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Size was 0, or higher than the maximum allowed size."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN      Tried to write to an address outside the application flash area."]
+#[doc = " @retval ::NRF_SUCCESS              The command was accepted."]
 #[inline(always)]
 pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u32 {
     let ret: u32;
@@ -2601,36 +2519,34 @@ pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u
     ret
 }
 
-
-    #[doc = "@brief Flash Erase page"]
-    #[doc = ""]
-    #[doc = " Commands to erase a flash page"]
-    #[doc = " If the SoftDevice is enabled:"]
-    #[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
-    #[doc = "  application with exactly one of the following events:"]
-    #[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
-    #[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
-    #[doc = ""]
-    #[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
-    #[doc = " erase has been completed"]
-    #[doc = ""]
-    #[doc = " @note"]
-    #[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
-    #[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
-    #[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
-    #[doc = "        and the command parameters)."]
-    #[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is erased, if it is"]
-    #[doc = "        protected."]
-    #[doc = ""]
-    #[doc = ""]
-    #[doc = " @param[in]  page_number           Page number of the page to erase"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_INTERNAL      If a new session could not be opened due to an internal error."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Tried to erase to a non existing flash page."]
-    #[doc = " @retval ::NRF_ERROR_BUSY          The previous command has not yet completed."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN     Tried to erase a page outside the application flash area."]
-    #[doc = " @retval ::NRF_SUCCESS             The command was accepted."]
-    
+#[doc = "@brief Flash Erase page"]
+#[doc = ""]
+#[doc = " Commands to erase a flash page"]
+#[doc = " If the SoftDevice is enabled:"]
+#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
+#[doc = "  application with exactly one of the following events:"]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
+#[doc = ""]
+#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
+#[doc = " erase has been completed"]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
+#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
+#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
+#[doc = "        and the command parameters)."]
+#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is erased, if it is"]
+#[doc = "        protected."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in]  page_number           Page number of the page to erase"]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INTERNAL      If a new session could not be opened due to an internal error."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Tried to erase to a non existing flash page."]
+#[doc = " @retval ::NRF_ERROR_BUSY          The previous command has not yet completed."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN     Tried to erase a page outside the application flash area."]
+#[doc = " @retval ::NRF_SUCCESS             The command was accepted."]
 #[inline(always)]
 pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
     let ret: u32;
@@ -2644,27 +2560,25 @@ pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Opens a session for radio timeslot requests."]
-    #[doc = ""]
-    #[doc = " @note Only one session can be open at a time."]
-    #[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) will be called when the radio timeslot"]
-    #[doc = "       starts. From this point the NRF_RADIO and NRF_TIMER0 peripherals can be freely accessed"]
-    #[doc = "       by the application."]
-    #[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0) is called whenever the NRF_TIMER0"]
-    #[doc = "       interrupt occurs."]
-    #[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO) is called whenever the NRF_RADIO"]
-    #[doc = "       interrupt occurs."]
-    #[doc = " @note p_radio_signal_callback() will be called at ARM interrupt priority level 0. This"]
-    #[doc = "       implies that none of the sd_* API calls can be used from p_radio_signal_callback()."]
-    #[doc = ""]
-    #[doc = " @param[in] p_radio_signal_callback The signal callback."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR p_radio_signal_callback is an invalid function pointer."]
-    #[doc = " @retval ::NRF_ERROR_BUSY If session cannot be opened."]
-    #[doc = " @retval ::NRF_ERROR_INTERNAL If a new session could not be opened due to an internal error."]
-    #[doc = " @retval ::NRF_SUCCESS Otherwise."]
-    
+#[doc = "@brief Opens a session for radio timeslot requests."]
+#[doc = ""]
+#[doc = " @note Only one session can be open at a time."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) will be called when the radio timeslot"]
+#[doc = "       starts. From this point the NRF_RADIO and NRF_TIMER0 peripherals can be freely accessed"]
+#[doc = "       by the application."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0) is called whenever the NRF_TIMER0"]
+#[doc = "       interrupt occurs."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO) is called whenever the NRF_RADIO"]
+#[doc = "       interrupt occurs."]
+#[doc = " @note p_radio_signal_callback() will be called at ARM interrupt priority level 0. This"]
+#[doc = "       implies that none of the sd_* API calls can be used from p_radio_signal_callback()."]
+#[doc = ""]
+#[doc = " @param[in] p_radio_signal_callback The signal callback."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR p_radio_signal_callback is an invalid function pointer."]
+#[doc = " @retval ::NRF_ERROR_BUSY If session cannot be opened."]
+#[doc = " @retval ::NRF_ERROR_INTERNAL If a new session could not be opened due to an internal error."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
 #[inline(always)]
 pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_callback_t) -> u32 {
     let ret: u32;
@@ -2678,18 +2592,16 @@ pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_ca
     ret
 }
 
-
-    #[doc = "@brief Closes a session for radio timeslot requests."]
-    #[doc = ""]
-    #[doc = " @note Any current radio timeslot will be finished before the session is closed."]
-    #[doc = " @note If a radio timeslot is scheduled when the session is closed, it will be canceled."]
-    #[doc = " @note The application cannot consider the session closed until the @ref NRF_EVT_RADIO_SESSION_CLOSED"]
-    #[doc = "       event is received."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN If session not opened."]
-    #[doc = " @retval ::NRF_ERROR_BUSY If session is currently being closed."]
-    #[doc = " @retval ::NRF_SUCCESS Otherwise."]
-    
+#[doc = "@brief Closes a session for radio timeslot requests."]
+#[doc = ""]
+#[doc = " @note Any current radio timeslot will be finished before the session is closed."]
+#[doc = " @note If a radio timeslot is scheduled when the session is closed, it will be canceled."]
+#[doc = " @note The application cannot consider the session closed until the @ref NRF_EVT_RADIO_SESSION_CLOSED"]
+#[doc = "       event is received."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN If session not opened."]
+#[doc = " @retval ::NRF_ERROR_BUSY If session is currently being closed."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
 #[inline(always)]
 pub unsafe fn sd_radio_session_close() -> u32 {
     let ret: u32;
@@ -2703,42 +2615,40 @@ pub unsafe fn sd_radio_session_close() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Requests a radio timeslot."]
-    #[doc = ""]
-    #[doc = " @note The request type is determined by p_request->request_type, and can be one of @ref NRF_RADIO_REQ_TYPE_EARLIEST"]
-    #[doc = "       and @ref NRF_RADIO_REQ_TYPE_NORMAL. The first request in a session must always be of type @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
-    #[doc = " @note For a normal request (@ref NRF_RADIO_REQ_TYPE_NORMAL), the start time of a radio timeslot is specified by"]
-    #[doc = "       p_request->distance_us and is given relative to the start of the previous timeslot."]
-    #[doc = " @note A too small p_request->distance_us will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
-    #[doc = " @note Timeslots scheduled too close will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
-    #[doc = " @note See the SoftDevice Specification for more on radio timeslot scheduling, distances and lengths."]
-    #[doc = " @note If an opportunity for the first radio timeslot is not found before 100 ms after the call to this"]
-    #[doc = "       function, it is not scheduled, and instead a @ref NRF_EVT_RADIO_BLOCKED event is sent."]
-    #[doc = "       The application may then try to schedule the first radio timeslot again."]
-    #[doc = " @note Successful requests will result in nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START)."]
-    #[doc = "       Unsuccessful requests will result in a @ref NRF_EVT_RADIO_BLOCKED event, see @ref NRF_SOC_EVTS."]
-    #[doc = " @note The jitter in the start time of the radio timeslots is +/- @ref NRF_RADIO_START_JITTER_US us."]
-    #[doc = " @note The nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) call has a latency relative to the"]
-    #[doc = "       specified radio timeslot start, but this does not affect the actual start time of the timeslot."]
-    #[doc = " @note NRF_TIMER0 is reset at the start of the radio timeslot, and is clocked at 1MHz from the high frequency"]
-    #[doc = "       (16 MHz) clock source. If p_request->hfclk_force_xtal is true, the high frequency clock is"]
-    #[doc = "       guaranteed to be clocked from the external crystal."]
-    #[doc = " @note The SoftDevice will neither access the NRF_RADIO peripheral nor the NRF_TIMER0 peripheral"]
-    #[doc = "       during the radio timeslot."]
-    #[doc = ""]
-    #[doc = " @param[in] p_request Pointer to the request parameters."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Either:"]
-    #[doc = "                                - The session is not open."]
-    #[doc = "                                - The session is not IDLE."]
-    #[doc = "                                - This is the first request and its type is not @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
-    #[doc = "                                - The request type was set to @ref NRF_RADIO_REQ_TYPE_NORMAL after a"]
-    #[doc = "                                  @ref NRF_RADIO_REQ_TYPE_EARLIEST request was blocked."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR If the p_request pointer is invalid."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM If the parameters of p_request are not valid."]
-    #[doc = " @retval ::NRF_SUCCESS Otherwise."]
-    
+#[doc = "@brief Requests a radio timeslot."]
+#[doc = ""]
+#[doc = " @note The request type is determined by p_request->request_type, and can be one of @ref NRF_RADIO_REQ_TYPE_EARLIEST"]
+#[doc = "       and @ref NRF_RADIO_REQ_TYPE_NORMAL. The first request in a session must always be of type @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
+#[doc = " @note For a normal request (@ref NRF_RADIO_REQ_TYPE_NORMAL), the start time of a radio timeslot is specified by"]
+#[doc = "       p_request->distance_us and is given relative to the start of the previous timeslot."]
+#[doc = " @note A too small p_request->distance_us will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
+#[doc = " @note Timeslots scheduled too close will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
+#[doc = " @note See the SoftDevice Specification for more on radio timeslot scheduling, distances and lengths."]
+#[doc = " @note If an opportunity for the first radio timeslot is not found before 100 ms after the call to this"]
+#[doc = "       function, it is not scheduled, and instead a @ref NRF_EVT_RADIO_BLOCKED event is sent."]
+#[doc = "       The application may then try to schedule the first radio timeslot again."]
+#[doc = " @note Successful requests will result in nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START)."]
+#[doc = "       Unsuccessful requests will result in a @ref NRF_EVT_RADIO_BLOCKED event, see @ref NRF_SOC_EVTS."]
+#[doc = " @note The jitter in the start time of the radio timeslots is +/- @ref NRF_RADIO_START_JITTER_US us."]
+#[doc = " @note The nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) call has a latency relative to the"]
+#[doc = "       specified radio timeslot start, but this does not affect the actual start time of the timeslot."]
+#[doc = " @note NRF_TIMER0 is reset at the start of the radio timeslot, and is clocked at 1MHz from the high frequency"]
+#[doc = "       (16 MHz) clock source. If p_request->hfclk_force_xtal is true, the high frequency clock is"]
+#[doc = "       guaranteed to be clocked from the external crystal."]
+#[doc = " @note The SoftDevice will neither access the NRF_RADIO peripheral nor the NRF_TIMER0 peripheral"]
+#[doc = "       during the radio timeslot."]
+#[doc = ""]
+#[doc = " @param[in] p_request Pointer to the request parameters."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Either:"]
+#[doc = "                                - The session is not open."]
+#[doc = "                                - The session is not IDLE."]
+#[doc = "                                - This is the first request and its type is not @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
+#[doc = "                                - The request type was set to @ref NRF_RADIO_REQ_TYPE_NORMAL after a"]
+#[doc = "                                  @ref NRF_RADIO_REQ_TYPE_EARLIEST request was blocked."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR If the p_request pointer is invalid."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM If the parameters of p_request are not valid."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
 #[inline(always)]
 pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
     let ret: u32;
@@ -2752,26 +2662,24 @@ pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Write register protected by the SoftDevice"]
-    #[doc = ""]
-    #[doc = " This function writes to a register that is write-protected by the SoftDevice. Please refer to your"]
-    #[doc = " SoftDevice Specification for more details about which registers that are protected by SoftDevice."]
-    #[doc = " This function can write to the following protected peripheral:"]
-    #[doc = "  - ACL"]
-    #[doc = ""]
-    #[doc = " @note Protected registers may be read directly."]
-    #[doc = " @note Register that are write-once will return @ref NRF_SUCCESS on second set, even the value in"]
-    #[doc = "       the register has not changed. See the Product Specification for more details about register"]
-    #[doc = "       properties."]
-    #[doc = ""]
-    #[doc = " @param[in]  p_register Pointer to register to be written."]
-    #[doc = " @param[in]  value Value to be written to the register."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR This function can not write to the reguested register."]
-    #[doc = " @retval ::NRF_SUCCESS Value successfully written to register."]
-    #[doc = ""]
-    
+#[doc = "@brief Write register protected by the SoftDevice"]
+#[doc = ""]
+#[doc = " This function writes to a register that is write-protected by the SoftDevice. Please refer to your"]
+#[doc = " SoftDevice Specification for more details about which registers that are protected by SoftDevice."]
+#[doc = " This function can write to the following protected peripheral:"]
+#[doc = "  - ACL"]
+#[doc = ""]
+#[doc = " @note Protected registers may be read directly."]
+#[doc = " @note Register that are write-once will return @ref NRF_SUCCESS on second set, even the value in"]
+#[doc = "       the register has not changed. See the Product Specification for more details about register"]
+#[doc = "       properties."]
+#[doc = ""]
+#[doc = " @param[in]  p_register Pointer to register to be written."]
+#[doc = " @param[in]  value Value to be written to the register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR This function can not write to the reguested register."]
+#[doc = " @retval ::NRF_SUCCESS Value successfully written to register."]
+#[doc = ""]
 #[inline(always)]
 pub unsafe fn sd_protected_register_write(p_register: *mut u32, value: u32) -> u32 {
     let ret: u32;
@@ -2911,40 +2819,39 @@ fn bindgen_test_layout_nrf_clock_lf_cfg_t() {
 pub type nrf_fault_handler_t =
     ::core::option::Option<unsafe extern "C" fn(id: u32, pc: u32, info: u32)>;
 
-    #[doc = "@brief Enables the SoftDevice and by extension the protocol stack."]
-    #[doc = ""]
-    #[doc = " @note Some care must be taken if a low frequency clock source is already running when calling this function:"]
-    #[doc = "       If the LF clock has a different source then the one currently running, it will be stopped. Then, the new"]
-    #[doc = "       clock source will be started."]
-    #[doc = ""]
-    #[doc = " @note This function has no effect when returning with an error."]
-    #[doc = ""]
-    #[doc = " @post If return code is ::NRF_SUCCESS"]
-    #[doc = "       - SoC library and protocol stack APIs are made available."]
-    #[doc = "       - A portion of RAM will be unavailable (see relevant SDS documentation)."]
-    #[doc = "       - Some peripherals will be unavailable or available only through the SoC API (see relevant SDS documentation)."]
-    #[doc = "       - Interrupts will not arrive from protected peripherals or interrupts."]
-    #[doc = "       - nrf_nvic_ functions must be used instead of CMSIS NVIC_ functions for reliable usage of the SoftDevice."]
-    #[doc = "       - Interrupt latency may be affected by the SoftDevice  (see relevant SDS documentation)."]
-    #[doc = "       - Chosen low frequency clock source will be running."]
-    #[doc = ""]
-    #[doc = " @param p_clock_lf_cfg Low frequency clock source and accuracy."]
-    #[doc = "If NULL the clock will be configured as an RC source with rc_ctiv = 16 and .rc_temp_ctiv = 2"]
-    #[doc = "In the case of XTAL source, the PPM accuracy of the chosen clock source must be greater than or equal to the actual characteristics of your XTAL clock."]
-    #[doc = " @param fault_handler Callback to be invoked in case of fault, cannot be NULL."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid or NULL pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE SoftDevice is already enabled, and the clock source and fault handler cannot be updated."]
-    #[doc = " @retval ::NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION SoftDevice interrupt is already enabled, or an enabled interrupt has an illegal priority level."]
-    #[doc = " @retval ::NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN Unknown low frequency clock source selected."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid clock source configuration supplied in p_clock_lf_cfg."]
-    
+#[doc = "@brief Enables the SoftDevice and by extension the protocol stack."]
+#[doc = ""]
+#[doc = " @note Some care must be taken if a low frequency clock source is already running when calling this function:"]
+#[doc = "       If the LF clock has a different source then the one currently running, it will be stopped. Then, the new"]
+#[doc = "       clock source will be started."]
+#[doc = ""]
+#[doc = " @note This function has no effect when returning with an error."]
+#[doc = ""]
+#[doc = " @post If return code is ::NRF_SUCCESS"]
+#[doc = "       - SoC library and protocol stack APIs are made available."]
+#[doc = "       - A portion of RAM will be unavailable (see relevant SDS documentation)."]
+#[doc = "       - Some peripherals will be unavailable or available only through the SoC API (see relevant SDS documentation)."]
+#[doc = "       - Interrupts will not arrive from protected peripherals or interrupts."]
+#[doc = "       - nrf_nvic_ functions must be used instead of CMSIS NVIC_ functions for reliable usage of the SoftDevice."]
+#[doc = "       - Interrupt latency may be affected by the SoftDevice  (see relevant SDS documentation)."]
+#[doc = "       - Chosen low frequency clock source will be running."]
+#[doc = ""]
+#[doc = " @param p_clock_lf_cfg Low frequency clock source and accuracy."]
+#[doc = "If NULL the clock will be configured as an RC source with rc_ctiv = 16 and .rc_temp_ctiv = 2"]
+#[doc = "In the case of XTAL source, the PPM accuracy of the chosen clock source must be greater than or equal to the actual characteristics of your XTAL clock."]
+#[doc = " @param fault_handler Callback to be invoked in case of fault, cannot be NULL."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid or NULL pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE SoftDevice is already enabled, and the clock source and fault handler cannot be updated."]
+#[doc = " @retval ::NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION SoftDevice interrupt is already enabled, or an enabled interrupt has an illegal priority level."]
+#[doc = " @retval ::NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN Unknown low frequency clock source selected."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid clock source configuration supplied in p_clock_lf_cfg."]
 #[inline(always)]
 pub unsafe fn sd_softdevice_enable(
-        p_clock_lf_cfg: *const nrf_clock_lf_cfg_t,
-        fault_handler: nrf_fault_handler_t,
-    ) -> u32 {
+    p_clock_lf_cfg: *const nrf_clock_lf_cfg_t,
+    fault_handler: nrf_fault_handler_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 16",
         inout("r0") to_asm(p_clock_lf_cfg) => ret,
@@ -2956,20 +2863,18 @@ pub unsafe fn sd_softdevice_enable(
     ret
 }
 
-
-    #[doc = "@brief Disables the SoftDevice and by extension the protocol stack."]
-    #[doc = ""]
-    #[doc = " Idempotent function to disable the SoftDevice."]
-    #[doc = ""]
-    #[doc = " @post SoC library and protocol stack APIs are made unavailable."]
-    #[doc = " @post All interrupts that was protected by the SoftDevice will be disabled and initialized to priority 0 (highest)."]
-    #[doc = " @post All peripherals used by the SoftDevice will be reset to default values."]
-    #[doc = " @post All of RAM become available."]
-    #[doc = " @post All interrupts are forwarded to the application."]
-    #[doc = " @post LFCLK source chosen in ::sd_softdevice_enable will be left running."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Disables the SoftDevice and by extension the protocol stack."]
+#[doc = ""]
+#[doc = " Idempotent function to disable the SoftDevice."]
+#[doc = ""]
+#[doc = " @post SoC library and protocol stack APIs are made unavailable."]
+#[doc = " @post All interrupts that was protected by the SoftDevice will be disabled and initialized to priority 0 (highest)."]
+#[doc = " @post All peripherals used by the SoftDevice will be reset to default values."]
+#[doc = " @post All of RAM become available."]
+#[doc = " @post All interrupts are forwarded to the application."]
+#[doc = " @post LFCLK source chosen in ::sd_softdevice_enable will be left running."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_softdevice_disable() -> u32 {
     let ret: u32;
@@ -2983,13 +2888,11 @@ pub unsafe fn sd_softdevice_disable() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Check if the SoftDevice is enabled."]
-    #[doc = ""]
-    #[doc = " @param[out]  p_softdevice_enabled If the SoftDevice is enabled: 1 else 0."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Check if the SoftDevice is enabled."]
+#[doc = ""]
+#[doc = " @param[out]  p_softdevice_enabled If the SoftDevice is enabled: 1 else 0."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
     let ret: u32;
@@ -3003,15 +2906,13 @@ pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the SoftDevice"]
-    #[doc = ""]
-    #[doc = " This function is only intended to be called when a bootloader is enabled."]
-    #[doc = ""]
-    #[doc = " @param[in] address The base address of the interrupt vector table for forwarded interrupts."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS"]
-    
+#[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the SoftDevice"]
+#[doc = ""]
+#[doc = " This function is only intended to be called when a bootloader is enabled."]
+#[doc = ""]
+#[doc = " @param[in] address The base address of the interrupt vector table for forwarded interrupts."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
 pub unsafe fn sd_softdevice_vector_table_base_set(address: u32) -> u32 {
     let ret: u32;
@@ -3818,29 +3719,28 @@ fn bindgen_test_layout_sd_mbr_command_t() {
     );
 }
 
-    #[doc = "@brief Issue Master Boot Record commands"]
-    #[doc = ""]
-    #[doc = " Commands used when updating a SoftDevice and bootloader."]
-    #[doc = ""]
-    #[doc = " The @ref SD_MBR_COMMAND_COPY_BL and @ref SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET requires"]
-    #[doc = " parameters to be retained by the MBR when resetting the IC. This is done in a separate flash"]
-    #[doc = " page. The location of the flash page should be provided by the application in either"]
-    #[doc = " @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR. If both addresses are set, the MBR"]
-    #[doc = " will prioritize @ref MBR_PARAM_PAGE_ADDR. This page will be cleared by the MBR and is used to"]
-    #[doc = " store the command before reset. When an address is specified, the page it refers to must not be"]
-    #[doc = " used by the application. If no address is provided by the application, i.e. both"]
-    #[doc = " @ref MBR_PARAM_PAGE_ADDR and @ref MBR_UICR_PARAM_PAGE_ADDR is 0xFFFFFFFF, MBR commands which use"]
-    #[doc = " flash will be unavailable and return @ref NRF_ERROR_NO_MEM."]
-    #[doc = ""]
-    #[doc = " @param[in]  param Pointer to a struct describing the command."]
-    #[doc = ""]
-    #[doc = " @note For a complete set of return values, see ::sd_mbr_command_copy_sd_t,"]
-    #[doc = "       ::sd_mbr_command_copy_bl_t, ::sd_mbr_command_compare_t,"]
-    #[doc = "       ::sd_mbr_command_vector_table_base_set_t, ::sd_mbr_command_irq_forward_address_set_t"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given."]
-    
+#[doc = "@brief Issue Master Boot Record commands"]
+#[doc = ""]
+#[doc = " Commands used when updating a SoftDevice and bootloader."]
+#[doc = ""]
+#[doc = " The @ref SD_MBR_COMMAND_COPY_BL and @ref SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET requires"]
+#[doc = " parameters to be retained by the MBR when resetting the IC. This is done in a separate flash"]
+#[doc = " page. The location of the flash page should be provided by the application in either"]
+#[doc = " @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR. If both addresses are set, the MBR"]
+#[doc = " will prioritize @ref MBR_PARAM_PAGE_ADDR. This page will be cleared by the MBR and is used to"]
+#[doc = " store the command before reset. When an address is specified, the page it refers to must not be"]
+#[doc = " used by the application. If no address is provided by the application, i.e. both"]
+#[doc = " @ref MBR_PARAM_PAGE_ADDR and @ref MBR_UICR_PARAM_PAGE_ADDR is 0xFFFFFFFF, MBR commands which use"]
+#[doc = " flash will be unavailable and return @ref NRF_ERROR_NO_MEM."]
+#[doc = ""]
+#[doc = " @param[in]  param Pointer to a struct describing the command."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values, see ::sd_mbr_command_copy_sd_t,"]
+#[doc = "       ::sd_mbr_command_copy_bl_t, ::sd_mbr_command_compare_t,"]
+#[doc = "       ::sd_mbr_command_vector_table_base_set_t, ::sd_mbr_command_irq_forward_address_set_t"]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given."]
 #[inline(always)]
 pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
     let ret: u32;
@@ -8261,31 +8161,30 @@ fn bindgen_test_layout_ble_gap_qos_params_t() {
     );
 }
 
-    #[doc = "@brief Set the local Bluetooth identity address."]
-    #[doc = ""]
-    #[doc = "        The local Bluetooth identity address is the address that identifies this device to other peers."]
-    #[doc = "        The address type must be either @ref BLE_GAP_ADDR_TYPE_PUBLIC or @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC."]
-    #[doc = ""]
-    #[doc = " @note  The identity address cannot be changed while advertising, scanning or creating a connection."]
-    #[doc = ""]
-    #[doc = " @note  This address will be distributed to the peer during bonding."]
-    #[doc = "        If the address changes, the address stored in the peer device will not be valid and the ability to"]
-    #[doc = "        reconnect using the old address will be lost."]
-    #[doc = ""]
-    #[doc = " @note  By default the SoftDevice will set an address of type @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC upon being"]
-    #[doc = "        enabled. The address is a random number populated during the IC manufacturing process and remains unchanged"]
-    #[doc = "        for the lifetime of each IC."]
-    #[doc = ""]
-    #[doc = ""]
-    #[doc = " @param[in] p_addr Pointer to address structure."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Address successfully set."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE The identity address cannot be changed while advertising,"]
-    #[doc = "                                   scanning or creating a connection."]
-    
+#[doc = "@brief Set the local Bluetooth identity address."]
+#[doc = ""]
+#[doc = "        The local Bluetooth identity address is the address that identifies this device to other peers."]
+#[doc = "        The address type must be either @ref BLE_GAP_ADDR_TYPE_PUBLIC or @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC."]
+#[doc = ""]
+#[doc = " @note  The identity address cannot be changed while advertising, scanning or creating a connection."]
+#[doc = ""]
+#[doc = " @note  This address will be distributed to the peer during bonding."]
+#[doc = "        If the address changes, the address stored in the peer device will not be valid and the ability to"]
+#[doc = "        reconnect using the old address will be lost."]
+#[doc = ""]
+#[doc = " @note  By default the SoftDevice will set an address of type @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC upon being"]
+#[doc = "        enabled. The address is a random number populated during the IC manufacturing process and remains unchanged"]
+#[doc = "        for the lifetime of each IC."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in] p_addr Pointer to address structure."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Address successfully set."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address."]
+#[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE The identity address cannot be changed while advertising,"]
+#[doc = "                                   scanning or creating a connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_addr_set(p_addr: *const ble_gap_addr_t) -> u32 {
     let ret: u32;
@@ -8299,17 +8198,15 @@ pub unsafe fn sd_ble_gap_addr_set(p_addr: *const ble_gap_addr_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get local Bluetooth identity address."]
-    #[doc = ""]
-    #[doc = " @note  This will always return the identity address irrespective of the privacy settings,"]
-    #[doc = "        i.e. the address type will always be either @ref BLE_GAP_ADDR_TYPE_PUBLIC or @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC."]
-    #[doc = ""]
-    #[doc = " @param[out] p_addr Pointer to address structure to be filled in."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Address successfully retrieved."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid or NULL pointer supplied."]
-    
+#[doc = "@brief Get local Bluetooth identity address."]
+#[doc = ""]
+#[doc = " @note  This will always return the identity address irrespective of the privacy settings,"]
+#[doc = "        i.e. the address type will always be either @ref BLE_GAP_ADDR_TYPE_PUBLIC or @ref BLE_GAP_ADDR_TYPE_RANDOM_STATIC."]
+#[doc = ""]
+#[doc = " @param[out] p_addr Pointer to address structure to be filled in."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Address successfully retrieved."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid or NULL pointer supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_addr_get(p_addr: *mut ble_gap_addr_t) -> u32 {
     let ret: u32;
@@ -8323,29 +8220,27 @@ pub unsafe fn sd_ble_gap_addr_get(p_addr: *mut ble_gap_addr_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Set the active whitelist in the SoftDevice."]
-    #[doc = ""]
-    #[doc = " @note  Only one whitelist can be used at a time and the whitelist is shared between the BLE roles."]
-    #[doc = "        The whitelist cannot be set if a BLE role is using the whitelist."]
-    #[doc = ""]
-    #[doc = " @note  If an address is resolved using the information in the device identity list, then the whitelist"]
-    #[doc = "        filter policy applies to the peer identity address and not the resolvable address sent on air."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_PRIVATE_SCAN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] pp_wl_addrs Pointer to a whitelist of peer addresses, if NULL the whitelist will be cleared."]
-    #[doc = " @param[in] len         Length of the whitelist, maximum @ref BLE_GAP_WHITELIST_ADDR_MAX_COUNT."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The whitelist is successfully set/cleared."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR The whitelist (or one of its entries) provided is invalid."]
-    #[doc = " @retval ::BLE_ERROR_GAP_WHITELIST_IN_USE The whitelist is in use by a BLE role and cannot be set or cleared."]
-    #[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE The given whitelist size is invalid (zero or too large); this can only return when"]
-    #[doc = "                               pp_wl_addrs is not NULL."]
-    
+#[doc = "@brief Set the active whitelist in the SoftDevice."]
+#[doc = ""]
+#[doc = " @note  Only one whitelist can be used at a time and the whitelist is shared between the BLE roles."]
+#[doc = "        The whitelist cannot be set if a BLE role is using the whitelist."]
+#[doc = ""]
+#[doc = " @note  If an address is resolved using the information in the device identity list, then the whitelist"]
+#[doc = "        filter policy applies to the peer identity address and not the resolvable address sent on air."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_PRIVATE_SCAN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] pp_wl_addrs Pointer to a whitelist of peer addresses, if NULL the whitelist will be cleared."]
+#[doc = " @param[in] len         Length of the whitelist, maximum @ref BLE_GAP_WHITELIST_ADDR_MAX_COUNT."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The whitelist is successfully set/cleared."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR The whitelist (or one of its entries) provided is invalid."]
+#[doc = " @retval ::BLE_ERROR_GAP_WHITELIST_IN_USE The whitelist is in use by a BLE role and cannot be set or cleared."]
+#[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE The given whitelist size is invalid (zero or too large); this can only return when"]
+#[doc = "                               pp_wl_addrs is not NULL."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_whitelist_set(pp_wl_addrs: *const *const ble_gap_addr_t, len: u8) -> u32 {
     let ret: u32;
@@ -8359,38 +8254,36 @@ pub unsafe fn sd_ble_gap_whitelist_set(pp_wl_addrs: *const *const ble_gap_addr_t
     ret
 }
 
-
-    #[doc = "@brief Set device identity list."]
-    #[doc = ""]
-    #[doc = " @note  Only one device identity list can be used at a time and the list is shared between the BLE roles."]
-    #[doc = "        The device identity list cannot be set if a BLE role is using the list."]
-    #[doc = ""]
-    #[doc = " @param[in] pp_id_keys     Pointer to an array of peer identity addresses and peer IRKs, if NULL the device identity list will be cleared."]
-    #[doc = " @param[in] pp_local_irks  Pointer to an array of local IRKs. Each entry in the array maps to the entry in pp_id_keys at the same index."]
-    #[doc = "                           To fill in the list with the currently set device IRK for all peers, set to NULL."]
-    #[doc = " @param[in] len            Length of the device identity list, maximum @ref BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_PRIVATE_SCAN_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_PRIV_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The device identity list successfully set/cleared."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR The device identity list (or one of its entries) provided is invalid."]
-    #[doc = "                                  This code may be returned if the local IRK list also has an invalid entry."]
-    #[doc = " @retval ::BLE_ERROR_GAP_DEVICE_IDENTITIES_IN_USE The device identity list is in use and cannot be set or cleared."]
-    #[doc = " @retval ::BLE_ERROR_GAP_DEVICE_IDENTITIES_DUPLICATE The device identity list contains multiple entries with the same identity address."]
-    #[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE The given device identity list size invalid (zero or too large); this can"]
-    #[doc = "                               only return when pp_id_keys is not NULL."]
-    
+#[doc = "@brief Set device identity list."]
+#[doc = ""]
+#[doc = " @note  Only one device identity list can be used at a time and the list is shared between the BLE roles."]
+#[doc = "        The device identity list cannot be set if a BLE role is using the list."]
+#[doc = ""]
+#[doc = " @param[in] pp_id_keys     Pointer to an array of peer identity addresses and peer IRKs, if NULL the device identity list will be cleared."]
+#[doc = " @param[in] pp_local_irks  Pointer to an array of local IRKs. Each entry in the array maps to the entry in pp_id_keys at the same index."]
+#[doc = "                           To fill in the list with the currently set device IRK for all peers, set to NULL."]
+#[doc = " @param[in] len            Length of the device identity list, maximum @ref BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_PRIVATE_SCAN_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_PRIV_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The device identity list successfully set/cleared."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR The device identity list (or one of its entries) provided is invalid."]
+#[doc = "                                  This code may be returned if the local IRK list also has an invalid entry."]
+#[doc = " @retval ::BLE_ERROR_GAP_DEVICE_IDENTITIES_IN_USE The device identity list is in use and cannot be set or cleared."]
+#[doc = " @retval ::BLE_ERROR_GAP_DEVICE_IDENTITIES_DUPLICATE The device identity list contains multiple entries with the same identity address."]
+#[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE The given device identity list size invalid (zero or too large); this can"]
+#[doc = "                               only return when pp_id_keys is not NULL."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_device_identities_set(
-        pp_id_keys: *const *const ble_gap_id_key_t,
-        pp_local_irks: *const *const ble_gap_irk_t,
-        len: u8,
-    ) -> u32 {
+    pp_id_keys: *const *const ble_gap_id_key_t,
+    pp_local_irks: *const *const ble_gap_irk_t,
+    len: u8,
+) -> u32 {
     let ret: u32;
     asm!("svc 112",
         inout("r0") to_asm(pp_id_keys) => ret,
@@ -8402,30 +8295,28 @@ pub unsafe fn sd_ble_gap_device_identities_set(
     ret
 }
 
-
-    #[doc = "@brief Set privacy settings."]
-    #[doc = ""]
-    #[doc = " @note  Privacy settings cannot be changed while advertising, scanning or creating a connection."]
-    #[doc = ""]
-    #[doc = " @param[in] p_privacy_params Privacy settings."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Set successfully."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
-    #[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR The pointer to privacy settings is NULL or invalid."]
-    #[doc = "                                  Otherwise, the p_device_irk pointer in privacy parameter is an invalid pointer."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Out of range parameters are provided."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED The SoftDevice does not support privacy if the Central Address Resolution"]
-    #[doc = "characteristic is not configured to be included and the SoftDevice is configured"]
-    #[doc = "to support central roles."]
-    #[doc = "See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Privacy settings cannot be changed while advertising, scanning"]
-    #[doc = "                                   or creating a connection."]
-    
+#[doc = "@brief Set privacy settings."]
+#[doc = ""]
+#[doc = " @note  Privacy settings cannot be changed while advertising, scanning or creating a connection."]
+#[doc = ""]
+#[doc = " @param[in] p_privacy_params Privacy settings."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_PRIVACY_SCAN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Set successfully."]
+#[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
+#[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid address type is supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR The pointer to privacy settings is NULL or invalid."]
+#[doc = "                                  Otherwise, the p_device_irk pointer in privacy parameter is an invalid pointer."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Out of range parameters are provided."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED The SoftDevice does not support privacy if the Central Address Resolution"]
+#[doc = "characteristic is not configured to be included and the SoftDevice is configured"]
+#[doc = "to support central roles."]
+#[doc = "See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Privacy settings cannot be changed while advertising, scanning"]
+#[doc = "                                   or creating a connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_privacy_set(p_privacy_params: *const ble_gap_privacy_params_t) -> u32 {
     let ret: u32;
@@ -8439,18 +8330,16 @@ pub unsafe fn sd_ble_gap_privacy_set(p_privacy_params: *const ble_gap_privacy_pa
     ret
 }
 
-
-    #[doc = "@brief Get privacy settings."]
-    #[doc = ""]
-    #[doc = " @note ::ble_gap_privacy_params_t::p_device_irk must be initialized to NULL or a valid address before this function is called."]
-    #[doc = "       If it is initialized to a valid address, the address pointed to will contain the current device IRK on return."]
-    #[doc = ""]
-    #[doc = " @param[in,out] p_privacy_params Privacy settings."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS            Privacy settings read."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR The pointer given for returning the privacy settings may be NULL or invalid."]
-    #[doc = "                                  Otherwise, the p_device_irk pointer in privacy parameter is an invalid pointer."]
-    
+#[doc = "@brief Get privacy settings."]
+#[doc = ""]
+#[doc = " @note ::ble_gap_privacy_params_t::p_device_irk must be initialized to NULL or a valid address before this function is called."]
+#[doc = "       If it is initialized to a valid address, the address pointed to will contain the current device IRK on return."]
+#[doc = ""]
+#[doc = " @param[in,out] p_privacy_params Privacy settings."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS            Privacy settings read."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR The pointer given for returning the privacy settings may be NULL or invalid."]
+#[doc = "                                  Otherwise, the p_device_irk pointer in privacy parameter is an invalid pointer."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_privacy_get(p_privacy_params: *mut ble_gap_privacy_params_t) -> u32 {
     let ret: u32;
@@ -8464,44 +8353,42 @@ pub unsafe fn sd_ble_gap_privacy_get(p_privacy_params: *mut ble_gap_privacy_para
     ret
 }
 
-
-    #[doc = "@brief Update connection parameters."]
-    #[doc = ""]
-    #[doc = " @details In the central role this will initiate a Link Layer connection parameter update procedure."]
-    #[doc = "          This function can be used as a central both to reply to a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST or to start the procedure unrequested."]
-    #[doc = "          Regardless of success or failure, the application"]
-    #[doc = "          will be informed of the result with a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_CONN_PARAM_UPDATE, Result of the connection parameter update procedure.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CPU_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CPU_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CTRL_PROC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_conn_params  Pointer to desired connection parameters."]
-    #[doc = "                           If NULL is provided on a central role and in response to a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST, the peripheral request will be rejected."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The Connection Update procedure has been started successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Either:"]
-    #[doc = "                                   - Disconnection in progress"]
-    #[doc = "                                   - Link has not been established."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress, wait for pending procedures to complete and retry."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    
+#[doc = "@brief Update connection parameters."]
+#[doc = ""]
+#[doc = " @details In the central role this will initiate a Link Layer connection parameter update procedure."]
+#[doc = "          This function can be used as a central both to reply to a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST or to start the procedure unrequested."]
+#[doc = "          Regardless of success or failure, the application"]
+#[doc = "          will be informed of the result with a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_CONN_PARAM_UPDATE, Result of the connection parameter update procedure.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CPU_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CPU_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CTRL_PROC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_conn_params  Pointer to desired connection parameters."]
+#[doc = "                           If NULL is provided on a central role and in response to a @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST, the peripheral request will be rejected."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The Connection Update procedure has been started successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Either:"]
+#[doc = "                                   - Disconnection in progress"]
+#[doc = "                                   - Link has not been established."]
+#[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress, wait for pending procedures to complete and retry."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_conn_param_update(
-        conn_handle: u16,
-        p_conn_params: *const ble_gap_conn_params_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_conn_params: *const ble_gap_conn_params_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 118",
         inout("r0") to_asm(conn_handle) => ret,
@@ -8513,28 +8400,26 @@ pub unsafe fn sd_ble_gap_conn_param_update(
     ret
 }
 
-
-    #[doc = "@brief Disconnect (GAP Link Termination)."]
-    #[doc = ""]
-    #[doc = " @details This call initiates the disconnection procedure, and its completion will be communicated to the application"]
-    #[doc = "          with a @ref BLE_GAP_EVT_DISCONNECTED event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_DISCONNECTED, Generated when disconnection procedure is complete.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] hci_status_code HCI status code, see @ref BLE_HCI_STATUS_CODES (accepted values are @ref BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION and @ref BLE_HCI_CONN_INTERVAL_UNACCEPTABLE)."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS The disconnection procedure has been started successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Disconnection in progress or link has not been established."]
-    
+#[doc = "@brief Disconnect (GAP Link Termination)."]
+#[doc = ""]
+#[doc = " @details This call initiates the disconnection procedure, and its completion will be communicated to the application"]
+#[doc = "          with a @ref BLE_GAP_EVT_DISCONNECTED event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_DISCONNECTED, Generated when disconnection procedure is complete.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] hci_status_code HCI status code, see @ref BLE_HCI_STATUS_CODES (accepted values are @ref BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION and @ref BLE_HCI_CONN_INTERVAL_UNACCEPTABLE)."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The disconnection procedure has been started successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Disconnection in progress or link has not been established."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_disconnect(conn_handle: u16, hci_status_code: u8) -> u32 {
     let ret: u32;
@@ -8548,26 +8433,24 @@ pub unsafe fn sd_ble_gap_disconnect(conn_handle: u16, hci_status_code: u8) -> u3
     ret
 }
 
-
-    #[doc = "@brief Set the radio's transmit power."]
-    #[doc = ""]
-    #[doc = " @param[in] role The role to set the transmit power for, see @ref BLE_GAP_TX_POWER_ROLES for"]
-    #[doc = "                 possible roles."]
-    #[doc = " @param[in] handle   The handle parameter is interpreted depending on role:"]
-    #[doc = "                     - If role is @ref BLE_GAP_TX_POWER_ROLE_CONN, this value is the specific connection handle."]
-    #[doc = "                     - For all other roles, handle is ignored."]
-    #[doc = " @param[in] tx_power Radio transmit power in dBm (see note for accepted values)."]
-    #[doc = ""]
-    #[doc = " @note Supported tx_power values: -40dBm, -20dBm, -16dBm, -12dBm, -8dBm, -4dBm, 0dBm, +3dBm and +4dBm."]
-    #[doc = " @note The initiator will have the same transmit power as the scanner."]
-    #[doc = " @note When a connection is created it will inherit the transmit power from the initiator or"]
-    #[doc = "       advertiser leading to the connection."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully changed the transmit power."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_ADV_HANDLE Advertising handle not found."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Set the radio's transmit power."]
+#[doc = ""]
+#[doc = " @param[in] role The role to set the transmit power for, see @ref BLE_GAP_TX_POWER_ROLES for"]
+#[doc = "                 possible roles."]
+#[doc = " @param[in] handle   The handle parameter is interpreted depending on role:"]
+#[doc = "                     - If role is @ref BLE_GAP_TX_POWER_ROLE_CONN, this value is the specific connection handle."]
+#[doc = "                     - For all other roles, handle is ignored."]
+#[doc = " @param[in] tx_power Radio transmit power in dBm (see note for accepted values)."]
+#[doc = ""]
+#[doc = " @note Supported tx_power values: -40dBm, -20dBm, -16dBm, -12dBm, -8dBm, -4dBm, 0dBm, +3dBm and +4dBm."]
+#[doc = " @note The initiator will have the same transmit power as the scanner."]
+#[doc = " @note When a connection is created it will inherit the transmit power from the initiator or"]
+#[doc = "       advertiser leading to the connection."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully changed the transmit power."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_ADV_HANDLE Advertising handle not found."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_tx_power_set(role: u8, handle: u16, tx_power: i8) -> u32 {
     let ret: u32;
@@ -8581,14 +8464,12 @@ pub unsafe fn sd_ble_gap_tx_power_set(role: u8, handle: u16, tx_power: i8) -> u3
     ret
 }
 
-
-    #[doc = "@brief Set GAP Appearance value."]
-    #[doc = ""]
-    #[doc = " @param[in] appearance Appearance (16-bit), see @ref BLE_APPEARANCES."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS  Appearance value set successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    
+#[doc = "@brief Set GAP Appearance value."]
+#[doc = ""]
+#[doc = " @param[in] appearance Appearance (16-bit), see @ref BLE_APPEARANCES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS  Appearance value set successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_appearance_set(appearance: u16) -> u32 {
     let ret: u32;
@@ -8602,14 +8483,12 @@ pub unsafe fn sd_ble_gap_appearance_set(appearance: u16) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get GAP Appearance value."]
-    #[doc = ""]
-    #[doc = " @param[out] p_appearance Pointer to appearance (16-bit) to be filled in, see @ref BLE_APPEARANCES."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Appearance value retrieved successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    
+#[doc = "@brief Get GAP Appearance value."]
+#[doc = ""]
+#[doc = " @param[out] p_appearance Pointer to appearance (16-bit) to be filled in, see @ref BLE_APPEARANCES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Appearance value retrieved successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_appearance_get(p_appearance: *mut u16) -> u32 {
     let ret: u32;
@@ -8623,28 +8502,26 @@ pub unsafe fn sd_ble_gap_appearance_get(p_appearance: *mut u16) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Set GAP device name."]
-    #[doc = ""]
-    #[doc = " @note  If the device name is located in application flash memory (see @ref ble_gap_cfg_device_name_t),"]
-    #[doc = "        it cannot be changed. Then @ref NRF_ERROR_FORBIDDEN will be returned."]
-    #[doc = ""]
-    #[doc = " @param[in] p_write_perm Write permissions for the Device Name characteristic, see @ref ble_gap_conn_sec_mode_t."]
-    #[doc = " @param[in] p_dev_name Pointer to a UTF-8 encoded, <b>non NULL-terminated</b> string."]
-    #[doc = " @param[in] len Length of the UTF-8, <b>non NULL-terminated</b> string pointed to by p_dev_name in octets (must be smaller or equal than @ref BLE_GAP_DEVNAME_MAX_LEN)."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS GAP device name and permissions set successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Device name is not writable."]
-    
+#[doc = "@brief Set GAP device name."]
+#[doc = ""]
+#[doc = " @note  If the device name is located in application flash memory (see @ref ble_gap_cfg_device_name_t),"]
+#[doc = "        it cannot be changed. Then @ref NRF_ERROR_FORBIDDEN will be returned."]
+#[doc = ""]
+#[doc = " @param[in] p_write_perm Write permissions for the Device Name characteristic, see @ref ble_gap_conn_sec_mode_t."]
+#[doc = " @param[in] p_dev_name Pointer to a UTF-8 encoded, <b>non NULL-terminated</b> string."]
+#[doc = " @param[in] len Length of the UTF-8, <b>non NULL-terminated</b> string pointed to by p_dev_name in octets (must be smaller or equal than @ref BLE_GAP_DEVNAME_MAX_LEN)."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS GAP device name and permissions set successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Device name is not writable."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_device_name_set(
-        p_write_perm: *const ble_gap_conn_sec_mode_t,
-        p_dev_name: *const u8,
-        len: u16,
-    ) -> u32 {
+    p_write_perm: *const ble_gap_conn_sec_mode_t,
+    p_dev_name: *const u8,
+    len: u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 125",
         inout("r0") to_asm(p_write_perm) => ret,
@@ -8656,21 +8533,19 @@ pub unsafe fn sd_ble_gap_device_name_set(
     ret
 }
 
-
-    #[doc = "@brief Get GAP device name."]
-    #[doc = ""]
-    #[doc = " @note  If the device name is longer than the size of the supplied buffer,"]
-    #[doc = "        p_len will return the complete device name length,"]
-    #[doc = "        and not the number of bytes actually returned in p_dev_name."]
-    #[doc = "        The application may use this information to allocate a suitable buffer size."]
-    #[doc = ""]
-    #[doc = " @param[out]    p_dev_name Pointer to an empty buffer where the UTF-8 <b>non NULL-terminated</b> string will be placed. Set to NULL to obtain the complete device name length."]
-    #[doc = " @param[in,out] p_len      Length of the buffer pointed by p_dev_name, complete device name length on output."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS GAP device name retrieved successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
-    
+#[doc = "@brief Get GAP device name."]
+#[doc = ""]
+#[doc = " @note  If the device name is longer than the size of the supplied buffer,"]
+#[doc = "        p_len will return the complete device name length,"]
+#[doc = "        and not the number of bytes actually returned in p_dev_name."]
+#[doc = "        The application may use this information to allocate a suitable buffer size."]
+#[doc = ""]
+#[doc = " @param[out]    p_dev_name Pointer to an empty buffer where the UTF-8 <b>non NULL-terminated</b> string will be placed. Set to NULL to obtain the complete device name length."]
+#[doc = " @param[in,out] p_len      Length of the buffer pointed by p_dev_name, complete device name length on output."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS GAP device name retrieved successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_device_name_get(p_dev_name: *mut u8, p_len: *mut u16) -> u32 {
     let ret: u32;
@@ -8684,61 +8559,59 @@ pub unsafe fn sd_ble_gap_device_name_get(p_dev_name: *mut u8, p_len: *mut u16) -
     ret
 }
 
-
-    #[doc = "@brief Initiate the GAP Authentication procedure."]
-    #[doc = ""]
-    #[doc = " @details In the central role, this function will send an SMP Pairing Request (or an SMP Pairing Failed if rejected)."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{Depending on the security parameters set and the packet exchanges with the peer\\, the following events may be generated:}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_SEC_PARAMS_REQUEST}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_PASSKEY_DISPLAY}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_KEY_PRESSED}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_AUTH_KEY_REQUEST}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_LESC_DHKEY_REQUEST}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_CONN_SEC_UPDATE}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_AUTH_STATUS}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_SEC_REQ_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PAIRING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_sec_params Pointer to the @ref ble_gap_sec_params_t structure with the security parameters to be used during the pairing or bonding procedure."]
-    #[doc = "                         In the central role, this pointer may be NULL to reject a Security Request."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully initiated authentication procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
-    #[doc = "                                   - No link has been established."]
-    #[doc = "                                   - An encryption is already executing or queued."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM The maximum number of authentication procedures that can run in parallel for the given role is reached."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Setting of sign or link fields in @ref ble_gap_sec_kdist_t not supported."]
-    #[doc = "                                   Distribution of own Identity Information is only supported if the Central"]
-    #[doc = "                                   Address Resolution characteristic is configured to be included or"]
-    #[doc = "                                   the Softdevice is configured to support peripheral roles only."]
-    #[doc = "                                   See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT A SMP timeout has occurred, and further SMP operations on this link is prohibited."]
-    
+#[doc = "@brief Initiate the GAP Authentication procedure."]
+#[doc = ""]
+#[doc = " @details In the central role, this function will send an SMP Pairing Request (or an SMP Pairing Failed if rejected)."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{Depending on the security parameters set and the packet exchanges with the peer\\, the following events may be generated:}"]
+#[doc = " @event{@ref BLE_GAP_EVT_SEC_PARAMS_REQUEST}"]
+#[doc = " @event{@ref BLE_GAP_EVT_PASSKEY_DISPLAY}"]
+#[doc = " @event{@ref BLE_GAP_EVT_KEY_PRESSED}"]
+#[doc = " @event{@ref BLE_GAP_EVT_AUTH_KEY_REQUEST}"]
+#[doc = " @event{@ref BLE_GAP_EVT_LESC_DHKEY_REQUEST}"]
+#[doc = " @event{@ref BLE_GAP_EVT_CONN_SEC_UPDATE}"]
+#[doc = " @event{@ref BLE_GAP_EVT_AUTH_STATUS}"]
+#[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_SEC_REQ_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PAIRING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_sec_params Pointer to the @ref ble_gap_sec_params_t structure with the security parameters to be used during the pairing or bonding procedure."]
+#[doc = "                         In the central role, this pointer may be NULL to reject a Security Request."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully initiated authentication procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
+#[doc = "                                   - No link has been established."]
+#[doc = "                                   - An encryption is already executing or queued."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM The maximum number of authentication procedures that can run in parallel for the given role is reached."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Setting of sign or link fields in @ref ble_gap_sec_kdist_t not supported."]
+#[doc = "                                   Distribution of own Identity Information is only supported if the Central"]
+#[doc = "                                   Address Resolution characteristic is configured to be included or"]
+#[doc = "                                   the Softdevice is configured to support peripheral roles only."]
+#[doc = "                                   See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT A SMP timeout has occurred, and further SMP operations on this link is prohibited."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_authenticate(
-        conn_handle: u16,
-        p_sec_params: *const ble_gap_sec_params_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_sec_params: *const ble_gap_sec_params_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 127",
         inout("r0") to_asm(conn_handle) => ret,
@@ -8750,59 +8623,57 @@ pub unsafe fn sd_ble_gap_authenticate(
     ret
 }
 
-
-    #[doc = "@brief Reply with GAP security parameters."]
-    #[doc = ""]
-    #[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
-    #[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{This function is used during authentication procedures, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PAIRING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] sec_status Security status, see @ref BLE_GAP_SEC_STATUS."]
-    #[doc = " @param[in] p_sec_params Pointer to a @ref ble_gap_sec_params_t security parameters structure. In the central role this must be set to NULL, as the parameters have"]
-    #[doc = "                         already been provided during a previous call to @ref sd_ble_gap_authenticate."]
-    #[doc = " @param[in,out] p_sec_keyset Pointer to a @ref ble_gap_sec_keyset_t security keyset structure. Any keys generated and/or distributed as a result of the ongoing security procedure"]
-    #[doc = "                         will be stored into the memory referenced by the pointers inside this structure. The keys will be stored and available to the application"]
-    #[doc = "                         upon reception of a @ref BLE_GAP_EVT_AUTH_STATUS event."]
-    #[doc = "                         Note that the SoftDevice expects the application to provide memory for storing the"]
-    #[doc = "                         peer's keys. So it must be ensured that the relevant pointers inside this structure are not NULL. The pointers to the local key"]
-    #[doc = "                         can, however, be NULL, in which case, the local key data will not be available to the application upon reception of the"]
-    #[doc = "                         @ref BLE_GAP_EVT_AUTH_STATUS event."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully accepted security parameter from the application."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Security parameters has not been requested."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Setting of sign or link fields in @ref ble_gap_sec_kdist_t not supported."]
-    #[doc = "                                   Distribution of own Identity Information is only supported if the Central"]
-    #[doc = "                                   Address Resolution characteristic is configured to be included or"]
-    #[doc = "                                   the Softdevice is configured to support peripheral roles only."]
-    #[doc = "                                   See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
-    
+#[doc = "@brief Reply with GAP security parameters."]
+#[doc = ""]
+#[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
+#[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{This function is used during authentication procedures, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PAIRING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] sec_status Security status, see @ref BLE_GAP_SEC_STATUS."]
+#[doc = " @param[in] p_sec_params Pointer to a @ref ble_gap_sec_params_t security parameters structure. In the central role this must be set to NULL, as the parameters have"]
+#[doc = "                         already been provided during a previous call to @ref sd_ble_gap_authenticate."]
+#[doc = " @param[in,out] p_sec_keyset Pointer to a @ref ble_gap_sec_keyset_t security keyset structure. Any keys generated and/or distributed as a result of the ongoing security procedure"]
+#[doc = "                         will be stored into the memory referenced by the pointers inside this structure. The keys will be stored and available to the application"]
+#[doc = "                         upon reception of a @ref BLE_GAP_EVT_AUTH_STATUS event."]
+#[doc = "                         Note that the SoftDevice expects the application to provide memory for storing the"]
+#[doc = "                         peer's keys. So it must be ensured that the relevant pointers inside this structure are not NULL. The pointers to the local key"]
+#[doc = "                         can, however, be NULL, in which case, the local key data will not be available to the application upon reception of the"]
+#[doc = "                         @ref BLE_GAP_EVT_AUTH_STATUS event."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully accepted security parameter from the application."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Security parameters has not been requested."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Setting of sign or link fields in @ref ble_gap_sec_kdist_t not supported."]
+#[doc = "                                   Distribution of own Identity Information is only supported if the Central"]
+#[doc = "                                   Address Resolution characteristic is configured to be included or"]
+#[doc = "                                   the Softdevice is configured to support peripheral roles only."]
+#[doc = "                                   See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_sec_params_reply(
-        conn_handle: u16,
-        sec_status: u8,
-        p_sec_params: *const ble_gap_sec_params_t,
-        p_sec_keyset: *const ble_gap_sec_keyset_t,
-    ) -> u32 {
+    conn_handle: u16,
+    sec_status: u8,
+    p_sec_params: *const ble_gap_sec_params_t,
+    p_sec_keyset: *const ble_gap_sec_keyset_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 128",
         inout("r0") to_asm(conn_handle) => ret,
@@ -8814,35 +8685,33 @@ pub unsafe fn sd_ble_gap_sec_params_reply(
     ret
 }
 
-
-    #[doc = "@brief Reply with an authentication key."]
-    #[doc = ""]
-    #[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_AUTH_KEY_REQUEST or a @ref BLE_GAP_EVT_PASSKEY_DISPLAY, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
-    #[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] key_type See @ref BLE_GAP_AUTH_KEY_TYPES."]
-    #[doc = " @param[in] p_key If key type is @ref BLE_GAP_AUTH_KEY_TYPE_NONE, then NULL."]
-    #[doc = "                  If key type is @ref BLE_GAP_AUTH_KEY_TYPE_PASSKEY, then a 6-byte ASCII string (digit 0..9 only, no NULL termination)"]
-    #[doc = "                     or NULL when confirming LE Secure Connections Numeric Comparison."]
-    #[doc = "                  If key type is @ref BLE_GAP_AUTH_KEY_TYPE_OOB, then a 16-byte OOB key value in little-endian format."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Authentication key successfully set."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Authentication key has not been requested."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Reply with an authentication key."]
+#[doc = ""]
+#[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_AUTH_KEY_REQUEST or a @ref BLE_GAP_EVT_PASSKEY_DISPLAY, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
+#[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_BONDING_PK_PERIPH_OOB_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] key_type See @ref BLE_GAP_AUTH_KEY_TYPES."]
+#[doc = " @param[in] p_key If key type is @ref BLE_GAP_AUTH_KEY_TYPE_NONE, then NULL."]
+#[doc = "                  If key type is @ref BLE_GAP_AUTH_KEY_TYPE_PASSKEY, then a 6-byte ASCII string (digit 0..9 only, no NULL termination)"]
+#[doc = "                     or NULL when confirming LE Secure Connections Numeric Comparison."]
+#[doc = "                  If key type is @ref BLE_GAP_AUTH_KEY_TYPE_OOB, then a 16-byte OOB key value in little-endian format."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Authentication key successfully set."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Authentication key has not been requested."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_auth_key_reply(conn_handle: u16, key_type: u8, p_key: *const u8) -> u32 {
     let ret: u32;
@@ -8856,40 +8725,38 @@ pub unsafe fn sd_ble_gap_auth_key_reply(conn_handle: u16, key_type: u8, p_key: *
     ret
 }
 
-
-    #[doc = "@brief Reply with an LE Secure connections DHKey."]
-    #[doc = ""]
-    #[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
-    #[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_dhkey LE Secure Connections DHKey."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS DHKey successfully set."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
-    #[doc = "                                   - The peer is not authenticated."]
-    #[doc = "                                   - The application has not pulled a @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST event."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Reply with an LE Secure connections DHKey."]
+#[doc = ""]
+#[doc = " @details This function is only used to reply to a @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST, calling it at other times will result in an @ref NRF_ERROR_INVALID_STATE."]
+#[doc = " @note    If the call returns an error code, the request is still pending, and the reply call may be repeated with corrected parameters."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_PAIRING_JW_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_NC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_PD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_dhkey LE Secure Connections DHKey."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS DHKey successfully set."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
+#[doc = "                                   - The peer is not authenticated."]
+#[doc = "                                   - The application has not pulled a @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST event."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_lesc_dhkey_reply(
-        conn_handle: u16,
-        p_dhkey: *const ble_gap_lesc_dhkey_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_dhkey: *const ble_gap_lesc_dhkey_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 130",
         inout("r0") to_asm(conn_handle) => ret,
@@ -8901,25 +8768,23 @@ pub unsafe fn sd_ble_gap_lesc_dhkey_reply(
     ret
 }
 
-
-    #[doc = "@brief Notify the peer of a local keypress."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] kp_not See @ref BLE_GAP_KP_NOT_TYPES."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Keypress notification successfully queued for transmission."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
-    #[doc = "                                   - Authentication key not requested."]
-    #[doc = "                                   - Passkey has not been entered."]
-    #[doc = "                                   - Keypresses have not been enabled by both peers."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy. Retry at later time."]
-    
+#[doc = "@brief Notify the peer of a local keypress."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_PKE_CD_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] kp_not See @ref BLE_GAP_KP_NOT_TYPES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Keypress notification successfully queued for transmission."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
+#[doc = "                                   - Authentication key not requested."]
+#[doc = "                                   - Passkey has not been entered."]
+#[doc = "                                   - Keypresses have not been enabled by both peers."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy. Retry at later time."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_keypress_notify(conn_handle: u16, kp_not: u8) -> u32 {
     let ret: u32;
@@ -8933,30 +8798,28 @@ pub unsafe fn sd_ble_gap_keypress_notify(conn_handle: u16, kp_not: u8) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Generate a set of OOB data to send to a peer out of band."]
-    #[doc = ""]
-    #[doc = " @note  The @ref ble_gap_addr_t included in the OOB data returned will be the currently active one (or, if a connection has already been established,"]
-    #[doc = "        the one used during connection setup). The application may manually overwrite it with an updated value."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle. Can be @ref BLE_CONN_HANDLE_INVALID if a BLE connection has not been established yet."]
-    #[doc = " @param[in] p_pk_own LE Secure Connections local P-256 Public Key."]
-    #[doc = " @param[out] p_oobd_own The OOB data to be sent out of band to a peer."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS OOB data successfully generated."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Generate a set of OOB data to send to a peer out of band."]
+#[doc = ""]
+#[doc = " @note  The @ref ble_gap_addr_t included in the OOB data returned will be the currently active one (or, if a connection has already been established,"]
+#[doc = "        the one used during connection setup). The application may manually overwrite it with an updated value."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle. Can be @ref BLE_CONN_HANDLE_INVALID if a BLE connection has not been established yet."]
+#[doc = " @param[in] p_pk_own LE Secure Connections local P-256 Public Key."]
+#[doc = " @param[out] p_oobd_own The OOB data to be sent out of band to a peer."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS OOB data successfully generated."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_lesc_oob_data_get(
-        conn_handle: u16,
-        p_pk_own: *const ble_gap_lesc_p256_pk_t,
-        p_oobd_own: *mut ble_gap_lesc_oob_data_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_pk_own: *const ble_gap_lesc_p256_pk_t,
+    p_oobd_own: *mut ble_gap_lesc_oob_data_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 132",
         inout("r0") to_asm(conn_handle) => ret,
@@ -8968,42 +8831,40 @@ pub unsafe fn sd_ble_gap_lesc_oob_data_get(
     ret
 }
 
-
-    #[doc = "@brief Provide the OOB data sent/received out of band."]
-    #[doc = ""]
-    #[doc = " @note  An authentication procedure with OOB selected as an algorithm must be in progress when calling this function."]
-    #[doc = " @note  A @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST event with the oobd_req set to 1 must have been received prior to calling this function."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_oobd_own The OOB data sent out of band to a peer or NULL if the peer has not received OOB data."]
-    #[doc = "                       Must correspond to @ref ble_gap_sec_params_t::oob flag in @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST."]
-    #[doc = " @param[in] p_oobd_peer The OOB data received out of band from a peer or NULL if none received."]
-    #[doc = "                        Must correspond to @ref ble_gap_sec_params_t::oob flag"]
-    #[doc = "                        in @ref sd_ble_gap_authenticate in the central role or"]
-    #[doc = "                        in @ref sd_ble_gap_sec_params_reply in the peripheral role."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS OOB data accepted."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
-    #[doc = "                                   - Authentication key not requested"]
-    #[doc = "                                   - Not expecting LESC OOB data"]
-    #[doc = "                                   - Have not actually exchanged passkeys."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Provide the OOB data sent/received out of band."]
+#[doc = ""]
+#[doc = " @note  An authentication procedure with OOB selected as an algorithm must be in progress when calling this function."]
+#[doc = " @note  A @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST event with the oobd_req set to 1 must have been received prior to calling this function."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{This function is used during authentication procedures\\, see the list of events in the documentation of @ref sd_ble_gap_authenticate.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_LESC_BONDING_OOB_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_oobd_own The OOB data sent out of band to a peer or NULL if the peer has not received OOB data."]
+#[doc = "                       Must correspond to @ref ble_gap_sec_params_t::oob flag in @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST."]
+#[doc = " @param[in] p_oobd_peer The OOB data received out of band from a peer or NULL if none received."]
+#[doc = "                        Must correspond to @ref ble_gap_sec_params_t::oob flag"]
+#[doc = "                        in @ref sd_ble_gap_authenticate in the central role or"]
+#[doc = "                        in @ref sd_ble_gap_sec_params_reply in the peripheral role."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS OOB data accepted."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
+#[doc = "                                   - Authentication key not requested"]
+#[doc = "                                   - Not expecting LESC OOB data"]
+#[doc = "                                   - Have not actually exchanged passkeys."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_lesc_oob_data_set(
-        conn_handle: u16,
-        p_oobd_own: *const ble_gap_lesc_oob_data_t,
-        p_oobd_peer: *const ble_gap_lesc_oob_data_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_oobd_own: *const ble_gap_lesc_oob_data_t,
+    p_oobd_peer: *const ble_gap_lesc_oob_data_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 133",
         inout("r0") to_asm(conn_handle) => ret,
@@ -9015,40 +8876,38 @@ pub unsafe fn sd_ble_gap_lesc_oob_data_set(
     ret
 }
 
-
-    #[doc = "@brief Initiate GAP Encryption procedure."]
-    #[doc = ""]
-    #[doc = " @details In the central role, this function will initiate the encryption procedure using the encryption information provided."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_CONN_SEC_UPDATE, The connection security has been updated.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CTRL_PROC_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_SEC_REQ_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_master_id Pointer to a @ref ble_gap_master_id_t master identification structure."]
-    #[doc = " @param[in] p_enc_info  Pointer to a @ref ble_gap_enc_info_t encryption information structure."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully initiated authentication procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE No link has been established."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_ROLE Operation is not supported in the Peripheral role."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress or not allowed at this time, wait for pending procedures to complete and retry."]
-    #[doc = " @retval ::BLE_ERROR_UNSUPPORTED_REMOTE_FEATURE Peer has indicated that it does not support Encryption procedure."]
-    
+#[doc = "@brief Initiate GAP Encryption procedure."]
+#[doc = ""]
+#[doc = " @details In the central role, this function will initiate the encryption procedure using the encryption information provided."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_CONN_SEC_UPDATE, The connection security has been updated.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_AUTH_MUTEX_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_ENC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_MULTILINK_CTRL_PROC_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_SEC_REQ_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_master_id Pointer to a @ref ble_gap_master_id_t master identification structure."]
+#[doc = " @param[in] p_enc_info  Pointer to a @ref ble_gap_enc_info_t encryption information structure."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully initiated authentication procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE No link has been established."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_ROLE Operation is not supported in the Peripheral role."]
+#[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress or not allowed at this time, wait for pending procedures to complete and retry."]
+#[doc = " @retval ::BLE_ERROR_UNSUPPORTED_REMOTE_FEATURE Peer has indicated that it does not support Encryption procedure."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_encrypt(
-        conn_handle: u16,
-        p_master_id: *const ble_gap_master_id_t,
-        p_enc_info: *const ble_gap_enc_info_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_master_id: *const ble_gap_master_id_t,
+    p_enc_info: *const ble_gap_enc_info_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 134",
         inout("r0") to_asm(conn_handle) => ret,
@@ -9060,18 +8919,19 @@ pub unsafe fn sd_ble_gap_encrypt(
     ret
 }
 
-
-    #[doc = "@brief Get the current connection security."]
-    #[doc = ""]
-    #[doc = " @param[in]  conn_handle Connection handle."]
-    #[doc = " @param[out] p_conn_sec  Pointer to a @ref ble_gap_conn_sec_t structure to be filled in."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Current connection security successfully retrieved."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    
+#[doc = "@brief Get the current connection security."]
+#[doc = ""]
+#[doc = " @param[in]  conn_handle Connection handle."]
+#[doc = " @param[out] p_conn_sec  Pointer to a @ref ble_gap_conn_sec_t structure to be filled in."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Current connection security successfully retrieved."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
-pub unsafe fn sd_ble_gap_conn_sec_get(conn_handle: u16, p_conn_sec: *mut ble_gap_conn_sec_t) -> u32 {
+pub unsafe fn sd_ble_gap_conn_sec_get(
+    conn_handle: u16,
+    p_conn_sec: *mut ble_gap_conn_sec_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 136",
         inout("r0") to_asm(conn_handle) => ret,
@@ -9083,26 +8943,24 @@ pub unsafe fn sd_ble_gap_conn_sec_get(conn_handle: u16, p_conn_sec: *mut ble_gap
     ret
 }
 
-
-    #[doc = "@brief Get the received signal strength for the last connection event."]
-    #[doc = ""]
-    #[doc = "        @ref sd_ble_gap_qos_start with @ref BLE_GAP_QOS_RSSI must be called to start reporting RSSI before using this function. @ref NRF_ERROR_NOT_FOUND"]
-    #[doc = "        will be returned until RSSI was sampled for the first time after calling @ref sd_ble_gap_qos_start."]
-    #[doc = " @note ERRATA-153 and ERRATA-225 require the rssi sample to be compensated based on a temperature measurement."]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_RSSI_READ_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in]  conn_handle Connection handle."]
-    #[doc = " @param[out] p_rssi      Pointer to the location where the RSSI measurement shall be stored."]
-    #[doc = " @param[out] p_ch_index  Pointer to the location where Channel Index for the RSSI measurement shall be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS                   Successfully read the RSSI."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND           No sample is available."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE       RSSI reporting is not ongoing."]
-    
+#[doc = "@brief Get the received signal strength for the last connection event."]
+#[doc = ""]
+#[doc = "        @ref sd_ble_gap_qos_start with @ref BLE_GAP_QOS_RSSI must be called to start reporting RSSI before using this function. @ref NRF_ERROR_NOT_FOUND"]
+#[doc = "        will be returned until RSSI was sampled for the first time after calling @ref sd_ble_gap_qos_start."]
+#[doc = " @note ERRATA-153 and ERRATA-225 require the rssi sample to be compensated based on a temperature measurement."]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_RSSI_READ_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in]  conn_handle Connection handle."]
+#[doc = " @param[out] p_rssi      Pointer to the location where the RSSI measurement shall be stored."]
+#[doc = " @param[out] p_ch_index  Pointer to the location where Channel Index for the RSSI measurement shall be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS                   Successfully read the RSSI."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND           No sample is available."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE       RSSI reporting is not ongoing."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_rssi_get(conn_handle: u16, p_rssi: *mut i8, p_ch_index: *mut u8) -> u32 {
     let ret: u32;
@@ -9116,58 +8974,56 @@ pub unsafe fn sd_ble_gap_rssi_get(conn_handle: u16, p_rssi: *mut i8, p_ch_index:
     ret
 }
 
-
-    #[doc = "@brief Start or continue scanning (GAP Discovery procedure, Observer Procedure)."]
-    #[doc = ""]
-    #[doc = " @note    A call to this function will require the application to keep the memory pointed by"]
-    #[doc = "          p_adv_report_buffer alive until the buffer is released. The buffer is released when the scanner is stopped"]
-    #[doc = "          or when this function is called with another buffer."]
-    #[doc = ""]
-    #[doc = " @note    The scanner will automatically stop in the following cases:"]
-    #[doc = "           - @ref sd_ble_gap_scan_stop is called."]
-    #[doc = "           - @ref sd_ble_gap_connect is called."]
-    #[doc = "           - A @ref BLE_GAP_EVT_TIMEOUT with source set to @ref BLE_GAP_TIMEOUT_SRC_SCAN is received."]
-    #[doc = "           - When a @ref BLE_GAP_EVT_ADV_REPORT event is received."]
-    #[doc = "             In this case scanning is only paused to let the application access received data."]
-    #[doc = "             The application must call this function to continue scanning, or call"]
-    #[doc = "             @ref sd_ble_gap_scan_stop to stop scanning."]
-    #[doc = ""]
-    #[doc = " @note    When the scanner is paused, the application should continue scanning"]
-    #[doc = "          as soon as possible after fetching the @ref BLE_GAP_EVT_ADV_REPORT event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_ADV_REPORT, An advertising or scan response packet has been received.}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT, Scanner has timed out.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_SCAN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] p_scan_params       Pointer to scan parameters structure. When this function is used to continue"]
-    #[doc = "                                scanning, this parameter must be NULL."]
-    #[doc = " @param[in] p_adv_report_buffer Pointer to buffer used to store incoming advertising data."]
-    #[doc = "                                The memory pointed to should be kept alive until the scanning is stopped."]
-    #[doc = "                                See @ref BLE_GAP_SCAN_BUFFER_SIZE for minimum and maximum buffer size."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully initiated scanning procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
-    #[doc = "                                   - Scanning is already ongoing and p_scan_params was not NULL"]
-    #[doc = "                                   - Scanning is not running and p_scan_params was NULL."]
-    #[doc = "                                   - The scanner has timed out when this function is called to continue scanning."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied. See @ref ble_gap_scan_params_t."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported parameters supplied. See @ref ble_gap_scan_params_t."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_LENGTH The provided buffer length is invalid. See @ref BLE_GAP_SCAN_BUFFER_MIN."]
-    #[doc = " @retval ::NRF_ERROR_RESOURCES Not enough BLE role slots available."]
-    #[doc = "                               Stop one or more currently active roles (Central, Peripheral or Broadcaster) and try again"]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
-    
+#[doc = "@brief Start or continue scanning (GAP Discovery procedure, Observer Procedure)."]
+#[doc = ""]
+#[doc = " @note    A call to this function will require the application to keep the memory pointed by"]
+#[doc = "          p_adv_report_buffer alive until the buffer is released. The buffer is released when the scanner is stopped"]
+#[doc = "          or when this function is called with another buffer."]
+#[doc = ""]
+#[doc = " @note    The scanner will automatically stop in the following cases:"]
+#[doc = "           - @ref sd_ble_gap_scan_stop is called."]
+#[doc = "           - @ref sd_ble_gap_connect is called."]
+#[doc = "           - A @ref BLE_GAP_EVT_TIMEOUT with source set to @ref BLE_GAP_TIMEOUT_SRC_SCAN is received."]
+#[doc = "           - When a @ref BLE_GAP_EVT_ADV_REPORT event is received."]
+#[doc = "             In this case scanning is only paused to let the application access received data."]
+#[doc = "             The application must call this function to continue scanning, or call"]
+#[doc = "             @ref sd_ble_gap_scan_stop to stop scanning."]
+#[doc = ""]
+#[doc = " @note    When the scanner is paused, the application should continue scanning"]
+#[doc = "          as soon as possible after fetching the @ref BLE_GAP_EVT_ADV_REPORT event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_ADV_REPORT, An advertising or scan response packet has been received.}"]
+#[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT, Scanner has timed out.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_SCAN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] p_scan_params       Pointer to scan parameters structure. When this function is used to continue"]
+#[doc = "                                scanning, this parameter must be NULL."]
+#[doc = " @param[in] p_adv_report_buffer Pointer to buffer used to store incoming advertising data."]
+#[doc = "                                The memory pointed to should be kept alive until the scanning is stopped."]
+#[doc = "                                See @ref BLE_GAP_SCAN_BUFFER_SIZE for minimum and maximum buffer size."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully initiated scanning procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation. Either:"]
+#[doc = "                                   - Scanning is already ongoing and p_scan_params was not NULL"]
+#[doc = "                                   - Scanning is not running and p_scan_params was NULL."]
+#[doc = "                                   - The scanner has timed out when this function is called to continue scanning."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied. See @ref ble_gap_scan_params_t."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported parameters supplied. See @ref ble_gap_scan_params_t."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH The provided buffer length is invalid. See @ref BLE_GAP_SCAN_BUFFER_MIN."]
+#[doc = " @retval ::NRF_ERROR_RESOURCES Not enough BLE role slots available."]
+#[doc = "                               Stop one or more currently active roles (Central, Peripheral or Broadcaster) and try again"]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_scan_start(
-        p_scan_params: *const ble_gap_scan_params_t,
-        p_adv_report_buffer: *const ble_data_t,
-    ) -> u32 {
+    p_scan_params: *const ble_gap_scan_params_t,
+    p_adv_report_buffer: *const ble_data_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 137",
         inout("r0") to_asm(p_scan_params) => ret,
@@ -9179,18 +9035,16 @@ pub unsafe fn sd_ble_gap_scan_start(
     ret
 }
 
-
-    #[doc = "@brief Stop scanning (GAP Discovery procedure, Observer Procedure)."]
-    #[doc = ""]
-    #[doc = " @note The buffer provided in @ref sd_ble_gap_scan_start is released."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_SCAN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully stopped scanning procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Not in the scanning state."]
-    
+#[doc = "@brief Stop scanning (GAP Discovery procedure, Observer Procedure)."]
+#[doc = ""]
+#[doc = " @note The buffer provided in @ref sd_ble_gap_scan_start is released."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_SCAN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully stopped scanning procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Not in the scanning state."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_scan_stop() -> u32 {
     let ret: u32;
@@ -9204,57 +9058,55 @@ pub unsafe fn sd_ble_gap_scan_stop() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Create a connection (GAP Link Establishment)."]
-    #[doc = ""]
-    #[doc = " @note If a scanning procedure is currently in progress it will be automatically stopped when calling this function."]
-    #[doc = "       The scanning procedure will be stopped even if the function returns an error."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_CONNECTED, A connection was established.}"]
-    #[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT, Failed to establish a connection.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_PRIV_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] p_peer_addr   Pointer to peer identity address. If @ref ble_gap_scan_params_t::filter_policy is set to use"]
-    #[doc = "                          whitelist, then p_peer_addr is ignored."]
-    #[doc = " @param[in] p_scan_params Pointer to scan parameters structure."]
-    #[doc = " @param[in] p_conn_params Pointer to desired connection parameters."]
-    #[doc = " @param[in] conn_cfg_tag  Tag identifying a configuration set by @ref sd_ble_cfg_set or"]
-    #[doc = "                          @ref BLE_CONN_CFG_TAG_DEFAULT to use the default connection configuration."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully initiated connection procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid parameter(s) pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = "                                   - Invalid parameter(s) in p_scan_params or p_conn_params."]
-    #[doc = "                                   - Use of whitelist requested but whitelist has not been set, see @ref sd_ble_gap_whitelist_set."]
-    #[doc = "                                   - Peer address was not present in the device identity list, see @ref sd_ble_gap_device_identities_set."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND conn_cfg_tag not found."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE The SoftDevice is in an invalid state to perform this operation."]
-    #[doc = "                                   - A locally initiated connect procedure must complete before initiating again."]
-    #[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid Peer address."]
-    #[doc = " @retval ::NRF_ERROR_CONN_COUNT The limit of available connections for this connection configuration tag has been reached."]
-    #[doc = "                                To increase the number of available connections,"]
-    #[doc = "                                use @ref sd_ble_cfg_set with @ref BLE_GAP_CFG_ROLE_COUNT or @ref BLE_CONN_CFG_GAP."]
-    #[doc = " @retval ::NRF_ERROR_RESOURCES Either:"]
-    #[doc = "                                 - Not enough BLE role slots available."]
-    #[doc = "                                   Stop one or more currently active roles (Central, Peripheral or Observer) and try again."]
-    #[doc = "                                 - The event_length parameter associated with conn_cfg_tag is too small to be able to"]
-    #[doc = "                                   establish a connection on the selected @ref ble_gap_scan_params_t::scan_phys."]
-    #[doc = "                                   Use @ref sd_ble_cfg_set to increase the event length."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
-    
+#[doc = "@brief Create a connection (GAP Link Establishment)."]
+#[doc = ""]
+#[doc = " @note If a scanning procedure is currently in progress it will be automatically stopped when calling this function."]
+#[doc = "       The scanning procedure will be stopped even if the function returns an error."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_CONNECTED, A connection was established.}"]
+#[doc = " @event{@ref BLE_GAP_EVT_TIMEOUT, Failed to establish a connection.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_PRIV_MSC}"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] p_peer_addr   Pointer to peer identity address. If @ref ble_gap_scan_params_t::filter_policy is set to use"]
+#[doc = "                          whitelist, then p_peer_addr is ignored."]
+#[doc = " @param[in] p_scan_params Pointer to scan parameters structure."]
+#[doc = " @param[in] p_conn_params Pointer to desired connection parameters."]
+#[doc = " @param[in] conn_cfg_tag  Tag identifying a configuration set by @ref sd_ble_cfg_set or"]
+#[doc = "                          @ref BLE_CONN_CFG_TAG_DEFAULT to use the default connection configuration."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully initiated connection procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid parameter(s) pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = "                                   - Invalid parameter(s) in p_scan_params or p_conn_params."]
+#[doc = "                                   - Use of whitelist requested but whitelist has not been set, see @ref sd_ble_gap_whitelist_set."]
+#[doc = "                                   - Peer address was not present in the device identity list, see @ref sd_ble_gap_device_identities_set."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND conn_cfg_tag not found."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE The SoftDevice is in an invalid state to perform this operation."]
+#[doc = "                                   - A locally initiated connect procedure must complete before initiating again."]
+#[doc = " @retval ::BLE_ERROR_GAP_INVALID_BLE_ADDR Invalid Peer address."]
+#[doc = " @retval ::NRF_ERROR_CONN_COUNT The limit of available connections for this connection configuration tag has been reached."]
+#[doc = "                                To increase the number of available connections,"]
+#[doc = "                                use @ref sd_ble_cfg_set with @ref BLE_GAP_CFG_ROLE_COUNT or @ref BLE_CONN_CFG_GAP."]
+#[doc = " @retval ::NRF_ERROR_RESOURCES Either:"]
+#[doc = "                                 - Not enough BLE role slots available."]
+#[doc = "                                   Stop one or more currently active roles (Central, Peripheral or Observer) and try again."]
+#[doc = "                                 - The event_length parameter associated with conn_cfg_tag is too small to be able to"]
+#[doc = "                                   establish a connection on the selected @ref ble_gap_scan_params_t::scan_phys."]
+#[doc = "                                   Use @ref sd_ble_cfg_set to increase the event length."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_connect(
-        p_peer_addr: *const ble_gap_addr_t,
-        p_scan_params: *const ble_gap_scan_params_t,
-        p_conn_params: *const ble_gap_conn_params_t,
-        conn_cfg_tag: u8,
-    ) -> u32 {
+    p_peer_addr: *const ble_gap_addr_t,
+    p_scan_params: *const ble_gap_scan_params_t,
+    p_conn_params: *const ble_gap_conn_params_t,
+    conn_cfg_tag: u8,
+) -> u32 {
     let ret: u32;
     asm!("svc 139",
         inout("r0") to_asm(p_peer_addr) => ret,
@@ -9266,17 +9118,15 @@ pub unsafe fn sd_ble_gap_connect(
     ret
 }
 
-
-    #[doc = "@brief Cancel a connection establishment."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully canceled an ongoing connection procedure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE No locally initiated connect procedure started or connection"]
-    #[doc = "                                   completed occurred."]
-    
+#[doc = "@brief Cancel a connection establishment."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_CONN_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully canceled an ongoing connection procedure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE No locally initiated connect procedure started or connection"]
+#[doc = "                                   completed occurred."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_connect_cancel() -> u32 {
     let ret: u32;
@@ -9290,59 +9140,57 @@ pub unsafe fn sd_ble_gap_connect_cancel() -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Initiate or respond to a PHY Update Procedure"]
-    #[doc = ""]
-    #[doc = " @details   This function is used to initiate or respond to a PHY Update Procedure. It will always"]
-    #[doc = "            generate a @ref BLE_GAP_EVT_PHY_UPDATE event if successfully executed."]
-    #[doc = "            If this function is used to initiate a PHY Update procedure and the only option"]
-    #[doc = "            provided in @ref ble_gap_phys_t::tx_phys and @ref ble_gap_phys_t::rx_phys is the"]
-    #[doc = "            currently active PHYs in the respective directions, the SoftDevice will generate a"]
-    #[doc = "            @ref BLE_GAP_EVT_PHY_UPDATE with the current PHYs set and will not initiate the"]
-    #[doc = "            procedure in the Link Layer."]
-    #[doc = ""]
-    #[doc = "            If @ref ble_gap_phys_t::tx_phys or @ref ble_gap_phys_t::rx_phys is @ref BLE_GAP_PHY_AUTO,"]
-    #[doc = "            then the stack will select PHYs based on the peer's PHY preferences and the local link"]
-    #[doc = "            configuration. The PHY Update procedure will for this case result in a PHY combination"]
-    #[doc = "            that respects the time constraints configured with @ref sd_ble_cfg_set and the current"]
-    #[doc = "            link layer data length."]
-    #[doc = ""]
-    #[doc = "            When acting as a central, the SoftDevice will select the fastest common PHY in each direction."]
-    #[doc = ""]
-    #[doc = "            If the peer responds the PHY Update Procedure with unknown response, then the resulting"]
-    #[doc = "            @ref BLE_GAP_EVT_PHY_UPDATE event will have a status set to"]
-    #[doc = "            @ref BLE_HCI_UNSUPPORTED_REMOTE_FEATURE."]
-    #[doc = ""]
-    #[doc = "            If the PHY Update procedure was rejected by the peer due to a procedure collision, the status"]
-    #[doc = "            will be @ref BLE_HCI_STATUS_CODE_LMP_ERROR_TRANSACTION_COLLISION or"]
-    #[doc = "            @ref BLE_HCI_DIFFERENT_TRANSACTION_COLLISION."]
-    #[doc = "            If the peer responds to the PHY Update procedure with invalid parameters, the status"]
-    #[doc = "            will be @ref BLE_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS."]
-    #[doc = "            If the PHY Update procedure was rejected by the peer for a different reason, the status will"]
-    #[doc = "            contain the reason as specified by the peer."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GAP_EVT_PHY_UPDATE, Result of the PHY Update Procedure.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PHY_UPDATE}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle   Connection handle to indicate the connection for which the PHY Update is requested."]
-    #[doc = " @param[in] p_gap_phys    Pointer to PHY structure."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully requested a PHY Update."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::BLE_ERROR_UNSUPPORTED_REMOTE_FEATURE Peer has indicated before that it does not support PHY Update procedure."]
-    #[doc = "                                                Note that this only applies if the PHY Update procedure is self initiated."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE No link has been established."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Procedure is already in progress or not allowed at this time. Process pending events and wait for the pending procedure to complete and retry."]
-    #[doc = ""]
-    
+#[doc = "@brief Initiate or respond to a PHY Update Procedure"]
+#[doc = ""]
+#[doc = " @details   This function is used to initiate or respond to a PHY Update Procedure. It will always"]
+#[doc = "            generate a @ref BLE_GAP_EVT_PHY_UPDATE event if successfully executed."]
+#[doc = "            If this function is used to initiate a PHY Update procedure and the only option"]
+#[doc = "            provided in @ref ble_gap_phys_t::tx_phys and @ref ble_gap_phys_t::rx_phys is the"]
+#[doc = "            currently active PHYs in the respective directions, the SoftDevice will generate a"]
+#[doc = "            @ref BLE_GAP_EVT_PHY_UPDATE with the current PHYs set and will not initiate the"]
+#[doc = "            procedure in the Link Layer."]
+#[doc = ""]
+#[doc = "            If @ref ble_gap_phys_t::tx_phys or @ref ble_gap_phys_t::rx_phys is @ref BLE_GAP_PHY_AUTO,"]
+#[doc = "            then the stack will select PHYs based on the peer's PHY preferences and the local link"]
+#[doc = "            configuration. The PHY Update procedure will for this case result in a PHY combination"]
+#[doc = "            that respects the time constraints configured with @ref sd_ble_cfg_set and the current"]
+#[doc = "            link layer data length."]
+#[doc = ""]
+#[doc = "            When acting as a central, the SoftDevice will select the fastest common PHY in each direction."]
+#[doc = ""]
+#[doc = "            If the peer responds the PHY Update Procedure with unknown response, then the resulting"]
+#[doc = "            @ref BLE_GAP_EVT_PHY_UPDATE event will have a status set to"]
+#[doc = "            @ref BLE_HCI_UNSUPPORTED_REMOTE_FEATURE."]
+#[doc = ""]
+#[doc = "            If the PHY Update procedure was rejected by the peer due to a procedure collision, the status"]
+#[doc = "            will be @ref BLE_HCI_STATUS_CODE_LMP_ERROR_TRANSACTION_COLLISION or"]
+#[doc = "            @ref BLE_HCI_DIFFERENT_TRANSACTION_COLLISION."]
+#[doc = "            If the peer responds to the PHY Update procedure with invalid parameters, the status"]
+#[doc = "            will be @ref BLE_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS."]
+#[doc = "            If the PHY Update procedure was rejected by the peer for a different reason, the status will"]
+#[doc = "            contain the reason as specified by the peer."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GAP_EVT_PHY_UPDATE, Result of the PHY Update Procedure.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GAP_CENTRAL_PHY_UPDATE}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle   Connection handle to indicate the connection for which the PHY Update is requested."]
+#[doc = " @param[in] p_gap_phys    Pointer to PHY structure."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully requested a PHY Update."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::BLE_ERROR_UNSUPPORTED_REMOTE_FEATURE Peer has indicated before that it does not support PHY Update procedure."]
+#[doc = "                                                Note that this only applies if the PHY Update procedure is self initiated."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Unsupported PHYs supplied to the call."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE No link has been established."]
+#[doc = " @retval ::NRF_ERROR_BUSY Procedure is already in progress or not allowed at this time. Process pending events and wait for the pending procedure to complete and retry."]
+#[doc = ""]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_phy_update(conn_handle: u16, p_gap_phys: *const ble_gap_phys_t) -> u32 {
     let ret: u32;
@@ -9356,20 +9204,18 @@ pub unsafe fn sd_ble_gap_phy_update(conn_handle: u16, p_gap_phys: *const ble_gap
     ret
 }
 
-
-    #[doc = "@brief   Start Quality of Service (QoS) reporting."]
-    #[doc = ""]
-    #[doc = " @param[in] qos_id QoS ID, see @ref BLE_GAP_QOS_IDS."]
-    #[doc = " @param[in] p_qos_params Pointer to a @ref ble_gap_qos_params_t structure containing the QoS parameters."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS             The QoS reporting is successfully started."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter supplied. qos_id is out of the"]
-    #[doc = "                                   allowed range."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Trying to start the reporting when already started."]
-    #[doc = ""]
-    #[doc = " @note For a complete set of return values see @ref ble_gap_qos_params_t."]
-    
+#[doc = "@brief   Start Quality of Service (QoS) reporting."]
+#[doc = ""]
+#[doc = " @param[in] qos_id QoS ID, see @ref BLE_GAP_QOS_IDS."]
+#[doc = " @param[in] p_qos_params Pointer to a @ref ble_gap_qos_params_t structure containing the QoS parameters."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS             The QoS reporting is successfully started."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter supplied. qos_id is out of the"]
+#[doc = "                                   allowed range."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Trying to start the reporting when already started."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values see @ref ble_gap_qos_params_t."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_qos_start(qos_id: u32, p_qos_params: *const ble_gap_qos_params_t) -> u32 {
     let ret: u32;
@@ -9383,20 +9229,18 @@ pub unsafe fn sd_ble_gap_qos_start(qos_id: u32, p_qos_params: *const ble_gap_qos
     ret
 }
 
-
-    #[doc = "@brief   Stop Quality of Service (QoS) reporting."]
-    #[doc = ""]
-    #[doc = " @param[in] qos_id QoS ID, see @ref BLE_GAP_QOS_IDS."]
-    #[doc = " @param[in] p_qos_params Pointer to a @ref ble_gap_qos_params_t structure containing the QoS parameters."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS             The QoS reporting is successfully stopped."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter supplied. qos_id is out of the"]
-    #[doc = "                                   allowed range."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Trying to stop the reporting when it is not started."]
-    #[doc = ""]
-    #[doc = " @note For a complete set of return values see @ref ble_gap_qos_params_t."]
-    
+#[doc = "@brief   Stop Quality of Service (QoS) reporting."]
+#[doc = ""]
+#[doc = " @param[in] qos_id QoS ID, see @ref BLE_GAP_QOS_IDS."]
+#[doc = " @param[in] p_qos_params Pointer to a @ref ble_gap_qos_params_t structure containing the QoS parameters."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS             The QoS reporting is successfully stopped."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter supplied. qos_id is out of the"]
+#[doc = "                                   allowed range."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Trying to stop the reporting when it is not started."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values see @ref ble_gap_qos_params_t."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_qos_stop(qos_id: u32, p_qos_params: *const ble_gap_qos_params_t) -> u32 {
     let ret: u32;
@@ -9410,28 +9254,26 @@ pub unsafe fn sd_ble_gap_qos_stop(qos_id: u32, p_qos_params: *const ble_gap_qos_
     ret
 }
 
-
-    #[doc = "@brief   Obtain the next connection event counter value."]
-    #[doc = ""]
-    #[doc = " @details The connection event counter is initialized to zero on the first connection event. The value is incremented"]
-    #[doc = "          by one for each connection event. For more information see Bluetooth Core Specification v5.0, Vol 6, Part B,"]
-    #[doc = "          Section 4.5.1."]
-    #[doc = ""]
-    #[doc = " @note    The connection event counter obtained through this API will be outdated if this API is called"]
-    #[doc = "          at the same time as the connection event counter is incremented."]
-    #[doc = ""]
-    #[doc = " @note    This API will always return the last connection event counter + 1."]
-    #[doc = "          The actual connection event may be multiple connection events later if:"]
-    #[doc = "           - Slave latency is enabled and there is no data to transmit or receive."]
-    #[doc = "           - Another role is scheduled with a higher priority at the same time as the next connection event."]
-    #[doc = ""]
-    #[doc = " @param[in]   conn_handle       Connection handle."]
-    #[doc = " @param[out]  p_counter         Pointer to the variable where the next connection event counter will be written."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS                   The connection event counter was successfully retrieved."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle parameter supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
-    
+#[doc = "@brief   Obtain the next connection event counter value."]
+#[doc = ""]
+#[doc = " @details The connection event counter is initialized to zero on the first connection event. The value is incremented"]
+#[doc = "          by one for each connection event. For more information see Bluetooth Core Specification v5.0, Vol 6, Part B,"]
+#[doc = "          Section 4.5.1."]
+#[doc = ""]
+#[doc = " @note    The connection event counter obtained through this API will be outdated if this API is called"]
+#[doc = "          at the same time as the connection event counter is incremented."]
+#[doc = ""]
+#[doc = " @note    This API will always return the last connection event counter + 1."]
+#[doc = "          The actual connection event may be multiple connection events later if:"]
+#[doc = "           - Slave latency is enabled and there is no data to transmit or receive."]
+#[doc = "           - Another role is scheduled with a higher priority at the same time as the next connection event."]
+#[doc = ""]
+#[doc = " @param[in]   conn_handle       Connection handle."]
+#[doc = " @param[out]  p_counter         Pointer to the variable where the next connection event counter will be written."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS                   The connection event counter was successfully retrieved."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle parameter supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_next_conn_evt_counter_get(conn_handle: u16, p_counter: *mut u16) -> u32 {
     let ret: u32;
@@ -9445,39 +9287,37 @@ pub unsafe fn sd_ble_gap_next_conn_evt_counter_get(conn_handle: u16, p_counter: 
     ret
 }
 
-
-    #[doc = "@brief   Start triggering a given task on the start of a Bluetooth Link Layer event."]
-    #[doc = ""]
-    #[doc = " @details When enabled, this feature will trigger a PPI task at the start of Bluetooth Link Layer events."]
-    #[doc = ""]
-    #[doc = " @param[in]      role          The role to start the event trigger for."]
-    #[doc = "                               The following roles are supported on this SoftDevice:"]
-    #[doc = "                               - @ref BLE_GAP_LL_ROLE_CONN"]
-    #[doc = "                               - @ref BLE_GAP_LL_ROLE_SCAN"]
-    #[doc = "                               - @ref BLE_GAP_LL_ROLE_INIT"]
-    #[doc = " @param[in]      handle        The handle parameter is interpreted depending on role:"]
-    #[doc = "                               - If role is @ref BLE_GAP_LL_ROLE_CONN, this value is the specific connection handle."]
-    #[doc = "                               - For all other roles, handle is ignored."]
-    #[doc = " @param[in]      p_params      Event trigger parameters."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS                   Success."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM       Invalid parameter supplied. See @ref ble_gap_event_trigger_t."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE       Either:"]
-    #[doc = "                                         - Trying to start event triggering when it is already ongoing."]
-    #[doc = "                                         - @ref ble_gap_event_trigger_t::conn_evt_counter_start is in the past."]
-    #[doc = "                                           Use @ref sd_ble_gap_next_conn_evt_counter_get to find a new value"]
-    #[doc = "                                           to be used as ble_gap_event_trigger_t::conn_evt_counter_start."]
-    #[doc = "                                         - Trying to start the event triggering for @ref BLE_GAP_LL_ROLE_SCAN or"]
-    #[doc = "                                           @ref BLE_GAP_LL_ROLE_INIT when the corresponding LL role is not active."]
-    
+#[doc = "@brief   Start triggering a given task on the start of a Bluetooth Link Layer event."]
+#[doc = ""]
+#[doc = " @details When enabled, this feature will trigger a PPI task at the start of Bluetooth Link Layer events."]
+#[doc = ""]
+#[doc = " @param[in]      role          The role to start the event trigger for."]
+#[doc = "                               The following roles are supported on this SoftDevice:"]
+#[doc = "                               - @ref BLE_GAP_LL_ROLE_CONN"]
+#[doc = "                               - @ref BLE_GAP_LL_ROLE_SCAN"]
+#[doc = "                               - @ref BLE_GAP_LL_ROLE_INIT"]
+#[doc = " @param[in]      handle        The handle parameter is interpreted depending on role:"]
+#[doc = "                               - If role is @ref BLE_GAP_LL_ROLE_CONN, this value is the specific connection handle."]
+#[doc = "                               - For all other roles, handle is ignored."]
+#[doc = " @param[in]      p_params      Event trigger parameters."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS                   Success."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR        Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM       Invalid parameter supplied. See @ref ble_gap_event_trigger_t."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE       Either:"]
+#[doc = "                                         - Trying to start event triggering when it is already ongoing."]
+#[doc = "                                         - @ref ble_gap_event_trigger_t::conn_evt_counter_start is in the past."]
+#[doc = "                                           Use @ref sd_ble_gap_next_conn_evt_counter_get to find a new value"]
+#[doc = "                                           to be used as ble_gap_event_trigger_t::conn_evt_counter_start."]
+#[doc = "                                         - Trying to start the event triggering for @ref BLE_GAP_LL_ROLE_SCAN or"]
+#[doc = "                                           @ref BLE_GAP_LL_ROLE_INIT when the corresponding LL role is not active."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_evt_trigger_start(
-        role: u8,
-        handle: u16,
-        p_params: *const ble_gap_event_trigger_t,
-    ) -> u32 {
+    role: u8,
+    handle: u16,
+    p_params: *const ble_gap_event_trigger_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 148",
         inout("r0") to_asm(role) => ret,
@@ -9489,22 +9329,20 @@ pub unsafe fn sd_ble_gap_evt_trigger_start(
     ret
 }
 
-
-    #[doc = "@brief   Stop triggering the task configured using @ref sd_ble_gap_evt_trigger_start."]
-    #[doc = ""]
-    #[doc = " @param[in]   role     The role to stop the event trigger for."]
-    #[doc = "                       The following roles are supported on this SoftDevice:"]
-    #[doc = "                       - @ref BLE_GAP_LL_ROLE_CONN"]
-    #[doc = "                       - @ref BLE_GAP_LL_ROLE_SCAN"]
-    #[doc = "                       - @ref BLE_GAP_LL_ROLE_INIT"]
-    #[doc = " @param[in]   handle   The handle parameter is interpreted depending on role:"]
-    #[doc = "                       - If role is @ref BLE_GAP_LL_ROLE_CONN, this value is the specific connection handle."]
-    #[doc = "                       - For all other roles, handle is ignored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS                   Success."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE       Trying to stop event triggering when it is not started."]
-    
+#[doc = "@brief   Stop triggering the task configured using @ref sd_ble_gap_evt_trigger_start."]
+#[doc = ""]
+#[doc = " @param[in]   role     The role to stop the event trigger for."]
+#[doc = "                       The following roles are supported on this SoftDevice:"]
+#[doc = "                       - @ref BLE_GAP_LL_ROLE_CONN"]
+#[doc = "                       - @ref BLE_GAP_LL_ROLE_SCAN"]
+#[doc = "                       - @ref BLE_GAP_LL_ROLE_INIT"]
+#[doc = " @param[in]   handle   The handle parameter is interpreted depending on role:"]
+#[doc = "                       - If role is @ref BLE_GAP_LL_ROLE_CONN, this value is the specific connection handle."]
+#[doc = "                       - For all other roles, handle is ignored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS                   Success."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE       Trying to stop event triggering when it is not started."]
 #[inline(always)]
 pub unsafe fn sd_ble_gap_evt_trigger_stop(role: u8, handle: u16) -> u32 {
     let ret: u32;
@@ -11140,39 +10978,38 @@ fn bindgen_test_layout_ble_gattc_evt_t() {
     );
 }
 
-    #[doc = "@brief Initiate or continue a GATT Primary Service Discovery procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes a Primary Service discovery procedure, starting from the supplied handle."]
-    #[doc = "          If the last service has not been reached, this function must be called again with an updated start handle value to continue the search."]
-    #[doc = ""]
-    #[doc = " @note If any of the discovered services have 128-bit UUIDs which are not present in the table provided to @ref sd_ble_uuid_vs_add, a UUID structure with"]
-    #[doc = "       type @ref BLE_UUID_TYPE_UNKNOWN will be received in the corresponding event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_PRIM_SRVC_DISC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] start_handle Handle to start searching from."]
-    #[doc = " @param[in] p_srvc_uuid Pointer to the service UUID to be found. If it is NULL, all primary services will be returned."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Primary Service Discovery procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Primary Service Discovery procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes a Primary Service discovery procedure, starting from the supplied handle."]
+#[doc = "          If the last service has not been reached, this function must be called again with an updated start handle value to continue the search."]
+#[doc = ""]
+#[doc = " @note If any of the discovered services have 128-bit UUIDs which are not present in the table provided to @ref sd_ble_uuid_vs_add, a UUID structure with"]
+#[doc = "       type @ref BLE_UUID_TYPE_UNKNOWN will be received in the corresponding event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_PRIM_SRVC_DISC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] start_handle Handle to start searching from."]
+#[doc = " @param[in] p_srvc_uuid Pointer to the service UUID to be found. If it is NULL, all primary services will be returned."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Primary Service Discovery procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_primary_services_discover(
-        conn_handle: u16,
-        start_handle: u16,
-        p_srvc_uuid: *const ble_uuid_t,
-    ) -> u32 {
+    conn_handle: u16,
+    start_handle: u16,
+    p_srvc_uuid: *const ble_uuid_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 155",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11184,36 +11021,34 @@ pub unsafe fn sd_ble_gattc_primary_services_discover(
     ret
 }
 
-
-    #[doc = "@brief Initiate or continue a GATT Relationship Discovery procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes the Find Included Services sub-procedure. If the last included service has not been reached,"]
-    #[doc = "          this must be called again with an updated handle range to continue the search."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_REL_DISC_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_REL_DISC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_handle_range A pointer to the range of handles of the Service to perform this procedure on."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Relationship Discovery procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Relationship Discovery procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes the Find Included Services sub-procedure. If the last included service has not been reached,"]
+#[doc = "          this must be called again with an updated handle range to continue the search."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_REL_DISC_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_REL_DISC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_handle_range A pointer to the range of handles of the Service to perform this procedure on."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Relationship Discovery procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_relationships_discover(
-        conn_handle: u16,
-        p_handle_range: *const ble_gattc_handle_range_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_handle_range: *const ble_gattc_handle_range_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 156",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11225,38 +11060,36 @@ pub unsafe fn sd_ble_gattc_relationships_discover(
     ret
 }
 
-
-    #[doc = "@brief Initiate or continue a GATT Characteristic Discovery procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes a Characteristic discovery procedure. If the last Characteristic has not been reached,"]
-    #[doc = "          this must be called again with an updated handle range to continue the discovery."]
-    #[doc = ""]
-    #[doc = " @note If any of the discovered characteristics have 128-bit UUIDs which are not present in the table provided to @ref sd_ble_uuid_vs_add, a UUID structure with"]
-    #[doc = "       type @ref BLE_UUID_TYPE_UNKNOWN will be received in the corresponding event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_CHAR_DISC_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_CHAR_DISC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_handle_range A pointer to the range of handles of the Service to perform this procedure on."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Characteristic Discovery procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Characteristic Discovery procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes a Characteristic discovery procedure. If the last Characteristic has not been reached,"]
+#[doc = "          this must be called again with an updated handle range to continue the discovery."]
+#[doc = ""]
+#[doc = " @note If any of the discovered characteristics have 128-bit UUIDs which are not present in the table provided to @ref sd_ble_uuid_vs_add, a UUID structure with"]
+#[doc = "       type @ref BLE_UUID_TYPE_UNKNOWN will be received in the corresponding event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_CHAR_DISC_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_CHAR_DISC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_handle_range A pointer to the range of handles of the Service to perform this procedure on."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Characteristic Discovery procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_characteristics_discover(
-        conn_handle: u16,
-        p_handle_range: *const ble_gattc_handle_range_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_handle_range: *const ble_gattc_handle_range_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 157",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11268,35 +11101,33 @@ pub unsafe fn sd_ble_gattc_characteristics_discover(
     ret
 }
 
-
-    #[doc = "@brief Initiate or continue a GATT Characteristic Descriptor Discovery procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes a Characteristic Descriptor discovery procedure. If the last Descriptor has not been reached,"]
-    #[doc = "          this must be called again with an updated handle range to continue the discovery."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_DESC_DISC_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_DESC_DISC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_handle_range A pointer to the range of handles of the Characteristic to perform this procedure on."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Descriptor Discovery procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Characteristic Descriptor Discovery procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes a Characteristic Descriptor discovery procedure. If the last Descriptor has not been reached,"]
+#[doc = "          this must be called again with an updated handle range to continue the discovery."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_DESC_DISC_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_DESC_DISC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_handle_range A pointer to the range of handles of the Characteristic to perform this procedure on."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Descriptor Discovery procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_descriptors_discover(
-        conn_handle: u16,
-        p_handle_range: *const ble_gattc_handle_range_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_handle_range: *const ble_gattc_handle_range_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 158",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11308,37 +11139,35 @@ pub unsafe fn sd_ble_gattc_descriptors_discover(
     ret
 }
 
-
-    #[doc = "@brief Initiate or continue a GATT Read using Characteristic UUID procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes a Read using Characteristic UUID procedure. If the last Characteristic has not been reached,"]
-    #[doc = "          this must be called again with an updated handle range to continue the discovery."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_READ_UUID_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_uuid Pointer to a Characteristic value UUID to read."]
-    #[doc = " @param[in] p_handle_range A pointer to the range of handles to perform this procedure on."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Read using Characteristic UUID procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Read using Characteristic UUID procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes a Read using Characteristic UUID procedure. If the last Characteristic has not been reached,"]
+#[doc = "          this must be called again with an updated handle range to continue the discovery."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_CHAR_VAL_BY_UUID_READ_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_READ_UUID_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_uuid Pointer to a Characteristic value UUID to read."]
+#[doc = " @param[in] p_handle_range A pointer to the range of handles to perform this procedure on."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Read using Characteristic UUID procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_char_value_by_uuid_read(
-        conn_handle: u16,
-        p_uuid: *const ble_uuid_t,
-        p_handle_range: *const ble_gattc_handle_range_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_uuid: *const ble_uuid_t,
+    p_handle_range: *const ble_gattc_handle_range_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 160",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11350,31 +11179,29 @@ pub unsafe fn sd_ble_gattc_char_value_by_uuid_read(
     ret
 }
 
-
-    #[doc = "@brief Initiate or continue a GATT Read (Long) Characteristic or Descriptor procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates or resumes a GATT Read (Long) Characteristic or Descriptor procedure. If the Characteristic or Descriptor"]
-    #[doc = "          to be read is longer than ATT_MTU - 1, this function must be called multiple times with appropriate offset to read the"]
-    #[doc = "          complete value."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_READ_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_VALUE_READ_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] handle The handle of the attribute to be read."]
-    #[doc = " @param[in] offset Offset into the attribute value to be read."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Read (Long) procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate or continue a GATT Read (Long) Characteristic or Descriptor procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates or resumes a GATT Read (Long) Characteristic or Descriptor procedure. If the Characteristic or Descriptor"]
+#[doc = "          to be read is longer than ATT_MTU - 1, this function must be called multiple times with appropriate offset to read the"]
+#[doc = "          complete value."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_READ_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_VALUE_READ_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] handle The handle of the attribute to be read."]
+#[doc = " @param[in] offset Offset into the attribute value to be read."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started or resumed the Read (Long) procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_read(conn_handle: u16, handle: u16, offset: u16) -> u32 {
     let ret: u32;
@@ -11388,36 +11215,34 @@ pub unsafe fn sd_ble_gattc_read(conn_handle: u16, handle: u16, offset: u16) -> u
     ret
 }
 
-
-    #[doc = "@brief Initiate a GATT Read Multiple Characteristic Values procedure."]
-    #[doc = ""]
-    #[doc = " @details This function initiates a GATT Read Multiple Characteristic Values procedure."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_CHAR_VALS_READ_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_READ_MULT_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_handles A pointer to the handle(s) of the attribute(s) to be read."]
-    #[doc = " @param[in] handle_count The number of handles in p_handles."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started the Read Multiple Characteristic Values procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Initiate a GATT Read Multiple Characteristic Values procedure."]
+#[doc = ""]
+#[doc = " @details This function initiates a GATT Read Multiple Characteristic Values procedure."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_CHAR_VALS_READ_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_READ_MULT_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_handles A pointer to the handle(s) of the attribute(s) to be read."]
+#[doc = " @param[in] handle_count The number of handles in p_handles."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started the Read Multiple Characteristic Values procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_char_values_read(
-        conn_handle: u16,
-        p_handles: *const u16,
-        handle_count: u16,
-    ) -> u32 {
+    conn_handle: u16,
+    p_handles: *const u16,
+    handle_count: u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 162",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11429,56 +11254,54 @@ pub unsafe fn sd_ble_gattc_char_values_read(
     ret
 }
 
-
-    #[doc = "@brief Perform a Write (Characteristic Value or Descriptor, with or without response, signed or not, long or reliable) procedure."]
-    #[doc = ""]
-    #[doc = " @details This function can perform all write procedures described in GATT."]
-    #[doc = ""]
-    #[doc = " @note    Only one write with response procedure can be ongoing per connection at a time."]
-    #[doc = "          If the application tries to write with response while another write with response procedure is ongoing,"]
-    #[doc = "          the function call will return @ref NRF_ERROR_BUSY."]
-    #[doc = "          A @ref BLE_GATTC_EVT_WRITE_RSP event will be issued as soon as the write response arrives from the peer."]
-    #[doc = ""]
-    #[doc = " @note    The minimum guaranteed number of Write without Response that can be queued is configured by @ref ble_gattc_conn_cfg_t::write_cmd_tx_queue_size"]
-    #[doc = "          When the queue is full, the function call will return @ref NRF_ERROR_RESOURCES."]
-    #[doc = "          A @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event will be issued as soon as the transmission of the write without response is complete."]
-    #[doc = ""]
-    #[doc = " @note    The application can keep track of the available queue element count for writes without responses by following the procedure below:"]
-    #[doc = "          - Store initial queue element count in a variable."]
-    #[doc = "          - Decrement the variable, which stores the currently available queue element count, by one when a call to this function returns @ref NRF_SUCCESS."]
-    #[doc = "          - Increment the variable, which stores the current available queue element count, by the count variable in @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE, Write without response transmission complete.}"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_WRITE_RSP, Write response received from the peer.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_VALUE_WRITE_WITHOUT_RESP_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTC_VALUE_WRITE_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTC_VALUE_LONG_WRITE_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTC_VALUE_RELIABLE_WRITE_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_write_params A pointer to a write parameters structure."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started the Write procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY For write with response, procedure already in progress. Wait for a @ref BLE_GATTC_EVT_WRITE_RSP event and retry."]
-    #[doc = " @retval ::NRF_ERROR_RESOURCES Too many writes without responses queued."]
-    #[doc = "                               Wait for a @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event and retry."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Perform a Write (Characteristic Value or Descriptor, with or without response, signed or not, long or reliable) procedure."]
+#[doc = ""]
+#[doc = " @details This function can perform all write procedures described in GATT."]
+#[doc = ""]
+#[doc = " @note    Only one write with response procedure can be ongoing per connection at a time."]
+#[doc = "          If the application tries to write with response while another write with response procedure is ongoing,"]
+#[doc = "          the function call will return @ref NRF_ERROR_BUSY."]
+#[doc = "          A @ref BLE_GATTC_EVT_WRITE_RSP event will be issued as soon as the write response arrives from the peer."]
+#[doc = ""]
+#[doc = " @note    The minimum guaranteed number of Write without Response that can be queued is configured by @ref ble_gattc_conn_cfg_t::write_cmd_tx_queue_size"]
+#[doc = "          When the queue is full, the function call will return @ref NRF_ERROR_RESOURCES."]
+#[doc = "          A @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event will be issued as soon as the transmission of the write without response is complete."]
+#[doc = ""]
+#[doc = " @note    The application can keep track of the available queue element count for writes without responses by following the procedure below:"]
+#[doc = "          - Store initial queue element count in a variable."]
+#[doc = "          - Decrement the variable, which stores the currently available queue element count, by one when a call to this function returns @ref NRF_SUCCESS."]
+#[doc = "          - Increment the variable, which stores the current available queue element count, by the count variable in @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE, Write without response transmission complete.}"]
+#[doc = " @event{@ref BLE_GATTC_EVT_WRITE_RSP, Write response received from the peer.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_VALUE_WRITE_WITHOUT_RESP_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTC_VALUE_WRITE_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTC_VALUE_LONG_WRITE_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTC_VALUE_RELIABLE_WRITE_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_write_params A pointer to a write parameters structure."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started the Write procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY For write with response, procedure already in progress. Wait for a @ref BLE_GATTC_EVT_WRITE_RSP event and retry."]
+#[doc = " @retval ::NRF_ERROR_RESOURCES Too many writes without responses queued."]
+#[doc = "                               Wait for a @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event and retry."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_write(
-        conn_handle: u16,
-        p_write_params: *const ble_gattc_write_params_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_write_params: *const ble_gattc_write_params_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 163",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11490,22 +11313,20 @@ pub unsafe fn sd_ble_gattc_write(
     ret
 }
 
-
-    #[doc = "@brief Send a Handle Value Confirmation to the GATT Server."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_HVI_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] handle The handle of the attribute in the indication."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully queued the Handle Value Confirmation for transmission."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State or no Indication pending to be confirmed."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Send a Handle Value Confirmation to the GATT Server."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_HVI_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] handle The handle of the attribute in the indication."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully queued the Handle Value Confirmation for transmission."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State or no Indication pending to be confirmed."]
+#[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_hv_confirm(conn_handle: u16, handle: u16) -> u32 {
     let ret: u32;
@@ -11519,28 +11340,26 @@ pub unsafe fn sd_ble_gattc_hv_confirm(conn_handle: u16, handle: u16) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Discovers information about a range of attributes on a GATT server."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_ATTR_INFO_DISC_RSP, Generated when information about a range of attributes has been received.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] p_handle_range The range of handles to request information about."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully started an attribute information discovery procedure."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid connection state"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Discovers information about a range of attributes on a GATT server."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_ATTR_INFO_DISC_RSP, Generated when information about a range of attributes has been received.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] p_handle_range The range of handles to request information about."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully started an attribute information discovery procedure."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid connection state"]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_attr_info_discover(
-        conn_handle: u16,
-        p_handle_range: *const ble_gattc_handle_range_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_handle_range: *const ble_gattc_handle_range_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 159",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11552,38 +11371,36 @@ pub unsafe fn sd_ble_gattc_attr_info_discover(
     ret
 }
 
-
-    #[doc = "@brief Start an ATT_MTU exchange by sending an Exchange MTU Request to the server."]
-    #[doc = ""]
-    #[doc = " @details The SoftDevice sets ATT_MTU to the minimum of:"]
-    #[doc = "          - The Client RX MTU value, and"]
-    #[doc = "          - The Server RX MTU value from @ref BLE_GATTC_EVT_EXCHANGE_MTU_RSP."]
-    #[doc = ""]
-    #[doc = "          However, the SoftDevice never sets ATT_MTU lower than @ref BLE_GATT_ATT_MTU_DEFAULT."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTC_EVT_EXCHANGE_MTU_RSP}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTC_MTU_EXCHANGE}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] client_rx_mtu  Client RX MTU size."]
-    #[doc = "                           - The minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
-    #[doc = "                           - The maximum value is @ref ble_gatt_conn_cfg_t::att_mtu in the connection configuration"]
-    #[doc = "used for this connection."]
-    #[doc = "                           - The value must be equal to Server RX MTU size given in @ref sd_ble_gatts_exchange_mtu_reply"]
-    #[doc = "                             if an ATT_MTU exchange has already been performed in the other direction."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully sent request to the server."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid connection state or an ATT_MTU exchange was already requested once."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid Client RX MTU size supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Start an ATT_MTU exchange by sending an Exchange MTU Request to the server."]
+#[doc = ""]
+#[doc = " @details The SoftDevice sets ATT_MTU to the minimum of:"]
+#[doc = "          - The Client RX MTU value, and"]
+#[doc = "          - The Server RX MTU value from @ref BLE_GATTC_EVT_EXCHANGE_MTU_RSP."]
+#[doc = ""]
+#[doc = "          However, the SoftDevice never sets ATT_MTU lower than @ref BLE_GATT_ATT_MTU_DEFAULT."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTC_EVT_EXCHANGE_MTU_RSP}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTC_MTU_EXCHANGE}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] client_rx_mtu  Client RX MTU size."]
+#[doc = "                           - The minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
+#[doc = "                           - The maximum value is @ref ble_gatt_conn_cfg_t::att_mtu in the connection configuration"]
+#[doc = "used for this connection."]
+#[doc = "                           - The value must be equal to Server RX MTU size given in @ref sd_ble_gatts_exchange_mtu_reply"]
+#[doc = "                             if an ATT_MTU exchange has already been performed in the other direction."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully sent request to the server."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid connection state or an ATT_MTU exchange was already requested once."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid Client RX MTU size supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_exchange_mtu_request(conn_handle: u16, client_rx_mtu: u16) -> u32 {
     let ret: u32;
@@ -11596,7 +11413,6 @@ pub unsafe fn sd_ble_gattc_exchange_mtu_request(conn_handle: u16, client_rx_mtu:
     );
     ret
 }
-
 
 #[doc = "< Add a service."]
 pub const BLE_GATTS_SVCS_SD_BLE_GATTS_SERVICE_ADD: BLE_GATTS_SVCS = 168;
@@ -13244,31 +13060,30 @@ fn bindgen_test_layout_ble_gatts_evt_t() {
     );
 }
 
-    #[doc = "@brief Add a service declaration to the Attribute Table."]
-    #[doc = ""]
-    #[doc = " @note Secondary Services are only relevant in the context of the entity that references them, it is therefore forbidden to"]
-    #[doc = "       add a secondary service declaration that is not referenced by another service later in the Attribute Table."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] type      Toggles between primary and secondary services, see @ref BLE_GATTS_SRVC_TYPES."]
-    #[doc = " @param[in] p_uuid    Pointer to service UUID."]
-    #[doc = " @param[out] p_handle Pointer to a 16-bit word where the assigned handle will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully added a service declaration."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, Vendor Specific UUIDs need to be present in the table."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    
+#[doc = "@brief Add a service declaration to the Attribute Table."]
+#[doc = ""]
+#[doc = " @note Secondary Services are only relevant in the context of the entity that references them, it is therefore forbidden to"]
+#[doc = "       add a secondary service declaration that is not referenced by another service later in the Attribute Table."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] type      Toggles between primary and secondary services, see @ref BLE_GATTS_SRVC_TYPES."]
+#[doc = " @param[in] p_uuid    Pointer to service UUID."]
+#[doc = " @param[out] p_handle Pointer to a 16-bit word where the assigned handle will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully added a service declaration."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, Vendor Specific UUIDs need to be present in the table."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_service_add(
-        type_: u8,
-        p_uuid: *const ble_uuid_t,
-        p_handle: *mut u16,
-    ) -> u32 {
+    type_: u8,
+    p_uuid: *const ble_uuid_t,
+    p_handle: *mut u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 168",
         inout("r0") to_asm(type_) => ret,
@@ -13280,36 +13095,34 @@ pub unsafe fn sd_ble_gatts_service_add(
     ret
 }
 
-
-    #[doc = "@brief Add an include declaration to the Attribute Table."]
-    #[doc = ""]
-    #[doc = " @note It is currently only possible to add an include declaration to the last added service (i.e. only sequential population is supported at this time)."]
-    #[doc = ""]
-    #[doc = " @note The included service must already be present in the Attribute Table prior to this call."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] service_handle    Handle of the service where the included service is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
-    #[doc = " @param[in] inc_srvc_handle   Handle of the included service."]
-    #[doc = " @param[out] p_include_handle Pointer to a 16-bit word where the assigned handle will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully added an include declaration."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, handle values need to match previously added services."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a service context is required."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Feature is not supported, service_handle must be that of the last added service."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, self inclusions are not allowed."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
-    
+#[doc = "@brief Add an include declaration to the Attribute Table."]
+#[doc = ""]
+#[doc = " @note It is currently only possible to add an include declaration to the last added service (i.e. only sequential population is supported at this time)."]
+#[doc = ""]
+#[doc = " @note The included service must already be present in the Attribute Table prior to this call."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] service_handle    Handle of the service where the included service is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
+#[doc = " @param[in] inc_srvc_handle   Handle of the included service."]
+#[doc = " @param[out] p_include_handle Pointer to a 16-bit word where the assigned handle will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully added an include declaration."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, handle values need to match previously added services."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a service context is required."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Feature is not supported, service_handle must be that of the last added service."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, self inclusions are not allowed."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_include_add(
-        service_handle: u16,
-        inc_srvc_handle: u16,
-        p_include_handle: *mut u16,
-    ) -> u32 {
+    service_handle: u16,
+    inc_srvc_handle: u16,
+    p_include_handle: *mut u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 169",
         inout("r0") to_asm(service_handle) => ret,
@@ -13321,40 +13134,38 @@ pub unsafe fn sd_ble_gatts_include_add(
     ret
 }
 
-
-    #[doc = "@brief Add a characteristic declaration, a characteristic value declaration and optional characteristic descriptor declarations to the Attribute Table."]
-    #[doc = ""]
-    #[doc = " @note It is currently only possible to add a characteristic to the last added service (i.e. only sequential population is supported at this time)."]
-    #[doc = ""]
-    #[doc = " @note Several restrictions apply to the parameters, such as matching permissions between the user description descriptor and the writable auxiliaries bits,"]
-    #[doc = "       readable (no security) and writable (selectable) CCCDs and SCCDs and valid presentation format values."]
-    #[doc = ""]
-    #[doc = " @note If no metadata is provided for the optional descriptors, their permissions will be derived from the characteristic permissions."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] service_handle    Handle of the service where the characteristic is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
-    #[doc = " @param[in] p_char_md         Characteristic metadata."]
-    #[doc = " @param[in] p_attr_char_value Pointer to the attribute structure corresponding to the characteristic value."]
-    #[doc = " @param[out] p_handles        Pointer to the structure where the assigned handles will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully added a characteristic."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, service handle, Vendor Specific UUIDs, lengths, and permissions need to adhere to the constraints."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a service context is required."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
-    
+#[doc = "@brief Add a characteristic declaration, a characteristic value declaration and optional characteristic descriptor declarations to the Attribute Table."]
+#[doc = ""]
+#[doc = " @note It is currently only possible to add a characteristic to the last added service (i.e. only sequential population is supported at this time)."]
+#[doc = ""]
+#[doc = " @note Several restrictions apply to the parameters, such as matching permissions between the user description descriptor and the writable auxiliaries bits,"]
+#[doc = "       readable (no security) and writable (selectable) CCCDs and SCCDs and valid presentation format values."]
+#[doc = ""]
+#[doc = " @note If no metadata is provided for the optional descriptors, their permissions will be derived from the characteristic permissions."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] service_handle    Handle of the service where the characteristic is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
+#[doc = " @param[in] p_char_md         Characteristic metadata."]
+#[doc = " @param[in] p_attr_char_value Pointer to the attribute structure corresponding to the characteristic value."]
+#[doc = " @param[out] p_handles        Pointer to the structure where the assigned handles will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully added a characteristic."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, service handle, Vendor Specific UUIDs, lengths, and permissions need to adhere to the constraints."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a service context is required."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_characteristic_add(
-        service_handle: u16,
-        p_char_md: *const ble_gatts_char_md_t,
-        p_attr_char_value: *const ble_gatts_attr_t,
-        p_handles: *mut ble_gatts_char_handles_t,
-    ) -> u32 {
+    service_handle: u16,
+    p_char_md: *const ble_gatts_char_md_t,
+    p_attr_char_value: *const ble_gatts_attr_t,
+    p_handles: *mut ble_gatts_char_handles_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 170",
         inout("r0") to_asm(service_handle) => ret,
@@ -13366,33 +13177,31 @@ pub unsafe fn sd_ble_gatts_characteristic_add(
     ret
 }
 
-
-    #[doc = "@brief Add a descriptor to the Attribute Table."]
-    #[doc = ""]
-    #[doc = " @note It is currently only possible to add a descriptor to the last added characteristic (i.e. only sequential population is supported at this time)."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] char_handle   Handle of the characteristic where the descriptor is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
-    #[doc = " @param[in] p_attr        Pointer to the attribute structure."]
-    #[doc = " @param[out] p_handle     Pointer to a 16-bit word where the assigned handle will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully added a descriptor."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, characteristic handle, Vendor Specific UUIDs, lengths, and permissions need to adhere to the constraints."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a characteristic context is required."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
-    
+#[doc = "@brief Add a descriptor to the Attribute Table."]
+#[doc = ""]
+#[doc = " @note It is currently only possible to add a descriptor to the last added characteristic (i.e. only sequential population is supported at this time)."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_ATT_TABLE_POP_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] char_handle   Handle of the characteristic where the descriptor is to be placed, if @ref BLE_GATT_HANDLE_INVALID is used, it will be placed sequentially."]
+#[doc = " @param[in] p_attr        Pointer to the attribute structure."]
+#[doc = " @param[out] p_handle     Pointer to a 16-bit word where the assigned handle will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully added a descriptor."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, characteristic handle, Vendor Specific UUIDs, lengths, and permissions need to adhere to the constraints."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid state to perform operation, a characteristic context is required."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_descriptor_add(
-        char_handle: u16,
-        p_attr: *const ble_gatts_attr_t,
-        p_handle: *mut u16,
-    ) -> u32 {
+    char_handle: u16,
+    p_attr: *const ble_gatts_attr_t,
+    p_handle: *mut u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 171",
         inout("r0") to_asm(char_handle) => ret,
@@ -13404,34 +13213,32 @@ pub unsafe fn sd_ble_gatts_descriptor_add(
     ret
 }
 
-
-    #[doc = "@brief Set the value of a given attribute."]
-    #[doc = ""]
-    #[doc = " @note Values other than system attributes can be set at any time, regardless of whether any active connections exist."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle  Connection handle. Ignored if the value does not belong to a system attribute."]
-    #[doc = " @param[in] handle       Attribute handle."]
-    #[doc = " @param[in,out] p_value  Attribute value information."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully set the value of the attribute."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden handle supplied, certain attributes are not modifiable by the application."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
-    
+#[doc = "@brief Set the value of a given attribute."]
+#[doc = ""]
+#[doc = " @note Values other than system attributes can be set at any time, regardless of whether any active connections exist."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle  Connection handle. Ignored if the value does not belong to a system attribute."]
+#[doc = " @param[in] handle       Attribute handle."]
+#[doc = " @param[in,out] p_value  Attribute value information."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully set the value of the attribute."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden handle supplied, certain attributes are not modifiable by the application."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_value_set(
-        conn_handle: u16,
-        handle: u16,
-        p_value: *mut ble_gatts_value_t,
-    ) -> u32 {
+    conn_handle: u16,
+    handle: u16,
+    p_value: *mut ble_gatts_value_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 172",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13443,35 +13250,33 @@ pub unsafe fn sd_ble_gatts_value_set(
     ret
 }
 
-
-    #[doc = "@brief Get the value of a given attribute."]
-    #[doc = ""]
-    #[doc = " @note                 If the attribute value is longer than the size of the supplied buffer,"]
-    #[doc = "                       @ref ble_gatts_value_t::len will return the total attribute value length (excluding offset),"]
-    #[doc = "                       and not the number of bytes actually returned in @ref ble_gatts_value_t::p_value."]
-    #[doc = "                       The application may use this information to allocate a suitable buffer size."]
-    #[doc = ""]
-    #[doc = " @note                 When retrieving system attribute values with this function, the connection handle"]
-    #[doc = "                       may refer to an already disconnected connection. Refer to the documentation of"]
-    #[doc = "                       @ref sd_ble_gatts_sys_attr_get for further information."]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle  Connection handle. Ignored if the value does not belong to a system attribute."]
-    #[doc = " @param[in] handle       Attribute handle."]
-    #[doc = " @param[in,out] p_value  Attribute value information."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully retrieved the value of the attribute."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid attribute offset supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
-    #[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
-    
+#[doc = "@brief Get the value of a given attribute."]
+#[doc = ""]
+#[doc = " @note                 If the attribute value is longer than the size of the supplied buffer,"]
+#[doc = "                       @ref ble_gatts_value_t::len will return the total attribute value length (excluding offset),"]
+#[doc = "                       and not the number of bytes actually returned in @ref ble_gatts_value_t::p_value."]
+#[doc = "                       The application may use this information to allocate a suitable buffer size."]
+#[doc = ""]
+#[doc = " @note                 When retrieving system attribute values with this function, the connection handle"]
+#[doc = "                       may refer to an already disconnected connection. Refer to the documentation of"]
+#[doc = "                       @ref sd_ble_gatts_sys_attr_get for further information."]
+#[doc = ""]
+#[doc = " @param[in] conn_handle  Connection handle. Ignored if the value does not belong to a system attribute."]
+#[doc = " @param[in] handle       Attribute handle."]
+#[doc = " @param[in,out] p_value  Attribute value information."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully retrieved the value of the attribute."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid attribute offset supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
+#[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_value_get(
-        conn_handle: u16,
-        handle: u16,
-        p_value: *mut ble_gatts_value_t,
-    ) -> u32 {
+    conn_handle: u16,
+    handle: u16,
+    p_value: *mut ble_gatts_value_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 173",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13483,72 +13288,73 @@ pub unsafe fn sd_ble_gatts_value_get(
     ret
 }
 
-
-    #[doc = "@brief Notify or Indicate an attribute value."]
-    #[doc = ""]
-    #[doc = " @details This function checks for the relevant Client Characteristic Configuration descriptor value to verify that the relevant operation"]
-    #[doc = "          (notification or indication) has been enabled by the client. It is also able to update the attribute value before issuing the PDU, so that"]
-    #[doc = "          the application can atomically perform a value update and a server initiated transaction with a single API call."]
-    #[doc = ""]
-    #[doc = " @note    The local attribute value may be updated even if an outgoing packet is not sent to the peer due to an error during execution."]
-    #[doc = "          The Attribute Table has been updated if one of the following error codes is returned: @ref NRF_ERROR_INVALID_STATE, @ref NRF_ERROR_BUSY,"]
-    #[doc = "          @ref NRF_ERROR_FORBIDDEN, @ref BLE_ERROR_GATTS_SYS_ATTR_MISSING and @ref NRF_ERROR_RESOURCES."]
-    #[doc = "          The caller can check whether the value has been updated by looking at the contents of *(@ref ble_gatts_hvx_params_t::p_len)."]
-    #[doc = ""]
-    #[doc = " @note    Only one indication procedure can be ongoing per connection at a time."]
-    #[doc = "          If the application tries to indicate an attribute value while another indication procedure is ongoing,"]
-    #[doc = "          the function call will return @ref NRF_ERROR_BUSY."]
-    #[doc = "          A @ref BLE_GATTS_EVT_HVC event will be issued as soon as the confirmation arrives from the peer."]
-    #[doc = ""]
-    #[doc = " @note    The minimum guaranteed number of Handle Value Notifications that can be queued is configured by @ref ble_gatts_conn_cfg_t::hvn_tx_queue_size"]
-    #[doc = "          When the queue is full, the function call will return @ref NRF_ERROR_RESOURCES."]
-    #[doc = "          A @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event will be issued as soon as the transmission of the notification is complete."]
-    #[doc = ""]
-    #[doc = " @note    The application can keep track of the available queue element count for notifications by following the procedure below:"]
-    #[doc = "          - Store initial queue element count in a variable."]
-    #[doc = "          - Decrement the variable, which stores the currently available queue element count, by one when a call to this function returns @ref NRF_SUCCESS."]
-    #[doc = "          - Increment the variable, which stores the current available queue element count, by the count variable in @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTS_EVT_HVN_TX_COMPLETE, Notification transmission complete.}"]
-    #[doc = " @event{@ref BLE_GATTS_EVT_HVC, Confirmation received from the peer.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_HVX_SYS_ATTRS_MISSING_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_HVN_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_HVI_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_HVX_DISABLED_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle      Connection handle."]
-    #[doc = " @param[in,out] p_hvx_params Pointer to an HVx parameters structure. If @ref ble_gatts_hvx_params_t::p_data"]
-    #[doc = "                             contains a non-NULL pointer the attribute value will be updated with the contents"]
-    #[doc = "                             pointed by it before sending the notification or indication. If the attribute value"]
-    #[doc = "                             is updated, @ref ble_gatts_hvx_params_t::p_len is updated by the SoftDevice to"]
-    #[doc = "                             contain the number of actual bytes written, else it will be set to 0."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully queued a notification or indication for transmission, and optionally updated the attribute value."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE One or more of the following is true:"]
-    #[doc = "                                   - Invalid Connection State"]
-    #[doc = "                                   - Notifications and/or indications not enabled in the CCCD"]
-    #[doc = "                                   - An ATT_MTU exchange is ongoing"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle(s) supplied. Only attributes added directly by the application are available to notify and indicate."]
-    #[doc = " @retval ::BLE_ERROR_GATTS_INVALID_ATTR_TYPE Invalid attribute type(s) supplied, only characteristic values may be notified and indicated."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN The connection's current security level is lower than the one required by the write permissions of the CCCD associated with this characteristic."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY For @ref BLE_GATT_HVX_INDICATION Procedure already in progress. Wait for a @ref BLE_GATTS_EVT_HVC event and retry."]
-    #[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
-    #[doc = " @retval ::NRF_ERROR_RESOURCES Too many notifications queued."]
-    #[doc = "                               Wait for a @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event and retry."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Notify or Indicate an attribute value."]
+#[doc = ""]
+#[doc = " @details This function checks for the relevant Client Characteristic Configuration descriptor value to verify that the relevant operation"]
+#[doc = "          (notification or indication) has been enabled by the client. It is also able to update the attribute value before issuing the PDU, so that"]
+#[doc = "          the application can atomically perform a value update and a server initiated transaction with a single API call."]
+#[doc = ""]
+#[doc = " @note    The local attribute value may be updated even if an outgoing packet is not sent to the peer due to an error during execution."]
+#[doc = "          The Attribute Table has been updated if one of the following error codes is returned: @ref NRF_ERROR_INVALID_STATE, @ref NRF_ERROR_BUSY,"]
+#[doc = "          @ref NRF_ERROR_FORBIDDEN, @ref BLE_ERROR_GATTS_SYS_ATTR_MISSING and @ref NRF_ERROR_RESOURCES."]
+#[doc = "          The caller can check whether the value has been updated by looking at the contents of *(@ref ble_gatts_hvx_params_t::p_len)."]
+#[doc = ""]
+#[doc = " @note    Only one indication procedure can be ongoing per connection at a time."]
+#[doc = "          If the application tries to indicate an attribute value while another indication procedure is ongoing,"]
+#[doc = "          the function call will return @ref NRF_ERROR_BUSY."]
+#[doc = "          A @ref BLE_GATTS_EVT_HVC event will be issued as soon as the confirmation arrives from the peer."]
+#[doc = ""]
+#[doc = " @note    The minimum guaranteed number of Handle Value Notifications that can be queued is configured by @ref ble_gatts_conn_cfg_t::hvn_tx_queue_size"]
+#[doc = "          When the queue is full, the function call will return @ref NRF_ERROR_RESOURCES."]
+#[doc = "          A @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event will be issued as soon as the transmission of the notification is complete."]
+#[doc = ""]
+#[doc = " @note    The application can keep track of the available queue element count for notifications by following the procedure below:"]
+#[doc = "          - Store initial queue element count in a variable."]
+#[doc = "          - Decrement the variable, which stores the currently available queue element count, by one when a call to this function returns @ref NRF_SUCCESS."]
+#[doc = "          - Increment the variable, which stores the current available queue element count, by the count variable in @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTS_EVT_HVN_TX_COMPLETE, Notification transmission complete.}"]
+#[doc = " @event{@ref BLE_GATTS_EVT_HVC, Confirmation received from the peer.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_HVX_SYS_ATTRS_MISSING_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_HVN_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_HVI_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_HVX_DISABLED_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle      Connection handle."]
+#[doc = " @param[in,out] p_hvx_params Pointer to an HVx parameters structure. If @ref ble_gatts_hvx_params_t::p_data"]
+#[doc = "                             contains a non-NULL pointer the attribute value will be updated with the contents"]
+#[doc = "                             pointed by it before sending the notification or indication. If the attribute value"]
+#[doc = "                             is updated, @ref ble_gatts_hvx_params_t::p_len is updated by the SoftDevice to"]
+#[doc = "                             contain the number of actual bytes written, else it will be set to 0."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully queued a notification or indication for transmission, and optionally updated the attribute value."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE One or more of the following is true:"]
+#[doc = "                                   - Invalid Connection State"]
+#[doc = "                                   - Notifications and/or indications not enabled in the CCCD"]
+#[doc = "                                   - An ATT_MTU exchange is ongoing"]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle(s) supplied. Only attributes added directly by the application are available to notify and indicate."]
+#[doc = " @retval ::BLE_ERROR_GATTS_INVALID_ATTR_TYPE Invalid attribute type(s) supplied, only characteristic values may be notified and indicated."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN The connection's current security level is lower than the one required by the write permissions of the CCCD associated with this characteristic."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY For @ref BLE_GATT_HVX_INDICATION Procedure already in progress. Wait for a @ref BLE_GATTS_EVT_HVC event and retry."]
+#[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
+#[doc = " @retval ::NRF_ERROR_RESOURCES Too many notifications queued."]
+#[doc = "                               Wait for a @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event and retry."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_hvx(conn_handle: u16, p_hvx_params: *const ble_gatts_hvx_params_t) -> u32 {
+pub unsafe fn sd_ble_gatts_hvx(
+    conn_handle: u16,
+    p_hvx_params: *const ble_gatts_hvx_params_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 174",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13560,47 +13366,45 @@ pub unsafe fn sd_ble_gatts_hvx(conn_handle: u16, p_hvx_params: *const ble_gatts_
     ret
 }
 
-
-    #[doc = "@brief Indicate the Service Changed attribute value."]
-    #[doc = ""]
-    #[doc = " @details This call will send a Handle Value Indication to one or more peers connected to inform them that the Attribute"]
-    #[doc = "          Table layout has changed. As soon as the peer has confirmed the indication, a @ref BLE_GATTS_EVT_SC_CONFIRM event will"]
-    #[doc = "          be issued."]
-    #[doc = ""]
-    #[doc = " @note    Some of the restrictions and limitations that apply to @ref sd_ble_gatts_hvx also apply here."]
-    #[doc = ""]
-    #[doc = " @events"]
-    #[doc = " @event{@ref BLE_GATTS_EVT_SC_CONFIRM, Confirmation of attribute table change received from peer.}"]
-    #[doc = " @endevents"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_SC_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle  Connection handle."]
-    #[doc = " @param[in] start_handle Start of affected attribute handle range."]
-    #[doc = " @param[in] end_handle   End of affected attribute handle range."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully queued the Service Changed indication for transmission."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Service Changed not enabled at initialization. See @ref"]
-    #[doc = "                                   sd_ble_cfg_set and @ref ble_gatts_cfg_service_changed_t."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE One or more of the following is true:"]
-    #[doc = "                                   - Invalid Connection State"]
-    #[doc = "                                   - Notifications and/or indications not enabled in the CCCD"]
-    #[doc = "                                   - An ATT_MTU exchange is ongoing"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle(s) supplied, handles must be in the range populated by the application."]
-    #[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress."]
-    #[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Indicate the Service Changed attribute value."]
+#[doc = ""]
+#[doc = " @details This call will send a Handle Value Indication to one or more peers connected to inform them that the Attribute"]
+#[doc = "          Table layout has changed. As soon as the peer has confirmed the indication, a @ref BLE_GATTS_EVT_SC_CONFIRM event will"]
+#[doc = "          be issued."]
+#[doc = ""]
+#[doc = " @note    Some of the restrictions and limitations that apply to @ref sd_ble_gatts_hvx also apply here."]
+#[doc = ""]
+#[doc = " @events"]
+#[doc = " @event{@ref BLE_GATTS_EVT_SC_CONFIRM, Confirmation of attribute table change received from peer.}"]
+#[doc = " @endevents"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_SC_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle  Connection handle."]
+#[doc = " @param[in] start_handle Start of affected attribute handle range."]
+#[doc = " @param[in] end_handle   End of affected attribute handle range."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully queued the Service Changed indication for transmission."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Service Changed not enabled at initialization. See @ref"]
+#[doc = "                                   sd_ble_cfg_set and @ref ble_gatts_cfg_service_changed_t."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE One or more of the following is true:"]
+#[doc = "                                   - Invalid Connection State"]
+#[doc = "                                   - Notifications and/or indications not enabled in the CCCD"]
+#[doc = "                                   - An ATT_MTU exchange is ongoing"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_ATTR_HANDLE Invalid attribute handle(s) supplied, handles must be in the range populated by the application."]
+#[doc = " @retval ::NRF_ERROR_BUSY Procedure already in progress."]
+#[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_service_changed(
-        conn_handle: u16,
-        start_handle: u16,
-        end_handle: u16,
-    ) -> u32 {
+    conn_handle: u16,
+    start_handle: u16,
+    end_handle: u16,
+) -> u32 {
     let ret: u32;
     asm!("svc 175",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13612,43 +13416,41 @@ pub unsafe fn sd_ble_gatts_service_changed(
     ret
 }
 
-
-    #[doc = "@brief Respond to a Read/Write authorization request."]
-    #[doc = ""]
-    #[doc = " @note This call should only be used as a response to a @ref BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event issued to the application."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_READ_REQ_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_WRITE_REQ_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_PEER_CANCEL_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle                 Connection handle."]
-    #[doc = " @param[in] p_rw_authorize_reply_params Pointer to a structure with the attribute provided by the application."]
-    #[doc = ""]
-    #[doc = " @note @ref ble_gatts_authorize_params_t::p_data is ignored when this function is used to respond"]
-    #[doc = "       to a @ref BLE_GATTS_AUTHORIZE_TYPE_READ event if @ref ble_gatts_authorize_params_t::update"]
-    #[doc = "       is set to 0."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS               Successfully queued a response to the peer, and in the case of a write operation, Attribute Table updated."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_BUSY            The stack is busy, process pending events and retry."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR    Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE   Invalid Connection State or no authorization request pending."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM   Authorization op invalid,"]
-    #[doc = "                                         handle supplied does not match requested handle,"]
-    #[doc = "                                         or invalid data to be written provided by the application."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Respond to a Read/Write authorization request."]
+#[doc = ""]
+#[doc = " @note This call should only be used as a response to a @ref BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST event issued to the application."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_READ_REQ_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_WRITE_REQ_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_PEER_CANCEL_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle                 Connection handle."]
+#[doc = " @param[in] p_rw_authorize_reply_params Pointer to a structure with the attribute provided by the application."]
+#[doc = ""]
+#[doc = " @note @ref ble_gatts_authorize_params_t::p_data is ignored when this function is used to respond"]
+#[doc = "       to a @ref BLE_GATTS_AUTHORIZE_TYPE_READ event if @ref ble_gatts_authorize_params_t::update"]
+#[doc = "       is set to 0."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS               Successfully queued a response to the peer, and in the case of a write operation, Attribute Table updated."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_BUSY            The stack is busy, process pending events and retry."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR    Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE   Invalid Connection State or no authorization request pending."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM   Authorization op invalid,"]
+#[doc = "                                         handle supplied does not match requested handle,"]
+#[doc = "                                         or invalid data to be written provided by the application."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_rw_authorize_reply(
-        conn_handle: u16,
-        p_rw_authorize_reply_params: *const ble_gatts_rw_authorize_reply_params_t,
-    ) -> u32 {
+    conn_handle: u16,
+    p_rw_authorize_reply_params: *const ble_gatts_rw_authorize_reply_params_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 176",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13660,55 +13462,53 @@ pub unsafe fn sd_ble_gatts_rw_authorize_reply(
     ret
 }
 
-
-    #[doc = "@brief Update persistent system attribute information."]
-    #[doc = ""]
-    #[doc = " @details Supply information about persistent system attributes to the stack,"]
-    #[doc = "          previously obtained using @ref sd_ble_gatts_sys_attr_get."]
-    #[doc = "          This call is only allowed for active connections, and is usually"]
-    #[doc = "          made immediately after a connection is established with an known bonded device,"]
-    #[doc = "          often as a response to a @ref BLE_GATTS_EVT_SYS_ATTR_MISSING."]
-    #[doc = ""]
-    #[doc = "          p_sysattrs may point directly to the application's stored copy of the system attributes"]
-    #[doc = "          obtained using @ref sd_ble_gatts_sys_attr_get."]
-    #[doc = "          If the pointer is NULL, the system attribute info is initialized, assuming that"]
-    #[doc = "          the application does not have any previously saved system attribute data for this device."]
-    #[doc = ""]
-    #[doc = " @note The state of persistent system attributes is reset upon connection establishment and then remembered for its duration."]
-    #[doc = ""]
-    #[doc = " @note If this call returns with an error code different from @ref NRF_SUCCESS, the storage of persistent system attributes may have been completed only partially."]
-    #[doc = "       This means that the state of the attribute table is undefined, and the application should either provide a new set of attributes using this same call or"]
-    #[doc = "       reset the SoftDevice to return to a known state."]
-    #[doc = ""]
-    #[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS is used with this function, only the system attributes included in system services will be modified."]
-    #[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS is used with this function, only the system attributes included in user services will be modified."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_HVX_SYS_ATTRS_MISSING_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_UNK_PEER_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_BONDED_PEER_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in]  conn_handle        Connection handle."]
-    #[doc = " @param[in]  p_sys_attr_data    Pointer to a saved copy of system attributes supplied to the stack, or NULL."]
-    #[doc = " @param[in]  len                Size of data pointed by p_sys_attr_data, in octets."]
-    #[doc = " @param[in]  flags              Optional additional flags, see @ref BLE_GATTS_SYS_ATTR_FLAGS"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully set the system attribute information."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid flags supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_DATA Invalid data supplied, the data should be exactly the same as retrieved with @ref sd_ble_gatts_sys_attr_get."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
-    
+#[doc = "@brief Update persistent system attribute information."]
+#[doc = ""]
+#[doc = " @details Supply information about persistent system attributes to the stack,"]
+#[doc = "          previously obtained using @ref sd_ble_gatts_sys_attr_get."]
+#[doc = "          This call is only allowed for active connections, and is usually"]
+#[doc = "          made immediately after a connection is established with an known bonded device,"]
+#[doc = "          often as a response to a @ref BLE_GATTS_EVT_SYS_ATTR_MISSING."]
+#[doc = ""]
+#[doc = "          p_sysattrs may point directly to the application's stored copy of the system attributes"]
+#[doc = "          obtained using @ref sd_ble_gatts_sys_attr_get."]
+#[doc = "          If the pointer is NULL, the system attribute info is initialized, assuming that"]
+#[doc = "          the application does not have any previously saved system attribute data for this device."]
+#[doc = ""]
+#[doc = " @note The state of persistent system attributes is reset upon connection establishment and then remembered for its duration."]
+#[doc = ""]
+#[doc = " @note If this call returns with an error code different from @ref NRF_SUCCESS, the storage of persistent system attributes may have been completed only partially."]
+#[doc = "       This means that the state of the attribute table is undefined, and the application should either provide a new set of attributes using this same call or"]
+#[doc = "       reset the SoftDevice to return to a known state."]
+#[doc = ""]
+#[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS is used with this function, only the system attributes included in system services will be modified."]
+#[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS is used with this function, only the system attributes included in user services will be modified."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_HVX_SYS_ATTRS_MISSING_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_UNK_PEER_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_BONDED_PEER_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in]  conn_handle        Connection handle."]
+#[doc = " @param[in]  p_sys_attr_data    Pointer to a saved copy of system attributes supplied to the stack, or NULL."]
+#[doc = " @param[in]  len                Size of data pointed by p_sys_attr_data, in octets."]
+#[doc = " @param[in]  flags              Optional additional flags, see @ref BLE_GATTS_SYS_ATTR_FLAGS"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully set the system attribute information."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid flags supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_DATA Invalid data supplied, the data should be exactly the same as retrieved with @ref sd_ble_gatts_sys_attr_get."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_sys_attr_set(
-        conn_handle: u16,
-        p_sys_attr_data: *const u8,
-        len: u16,
-        flags: u32,
-    ) -> u32 {
+    conn_handle: u16,
+    p_sys_attr_data: *const u8,
+    len: u16,
+    flags: u32,
+) -> u32 {
     let ret: u32;
     asm!("svc 177",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13720,44 +13520,42 @@ pub unsafe fn sd_ble_gatts_sys_attr_set(
     ret
 }
 
-
-    #[doc = "@brief Retrieve persistent system attribute information from the stack."]
-    #[doc = ""]
-    #[doc = " @details This call is used to retrieve information about values to be stored persistently by the application"]
-    #[doc = "          during the lifetime of a connection or after it has been terminated. When a new connection is established with the same bonded device,"]
-    #[doc = "          the system attribute information retrieved with this function should be restored using using @ref sd_ble_gatts_sys_attr_set."]
-    #[doc = "          If retrieved after disconnection, the data should be read before a new connection established. The connection handle for"]
-    #[doc = "          the previous, now disconnected, connection will remain valid until a new one is created to allow this API call to refer to it."]
-    #[doc = "          Connection handles belonging to active connections can be used as well, but care should be taken since the system attributes"]
-    #[doc = "          may be written to at any time by the peer during a connection's lifetime."]
-    #[doc = ""]
-    #[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS is used with this function, only the system attributes included in system services will be returned."]
-    #[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS is used with this function, only the system attributes included in user services will be returned."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_BONDED_PEER_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in]     conn_handle       Connection handle of the recently terminated connection."]
-    #[doc = " @param[out]    p_sys_attr_data   Pointer to a buffer where updated information about system attributes will be filled in. The format of the data is described"]
-    #[doc = "                                  in @ref BLE_GATTS_SYS_ATTRS_FORMAT. NULL can be provided to obtain the length of the data."]
-    #[doc = " @param[in,out] p_len             Size of application buffer if p_sys_attr_data is not NULL. Unconditionally updated to actual length of system attribute data."]
-    #[doc = " @param[in]     flags             Optional additional flags, see @ref BLE_GATTS_SYS_ATTR_FLAGS"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully retrieved the system attribute information."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid flags supplied."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE The system attribute information did not fit into the provided buffer."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND No system attributes found."]
-    
+#[doc = "@brief Retrieve persistent system attribute information from the stack."]
+#[doc = ""]
+#[doc = " @details This call is used to retrieve information about values to be stored persistently by the application"]
+#[doc = "          during the lifetime of a connection or after it has been terminated. When a new connection is established with the same bonded device,"]
+#[doc = "          the system attribute information retrieved with this function should be restored using using @ref sd_ble_gatts_sys_attr_set."]
+#[doc = "          If retrieved after disconnection, the data should be read before a new connection established. The connection handle for"]
+#[doc = "          the previous, now disconnected, connection will remain valid until a new one is created to allow this API call to refer to it."]
+#[doc = "          Connection handles belonging to active connections can be used as well, but care should be taken since the system attributes"]
+#[doc = "          may be written to at any time by the peer during a connection's lifetime."]
+#[doc = ""]
+#[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_SYS_SRVCS is used with this function, only the system attributes included in system services will be returned."]
+#[doc = " @note When the @ref BLE_GATTS_SYS_ATTR_FLAG_USR_SRVCS is used with this function, only the system attributes included in user services will be returned."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_SYS_ATTRS_BONDED_PEER_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in]     conn_handle       Connection handle of the recently terminated connection."]
+#[doc = " @param[out]    p_sys_attr_data   Pointer to a buffer where updated information about system attributes will be filled in. The format of the data is described"]
+#[doc = "                                  in @ref BLE_GATTS_SYS_ATTRS_FORMAT. NULL can be provided to obtain the length of the data."]
+#[doc = " @param[in,out] p_len             Size of application buffer if p_sys_attr_data is not NULL. Unconditionally updated to actual length of system attribute data."]
+#[doc = " @param[in]     flags             Optional additional flags, see @ref BLE_GATTS_SYS_ATTR_FLAGS"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully retrieved the system attribute information."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid flags supplied."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE The system attribute information did not fit into the provided buffer."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND No system attributes found."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_sys_attr_get(
-        conn_handle: u16,
-        p_sys_attr_data: *mut u8,
-        p_len: *mut u16,
-        flags: u32,
-    ) -> u32 {
+    conn_handle: u16,
+    p_sys_attr_data: *mut u8,
+    p_len: *mut u16,
+    flags: u32,
+) -> u32 {
     let ret: u32;
     asm!("svc 178",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13769,14 +13567,12 @@ pub unsafe fn sd_ble_gatts_sys_attr_get(
     ret
 }
 
-
-    #[doc = "@brief Retrieve the first valid user attribute handle."]
-    #[doc = ""]
-    #[doc = " @param[out] p_handle   Pointer to an integer where the handle will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully retrieved the handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    
+#[doc = "@brief Retrieve the first valid user attribute handle."]
+#[doc = ""]
+#[doc = " @param[out] p_handle   Pointer to an integer where the handle will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully retrieved the handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_initial_user_handle_get(p_handle: *mut u16) -> u32 {
     let ret: u32;
@@ -13790,24 +13586,22 @@ pub unsafe fn sd_ble_gatts_initial_user_handle_get(p_handle: *mut u16) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Retrieve the attribute UUID and/or metadata."]
-    #[doc = ""]
-    #[doc = " @param[in]  handle Attribute handle"]
-    #[doc = " @param[out] p_uuid UUID of the attribute. Use NULL to omit this field."]
-    #[doc = " @param[out] p_md Metadata of the attribute. Use NULL to omit this field."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully retrieved the attribute metadata,"]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameters supplied. Returned when both @c p_uuid and @c p_md are NULL."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute was not found."]
-    
+#[doc = "@brief Retrieve the attribute UUID and/or metadata."]
+#[doc = ""]
+#[doc = " @param[in]  handle Attribute handle"]
+#[doc = " @param[out] p_uuid UUID of the attribute. Use NULL to omit this field."]
+#[doc = " @param[out] p_md Metadata of the attribute. Use NULL to omit this field."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully retrieved the attribute metadata,"]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameters supplied. Returned when both @c p_uuid and @c p_md are NULL."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute was not found."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_attr_get(
-        handle: u16,
-        p_uuid: *mut ble_uuid_t,
-        p_md: *mut ble_gatts_attr_md_t,
-    ) -> u32 {
+    handle: u16,
+    p_uuid: *mut ble_uuid_t,
+    p_md: *mut ble_gatts_attr_md_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 180",
         inout("r0") to_asm(handle) => ret,
@@ -13819,35 +13613,33 @@ pub unsafe fn sd_ble_gatts_attr_get(
     ret
 }
 
-
-    #[doc = "@brief Reply to an ATT_MTU exchange request by sending an Exchange MTU Response to the client."]
-    #[doc = ""]
-    #[doc = " @details This function is only used to reply to a @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event."]
-    #[doc = ""]
-    #[doc = " @details The SoftDevice sets ATT_MTU to the minimum of:"]
-    #[doc = "          - The Client RX MTU value from @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST, and"]
-    #[doc = "          - The Server RX MTU value."]
-    #[doc = ""]
-    #[doc = "          However, the SoftDevice never sets ATT_MTU lower than @ref BLE_GATT_ATT_MTU_DEFAULT."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_MTU_EXCHANGE}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
-    #[doc = " @param[in] server_rx_mtu  Server RX MTU size."]
-    #[doc = "                           - The minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
-    #[doc = "                           - The maximum value is @ref ble_gatt_conn_cfg_t::att_mtu in the connection configuration"]
-    #[doc = "                             used for this connection."]
-    #[doc = "                           - The value must be equal to Client RX MTU size given in @ref sd_ble_gattc_exchange_mtu_request"]
-    #[doc = "                             if an ATT_MTU exchange has already been performed in the other direction."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully sent response to the client."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State or no ATT_MTU exchange request pending."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid Server RX MTU size supplied."]
-    #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
-    
+#[doc = "@brief Reply to an ATT_MTU exchange request by sending an Exchange MTU Response to the client."]
+#[doc = ""]
+#[doc = " @details This function is only used to reply to a @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST event."]
+#[doc = ""]
+#[doc = " @details The SoftDevice sets ATT_MTU to the minimum of:"]
+#[doc = "          - The Client RX MTU value from @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST, and"]
+#[doc = "          - The Server RX MTU value."]
+#[doc = ""]
+#[doc = "          However, the SoftDevice never sets ATT_MTU lower than @ref BLE_GATT_ATT_MTU_DEFAULT."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_MTU_EXCHANGE}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @param[in] conn_handle    The connection handle identifying the connection to perform this procedure on."]
+#[doc = " @param[in] server_rx_mtu  Server RX MTU size."]
+#[doc = "                           - The minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
+#[doc = "                           - The maximum value is @ref ble_gatt_conn_cfg_t::att_mtu in the connection configuration"]
+#[doc = "                             used for this connection."]
+#[doc = "                           - The value must be equal to Client RX MTU size given in @ref sd_ble_gattc_exchange_mtu_request"]
+#[doc = "                             if an ATT_MTU exchange has already been performed in the other direction."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully sent response to the client."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection State or no ATT_MTU exchange request pending."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid Server RX MTU size supplied."]
+#[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_exchange_mtu_reply(conn_handle: u16, server_rx_mtu: u16) -> u32 {
     let ret: u32;
@@ -14921,50 +14713,49 @@ fn bindgen_test_layout_ble_cfg_t() {
     );
 }
 
-    #[doc = "@brief Enable the BLE stack"]
-    #[doc = ""]
-    #[doc = " @param[in, out] p_app_ram_base   Pointer to a variable containing the start address of the"]
-    #[doc = "                                  application RAM region (APP_RAM_BASE). On return, this will"]
-    #[doc = "                                  contain the minimum start address of the application RAM region"]
-    #[doc = "                                  required by the SoftDevice for this configuration."]
-    #[doc = " @warning After this call, the SoftDevice may generate several events. The list of events provided"]
-    #[doc = "          below require the application to initiate a SoftDevice API call. The corresponding API call"]
-    #[doc = "          is referenced in the event documentation."]
-    #[doc = "          If the application fails to do so, the BLE connection may timeout, or the SoftDevice may stop"]
-    #[doc = "          communicating with the peer device."]
-    #[doc = "          - @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST"]
-    #[doc = "          - @ref BLE_GAP_EVT_PHY_UPDATE_REQUEST"]
-    #[doc = "          - @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST"]
-    #[doc = "          - @ref BLE_GAP_EVT_SEC_REQUEST"]
-    #[doc = "          - @ref BLE_GAP_EVT_AUTH_KEY_REQUEST"]
-    #[doc = "          - @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST"]
-    #[doc = "          - @ref BLE_EVT_USER_MEM_REQUEST"]
-    #[doc = ""]
-    #[doc = " @note The memory requirement for a specific configuration will not increase between SoftDevices"]
-    #[doc = "       with the same major version number."]
-    #[doc = ""]
-    #[doc = " @note At runtime the IC's RAM is split into 2 regions: The SoftDevice RAM region is located"]
-    #[doc = "       between 0x20000000 and APP_RAM_BASE-1 and the application's RAM region is located between"]
-    #[doc = "       APP_RAM_BASE and the start of the call stack."]
-    #[doc = ""]
-    #[doc = " @details This call initializes the BLE stack, no BLE related function other than @ref"]
-    #[doc = "          sd_ble_cfg_set can be called before this one."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_COMMON_ENABLE}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS              The BLE stack has been initialized successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE  The BLE stack had already been initialized and cannot be reinitialized."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Invalid or not sufficiently aligned pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM         One or more of the following is true:"]
-    #[doc = "                                    - The amount of memory assigned to the SoftDevice by *p_app_ram_base is not"]
-    #[doc = "                                      large enough to fit this configuration's memory requirement. Check *p_app_ram_base"]
-    #[doc = "                                      and set the start address of the application RAM region accordingly."]
-    #[doc = "                                    - Dynamic part of the SoftDevice RAM region is larger then 64 kB which"]
-    #[doc = "                                      is currently not supported."]
-    #[doc = " @retval ::NRF_ERROR_RESOURCES      The total number of L2CAP Channels configured using @ref sd_ble_cfg_set is too large."]
-    
+#[doc = "@brief Enable the BLE stack"]
+#[doc = ""]
+#[doc = " @param[in, out] p_app_ram_base   Pointer to a variable containing the start address of the"]
+#[doc = "                                  application RAM region (APP_RAM_BASE). On return, this will"]
+#[doc = "                                  contain the minimum start address of the application RAM region"]
+#[doc = "                                  required by the SoftDevice for this configuration."]
+#[doc = " @warning After this call, the SoftDevice may generate several events. The list of events provided"]
+#[doc = "          below require the application to initiate a SoftDevice API call. The corresponding API call"]
+#[doc = "          is referenced in the event documentation."]
+#[doc = "          If the application fails to do so, the BLE connection may timeout, or the SoftDevice may stop"]
+#[doc = "          communicating with the peer device."]
+#[doc = "          - @ref BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST"]
+#[doc = "          - @ref BLE_GAP_EVT_PHY_UPDATE_REQUEST"]
+#[doc = "          - @ref BLE_GAP_EVT_SEC_PARAMS_REQUEST"]
+#[doc = "          - @ref BLE_GAP_EVT_SEC_REQUEST"]
+#[doc = "          - @ref BLE_GAP_EVT_AUTH_KEY_REQUEST"]
+#[doc = "          - @ref BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST"]
+#[doc = "          - @ref BLE_EVT_USER_MEM_REQUEST"]
+#[doc = ""]
+#[doc = " @note The memory requirement for a specific configuration will not increase between SoftDevices"]
+#[doc = "       with the same major version number."]
+#[doc = ""]
+#[doc = " @note At runtime the IC's RAM is split into 2 regions: The SoftDevice RAM region is located"]
+#[doc = "       between 0x20000000 and APP_RAM_BASE-1 and the application's RAM region is located between"]
+#[doc = "       APP_RAM_BASE and the start of the call stack."]
+#[doc = ""]
+#[doc = " @details This call initializes the BLE stack, no BLE related function other than @ref"]
+#[doc = "          sd_ble_cfg_set can be called before this one."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_COMMON_ENABLE}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS              The BLE stack has been initialized successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE  The BLE stack had already been initialized and cannot be reinitialized."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Invalid or not sufficiently aligned pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM         One or more of the following is true:"]
+#[doc = "                                    - The amount of memory assigned to the SoftDevice by *p_app_ram_base is not"]
+#[doc = "                                      large enough to fit this configuration's memory requirement. Check *p_app_ram_base"]
+#[doc = "                                      and set the start address of the application RAM region accordingly."]
+#[doc = "                                    - Dynamic part of the SoftDevice RAM region is larger then 64 kB which"]
+#[doc = "                                      is currently not supported."]
+#[doc = " @retval ::NRF_ERROR_RESOURCES      The total number of L2CAP Channels configured using @ref sd_ble_cfg_set is too large."]
 #[inline(always)]
 pub unsafe fn sd_ble_enable(p_app_ram_base: *mut u32) -> u32 {
     let ret: u32;
@@ -14978,41 +14769,39 @@ pub unsafe fn sd_ble_enable(p_app_ram_base: *mut u32) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Add configurations for the BLE stack"]
-    #[doc = ""]
-    #[doc = " @param[in] cfg_id              Config ID, see @ref BLE_CONN_CFGS, @ref BLE_COMMON_CFGS, @ref"]
-    #[doc = "                                BLE_GAP_CFGS or @ref BLE_GATTS_CFGS."]
-    #[doc = " @param[in] p_cfg               Pointer to a ble_cfg_t structure containing the configuration value."]
-    #[doc = " @param[in] app_ram_base        The start address of the application RAM region (APP_RAM_BASE)."]
-    #[doc = "                                See @ref sd_ble_enable for details about APP_RAM_BASE."]
-    #[doc = ""]
-    #[doc = " @note The memory requirement for a specific configuration will not increase between SoftDevices"]
-    #[doc = "       with the same major version number."]
-    #[doc = ""]
-    #[doc = " @note If a configuration is set more than once, the last one set is the one that takes effect on"]
-    #[doc = "       @ref sd_ble_enable."]
-    #[doc = ""]
-    #[doc = " @note Any part of the BLE stack that is NOT configured with @ref sd_ble_cfg_set will have default"]
-    #[doc = "       configuration."]
-    #[doc = ""]
-    #[doc = " @note @ref sd_ble_cfg_set may be called at any time when the SoftDevice is enabled (see @ref"]
-    #[doc = "       sd_softdevice_enable) while the BLE part of the SoftDevice is not enabled (see @ref"]
-    #[doc = "       sd_ble_enable)."]
-    #[doc = ""]
-    #[doc = " @note Error codes for the configurations are described in the configuration structs."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_COMMON_ENABLE}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS              The configuration has been added successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE  The BLE stack had already been initialized."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Invalid or not sufficiently aligned pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM  Invalid cfg_id supplied."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM         The amount of memory assigned to the SoftDevice by app_ram_base is not"]
-    #[doc = "                                    large enough to fit this configuration's memory requirement."]
-    
+#[doc = "@brief Add configurations for the BLE stack"]
+#[doc = ""]
+#[doc = " @param[in] cfg_id              Config ID, see @ref BLE_CONN_CFGS, @ref BLE_COMMON_CFGS, @ref"]
+#[doc = "                                BLE_GAP_CFGS or @ref BLE_GATTS_CFGS."]
+#[doc = " @param[in] p_cfg               Pointer to a ble_cfg_t structure containing the configuration value."]
+#[doc = " @param[in] app_ram_base        The start address of the application RAM region (APP_RAM_BASE)."]
+#[doc = "                                See @ref sd_ble_enable for details about APP_RAM_BASE."]
+#[doc = ""]
+#[doc = " @note The memory requirement for a specific configuration will not increase between SoftDevices"]
+#[doc = "       with the same major version number."]
+#[doc = ""]
+#[doc = " @note If a configuration is set more than once, the last one set is the one that takes effect on"]
+#[doc = "       @ref sd_ble_enable."]
+#[doc = ""]
+#[doc = " @note Any part of the BLE stack that is NOT configured with @ref sd_ble_cfg_set will have default"]
+#[doc = "       configuration."]
+#[doc = ""]
+#[doc = " @note @ref sd_ble_cfg_set may be called at any time when the SoftDevice is enabled (see @ref"]
+#[doc = "       sd_softdevice_enable) while the BLE part of the SoftDevice is not enabled (see @ref"]
+#[doc = "       sd_ble_enable)."]
+#[doc = ""]
+#[doc = " @note Error codes for the configurations are described in the configuration structs."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_COMMON_ENABLE}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS              The configuration has been added successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE  The BLE stack had already been initialized."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Invalid or not sufficiently aligned pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM  Invalid cfg_id supplied."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM         The amount of memory assigned to the SoftDevice by app_ram_base is not"]
+#[doc = "                                    large enough to fit this configuration's memory requirement."]
 #[inline(always)]
 pub unsafe fn sd_ble_cfg_set(cfg_id: u32, p_cfg: *const ble_cfg_t, app_ram_base: u32) -> u32 {
     let ret: u32;
@@ -15026,43 +14815,41 @@ pub unsafe fn sd_ble_cfg_set(cfg_id: u32, p_cfg: *const ble_cfg_t, app_ram_base:
     ret
 }
 
-
-    #[doc = "@brief Get an event from the pending events queue."]
-    #[doc = ""]
-    #[doc = " @param[out] p_dest Pointer to buffer to be filled in with an event, or NULL to retrieve the event length."]
-    #[doc = "                    This buffer <b>must be aligned to the extend defined by @ref BLE_EVT_PTR_ALIGNMENT</b>."]
-    #[doc = "                    The buffer should be interpreted as a @ref ble_evt_t struct."]
-    #[doc = " @param[in, out] p_len Pointer the length of the buffer, on return it is filled with the event length."]
-    #[doc = ""]
-    #[doc = " @details This call allows the application to pull a BLE event from the BLE stack. The application is signaled that"]
-    #[doc = " an event is available from the BLE stack by the triggering of the SD_EVT_IRQn interrupt."]
-    #[doc = " The application is free to choose whether to call this function from thread mode (main context) or directly from the"]
-    #[doc = " Interrupt Service Routine that maps to SD_EVT_IRQn. In any case however, and because the BLE stack runs at a higher"]
-    #[doc = " priority than the application, this function should be called in a loop (until @ref NRF_ERROR_NOT_FOUND is returned)"]
-    #[doc = " every time SD_EVT_IRQn is raised to ensure that all available events are pulled from the BLE stack. Failure to do so"]
-    #[doc = " could potentially leave events in the internal queue without the application being aware of this fact."]
-    #[doc = ""]
-    #[doc = " Sizing the p_dest buffer is equally important, since the application needs to provide all the memory necessary for the event to"]
-    #[doc = " be copied into application memory. If the buffer provided is not large enough to fit the entire contents of the event,"]
-    #[doc = " @ref NRF_ERROR_DATA_SIZE will be returned and the application can then call again with a larger buffer size."]
-    #[doc = " The maximum possible event length is defined by @ref BLE_EVT_LEN_MAX. The application may also \"peek\" the event length"]
-    #[doc = " by providing p_dest as a NULL pointer and inspecting the value of *p_len upon return:"]
-    #[doc = ""]
-    #[doc = "     \\code"]
-    #[doc = "     uint16_t len;"]
-    #[doc = "     errcode = sd_ble_evt_get(NULL, &len);"]
-    #[doc = "     \\endcode"]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_COMMON_IRQ_EVT_MSC}"]
-    #[doc = " @mmsc{@ref BLE_COMMON_THREAD_EVT_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Event pulled and stored into the supplied buffer."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid or not sufficiently aligned pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND No events ready to be pulled."]
-    #[doc = " @retval ::NRF_ERROR_DATA_SIZE Event ready but could not fit into the supplied buffer."]
-    
+#[doc = "@brief Get an event from the pending events queue."]
+#[doc = ""]
+#[doc = " @param[out] p_dest Pointer to buffer to be filled in with an event, or NULL to retrieve the event length."]
+#[doc = "                    This buffer <b>must be aligned to the extend defined by @ref BLE_EVT_PTR_ALIGNMENT</b>."]
+#[doc = "                    The buffer should be interpreted as a @ref ble_evt_t struct."]
+#[doc = " @param[in, out] p_len Pointer the length of the buffer, on return it is filled with the event length."]
+#[doc = ""]
+#[doc = " @details This call allows the application to pull a BLE event from the BLE stack. The application is signaled that"]
+#[doc = " an event is available from the BLE stack by the triggering of the SD_EVT_IRQn interrupt."]
+#[doc = " The application is free to choose whether to call this function from thread mode (main context) or directly from the"]
+#[doc = " Interrupt Service Routine that maps to SD_EVT_IRQn. In any case however, and because the BLE stack runs at a higher"]
+#[doc = " priority than the application, this function should be called in a loop (until @ref NRF_ERROR_NOT_FOUND is returned)"]
+#[doc = " every time SD_EVT_IRQn is raised to ensure that all available events are pulled from the BLE stack. Failure to do so"]
+#[doc = " could potentially leave events in the internal queue without the application being aware of this fact."]
+#[doc = ""]
+#[doc = " Sizing the p_dest buffer is equally important, since the application needs to provide all the memory necessary for the event to"]
+#[doc = " be copied into application memory. If the buffer provided is not large enough to fit the entire contents of the event,"]
+#[doc = " @ref NRF_ERROR_DATA_SIZE will be returned and the application can then call again with a larger buffer size."]
+#[doc = " The maximum possible event length is defined by @ref BLE_EVT_LEN_MAX. The application may also \"peek\" the event length"]
+#[doc = " by providing p_dest as a NULL pointer and inspecting the value of *p_len upon return:"]
+#[doc = ""]
+#[doc = "     \\code"]
+#[doc = "     uint16_t len;"]
+#[doc = "     errcode = sd_ble_evt_get(NULL, &len);"]
+#[doc = "     \\endcode"]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_COMMON_IRQ_EVT_MSC}"]
+#[doc = " @mmsc{@ref BLE_COMMON_THREAD_EVT_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Event pulled and stored into the supplied buffer."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid or not sufficiently aligned pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND No events ready to be pulled."]
+#[doc = " @retval ::NRF_ERROR_DATA_SIZE Event ready but could not fit into the supplied buffer."]
 #[inline(always)]
 pub unsafe fn sd_ble_evt_get(p_dest: *mut u8, p_len: *mut u16) -> u32 {
     let ret: u32;
@@ -15076,33 +14863,31 @@ pub unsafe fn sd_ble_evt_get(p_dest: *mut u8, p_len: *mut u16) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Add a Vendor Specific base UUID."]
-    #[doc = ""]
-    #[doc = " @details This call enables the application to add a Vendor Specific base UUID to the BLE stack's table, for later"]
-    #[doc = " use with all other modules and APIs. This then allows the application to use the shorter, 24-bit @ref ble_uuid_t"]
-    #[doc = " format when dealing with both 16-bit and 128-bit UUIDs without having to check for lengths and having split code"]
-    #[doc = " paths. This is accomplished by extending the grouping mechanism that the Bluetooth SIG standard base UUID uses"]
-    #[doc = " for all other 128-bit UUIDs. The type field in the @ref ble_uuid_t structure is an index (relative to"]
-    #[doc = " @ref BLE_UUID_TYPE_VENDOR_BEGIN) to the table populated by multiple calls to this function, and the UUID field"]
-    #[doc = " in the same structure contains the 2 bytes at indexes 12 and 13. The number of possible 128-bit UUIDs available to"]
-    #[doc = " the application is therefore the number of Vendor Specific UUIDs added with the help of this function times 65536,"]
-    #[doc = " although restricted to modifying bytes 12 and 13 for each of the entries in the supplied array."]
-    #[doc = ""]
-    #[doc = " @note Bytes 12 and 13 of the provided UUID will not be used internally, since those are always replaced by"]
-    #[doc = " the 16-bit uuid field in @ref ble_uuid_t."]
-    #[doc = ""]
-    #[doc = " @note If a UUID is already present in the BLE stack's internal table, the corresponding index will be returned in"]
-    #[doc = " p_uuid_type along with an @ref NRF_SUCCESS error code."]
-    #[doc = ""]
-    #[doc = " @param[in]  p_vs_uuid    Pointer to a 16-octet (128-bit) little endian Vendor Specific base UUID disregarding"]
-    #[doc = "                          bytes 12 and 13."]
-    #[doc = " @param[out] p_uuid_type  Pointer to a uint8_t where the type field in @ref ble_uuid_t corresponding to this UUID will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully added the Vendor Specific base UUID."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR If p_vs_uuid or p_uuid_type is NULL or invalid."]
-    #[doc = " @retval ::NRF_ERROR_NO_MEM If there are no more free slots for VS UUIDs."]
-    
+#[doc = "@brief Add a Vendor Specific base UUID."]
+#[doc = ""]
+#[doc = " @details This call enables the application to add a Vendor Specific base UUID to the BLE stack's table, for later"]
+#[doc = " use with all other modules and APIs. This then allows the application to use the shorter, 24-bit @ref ble_uuid_t"]
+#[doc = " format when dealing with both 16-bit and 128-bit UUIDs without having to check for lengths and having split code"]
+#[doc = " paths. This is accomplished by extending the grouping mechanism that the Bluetooth SIG standard base UUID uses"]
+#[doc = " for all other 128-bit UUIDs. The type field in the @ref ble_uuid_t structure is an index (relative to"]
+#[doc = " @ref BLE_UUID_TYPE_VENDOR_BEGIN) to the table populated by multiple calls to this function, and the UUID field"]
+#[doc = " in the same structure contains the 2 bytes at indexes 12 and 13. The number of possible 128-bit UUIDs available to"]
+#[doc = " the application is therefore the number of Vendor Specific UUIDs added with the help of this function times 65536,"]
+#[doc = " although restricted to modifying bytes 12 and 13 for each of the entries in the supplied array."]
+#[doc = ""]
+#[doc = " @note Bytes 12 and 13 of the provided UUID will not be used internally, since those are always replaced by"]
+#[doc = " the 16-bit uuid field in @ref ble_uuid_t."]
+#[doc = ""]
+#[doc = " @note If a UUID is already present in the BLE stack's internal table, the corresponding index will be returned in"]
+#[doc = " p_uuid_type along with an @ref NRF_SUCCESS error code."]
+#[doc = ""]
+#[doc = " @param[in]  p_vs_uuid    Pointer to a 16-octet (128-bit) little endian Vendor Specific base UUID disregarding"]
+#[doc = "                          bytes 12 and 13."]
+#[doc = " @param[out] p_uuid_type  Pointer to a uint8_t where the type field in @ref ble_uuid_t corresponding to this UUID will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully added the Vendor Specific base UUID."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR If p_vs_uuid or p_uuid_type is NULL or invalid."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM If there are no more free slots for VS UUIDs."]
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_vs_add(p_vs_uuid: *const ble_uuid128_t, p_uuid_type: *mut u8) -> u32 {
     let ret: u32;
@@ -15116,25 +14901,23 @@ pub unsafe fn sd_ble_uuid_vs_add(p_vs_uuid: *const ble_uuid128_t, p_uuid_type: *
     ret
 }
 
-
-    #[doc = "@brief Remove a Vendor Specific base UUID."]
-    #[doc = ""]
-    #[doc = " @details This call removes a Vendor Specific base UUID that has been added with @ref sd_ble_uuid_vs_add. This function allows"]
-    #[doc = " the application to reuse memory allocated for Vendor Specific base UUIDs."]
-    #[doc = ""]
-    #[doc = " @note Currently this function can only be called with a p_uuid_type set to @ref BLE_UUID_TYPE_UNKNOWN or the last added UUID type."]
-    #[doc = ""]
-    #[doc = " @param[inout] p_uuid_type Pointer to a uint8_t where its value matches the UUID type in @ref ble_uuid_t::type to be removed."]
-    #[doc = "                           If the type is set to @ref BLE_UUID_TYPE_UNKNOWN, or the pointer is NULL, the last Vendor Specific"]
-    #[doc = "                           base UUID will be removed. If the function returns successfully, the UUID type that was removed will"]
-    #[doc = "                           be written back to @p p_uuid_type. If function returns with a failure, it contains the last type that"]
-    #[doc = "                           is in use by the ATT Server."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully removed the Vendor Specific base UUID."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR If p_uuid_type is invalid."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM If p_uuid_type points to a non-valid UUID type."]
-    #[doc = " @retval ::NRF_ERROR_FORBIDDEN If the Vendor Specific base UUID is in use by the ATT Server."]
-    
+#[doc = "@brief Remove a Vendor Specific base UUID."]
+#[doc = ""]
+#[doc = " @details This call removes a Vendor Specific base UUID that has been added with @ref sd_ble_uuid_vs_add. This function allows"]
+#[doc = " the application to reuse memory allocated for Vendor Specific base UUIDs."]
+#[doc = ""]
+#[doc = " @note Currently this function can only be called with a p_uuid_type set to @ref BLE_UUID_TYPE_UNKNOWN or the last added UUID type."]
+#[doc = ""]
+#[doc = " @param[inout] p_uuid_type Pointer to a uint8_t where its value matches the UUID type in @ref ble_uuid_t::type to be removed."]
+#[doc = "                           If the type is set to @ref BLE_UUID_TYPE_UNKNOWN, or the pointer is NULL, the last Vendor Specific"]
+#[doc = "                           base UUID will be removed. If the function returns successfully, the UUID type that was removed will"]
+#[doc = "                           be written back to @p p_uuid_type. If function returns with a failure, it contains the last type that"]
+#[doc = "                           is in use by the ATT Server."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully removed the Vendor Specific base UUID."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR If p_uuid_type is invalid."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM If p_uuid_type points to a non-valid UUID type."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN If the Vendor Specific base UUID is in use by the ATT Server."]
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_vs_remove(p_uuid_type: *mut u8) -> u32 {
     let ret: u32;
@@ -15148,31 +14931,29 @@ pub unsafe fn sd_ble_uuid_vs_remove(p_uuid_type: *mut u8) -> u32 {
     ret
 }
 
-
-    #[doc = " @brief Decode little endian raw UUID bytes (16-bit or 128-bit) into a 24 bit @ref ble_uuid_t structure."]
-    #[doc = ""]
-    #[doc = " @details The raw UUID bytes excluding bytes 12 and 13 (i.e. bytes 0-11 and 14-15) of p_uuid_le are compared"]
-    #[doc = " to the corresponding ones in each entry of the table of Vendor Specific base UUIDs populated with @ref sd_ble_uuid_vs_add"]
-    #[doc = " to look for a match. If there is such a match, bytes 12 and 13 are returned as p_uuid->uuid and the index"]
-    #[doc = " relative to @ref BLE_UUID_TYPE_VENDOR_BEGIN as p_uuid->type."]
-    #[doc = ""]
-    #[doc = " @note If the UUID length supplied is 2, then the type set by this call will always be @ref BLE_UUID_TYPE_BLE."]
-    #[doc = ""]
-    #[doc = " @param[in]   uuid_le_len Length in bytes of the buffer pointed to by p_uuid_le (must be 2 or 16 bytes)."]
-    #[doc = " @param[in]   p_uuid_le   Pointer pointing to little endian raw UUID bytes."]
-    #[doc = " @param[out]  p_uuid      Pointer to a @ref ble_uuid_t structure to be filled in."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully decoded into the @ref ble_uuid_t structure."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Invalid UUID length."]
-    #[doc = " @retval ::NRF_ERROR_NOT_FOUND For a 128-bit UUID, no match in the populated table of UUIDs."]
-    
+#[doc = " @brief Decode little endian raw UUID bytes (16-bit or 128-bit) into a 24 bit @ref ble_uuid_t structure."]
+#[doc = ""]
+#[doc = " @details The raw UUID bytes excluding bytes 12 and 13 (i.e. bytes 0-11 and 14-15) of p_uuid_le are compared"]
+#[doc = " to the corresponding ones in each entry of the table of Vendor Specific base UUIDs populated with @ref sd_ble_uuid_vs_add"]
+#[doc = " to look for a match. If there is such a match, bytes 12 and 13 are returned as p_uuid->uuid and the index"]
+#[doc = " relative to @ref BLE_UUID_TYPE_VENDOR_BEGIN as p_uuid->type."]
+#[doc = ""]
+#[doc = " @note If the UUID length supplied is 2, then the type set by this call will always be @ref BLE_UUID_TYPE_BLE."]
+#[doc = ""]
+#[doc = " @param[in]   uuid_le_len Length in bytes of the buffer pointed to by p_uuid_le (must be 2 or 16 bytes)."]
+#[doc = " @param[in]   p_uuid_le   Pointer pointing to little endian raw UUID bytes."]
+#[doc = " @param[out]  p_uuid      Pointer to a @ref ble_uuid_t structure to be filled in."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully decoded into the @ref ble_uuid_t structure."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Invalid UUID length."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND For a 128-bit UUID, no match in the populated table of UUIDs."]
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_decode(
-        uuid_le_len: u8,
-        p_uuid_le: *const u8,
-        p_uuid: *mut ble_uuid_t,
-    ) -> u32 {
+    uuid_le_len: u8,
+    p_uuid_le: *const u8,
+    p_uuid: *mut ble_uuid_t,
+) -> u32 {
     let ret: u32;
     asm!("svc 100",
         inout("r0") to_asm(uuid_le_len) => ret,
@@ -15184,25 +14965,23 @@ pub unsafe fn sd_ble_uuid_decode(
     ret
 }
 
-
-    #[doc = " @brief Encode a @ref ble_uuid_t structure into little endian raw UUID bytes (16-bit or 128-bit)."]
-    #[doc = ""]
-    #[doc = " @note The pointer to the destination buffer p_uuid_le may be NULL, in which case only the validity and size of p_uuid is computed."]
-    #[doc = ""]
-    #[doc = " @param[in]   p_uuid        Pointer to a @ref ble_uuid_t structure that will be encoded into bytes."]
-    #[doc = " @param[out]  p_uuid_le_len Pointer to a uint8_t that will be filled with the encoded length (2 or 16 bytes)."]
-    #[doc = " @param[out]  p_uuid_le     Pointer to a buffer where the little endian raw UUID bytes (2 or 16) will be stored."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully encoded into the buffer."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid UUID type."]
-    
+#[doc = " @brief Encode a @ref ble_uuid_t structure into little endian raw UUID bytes (16-bit or 128-bit)."]
+#[doc = ""]
+#[doc = " @note The pointer to the destination buffer p_uuid_le may be NULL, in which case only the validity and size of p_uuid is computed."]
+#[doc = ""]
+#[doc = " @param[in]   p_uuid        Pointer to a @ref ble_uuid_t structure that will be encoded into bytes."]
+#[doc = " @param[out]  p_uuid_le_len Pointer to a uint8_t that will be filled with the encoded length (2 or 16 bytes)."]
+#[doc = " @param[out]  p_uuid_le     Pointer to a buffer where the little endian raw UUID bytes (2 or 16) will be stored."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully encoded into the buffer."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid UUID type."]
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_encode(
-        p_uuid: *const ble_uuid_t,
-        p_uuid_le_len: *mut u8,
-        p_uuid_le: *mut u8,
-    ) -> u32 {
+    p_uuid: *const ble_uuid_t,
+    p_uuid_le_len: *mut u8,
+    p_uuid_le: *mut u8,
+) -> u32 {
     let ret: u32;
     asm!("svc 101",
         inout("r0") to_asm(p_uuid) => ret,
@@ -15214,17 +14993,15 @@ pub unsafe fn sd_ble_uuid_encode(
     ret
 }
 
-
-    #[doc = "@brief Get Version Information."]
-    #[doc = ""]
-    #[doc = " @details This call allows the application to get the BLE stack version information."]
-    #[doc = ""]
-    #[doc = " @param[out] p_version Pointer to a ble_version_t structure to be filled in."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS  Version information stored successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy (typically doing a locally-initiated disconnection procedure)."]
-    
+#[doc = "@brief Get Version Information."]
+#[doc = ""]
+#[doc = " @details This call allows the application to get the BLE stack version information."]
+#[doc = ""]
+#[doc = " @param[out] p_version Pointer to a ble_version_t structure to be filled in."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS  Version information stored successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy (typically doing a locally-initiated disconnection procedure)."]
 #[inline(always)]
 pub unsafe fn sd_ble_version_get(p_version: *mut ble_version_t) -> u32 {
     let ret: u32;
@@ -15238,30 +15015,28 @@ pub unsafe fn sd_ble_version_get(p_version: *mut ble_version_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Provide a user memory block."]
-    #[doc = ""]
-    #[doc = " @note This call can only be used as a response to a @ref BLE_EVT_USER_MEM_REQUEST event issued to the application."]
-    #[doc = ""]
-    #[doc = " @param[in] conn_handle Connection handle."]
-    #[doc = " @param[in] p_block Pointer to a user memory block structure or NULL if memory is managed by the application."]
-    #[doc = ""]
-    #[doc = " @mscs"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_PEER_CANCEL_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_AUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_NOAUTH_MSC}"]
-    #[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
-    #[doc = " @endmscs"]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS Successfully queued a response to the peer."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Invalid user memory block length supplied."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection state or no user memory request pending."]
-    
+#[doc = "@brief Provide a user memory block."]
+#[doc = ""]
+#[doc = " @note This call can only be used as a response to a @ref BLE_EVT_USER_MEM_REQUEST event issued to the application."]
+#[doc = ""]
+#[doc = " @param[in] conn_handle Connection handle."]
+#[doc = " @param[in] p_block Pointer to a user memory block structure or NULL if memory is managed by the application."]
+#[doc = ""]
+#[doc = " @mscs"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_PEER_CANCEL_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_NOBUF_NOAUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_AUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_BUF_NOAUTH_MSC}"]
+#[doc = " @mmsc{@ref BLE_GATTS_QUEUED_WRITE_QUEUE_FULL_MSC}"]
+#[doc = " @endmscs"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS Successfully queued a response to the peer."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_BUSY The stack is busy, process pending events and retry."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Invalid user memory block length supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Invalid Connection state or no user memory request pending."]
 #[inline(always)]
 pub unsafe fn sd_ble_user_mem_reply(conn_handle: u16, p_block: *const ble_user_mem_block_t) -> u32 {
     let ret: u32;
@@ -15275,23 +15050,21 @@ pub unsafe fn sd_ble_user_mem_reply(conn_handle: u16, p_block: *const ble_user_m
     ret
 }
 
-
-    #[doc = "@brief Set a BLE option."]
-    #[doc = ""]
-    #[doc = " @details This call allows the application to set the value of an option."]
-    #[doc = ""]
-    #[doc = " @param[in] opt_id Option ID, see @ref BLE_COMMON_OPTS and @ref BLE_GAP_OPTS."]
-    #[doc = " @param[in] p_opt Pointer to a @ref ble_opt_t structure containing the option value."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS  Option set successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Unable to set the parameter at this time."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy or the previous procedure has not completed."]
-    #[doc = ""]
-    #[doc = " @note For a complete set of return values see @ref ble_opt_t."]
-    
+#[doc = "@brief Set a BLE option."]
+#[doc = ""]
+#[doc = " @details This call allows the application to set the value of an option."]
+#[doc = ""]
+#[doc = " @param[in] opt_id Option ID, see @ref BLE_COMMON_OPTS and @ref BLE_GAP_OPTS."]
+#[doc = " @param[in] p_opt Pointer to a @ref ble_opt_t structure containing the option value."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS  Option set successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Unable to set the parameter at this time."]
+#[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy or the previous procedure has not completed."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values see @ref ble_opt_t."]
 #[inline(always)]
 pub unsafe fn sd_ble_opt_set(opt_id: u32, p_opt: *const ble_opt_t) -> u32 {
     let ret: u32;
@@ -15305,24 +15078,22 @@ pub unsafe fn sd_ble_opt_set(opt_id: u32, p_opt: *const ble_opt_t) -> u32 {
     ret
 }
 
-
-    #[doc = "@brief Get a BLE option."]
-    #[doc = ""]
-    #[doc = " @details This call allows the application to retrieve the value of an option."]
-    #[doc = ""]
-    #[doc = " @param[in] opt_id Option ID, see @ref BLE_COMMON_OPTS and @ref BLE_GAP_OPTS."]
-    #[doc = " @param[out] p_opt Pointer to a @ref ble_opt_t structure to be filled in."]
-    #[doc = ""]
-    #[doc = " @retval ::NRF_SUCCESS  Option retrieved successfully."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
-    #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
-    #[doc = " @retval ::NRF_ERROR_INVALID_STATE Unable to retrieve the parameter at this time."]
-    #[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy or the previous procedure has not completed."]
-    #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED This option is not supported."]
-    #[doc = ""]
-    #[doc = " @note For a complete set of return values see @ref ble_opt_t."]
-    
+#[doc = "@brief Get a BLE option."]
+#[doc = ""]
+#[doc = " @details This call allows the application to retrieve the value of an option."]
+#[doc = ""]
+#[doc = " @param[in] opt_id Option ID, see @ref BLE_COMMON_OPTS and @ref BLE_GAP_OPTS."]
+#[doc = " @param[out] p_opt Pointer to a @ref ble_opt_t structure to be filled in."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS  Option retrieved successfully."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
+#[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid Connection Handle."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameter(s) supplied, check parameter limits and constraints."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE Unable to retrieve the parameter at this time."]
+#[doc = " @retval ::NRF_ERROR_BUSY The BLE stack is busy or the previous procedure has not completed."]
+#[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED This option is not supported."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values see @ref ble_opt_t."]
 #[inline(always)]
 pub unsafe fn sd_ble_opt_get(opt_id: u32, p_opt: *mut ble_opt_t) -> u32 {
     let ret: u32;
@@ -15335,4 +15106,3 @@ pub unsafe fn sd_ble_opt_get(opt_id: u32, p_opt: *mut ble_opt_t) -> u32 {
     );
     ret
 }
-
