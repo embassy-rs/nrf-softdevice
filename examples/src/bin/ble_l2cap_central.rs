@@ -19,7 +19,7 @@ use embassy::util::Forever;
 use heapless::consts::*;
 
 use nrf_softdevice::ble::l2cap::Packet as _;
-use nrf_softdevice::ble::{central, l2cap, Address, Connection, Uuid};
+use nrf_softdevice::ble::{central, l2cap, Address, Connection, TxPower, Uuid};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
@@ -36,7 +36,10 @@ async fn softdevice_task(sd: &'static Softdevice) {
 async fn ble_central_task(sd: &'static Softdevice) {
     info!("Scanning for peer...");
 
-    let config = central::ScanConfig { whitelist: None };
+    let config = central::ScanConfig {
+        whitelist: None,
+        tx_power: TxPower::ZerodBm,
+    };
     let res = central::scan(sd, &config, |params| unsafe {
         let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
         while data.len() != 0 {

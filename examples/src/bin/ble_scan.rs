@@ -14,7 +14,7 @@ use defmt::{panic, *};
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::central;
+use nrf_softdevice::ble::{central, TxPower};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
@@ -27,7 +27,10 @@ async fn softdevice_task(sd: &'static Softdevice) {
 
 #[task]
 async fn ble_task(sd: &'static Softdevice) {
-    let config = central::ScanConfig { whitelist: None };
+    let config = central::ScanConfig {
+        whitelist: None,
+        tx_power: TxPower::ZerodBm,
+    };
     let res = central::scan(sd, &config, |params| unsafe {
         info!("AdvReport!");
         info!(
