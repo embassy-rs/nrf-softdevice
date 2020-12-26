@@ -1,6 +1,3 @@
-use fixed::types::I30F2;
-
-use crate::fmt::*;
 use crate::{raw, RawError, Softdevice};
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

@@ -156,7 +156,7 @@ pub(crate) async fn discover_service(
                 match v.len() {
                     0 => Err(DiscoverError::ServiceNotFound),
                     1 => Ok(v[0]),
-                    n => {
+                    _n => {
                         warn!(
                             "Found {:?} services with the same UUID, using the first one",
                             params.count

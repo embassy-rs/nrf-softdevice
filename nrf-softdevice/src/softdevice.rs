@@ -3,7 +3,6 @@ use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::util::Forever;
 
-use crate::ble;
 use crate::fmt::{panic, *};
 use crate::interrupt;
 use crate::pac;

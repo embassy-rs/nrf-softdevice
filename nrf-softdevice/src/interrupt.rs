@@ -6,7 +6,7 @@
 //!
 //! You must NOT use any other crate to manage interrupts, such as `cortex-m`'s `NVIC`.
 
-use crate::fmt::{assert, unreachable, *};
+use crate::fmt::{assert, unreachable};
 use crate::pac::{NVIC, NVIC_PRIO_BITS};
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 
@@ -118,7 +118,7 @@ where
     F: FnOnce(&CriticalSection) -> R,
 {
     unsafe {
-        let nvic = &*NVIC::ptr();
+        let _nvic = &*NVIC::ptr();
 
         let token = disable_all();
         let r = f(&CriticalSection::new());

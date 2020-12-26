@@ -133,7 +133,7 @@ pub(crate) static ADV_PORTAL: Portal<Result<Connection, AdvertiseError>> = Porta
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn advertise(
-    sd: &Softdevice,
+    _sd: &Softdevice,
     adv: ConnectableAdvertisement<'_>,
     config: &Config,
 ) -> Result<Connection, AdvertiseError> {

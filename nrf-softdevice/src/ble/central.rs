@@ -5,11 +5,10 @@
 
 use core::mem;
 use core::ptr;
-use core::slice;
 
 use crate::ble::types::*;
-use crate::ble::{Address, Connection, ConnectionState};
-use crate::fmt::{assert, panic, *};
+use crate::ble::{Address, Connection};
+use crate::fmt::{assert, *};
 use crate::raw;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{RawError, Softdevice};
@@ -190,7 +189,7 @@ pub(crate) enum ScanPortalMessage {
 pub(crate) static SCAN_PORTAL: Portal<ScanPortalMessage> = Portal::new();
 
 pub async fn scan<'a, F, R>(
-    sd: &Softdevice,
+    _sd: &Softdevice,
     config: &ScanConfig<'a>,
     mut f: F,
 ) -> Result<R, ScanError>
@@ -251,7 +250,7 @@ where
         }
     }
 
-    let d = OnDrop::new(|| {
+    let _d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_scan_stop() };
         if let Err(e) = RawError::convert(ret) {
             warn!("sd_ble_gap_scan_stop: {:?}", e);
@@ -261,7 +260,7 @@ where
     info!("Scan started");
     let res = SCAN_PORTAL
         .wait_many(|msg| match msg {
-            ScanPortalMessage::Timeout(ble_evt) => return Some(Err(ScanError::Timeout)),
+            ScanPortalMessage::Timeout(_ble_evt) => return Some(Err(ScanError::Timeout)),
             ScanPortalMessage::AdvReport(ble_evt) => unsafe {
                 let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
                 let params = &gap_evt.params.adv_report;

@@ -1,6 +1,5 @@
 //! Link-Layer Control and Adaptation Protocol
 
-use core::convert::TryInto;
 use core::marker::PhantomData;
 use core::ptr;
 use core::ptr::NonNull;
@@ -38,7 +37,7 @@ pub(crate) fn on_ch_setup(ble_evt: *const raw::ble_evt_t) {
 
 pub(crate) fn on_ch_released(ble_evt: *const raw::ble_evt_t) {
     trace!("on_ch_released");
-    let conn_handle = evt_conn_handle(ble_evt);
+    let _conn_handle = evt_conn_handle(ble_evt);
 }
 
 pub(crate) fn on_ch_sdu_buf_released(ble_evt: *const raw::ble_evt_t) {
@@ -53,7 +52,7 @@ pub(crate) fn on_ch_sdu_buf_released(ble_evt: *const raw::ble_evt_t) {
 
 pub(crate) fn on_ch_credit(ble_evt: *const raw::ble_evt_t) {
     trace!("on_ch_credit");
-    let conn_handle = evt_conn_handle(ble_evt);
+    let _conn_handle = evt_conn_handle(ble_evt);
 }
 
 pub(crate) fn on_ch_rx(ble_evt: *const raw::ble_evt_t) {
@@ -79,7 +78,7 @@ pub enum TxError {
 }
 
 impl From<DisconnectedError> for TxError {
-    fn from(err: DisconnectedError) -> Self {
+    fn from(_err: DisconnectedError) -> Self {
         TxError::Disconnected
     }
 }
@@ -96,7 +95,7 @@ pub enum RxError {
 }
 
 impl From<DisconnectedError> for RxError {
-    fn from(err: DisconnectedError) -> Self {
+    fn from(_err: DisconnectedError) -> Self {
         RxError::Disconnected
     }
 }
@@ -115,7 +114,7 @@ pub enum SetupError {
 }
 
 impl From<DisconnectedError> for SetupError {
-    fn from(err: DisconnectedError) -> Self {
+    fn from(_err: DisconnectedError) -> Self {
         SetupError::Disconnected
     }
 }
@@ -154,7 +153,7 @@ static IS_INIT: AtomicBool = AtomicBool::new(false);
 static mut PACKET_FREE: Option<unsafe fn(NonNull<u8>)> = None;
 
 impl<P: Packet> L2cap<P> {
-    pub fn init(sd: &Softdevice) -> Self {
+    pub fn init(_sd: &Softdevice) -> Self {
         if IS_INIT.compare_and_swap(false, true, Ordering::AcqRel) {
             panic!("L2cap::init() called multiple times.")
         }
@@ -204,7 +203,7 @@ impl<P: Packet> L2cap<P> {
                 PortalMessage::Disconnected => Err(SetupError::Disconnected),
                 PortalMessage::SetupDone(ble_evt) => unsafe {
                     let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let evt = &l2cap_evt.params.ch_setup;
+                    let _evt = &l2cap_evt.params.ch_setup;
 
                     // default is 1
                     if config.credits != 1 {
@@ -230,7 +229,7 @@ impl<P: Packet> L2cap<P> {
                 },
                 PortalMessage::SetupRefused(ble_evt) => unsafe {
                     let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let evt = &l2cap_evt.params.ch_setup_refused;
+                    let _evt = &l2cap_evt.params.ch_setup_refused;
                     Err(SetupError::Refused)
                 },
                 _ => unreachable!(),

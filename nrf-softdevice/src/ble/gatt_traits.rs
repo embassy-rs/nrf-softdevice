@@ -1,9 +1,8 @@
-use core::convert::TryInto;
 use core::mem;
 use core::slice;
 use heapless::{ArrayLength, Vec};
 
-use crate::fmt::{panic, *};
+use crate::fmt::panic;
 
 pub enum FromGattError {
     InvalidLength,

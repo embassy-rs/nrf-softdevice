@@ -1,13 +1,14 @@
 //! Bluetooth Low Energy
 
 mod connection;
-pub use connection::*;
-mod types;
-pub use types::*;
 mod events;
-pub use events::*;
 mod gatt_traits;
+mod types;
+
+pub use connection::*;
+pub(crate) use events::*;
 pub use gatt_traits::*;
+pub use types::*;
 
 #[cfg(feature = "ble-central")]
 pub mod central;
@@ -29,7 +30,7 @@ use core::mem;
 use crate::fmt::*;
 use crate::{raw, RawError, Softdevice};
 
-pub fn get_address(sd: &Softdevice) -> Address {
+pub fn get_address(_sd: &Softdevice) -> Address {
     unsafe {
         let mut addr: raw::ble_gap_addr_t = mem::zeroed();
         let ret = raw::sd_ble_gap_addr_get(&mut addr);
@@ -38,7 +39,7 @@ pub fn get_address(sd: &Softdevice) -> Address {
     }
 }
 
-pub fn set_address(sd: &Softdevice, addr: &Address) {
+pub fn set_address(_sd: &Softdevice, addr: &Address) {
     unsafe {
         let addr = addr.into_raw();
         let ret = raw::sd_ble_gap_addr_set(&addr);

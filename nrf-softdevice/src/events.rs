@@ -2,10 +2,10 @@ use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::fmt::{panic, unreachable, *};
+use crate::fmt::{panic, *};
 use crate::util::Signal;
+use crate::RawError;
 use crate::{interrupt, raw};
-use crate::{RawError, Softdevice};
 
 static SWI2_SIGNAL: Signal<()> = Signal::new();
 

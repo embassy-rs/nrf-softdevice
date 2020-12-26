@@ -24,7 +24,7 @@ impl Flash {
     /// # Panics
     ///
     /// Panics if called more than once.
-    pub fn take(sd: &Softdevice) -> Flash {
+    pub fn take(_sd: &Softdevice) -> Flash {
         if FLASH_TAKEN.compare_and_swap(false, true, Ordering::AcqRel) {
             panic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
         }

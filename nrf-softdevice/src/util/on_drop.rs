@@ -1,5 +1,3 @@
-use core::mem;
-
 pub struct OnDrop<F: FnOnce()> {
     f: Option<F>,
 }
