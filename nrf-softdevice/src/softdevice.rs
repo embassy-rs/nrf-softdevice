@@ -110,7 +110,10 @@ impl Softdevice {
     /// - Panics if the requested configuration has too high memory requirements for the softdevice. The softdevice supports a maximum dynamic memory size of 64kb.
     /// - Panics if called multiple times. Must be called at most once.
     pub fn enable(_peripherals: Peripherals, config: &Config) -> &'static Softdevice {
-        if ENABLED.compare_and_swap(false, true, Ordering::AcqRel) {
+        if ENABLED
+            .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+            .is_err()
+        {
             panic!("nrf_softdevice::enable() called multiple times.")
         }
 

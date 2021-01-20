@@ -154,7 +154,10 @@ static mut PACKET_FREE: Option<unsafe fn(NonNull<u8>)> = None;
 
 impl<P: Packet> L2cap<P> {
     pub fn init(_sd: &Softdevice) -> Self {
-        if IS_INIT.compare_and_swap(false, true, Ordering::AcqRel) {
+        if IS_INIT
+            .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
+            .is_err()
+        {
             panic!("L2cap::init() called multiple times.")
         }
 
