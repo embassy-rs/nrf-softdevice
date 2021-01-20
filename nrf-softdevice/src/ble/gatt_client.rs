@@ -123,17 +123,6 @@ impl From<RawError> for DiscoverError {
 type DiscCharsMax = U6;
 type DiscDescsMax = U6;
 
-pub(crate) enum PortalMessage {
-    DiscoverService(*const raw::ble_evt_t),
-    DiscoverCharacteristics(*const raw::ble_evt_t),
-    DiscoverDescriptors(*const raw::ble_evt_t),
-    Read(*const raw::ble_evt_t),
-    Write(*const raw::ble_evt_t),
-    WriteTxComplete(*const raw::ble_evt_t),
-    MtuExchangeResp(*const raw::ble_evt_t),
-    Disconnected,
-}
-
 pub(crate) async fn discover_service(
     conn: &Connection,
     uuid: Uuid,
@@ -147,40 +136,32 @@ pub(crate) async fn discover_service(
     })?;
 
     portal(conn_handle)
-        .wait_once(|e| match e {
-            PortalMessage::DiscoverService(ble_evt) => unsafe {
-                let gattc_evt = check_status(ble_evt)?;
-                let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
-                let v = get_flexarray(ble_evt, &params.services, params.count as usize);
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Err(DiscoverError::Disconnected)
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => {
+                    let gattc_evt = check_status(ble_evt)?;
+                    let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
+                    let v = get_flexarray(ble_evt, &params.services, params.count as usize);
 
-                match v.len() {
-                    0 => Err(DiscoverError::ServiceNotFound),
-                    1 => Ok(v[0]),
-                    _n => {
-                        warn!(
-                            "Found {:?} services with the same UUID, using the first one",
-                            params.count
-                        );
-                        Ok(v[0])
+                    match v.len() {
+                        0 => Err(DiscoverError::ServiceNotFound),
+                        1 => Ok(v[0]),
+                        _n => {
+                            warn!(
+                                "Found {:?} services with the same UUID, using the first one",
+                                params.count
+                            );
+                            Ok(v[0])
+                        }
                     }
                 }
-            },
-            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-            _ => unreachable!(),
+                _ => unreachable!(),
+            }
         })
         .await
-}
-
-pub(crate) unsafe fn on_prim_srvc_disc_rsp(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_prim_srvc_disc_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverService(ble_evt))
 }
 
 // =============================
@@ -207,33 +188,24 @@ async fn discover_characteristics(
     })?;
 
     portal(conn_handle)
-        .wait_once(|e| match e {
-            PortalMessage::DiscoverCharacteristics(ble_evt) => unsafe {
-                let gattc_evt = check_status(ble_evt)?;
-                let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
-                let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
-                let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                    panic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
-                });
-                Ok(v)
-            },
-            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-            _ => unreachable!(),
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Err(DiscoverError::Disconnected)
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_DISC_RSP => {
+                    let gattc_evt = check_status(ble_evt)?;
+                    let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
+                    let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
+                    let v = Vec::from_slice(v).unwrap_or_else(|_| {
+                        panic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
+                    });
+                    Ok(v)
+                }
+                _ => unreachable!(),
+            }
         })
         .await
-}
-
-pub(crate) unsafe fn on_char_disc_rsp(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_char_disc_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverCharacteristics(ble_evt))
 }
 
 // =============================
@@ -260,33 +232,24 @@ async fn discover_descriptors(
     })?;
 
     portal(conn_handle)
-        .wait_once(|e| match e {
-            PortalMessage::DiscoverDescriptors(ble_evt) => unsafe {
-                let gattc_evt = check_status(ble_evt)?;
-                let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
-                let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
-                let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                    panic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
-                });
-                Ok(v)
-            },
-            PortalMessage::Disconnected => Err(DiscoverError::Disconnected),
-            _ => unreachable!(),
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Err(DiscoverError::Disconnected)
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_DESC_DISC_RSP => {
+                    let gattc_evt = check_status(ble_evt)?;
+                    let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
+                    let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
+                    let v = Vec::from_slice(v).unwrap_or_else(|_| {
+                        panic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
+                    });
+                    Ok(v)
+                }
+                _ => unreachable!(),
+            }
         })
         .await
-}
-
-pub(crate) unsafe fn on_desc_disc_rsp(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_desc_disc_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    portal(gattc_evt.conn_handle).call(PortalMessage::DiscoverDescriptors(ble_evt))
 }
 
 // =============================
@@ -415,36 +378,30 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
     })?;
 
     portal(conn_handle)
-        .wait_many(|e| match e {
-            PortalMessage::Read(ble_evt) => unsafe {
-                let gattc_evt = match check_status(ble_evt) {
-                    Ok(evt) => evt,
-                    Err(e) => return Some(Err(e.into())),
-                };
-                let params = get_union_field(ble_evt, &gattc_evt.params.read_rsp);
-                let v = get_flexarray(ble_evt, &params.data, params.len as usize);
-                let len = core::cmp::min(v.len(), buf.len());
-                buf[..len].copy_from_slice(&v[..len]);
-
-                if v.len() > buf.len() {
-                    return Some(Err(ReadError::Truncated));
+        .wait_many(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Some(Err(ReadError::Disconnected))
                 }
-                Some(Ok(len))
-            },
-            PortalMessage::Disconnected => Some(Err(ReadError::Disconnected)),
-            _ => None,
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_READ_RSP => {
+                    let gattc_evt = match check_status(ble_evt) {
+                        Ok(evt) => evt,
+                        Err(e) => return Some(Err(e.into())),
+                    };
+                    let params = get_union_field(ble_evt, &gattc_evt.params.read_rsp);
+                    let v = get_flexarray(ble_evt, &params.data, params.len as usize);
+                    let len = core::cmp::min(v.len(), buf.len());
+                    buf[..len].copy_from_slice(&v[..len]);
+
+                    if v.len() > buf.len() {
+                        return Some(Err(ReadError::Truncated));
+                    }
+                    Some(Ok(len))
+                }
+                _ => None,
+            }
         })
         .await
-}
-
-pub(crate) unsafe fn on_read_rsp(ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
-    trace!(
-        "gattc on_read_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    portal(gattc_evt.conn_handle).call(PortalMessage::Read(ble_evt))
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -492,16 +449,20 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
     })?;
 
     portal(conn_handle)
-        .wait_many(|e| match e {
-            PortalMessage::Write(ble_evt) => unsafe {
-                match check_status(ble_evt) {
-                    Ok(_) => {}
-                    Err(e) => return Some(Err(e.into())),
-                };
-                Some(Ok(()))
-            },
-            PortalMessage::Disconnected => Some(Err(WriteError::Disconnected)),
-            _ => None,
+        .wait_many(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Some(Err(WriteError::Disconnected))
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_RSP => {
+                    match check_status(ble_evt) {
+                        Ok(_) => {}
+                        Err(e) => return Some(Err(e.into())),
+                    };
+                    Some(Ok(()))
+                }
+                _ => None,
+            }
         })
         .await
 }
@@ -532,10 +493,14 @@ pub async fn write_without_response(
         }
 
         portal(conn_handle)
-            .wait_many(|e| match e {
-                PortalMessage::WriteTxComplete(_) => Some(Ok(())),
-                PortalMessage::Disconnected => Some(Err(WriteError::Disconnected)),
-                _ => None,
+            .wait_many(|ble_evt| unsafe {
+                match (*ble_evt).header.evt_id as u32 {
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                        return Some(Err(WriteError::Disconnected))
+                    }
+                    raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => Some(Ok(())),
+                    _ => None,
+                }
             })
             .await?;
     }
@@ -592,19 +557,6 @@ pub fn try_write_without_response(
     }
 }
 
-pub(crate) unsafe fn on_write_rsp(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_write_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    portal(gattc_evt.conn_handle).call(PortalMessage::Write(ble_evt))
-}
-
 unsafe fn check_status(
     ble_evt: *const raw::ble_evt_t,
 ) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
@@ -615,91 +567,9 @@ unsafe fn check_status(
     }
 }
 
-pub(crate) unsafe fn on_rel_disc_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_rel_disc_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_attr_info_disc_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_attr_info_disc_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_char_val_by_uuid_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_char_val_by_uuid_read_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_char_vals_read_rsp(
-    _ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_char_vals_read_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_hvx(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
-    trace!(
-        "gattc on_hvx conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_exchange_mtu_rsp(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_exchange_mtu_rsp conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    let conn_handle = gattc_evt.conn_handle;
-    portal(conn_handle).call(PortalMessage::MtuExchangeResp(ble_evt));
-}
-
-pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gattc_evt: &raw::ble_gattc_evt_t) {
-    trace!(
-        "gattc on_timeout conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-}
-
-pub(crate) unsafe fn on_write_cmd_tx_complete(
-    ble_evt: *const raw::ble_evt_t,
-    gattc_evt: &raw::ble_gattc_evt_t,
-) {
-    trace!(
-        "gattc on_write_cmd_tx_complete conn_handle={:?} gatt_status={:?}",
-        gattc_evt.conn_handle,
-        gattc_evt.gatt_status
-    );
-
-    portal(gattc_evt.conn_handle).call(PortalMessage::WriteTxComplete(ble_evt))
+pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
+    let gattc_evt = get_union_field(ble_evt, &(*ble_evt).evt.gattc_evt);
+    portal(gattc_evt.conn_handle).call(ble_evt);
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -753,26 +623,30 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
     }
 
     portal(conn_handle)
-        .wait_once(|r| match r {
-            PortalMessage::Disconnected => Err(MtuExchangeError::Disconnected),
-            PortalMessage::MtuExchangeResp(ble_evt) => unsafe {
-                let gattc_evt = match check_status(ble_evt) {
-                    Ok(evt) => evt,
-                    Err(e) => return Err(e.into()),
-                };
-                let params = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
-                let mtu = params.server_rx_mtu;
-                info!("att mtu exchange: got mtu {:?}", mtu);
-                conn.with_state(|state| state.att_mtu = mtu);
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Err(MtuExchangeError::Disconnected)
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => {
+                    let gattc_evt = match check_status(ble_evt) {
+                        Ok(evt) => evt,
+                        Err(e) => return Err(e.into()),
+                    };
+                    let params = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
+                    let mtu = params.server_rx_mtu;
+                    info!("att mtu exchange: got mtu {:?}", mtu);
+                    conn.with_state(|state| state.att_mtu = mtu);
 
-                Ok(())
-            },
-            _ => unreachable!(),
+                    Ok(())
+                }
+                _ => unreachable!(),
+            }
         })
         .await
 }
 
-static PORTALS: [Portal<PortalMessage>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
-pub(crate) fn portal(conn_handle: u16) -> &'static Portal<PortalMessage> {
-    unsafe { &PORTALS[conn_handle as usize] }
+static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
+pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
+    &PORTALS[conn_handle as usize]
 }

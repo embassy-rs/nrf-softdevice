@@ -36,16 +36,19 @@ impl<T> Portal<T> {
         }
     }
 
-    pub fn call(&self, val: T) {
+    pub fn call(&self, val: T) -> bool {
         assert_thread_mode();
 
         // safety: this runs from thread mode
         unsafe {
             match *self.state.get() {
-                State::None => {}
-                State::Done => {}
+                State::None => false,
+                State::Done => false,
                 State::Running => panic!("Portall::call() called reentrantly"),
-                State::Waiting(func) => (*func)(val),
+                State::Waiting(func) => {
+                    (*func)(val);
+                    true
+                }
             }
         }
     }

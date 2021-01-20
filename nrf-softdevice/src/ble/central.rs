@@ -6,36 +6,19 @@
 use core::mem;
 use core::ptr;
 
+use crate::ble::gap;
 use crate::ble::types::*;
 use crate::ble::{Address, Connection};
-use crate::fmt::{assert, *};
+use crate::fmt::{assert, unreachable, *};
 use crate::raw;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{RawError, Softdevice};
-
-pub(crate) unsafe fn on_adv_report(ble_evt: *const raw::ble_evt_t, _gap_evt: &raw::ble_gap_evt_t) {
-    trace!("central on_adv_report");
-    SCAN_PORTAL.call(ScanPortalMessage::AdvReport(ble_evt))
-}
-
-pub(crate) unsafe fn on_qos_channel_survey_report(
-    _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
-) {
-    trace!("central on_qos_channel_survey_report");
-}
-
-pub(crate) unsafe fn on_conn_param_update_request(
-    _ble_evt: *const raw::ble_evt_t,
-    _gap_evt: &raw::ble_gap_evt_t,
-) {
-    trace!("central on_conn_param_update_request");
-}
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConnectError {
     Timeout,
     NoAddresses,
+    NoFreeConn,
     Raw(RawError),
 }
 
@@ -45,7 +28,7 @@ impl From<RawError> for ConnectError {
     }
 }
 
-pub(crate) static CONNECT_PORTAL: Portal<Result<Connection, ConnectError>> = Portal::new();
+pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn connect(
@@ -97,7 +80,38 @@ pub async fn connect(
 
     info!("connect started");
 
-    let conn = CONNECT_PORTAL.wait_once(|res| res).await?;
+    let conn = CONNECT_PORTAL
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONNECTED => {
+                    let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
+                    let params = &gap_evt.params.connected;
+                    let conn_handle = gap_evt.conn_handle;
+                    let role = Role::from_raw(params.role);
+                    let peer_address = Address::from_raw(params.peer_addr);
+                    debug!("connected role={:?} peer_addr={:?}", role, peer_address);
+
+                    match Connection::new(conn_handle, role, peer_address) {
+                        Ok(conn) => {
+                            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+                            gap::do_data_length_update(conn_handle, ptr::null());
+
+                            Ok(conn)
+                        }
+                        Err(_) => {
+                            raw::sd_ble_gap_disconnect(
+                                conn_handle,
+                                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
+                            );
+                            Err(ConnectError::NoFreeConn)
+                        }
+                    }
+                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => Err(ConnectError::Timeout),
+                _ => unreachable!(),
+            }
+        })
+        .await?;
 
     conn.with_state(|state| {
         state.rx_phys = config.tx_phys;
@@ -162,12 +176,7 @@ impl From<RawError> for ScanError {
     }
 }
 
-pub(crate) enum ScanPortalMessage {
-    Timeout(*const raw::ble_evt_t),
-    AdvReport(*const raw::ble_evt_t),
-}
-
-pub(crate) static SCAN_PORTAL: Portal<ScanPortalMessage> = Portal::new();
+pub(crate) static SCAN_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 pub async fn scan<'a, F, R>(
     _sd: &Softdevice,
@@ -218,26 +227,29 @@ where
 
     info!("Scan started");
     let res = SCAN_PORTAL
-        .wait_many(|msg| match msg {
-            ScanPortalMessage::Timeout(_ble_evt) => return Some(Err(ScanError::Timeout)),
-            ScanPortalMessage::AdvReport(ble_evt) => unsafe {
-                let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
-                let params = &gap_evt.params.adv_report;
-                if let Some(r) = f(params) {
-                    return Some(Ok(r));
-                }
-
-                // Resume scan
-                let ret = raw::sd_ble_gap_scan_start(ptr::null(), &buf_data);
-                match RawError::convert(ret) {
-                    Ok(()) => {}
-                    Err(err) => {
-                        warn!("sd_ble_gap_scan_start err {:?}", err);
-                        return Some(Err(ScanError::Raw(err)));
+        .wait_many(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => return Some(Err(ScanError::Timeout)),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_REPORT => {
+                    let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
+                    let params = &gap_evt.params.adv_report;
+                    if let Some(r) = f(params) {
+                        return Some(Ok(r));
                     }
-                };
-                None
-            },
+
+                    // Resume scan
+                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), &buf_data);
+                    match RawError::convert(ret) {
+                        Ok(()) => {}
+                        Err(err) => {
+                            warn!("sd_ble_gap_scan_start err {:?}", err);
+                            return Some(Err(ScanError::Raw(err)));
+                        }
+                    };
+                    None
+                }
+                _ => None,
+            }
         })
         .await?;
 

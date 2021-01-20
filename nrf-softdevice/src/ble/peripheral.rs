@@ -4,41 +4,11 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
-use crate::fmt::{assert, *};
+use crate::fmt::{assert, unreachable, *};
 use crate::raw;
+use crate::util::get_union_field;
 use crate::util::{OnDrop, Portal};
 use crate::{RawError, Softdevice};
-
-pub(crate) unsafe fn on_adv_set_terminated(
-    _ble_evt: *const raw::ble_evt_t,
-    gap_evt: &raw::ble_gap_evt_t,
-) {
-    trace!(
-        "peripheral on_adv_set_terminated conn_handle={:?}",
-        gap_evt.conn_handle
-    );
-    ADV_PORTAL.call(Err(AdvertiseError::Timeout))
-}
-
-pub(crate) unsafe fn on_scan_req_report(
-    _ble_evt: *const raw::ble_evt_t,
-    gap_evt: &raw::ble_gap_evt_t,
-) {
-    trace!(
-        "peripheral on_scan_req_report conn_handle={:?}",
-        gap_evt.conn_handle
-    );
-}
-
-pub(crate) unsafe fn on_sec_info_request(
-    _ble_evt: *const raw::ble_evt_t,
-    gap_evt: &raw::ble_gap_evt_t,
-) {
-    trace!(
-        "peripheral on_sec_info_request conn_handle={:?}",
-        gap_evt.conn_handle
-    );
-}
 
 /// Connectable advertisement types, which can accept connections from interested Central devices.
 pub enum ConnectableAdvertisement<'a> {
@@ -119,6 +89,7 @@ pub enum NonconnectableAdvertisement {
 #[derive(Debug)]
 pub enum AdvertiseError {
     Timeout,
+    NoFreeConn,
     Raw(RawError),
 }
 
@@ -129,7 +100,7 @@ impl From<RawError> for AdvertiseError {
 }
 
 static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
-pub(crate) static ADV_PORTAL: Portal<Result<Connection, AdvertiseError>> = Portal::new();
+pub(crate) static ADV_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn advertise(
@@ -203,17 +174,42 @@ pub async fn advertise(
 
     // The advertising data needs to be kept alive for the entire duration of the advertising procedure.
 
-    match ADV_PORTAL.wait_once(|res| res).await {
-        Ok(conn) => {
-            d.defuse();
-            Ok(conn)
-        }
-        Err(AdvertiseError::Timeout) => {
-            d.defuse();
-            Err(AdvertiseError::Timeout)
-        }
-        Err(e) => Err(e),
-    }
+    let res = ADV_PORTAL
+        .wait_once(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONNECTED => {
+                    let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
+                    let params = &gap_evt.params.connected;
+                    let conn_handle = gap_evt.conn_handle;
+                    let role = Role::from_raw(params.role);
+                    let peer_address = Address::from_raw(params.peer_addr);
+                    debug!("connected role={:?} peer_addr={:?}", role, peer_address);
+
+                    match Connection::new(conn_handle, role, peer_address) {
+                        Ok(conn) => {
+                            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+                            gap::do_data_length_update(conn_handle, ptr::null());
+
+                            Ok(conn)
+                        }
+                        Err(_) => {
+                            raw::sd_ble_gap_disconnect(
+                                conn_handle,
+                                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
+                            );
+                            Err(AdvertiseError::NoFreeConn)
+                        }
+                    }
+                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => Err(AdvertiseError::Timeout),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_ADV_SET_TERMINATED => Err(AdvertiseError::Timeout),
+                _ => unreachable!(),
+            }
+        })
+        .await;
+
+    d.defuse();
+    res
 }
 
 #[derive(Copy, Clone)]

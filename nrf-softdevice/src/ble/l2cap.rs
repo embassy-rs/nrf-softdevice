@@ -12,63 +12,24 @@ use crate::raw;
 use crate::util::{get_union_field, Portal};
 use crate::{RawError, Softdevice};
 
-fn evt_conn_handle(ble_evt: *const raw::ble_evt_t) -> u16 {
-    let evt = unsafe { get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt) };
-    evt.conn_handle
-}
-
-pub(crate) fn on_ch_setup_request(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_setup_request");
-    let conn_handle = evt_conn_handle(ble_evt);
-    portal(conn_handle).call(PortalMessage::SetupRequest(ble_evt));
-}
-
-pub(crate) fn on_ch_setup_refused(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_setup_refused");
-    let conn_handle = evt_conn_handle(ble_evt);
-    portal(conn_handle).call(PortalMessage::SetupRefused(ble_evt));
-}
-
-pub(crate) fn on_ch_setup(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_setup");
-    let conn_handle = evt_conn_handle(ble_evt);
-    portal(conn_handle).call(PortalMessage::SetupDone(ble_evt));
-}
-
-pub(crate) fn on_ch_released(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_released");
-    let _conn_handle = evt_conn_handle(ble_evt);
-}
-
-pub(crate) fn on_ch_sdu_buf_released(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_sdu_buf_released");
-    unsafe {
-        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-        let evt = &l2cap_evt.params.ch_sdu_buf_released;
-        let pkt = unwrap!(NonNull::new(evt.sdu_buf.p_data));
-        (unwrap!(PACKET_FREE))(pkt)
-    }
-}
-
-pub(crate) fn on_ch_credit(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_credit");
-    let _conn_handle = evt_conn_handle(ble_evt);
-}
-
-pub(crate) fn on_ch_rx(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_rx");
-    let conn_handle = evt_conn_handle(ble_evt);
-    portal(conn_handle).call(PortalMessage::Received(ble_evt));
-}
-
-pub(crate) fn on_ch_tx(ble_evt: *const raw::ble_evt_t) {
-    trace!("on_ch_tx");
-    unsafe {
-        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-        let evt = &l2cap_evt.params.tx;
-        let pkt = unwrap!(NonNull::new(evt.sdu_buf.p_data));
-        (unwrap!(PACKET_FREE))(pkt)
-    }
+pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
+    let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
+    match (*ble_evt).header.evt_id as u32 {
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_CREDIT => {}
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SDU_BUF_RELEASED => {
+            let params = &l2cap_evt.params.ch_sdu_buf_released;
+            let pkt = unwrap!(NonNull::new(params.sdu_buf.p_data));
+            (unwrap!(PACKET_FREE))(pkt)
+        }
+        raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => {
+            let params = &l2cap_evt.params.tx;
+            let pkt = unwrap!(NonNull::new(params.sdu_buf.p_data));
+            (unwrap!(PACKET_FREE))(pkt)
+        }
+        _ => {
+            portal(l2cap_evt.conn_handle).call(ble_evt);
+        }
+    };
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -125,17 +86,9 @@ impl From<RawError> for SetupError {
     }
 }
 
-static PORTALS: [Portal<PortalMessage>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
-pub(crate) fn portal(conn_handle: u16) -> &'static Portal<PortalMessage> {
+static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
+pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
     &PORTALS[conn_handle as usize]
-}
-
-pub(crate) enum PortalMessage {
-    SetupDone(*const raw::ble_evt_t),
-    SetupRefused(*const raw::ble_evt_t),
-    SetupRequest(*const raw::ble_evt_t),
-    Received(*const raw::ble_evt_t),
-    Disconnected,
 }
 
 pub trait Packet: Sized {
@@ -202,79 +155,14 @@ impl<P: Packet> L2cap<P> {
         info!("cid {:?}", cid);
 
         portal(conn_handle)
-            .wait_once(|msg| match msg {
-                PortalMessage::Disconnected => Err(SetupError::Disconnected),
-                PortalMessage::SetupDone(ble_evt) => unsafe {
-                    let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let _evt = &l2cap_evt.params.ch_setup;
-
-                    // default is 1
-                    if config.credits != 1 {
-                        let ret = unsafe {
-                            raw::sd_ble_l2cap_ch_flow_control(
-                                conn_handle,
-                                cid,
-                                config.credits,
-                                ptr::null_mut(),
-                            )
-                        };
-                        if let Err(err) = RawError::convert(ret) {
-                            warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
-                            return Err(err.into());
-                        }
+            .wait_once(|ble_evt| unsafe {
+                match (*ble_evt).header.evt_id as u32 {
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                        return Err(SetupError::Disconnected)
                     }
-
-                    Ok(Channel {
-                        conn: conn.clone(),
-                        cid,
-                        _private: PhantomData,
-                    })
-                },
-                PortalMessage::SetupRefused(ble_evt) => unsafe {
-                    let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let _evt = &l2cap_evt.params.ch_setup_refused;
-                    Err(SetupError::Refused)
-                },
-                _ => unreachable!(),
-            })
-            .await
-    }
-
-    pub async fn listen(
-        &self,
-        conn: &Connection,
-        config: &Config,
-    ) -> Result<Channel<P>, SetupError> {
-        let sd = unsafe { Softdevice::steal() };
-        let conn_handle = conn.with_state(|state| state.check_connected())?;
-
-        portal(conn_handle)
-            .wait_many(|msg| match msg {
-                PortalMessage::Disconnected => Some(Err(SetupError::Disconnected)),
-                PortalMessage::SetupRequest(ble_evt) => unsafe {
-                    let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let evt = &l2cap_evt.params.ch_setup_request;
-
-                    let mut cid: u16 = l2cap_evt.local_cid;
-                    if evt.le_psm == config.psm {
-                        let params = raw::ble_l2cap_ch_setup_params_t {
-                            le_psm: evt.le_psm,
-                            status: raw::BLE_L2CAP_CH_STATUS_CODE_SUCCESS as _,
-                            rx_params: raw::ble_l2cap_ch_rx_params_t {
-                                rx_mps: sd.l2cap_rx_mps,
-                                rx_mtu: P::MTU as u16,
-                                sdu_buf: raw::ble_data_t {
-                                    len: 0,
-                                    p_data: ptr::null_mut(),
-                                },
-                            },
-                        };
-
-                        let ret = raw::sd_ble_l2cap_ch_setup(conn_handle, &mut cid, &params);
-                        if let Err(err) = RawError::convert(ret) {
-                            warn!("sd_ble_l2cap_ch_setup err {:?}", err);
-                            return Some(Err(err.into()));
-                        }
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => {
+                        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
+                        let _evt = &l2cap_evt.params.ch_setup;
 
                         // default is 1
                         if config.credits != 1 {
@@ -288,31 +176,104 @@ impl<P: Packet> L2cap<P> {
                             };
                             if let Err(err) = RawError::convert(ret) {
                                 warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
-                                return Some(Err(err.into()));
+                                return Err(err.into());
                             }
                         }
 
-                        Some(Ok(Channel {
-                            _private: PhantomData,
-                            cid,
+                        Ok(Channel {
                             conn: conn.clone(),
-                        }))
-                    } else {
-                        let params = raw::ble_l2cap_ch_setup_params_t {
-                            le_psm: evt.le_psm,
-                            status: raw::BLE_L2CAP_CH_STATUS_CODE_LE_PSM_NOT_SUPPORTED as _,
-                            rx_params: mem::zeroed(),
-                        };
-
-                        let ret = raw::sd_ble_l2cap_ch_setup(conn_handle, &mut cid, &params);
-                        if let Err(err) = RawError::convert(ret) {
-                            warn!("sd_ble_l2cap_ch_setup err {:?}", err);
-                        }
-
-                        None
+                            cid,
+                            _private: PhantomData,
+                        })
                     }
-                },
-                _ => unreachable!(),
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REFUSED => {
+                        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
+                        let _evt = &l2cap_evt.params.ch_setup_refused;
+                        Err(SetupError::Refused)
+                    }
+                    _ => unreachable!(),
+                }
+            })
+            .await
+    }
+
+    pub async fn listen(
+        &self,
+        conn: &Connection,
+        config: &Config,
+    ) -> Result<Channel<P>, SetupError> {
+        let sd = unsafe { Softdevice::steal() };
+        let conn_handle = conn.with_state(|state| state.check_connected())?;
+
+        portal(conn_handle)
+            .wait_many(|ble_evt| unsafe {
+                match (*ble_evt).header.evt_id as u32 {
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                        return Some(Err(SetupError::Disconnected))
+                    }
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => {
+                        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
+                        let evt = &l2cap_evt.params.ch_setup_request;
+
+                        let mut cid: u16 = l2cap_evt.local_cid;
+                        if evt.le_psm == config.psm {
+                            let params = raw::ble_l2cap_ch_setup_params_t {
+                                le_psm: evt.le_psm,
+                                status: raw::BLE_L2CAP_CH_STATUS_CODE_SUCCESS as _,
+                                rx_params: raw::ble_l2cap_ch_rx_params_t {
+                                    rx_mps: sd.l2cap_rx_mps,
+                                    rx_mtu: P::MTU as u16,
+                                    sdu_buf: raw::ble_data_t {
+                                        len: 0,
+                                        p_data: ptr::null_mut(),
+                                    },
+                                },
+                            };
+
+                            let ret = raw::sd_ble_l2cap_ch_setup(conn_handle, &mut cid, &params);
+                            if let Err(err) = RawError::convert(ret) {
+                                warn!("sd_ble_l2cap_ch_setup err {:?}", err);
+                                return Some(Err(err.into()));
+                            }
+
+                            // default is 1
+                            if config.credits != 1 {
+                                let ret = unsafe {
+                                    raw::sd_ble_l2cap_ch_flow_control(
+                                        conn_handle,
+                                        cid,
+                                        config.credits,
+                                        ptr::null_mut(),
+                                    )
+                                };
+                                if let Err(err) = RawError::convert(ret) {
+                                    warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
+                                    return Some(Err(err.into()));
+                                }
+                            }
+
+                            Some(Ok(Channel {
+                                _private: PhantomData,
+                                cid,
+                                conn: conn.clone(),
+                            }))
+                        } else {
+                            let params = raw::ble_l2cap_ch_setup_params_t {
+                                le_psm: evt.le_psm,
+                                status: raw::BLE_L2CAP_CH_STATUS_CODE_LE_PSM_NOT_SUPPORTED as _,
+                                rx_params: mem::zeroed(),
+                            };
+
+                            let ret = raw::sd_ble_l2cap_ch_setup(conn_handle, &mut cid, &params);
+                            if let Err(err) = RawError::convert(ret) {
+                                warn!("sd_ble_l2cap_ch_setup err {:?}", err);
+                            }
+
+                            None
+                        }
+                    }
+                    _ => unreachable!(),
+                }
             })
             .await
     }
@@ -385,18 +346,21 @@ impl<P: Packet> Channel<P> {
         }
 
         portal(conn_handle)
-            .wait_once(|msg| match msg {
-                PortalMessage::Disconnected => Err(RxError::Disconnected),
-                PortalMessage::Received(ble_evt) => unsafe {
-                    let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
-                    let evt = &l2cap_evt.params.rx;
+            .wait_once(|ble_evt| unsafe {
+                match (*ble_evt).header.evt_id as u32 {
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => Err(RxError::Disconnected),
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => Err(RxError::Disconnected),
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => {
+                        let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
+                        let evt = &l2cap_evt.params.rx;
 
-                    let ptr = unwrap!(NonNull::new(evt.sdu_buf.p_data));
-                    let len = evt.sdu_len;
-                    let pkt = Packet::from_raw_parts(ptr, len as usize);
-                    Ok(pkt)
-                },
-                _ => unreachable!(),
+                        let ptr = unwrap!(NonNull::new(evt.sdu_buf.p_data));
+                        let len = evt.sdu_len;
+                        let pkt = Packet::from_raw_parts(ptr, len as usize);
+                        Ok(pkt)
+                    }
+                    _ => unreachable!(),
+                }
             })
             .await
     }

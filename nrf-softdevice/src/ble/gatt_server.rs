@@ -122,11 +122,6 @@ pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
     })
 }
 
-pub(crate) enum PortalMessage {
-    Write(*const raw::ble_evt_t),
-    Disconnected,
-}
-
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RunError {
     Disconnected,
@@ -151,10 +146,12 @@ where
 {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
     portal(conn_handle)
-        .wait_many(|m| {
-            match m {
-                PortalMessage::Disconnected => return Some(Err(RunError::Disconnected)),
-                PortalMessage::Write(ble_evt) => unsafe {
+        .wait_many(|ble_evt| unsafe {
+            match (*ble_evt).header.evt_id as u32 {
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    return Some(Err(RunError::Disconnected))
+                }
+                raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => {
                     let bounded = BoundedLifetime;
                     let evt = bounded.deref(ble_evt);
                     let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
@@ -169,7 +166,8 @@ where
                     }
 
                     server.on_write(params.handle, v).map(|e| f(e));
-                },
+                }
+                _ => {}
             }
             None
         })
@@ -267,89 +265,40 @@ pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), No
     Ok(())
 }
 
-pub(crate) unsafe fn on_write(ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_write conn_handle={:?}", gatts_evt.conn_handle);
-    portal(gatts_evt.conn_handle).call(PortalMessage::Write(ble_evt));
-}
+pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
+    let gatts_evt = get_union_field(ble_evt, &(*ble_evt).evt.gatts_evt);
+    match (*ble_evt).header.evt_id as u32 {
+        raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST => {
+            let conn_handle = gatts_evt.conn_handle;
+            let params = get_union_field(ble_evt, &gatts_evt.params.exchange_mtu_request);
+            let want_mtu = params.client_rx_mtu;
+            let max_mtu = crate::Softdevice::steal().att_mtu;
+            let mtu = want_mtu
+                .min(max_mtu)
+                .max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+            trace!(
+                "att mtu exchange: peer wants mtu {:?}, granting {:?}",
+                want_mtu,
+                mtu
+            );
 
-pub(crate) unsafe fn on_rw_authorize_request(
-    _ble_evt: *const raw::ble_evt_t,
-    gatts_evt: &raw::ble_gatts_evt_t,
-) {
-    trace!(
-        "gatts on_rw_authorize_request conn_handle={:?}",
-        gatts_evt.conn_handle
-    );
-}
+            let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, mtu) };
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", err);
+                return;
+            }
 
-pub(crate) unsafe fn on_sys_attr_missing(
-    _ble_evt: *const raw::ble_evt_t,
-    gatts_evt: &raw::ble_gatts_evt_t,
-) {
-    trace!(
-        "gatts on_sys_attr_missing conn_handle={:?}",
-        gatts_evt.conn_handle
-    );
-    raw::sd_ble_gatts_sys_attr_set(gatts_evt.conn_handle, ptr::null(), 0, 0);
-}
-
-pub(crate) unsafe fn on_hvc(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_hvc conn_handle={:?}", gatts_evt.conn_handle);
-}
-
-pub(crate) unsafe fn on_sc_confirm(
-    _ble_evt: *const raw::ble_evt_t,
-    gatts_evt: &raw::ble_gatts_evt_t,
-) {
-    trace!(
-        "gatts on_sc_confirm conn_handle={:?}",
-        gatts_evt.conn_handle
-    );
-}
-
-pub(crate) unsafe fn on_exchange_mtu_request(
-    ble_evt: *const raw::ble_evt_t,
-    gatts_evt: &raw::ble_gatts_evt_t,
-) {
-    let conn_handle = gatts_evt.conn_handle;
-    let params = get_union_field(ble_evt, &gatts_evt.params.exchange_mtu_request);
-    let want_mtu = params.client_rx_mtu;
-    let max_mtu = crate::Softdevice::steal().att_mtu;
-    let mtu = want_mtu
-        .min(max_mtu)
-        .max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
-    trace!(
-        "att mtu exchange: peer wants mtu {:?}, granting {:?}",
-        want_mtu,
-        mtu
-    );
-
-    let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, mtu) };
-    if let Err(err) = RawError::convert(ret) {
-        warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", err);
-        return;
+            connection::with_state_by_conn_handle(conn_handle, |state| {
+                state.att_mtu = mtu;
+            });
+        }
+        _ => {
+            portal(gatts_evt.conn_handle).call(ble_evt);
+        }
     }
-
-    connection::with_state_by_conn_handle(conn_handle, |state| {
-        state.att_mtu = mtu;
-    });
 }
 
-pub(crate) unsafe fn on_timeout(_ble_evt: *const raw::ble_evt_t, gatts_evt: &raw::ble_gatts_evt_t) {
-    trace!("gatts on_timeout conn_handle={:?}", gatts_evt.conn_handle);
-}
-
-pub(crate) unsafe fn on_hvn_tx_complete(
-    _ble_evt: *const raw::ble_evt_t,
-    gatts_evt: &raw::ble_gatts_evt_t,
-) {
-    trace!(
-        "gatts on_hvn_tx_complete conn_handle={:?}",
-        gatts_evt.conn_handle
-    );
-}
-
-static PORTALS: [Portal<PortalMessage>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
-pub(crate) fn portal(conn_handle: u16) -> &'static Portal<PortalMessage> {
+static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
+pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
     &PORTALS[conn_handle as usize]
 }

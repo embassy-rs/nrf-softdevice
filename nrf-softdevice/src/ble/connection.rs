@@ -93,7 +93,7 @@ impl ConnectionState {
         Ok(())
     }
 
-    pub(crate) fn on_disconnected(&mut self) {
+    pub(crate) fn on_disconnected(&mut self, ble_evt: *const raw::ble_evt_t) {
         let conn_handle = unwrap!(
             self.conn_handle,
             "bug: on_disconnected when already disconnected"
@@ -107,11 +107,11 @@ impl ConnectionState {
 
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
-        gatt_client::portal(conn_handle).call(gatt_client::PortalMessage::Disconnected);
+        gatt_client::portal(conn_handle).call(ble_evt);
         #[cfg(feature = "ble-gatt-server")]
-        gatt_server::portal(conn_handle).call(gatt_server::PortalMessage::Disconnected);
+        gatt_server::portal(conn_handle).call(ble_evt);
         #[cfg(feature = "ble-l2cap")]
-        l2cap::portal(conn_handle).call(l2cap::PortalMessage::Disconnected);
+        l2cap::portal(conn_handle).call(ble_evt);
 
         trace!("conn {:?}: disconnected", index);
     }
