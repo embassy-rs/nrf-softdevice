@@ -316,7 +316,14 @@ async fn discover_inner<T: Client>(
 
     // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
     if start_handle <= end_handle {
-        for desc in discover_descriptors(conn, start_handle, end_handle).await? {
+        let descs = {
+            match discover_descriptors(conn, start_handle, end_handle).await {
+                Ok(descs) => descs,
+                Err(DiscoverError::Gatt(AtterrAttributeNotFound)) => Vec::new(),
+                Err(err) => return Err(err),
+            }
+        };
+        for desc in descs {
             descriptors
                 .push(Descriptor {
                     uuid: Uuid::from_raw(desc.uuid),
