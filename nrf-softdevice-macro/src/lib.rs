@@ -149,6 +149,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                     can_notify: #notify,
                     can_indicate: #indicate,
                     max_len: #ty_as_val::MAX_SIZE as _,
+                    vlen: #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE,
                 },
                 &[123],
             )?;

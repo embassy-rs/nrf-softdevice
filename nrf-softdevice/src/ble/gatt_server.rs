@@ -20,6 +20,7 @@ pub struct Characteristic {
     pub can_notify: bool,
     pub can_indicate: bool,
     pub max_len: usize,
+    pub vlen: bool,
 }
 
 pub struct CharacteristicHandles {
@@ -81,6 +82,9 @@ pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
             _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
         };
         attr_md.set_vloc(raw::BLE_GATTS_VLOC_STACK as u8);
+        if char.vlen {
+            attr_md.set_vlen(1);
+        }
 
         let mut attr: raw::ble_gatts_attr_t = unsafe { mem::zeroed() };
         attr.p_uuid = unsafe { char.uuid.as_raw_ptr() };
