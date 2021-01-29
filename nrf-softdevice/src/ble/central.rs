@@ -70,29 +70,7 @@ pub async fn connect(
         err
     })?;
 
-    // in units of 625us
-    let scan_interval: u32 = 2732;
-    let scan_window: u32 = 500;
-
-    // TODO make configurable
-    let mut scan_params: raw::ble_gap_scan_params_t = unsafe { mem::zeroed() };
-    scan_params.set_extended(1);
-    scan_params.set_active(1);
-    scan_params.scan_phys = raw::BLE_GAP_PHY_1MBPS as u8;
-    scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_WHITELIST as _);
-    scan_params.timeout = raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _;
-
-    // s122 has these in us instead of 625us :shrug:
-    #[cfg(not(feature = "s122"))]
-    {
-        scan_params.interval = scan_interval as u16;
-        scan_params.window = scan_window as u16;
-    }
-    #[cfg(feature = "s122")]
-    {
-        scan_params.interval_us = scan_interval * 625;
-        scan_params.window_us = scan_window * 625;
-    }
+    let mut scan_params = raw::ble_gap_scan_params_t::from(&config.scan_params);
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
@@ -148,6 +126,7 @@ pub struct Config {
     // bits of BLE_GAP_PHY_
     pub rx_phys: u8,
 
+    pub scan_params: ScanParams,
     pub conn_params: raw::ble_gap_conn_params_t,
 }
 
@@ -159,6 +138,7 @@ impl Default for Config {
             att_mtu: None,
             tx_phys: raw::BLE_GAP_PHY_AUTO as _,
             rx_phys: raw::BLE_GAP_PHY_AUTO as _,
+            scan_params: ScanParams::default(),
             conn_params: raw::ble_gap_conn_params_t {
                 min_conn_interval: 40,
                 max_conn_interval: 200,
@@ -209,29 +189,7 @@ where
         err
     })?;
 
-    // in units of 625us
-    let scan_interval: u32 = 2732;
-    let scan_window: u32 = 500;
-
-    // TODO make configurable
-    let mut scan_params: raw::ble_gap_scan_params_t = unsafe { mem::zeroed() };
-    scan_params.set_extended(1);
-    scan_params.set_active(1);
-    scan_params.scan_phys = raw::BLE_GAP_PHY_1MBPS as u8;
-    scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as _); // todo
-    scan_params.timeout = raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _;
-
-    // s122 has these in us instead of 625us :shrug:
-    #[cfg(not(feature = "s122"))]
-    {
-        scan_params.interval = scan_interval as u16;
-        scan_params.window = scan_window as u16;
-    }
-    #[cfg(feature = "s122")]
-    {
-        scan_params.interval_us = scan_interval * 625;
-        scan_params.window_us = scan_window * 625;
-    }
+    let mut scan_params = raw::ble_gap_scan_params_t::from(&config.scan_params);
 
     // Buffer to store received advertisement data.
     const BUF_LEN: usize = 256;
@@ -289,6 +247,7 @@ where
 pub struct ScanConfig<'a> {
     pub whitelist: Option<&'a [Address]>,
     pub tx_power: TxPower,
+    pub scan_params: ScanParams,
 }
 
 impl<'a> Default for ScanConfig<'a> {
@@ -296,6 +255,58 @@ impl<'a> Default for ScanConfig<'a> {
         Self {
             whitelist: None,
             tx_power: TxPower::ZerodBm,
+            scan_params: ScanParams::default(),
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct ScanParams {
+    pub extended: bool,
+    pub active: bool,
+    pub filter_policy: u8,
+    pub scan_phys: u8,
+    pub interval: u32,
+    pub window: u32,
+    pub timeout: u16,
+}
+impl From<&ScanParams> for raw::ble_gap_scan_params_t {
+    fn from(res: &ScanParams) -> raw::ble_gap_scan_params_t {
+        let mut scan_params: raw::ble_gap_scan_params_t = unsafe { mem::zeroed() };
+        if res.extended {
+            scan_params.set_extended(1);
+        }
+        if res.active {
+            scan_params.set_active(1);
+        }
+        scan_params.set_filter_policy(res.filter_policy);
+        scan_params.scan_phys = res.scan_phys;
+        scan_params.timeout = res.timeout;
+
+        // s122 has these in us instead of 625us :shrug:
+        #[cfg(not(feature = "s122"))]
+        {
+            scan_params.interval = res.interval as u16;
+            scan_params.window = res.window as u16;
+        }
+        #[cfg(feature = "s122")]
+        {
+            scan_params.interval_us = res.interval * 625;
+            scan_params.window_us = res.window * 625;
+        }
+        return scan_params;
+    }
+}
+impl Default for ScanParams {
+    fn default() -> Self {
+        Self {
+            extended: true,
+            active: true,
+            filter_policy: raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as _,
+            scan_phys: raw::BLE_GAP_PHY_1MBPS as _,
+            interval: 2732,
+            window: 500,
+            timeout: raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _,
         }
     }
 }
