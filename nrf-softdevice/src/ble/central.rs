@@ -71,6 +71,7 @@ pub async fn connect(
     })?;
 
     let mut scan_params = raw::ble_gap_scan_params_t::from(&config.scan_params);
+    scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_WHITELIST as _);
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
