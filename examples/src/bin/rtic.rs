@@ -126,14 +126,11 @@ const APP: () = {
         let temp = unwrap!(temperature_celsius(&sd));
         info!("{:i32}°C", temp.to_num::<i32>());
 
-        let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-        unwrap!(executor.spawn(softdevice_task(sd)));
-        unwrap!(executor.spawn(bluetooth_task(sd)));
-
-        loop {
-            executor.run();
-            cortex_m::asm::wfe();
-        }
+        let executor = EXECUTOR.put(Executor::new());
+        executor.run(|spawner| {
+            unwrap!(spawner.spawn(softdevice_task(sd)));
+            unwrap!(spawner.spawn(bluetooth_task(sd)));
+        });
     }
 
     #[task(binds = TIMER1, resources = [timer], priority = 1)]

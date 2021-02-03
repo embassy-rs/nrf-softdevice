@@ -12,7 +12,6 @@ use core::mem;
 use core::ptr::NonNull;
 use cortex_m_rt::entry;
 use defmt::{panic, *};
-use heapless::consts::*;
 
 use nrf_softdevice::ble;
 use nrf_softdevice::ble::{l2cap, peripheral, Connection};
@@ -30,7 +29,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 }
 
 #[task]
-async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
+async fn bluetooth_task(sd: &'static Softdevice) {
     info!("My address: {:?}", ble::get_address(sd));
 
     #[rustfmt::skip]
@@ -151,12 +150,9 @@ fn main() -> ! {
     let (sdp, p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
-    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    unwrap!(executor.spawn(softdevice_task(sd)));
-    unwrap!(executor.spawn(bluetooth_task(sd, peripheral::Config::default())));
-
-    loop {
-        executor.run();
-        cortex_m::asm::wfe();
-    }
+    let executor = EXECUTOR.put(Executor::new());
+    executor.run(|spawner| {
+        unwrap!(spawner.spawn(softdevice_task(sd)));
+        unwrap!(spawner.spawn(bluetooth_task(sd)));
+    });
 }

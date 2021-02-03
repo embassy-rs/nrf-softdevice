@@ -174,12 +174,9 @@ fn main() -> ! {
     let (sdp, p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
-    let executor = EXECUTOR.put(Executor::new(cortex_m::asm::sev));
-    unwrap!(executor.spawn(softdevice_task(sd)));
-    unwrap!(executor.spawn(ble_central_task(sd)));
-
-    loop {
-        executor.run();
-        cortex_m::asm::wfe();
-    }
+    let executor = EXECUTOR.put(Executor::new());
+    executor.run(|spawner| {
+        unwrap!(spawner.spawn(softdevice_task(sd)));
+        unwrap!(spawner.spawn(ble_central_task(sd)));
+    });
 }
