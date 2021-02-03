@@ -45,9 +45,6 @@ pub(crate) struct ConnectionState {
     pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
     pub data_length_effective: u8, // Effective data length (in bytes).
-
-    pub rx_phys: u8,
-    pub tx_phys: u8,
 }
 
 impl ConnectionState {
@@ -66,8 +63,6 @@ impl ConnectionState {
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
-            rx_phys: 0,
-            tx_phys: 0,
         }
     }
     pub(crate) fn check_connected(&mut self) -> Result<u16, DisconnectedError> {
@@ -188,9 +183,6 @@ impl Connection {
 
                 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                 data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
-
-                rx_phys: 0,
-                tx_phys: 0,
             };
 
             // Update index_by_handle

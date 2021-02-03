@@ -32,7 +32,7 @@ use crate::fmt::*;
 use crate::{raw, RawError, Softdevice};
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
-    defmt::trace!("ble evt {:u32}", (*ble_evt).header.evt_id as u32);
+    trace!("ble evt {:?}", (*ble_evt).header.evt_id as u32);
     match (*ble_evt).header.evt_id as u32 {
         raw::BLE_EVT_BASE..=raw::BLE_EVT_LAST => common::on_evt(ble_evt),
         raw::BLE_GAP_EVT_BASE..=raw::BLE_GAP_EVT_LAST => gap::on_evt(ble_evt),

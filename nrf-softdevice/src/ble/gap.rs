@@ -85,11 +85,10 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 peer_preferred_phys.tx_phys
             );
 
-            let phys =
-                connection::with_state_by_conn_handle(conn_handle, |state| raw::ble_gap_phys_t {
-                    rx_phys: state.rx_phys,
-                    tx_phys: state.tx_phys,
-                });
+            let phys = raw::ble_gap_phys_t {
+                rx_phys: peer_preferred_phys.rx_phys,
+                tx_phys: peer_preferred_phys.tx_phys,
+            };
 
             let ret = raw::sd_ble_gap_phy_update(conn_handle, &phys as *const raw::ble_gap_phys_t);
 

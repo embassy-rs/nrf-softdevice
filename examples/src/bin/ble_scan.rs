@@ -27,10 +27,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 
 #[task]
 async fn ble_task(sd: &'static Softdevice) {
-    let config = central::ScanConfig {
-        whitelist: None,
-        tx_power: TxPower::ZerodBm,
-    };
+    let config = central::ScanConfig::default();
     let res = central::scan(sd, &config, |params| unsafe {
         info!("AdvReport!");
         info!(

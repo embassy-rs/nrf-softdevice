@@ -37,9 +37,9 @@ async fn ble_central_task(sd: &'static Softdevice) {
         AddressType::RandomStatic,
         [0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0],
     )];
-
-    let config = central::Config::default();
-    let conn = unwrap!(central::connect(sd, addrs, &config).await);
+    let mut config = central::ConnectConfig::default();
+    config.scan_config.whitelist = Some(addrs);
+    let conn = unwrap!(central::connect(sd, &config).await);
     info!("connected");
 
     let client: BatteryServiceClient = unwrap!(gatt_client::discover(&conn).await);

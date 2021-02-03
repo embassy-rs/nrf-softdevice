@@ -229,8 +229,8 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            primary_phy: Phy::_1M,
-            secondary_phy: Phy::_1M,
+            primary_phy: Phy::M1,
+            secondary_phy: Phy::M1,
             tx_power: TxPower::ZerodBm,
             timeout: None,
             max_events: None,

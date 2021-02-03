@@ -167,7 +167,35 @@ pub enum TxPower {
 #[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum Phy {
-    _1M = 1,
-    _2M = 2,
+    /// 1Mbps phy
+    M1 = 1,
+    /// 2Mbps phy
+    M2 = 2,
+    /// Coded phy (125kbps, S=8)
+    #[cfg(feature = "s140")]
     Coded = 4,
+}
+
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[derive(Eq, PartialEq, Copy, Clone)]
+#[repr(u8)]
+pub enum PhySet {
+    /// 1Mbps phy
+    M1 = 1,
+    /// 2Mbps phy
+    M2 = 2,
+    /// 1Mbps + 2Mbps phys
+    M1_M2 = 3,
+    /// Coded phy (125kbps, S=8)
+    #[cfg(feature = "s140")]
+    Coded = 4,
+    /// 1Mbps and Coded phys
+    #[cfg(feature = "s140")]
+    M1_Coded = 5,
+    /// 2Mbps and Coded phys
+    #[cfg(feature = "s140")]
+    M2_Coded = 6,
+    /// 1Mbps, 2Mbps and Coded phys
+    #[cfg(feature = "s140")]
+    M1_M2_Coded = 7,
 }

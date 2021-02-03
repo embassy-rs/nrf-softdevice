@@ -39,6 +39,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
     let config = central::ScanConfig {
         whitelist: None,
         tx_power: TxPower::ZerodBm,
+        ..Default::default()
     };
     let res = central::scan(sd, &config, |params| unsafe {
         let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
@@ -72,8 +73,9 @@ async fn ble_central_task(sd: &'static Softdevice) {
 
     let addrs = &[&address];
 
-    let config = central::Config::default();
-    let conn = unwrap!(central::connect(sd, addrs, &config).await);
+    let mut config = central::ConnectConfig::default();
+    config.scan_config.whitelist = Some(addrs);
+    let conn = unwrap!(central::connect(sd, &config).await);
     info!("connected");
 
     let l = l2cap::L2cap::<Packet>::init(sd);

@@ -33,28 +33,17 @@ pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn connect(
     sd: &Softdevice,
-    addresses: &[&Address],
-    config: &Config,
+    config: &ConnectConfig<'_>,
 ) -> Result<Connection, ConnectError> {
-    if addresses.len() == 0 {
+    if let Some(w) = config.scan_config.whitelist {
+        if w.len() == 0 {
+            return Err(ConnectError::NoAddresses);
+        }
+    } else {
         return Err(ConnectError::NoAddresses);
     }
 
-    // Set tx power
-    let ret = unsafe {
-        raw::sd_ble_gap_tx_power_set(
-            raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
-            0,
-            config.tx_power as i8,
-        )
-    };
-    RawError::convert(ret).map_err(|err| {
-        warn!("sd_ble_gap_tx_power_set err {:?}", err);
-        err
-    })?;
-
-    let mut scan_params = raw::ble_gap_scan_params_t::from(&config.scan_params);
-    scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_WHITELIST as _);
+    let scan_params = config.scan_config.to_raw()?;
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
@@ -63,16 +52,7 @@ pub async fn connect(
         }
     });
 
-    assert!(addresses.len() <= u8::MAX as usize);
-    let ret =
-        unsafe { raw::sd_ble_gap_whitelist_set(addresses.as_ptr() as _, addresses.len() as u8) };
-    if let Err(err) = RawError::convert(ret) {
-        warn!("sd_ble_gap_connect err {:?}", err);
-        return Err(err.into());
-    }
-
-    let ret =
-        unsafe { raw::sd_ble_gap_connect(ptr::null(), &mut scan_params, &config.conn_params, 1) };
+    let ret = unsafe { raw::sd_ble_gap_connect(ptr::null(), &scan_params, &config.conn_params, 1) };
     if let Err(err) = RawError::convert(ret) {
         warn!("sd_ble_gap_connect err {:?}", err);
         return Err(err.into());
@@ -113,11 +93,6 @@ pub async fn connect(
         })
         .await?;
 
-    conn.with_state(|state| {
-        state.rx_phys = config.tx_phys;
-        state.tx_phys = config.rx_phys;
-    });
-
     d.defuse();
 
     #[cfg(feature = "ble-gatt-client")]
@@ -130,30 +105,21 @@ pub async fn connect(
 }
 
 #[derive(Copy, Clone)]
-pub struct Config {
-    pub tx_power: TxPower,
-
+pub struct ConnectConfig<'a> {
     /// Requested ATT_MTU size for the next connection that is established.
     #[cfg(feature = "ble-gatt-client")]
     pub att_mtu: Option<u16>,
-    // bits of BLE_GAP_PHY_
-    pub tx_phys: u8,
-    // bits of BLE_GAP_PHY_
-    pub rx_phys: u8,
 
-    pub scan_params: ScanParams,
+    pub scan_config: ScanConfig<'a>,
     pub conn_params: raw::ble_gap_conn_params_t,
 }
 
-impl Default for Config {
+impl<'a> Default for ConnectConfig<'a> {
     fn default() -> Self {
         Self {
-            tx_power: TxPower::ZerodBm,
             #[cfg(feature = "ble-gatt-client")]
             att_mtu: None,
-            tx_phys: raw::BLE_GAP_PHY_AUTO as _,
-            rx_phys: raw::BLE_GAP_PHY_AUTO as _,
-            scan_params: ScanParams::default(),
+            scan_config: ScanConfig::default(),
             conn_params: raw::ble_gap_conn_params_t {
                 min_conn_interval: 40,
                 max_conn_interval: 200,
@@ -186,20 +152,7 @@ pub async fn scan<'a, F, R>(
 where
     F: for<'b> FnMut(&'b raw::ble_gap_evt_adv_report_t) -> Option<R>,
 {
-    // Set tx power
-    let ret = unsafe {
-        raw::sd_ble_gap_tx_power_set(
-            raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
-            0,
-            config.tx_power as i8,
-        )
-    };
-    RawError::convert(ret).map_err(|err| {
-        warn!("sd_ble_gap_tx_power_set err {:?}", err);
-        err
-    })?;
-
-    let mut scan_params = raw::ble_gap_scan_params_t::from(&config.scan_params);
+    let scan_params = config.to_raw()?;
 
     // Buffer to store received advertisement data.
     const BUF_LEN: usize = 256;
@@ -258,68 +211,106 @@ where
 
 #[derive(Copy, Clone)]
 pub struct ScanConfig<'a> {
-    pub whitelist: Option<&'a [Address]>,
+    /// Whitelist of addresses to scan. If None, all advertisements
+    /// will be processed when scanning.
+    ///
+    /// For connecting this must be Some, and have least 1 address.
+    pub whitelist: Option<&'a [&'a Address]>,
+
+    /// Support extended advertisements.
+    ///
+    /// If true, the scanner will accept extended advertising packets.
+    /// If false, the scanner will not receive advertising packets
+    /// on secondary advertising channels, and will not be able
+    /// to receive long advertising PDUs.
+    pub extended: bool,
+
+    /// If true, scan actively by sending scan requests.
+    /// Ignored when using for connecting.
+    pub active: bool,
+
+    /// Set of PHYs to scan
+    pub phys: PhySet,
+
+    /// Scan interval, in units of 625us
+    pub interval: u32,
+
+    /// Scan window, in units of 625us
+    pub window: u32,
+
+    /// Timeout in units of 10ms. If set to 0, scan forever.
+    pub timeout: u16,
+
+    /// Radio TX power. This is used for scanning, and is inherited
+    /// as the connection TX power if this ScanConfig is used for connect().
     pub tx_power: TxPower,
-    pub scan_params: ScanParams,
 }
 
 impl<'a> Default for ScanConfig<'a> {
     fn default() -> Self {
         Self {
+            extended: true,
+            active: true,
+            phys: PhySet::M1,
+            interval: 2732,
+            window: 500,
+            timeout: raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _,
             whitelist: None,
             tx_power: TxPower::ZerodBm,
-            scan_params: ScanParams::default(),
         }
     }
 }
 
-#[derive(Copy, Clone)]
-pub struct ScanParams {
-    pub extended: bool,
-    pub active: bool,
-    pub filter_policy: u8,
-    pub scan_phys: u8,
-    pub interval: u32,
-    pub window: u32,
-    pub timeout: u16,
-}
-impl From<&ScanParams> for raw::ble_gap_scan_params_t {
-    fn from(res: &ScanParams) -> raw::ble_gap_scan_params_t {
+impl<'a> ScanConfig<'a> {
+    fn to_raw(&self) -> Result<raw::ble_gap_scan_params_t, RawError> {
         let mut scan_params: raw::ble_gap_scan_params_t = unsafe { mem::zeroed() };
-        if res.extended {
+        if self.extended {
             scan_params.set_extended(1);
         }
-        if res.active {
+        if self.active {
             scan_params.set_active(1);
         }
-        scan_params.set_filter_policy(res.filter_policy);
-        scan_params.scan_phys = res.scan_phys;
-        scan_params.timeout = res.timeout;
+        scan_params.scan_phys = self.phys as u8;
+        scan_params.timeout = self.timeout;
 
         // s122 has these in us instead of 625us :shrug:
         #[cfg(not(feature = "s122"))]
         {
-            scan_params.interval = res.interval as u16;
-            scan_params.window = res.window as u16;
+            scan_params.interval = self.interval as u16;
+            scan_params.window = self.window as u16;
         }
         #[cfg(feature = "s122")]
         {
-            scan_params.interval_us = res.interval * 625;
-            scan_params.window_us = res.window * 625;
+            scan_params.interval_us = self.interval * 625;
+            scan_params.window_us = self.window * 625;
         }
-        return scan_params;
-    }
-}
-impl Default for ScanParams {
-    fn default() -> Self {
-        Self {
-            extended: true,
-            active: true,
-            filter_policy: raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as _,
-            scan_phys: raw::BLE_GAP_PHY_1MBPS as _,
-            interval: 2732,
-            window: 500,
-            timeout: raw::BLE_GAP_SCAN_TIMEOUT_UNLIMITED as _,
+
+        // Set whitelist
+        if let Some(w) = self.whitelist {
+            assert!(w.len() <= u8::MAX as usize);
+            let ret = unsafe { raw::sd_ble_gap_whitelist_set(w.as_ptr() as _, w.len() as u8) };
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_whitelist_set err {:?}", err);
+                return Err(err.into());
+            }
+            scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_WHITELIST as _);
+        } else {
+            scan_params.set_filter_policy(raw::BLE_GAP_SCAN_FP_ACCEPT_ALL as _);
         }
+
+        // Set tx power
+        let ret = unsafe {
+            raw::sd_ble_gap_tx_power_set(
+                raw::BLE_GAP_TX_POWER_ROLES_BLE_GAP_TX_POWER_ROLE_SCAN_INIT as _,
+                0,
+                self.tx_power as i8,
+            )
+        };
+        RawError::convert(ret).map_err(|err| {
+            warn!("sd_ble_gap_tx_power_set err {:?}", err);
+            err
+        })?;
+
+        Ok(scan_params)
     }
 }
