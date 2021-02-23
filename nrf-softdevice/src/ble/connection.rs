@@ -201,8 +201,8 @@ impl Connection {
 }
 
 // ConnectionStates by index.
-static mut STATES: [UnsafeCell<ConnectionState>; CONNS_MAX] =
-    [UnsafeCell::new(ConnectionState::dummy()); CONNS_MAX];
+const DUMMY_STATE: UnsafeCell<ConnectionState> = UnsafeCell::new(ConnectionState::dummy());
+static mut STATES: [UnsafeCell<ConnectionState>; CONNS_MAX] = [DUMMY_STATE; CONNS_MAX];
 
 pub(crate) fn with_state_by_conn_handle<T>(
     conn_handle: u16,
@@ -233,7 +233,8 @@ fn allocate_index<T>(f: impl FnOnce(u8, &mut ConnectionState) -> T) -> Result<T,
 }
 
 // conn_handle -> index mapping. Used to make stuff go faster
-static mut INDEX_BY_HANDLE: [Cell<Option<u8>>; CONNS_MAX] = [Cell::new(None); CONNS_MAX];
+const INDEX_NONE: Cell<Option<u8>> = Cell::new(None);
+static mut INDEX_BY_HANDLE: [Cell<Option<u8>>; CONNS_MAX] = [INDEX_NONE; CONNS_MAX];
 
 fn index_by_handle(conn_handle: u16) -> &'static Cell<Option<u8>> {
     unsafe { &INDEX_BY_HANDLE[conn_handle as usize] }
