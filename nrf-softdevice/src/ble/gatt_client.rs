@@ -646,7 +646,8 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
         .await
 }
 
-static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [Portal::new(); CONNS_MAX];
+const PORTAL_NEW: Portal<*const raw::ble_evt_t> = Portal::new();
+static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [PORTAL_NEW; CONNS_MAX];
 pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
     &PORTALS[conn_handle as usize]
 }
