@@ -164,6 +164,10 @@ impl Connection {
         self.with_state(|state| state.disconnect())
     }
 
+    pub fn handle(&self) -> Option<u16> {
+        self.with_state(|state| state.conn_handle)
+    }
+
     pub(crate) fn new(
         conn_handle: u16,
         role: Role,
