@@ -185,17 +185,17 @@ pub enum PhySet {
     /// 2Mbps phy
     M2 = 2,
     /// 1Mbps + 2Mbps phys
-    M1_M2 = 3,
+    M1M2 = 3,
     /// Coded phy (125kbps, S=8)
     #[cfg(feature = "s140")]
     Coded = 4,
     /// 1Mbps and Coded phys
     #[cfg(feature = "s140")]
-    M1_Coded = 5,
+    M1Coded = 5,
     /// 2Mbps and Coded phys
     #[cfg(feature = "s140")]
-    M2_Coded = 6,
+    M2Coded = 6,
     /// 1Mbps, 2Mbps and Coded phys
     #[cfg(feature = "s140")]
-    M1_M2_Coded = 7,
+    M1M2Coded = 7,
 }
