@@ -104,7 +104,7 @@ impl l2cap::Packet for Packet {
         let mut v = Vec::with_capacity(Self::MTU);
         let ptr = v.as_mut_ptr();
         mem::forget(v);
-        info!("allocate {:?}", ptr as u32);
+        info!("allocate {:x}", ptr as u32);
         NonNull::new(ptr)
     }
 
@@ -112,12 +112,12 @@ impl l2cap::Packet for Packet {
         let ptr = self.0.as_mut_ptr();
         let len = self.0.len();
         mem::forget(self);
-        info!("into_raw_parts {:?}", ptr as u32);
+        info!("into_raw_parts {:x}", ptr as u32);
         (unwrap!(NonNull::new(ptr)), len)
     }
 
     unsafe fn from_raw_parts(ptr: NonNull<u8>, len: usize) -> Self {
-        info!("from_raw_parts {:?}", ptr.as_ptr() as u32);
+        info!("from_raw_parts {:x}", ptr.as_ptr() as u32);
         Self(Vec::from_raw_parts(ptr.as_ptr(), len, Self::MTU))
     }
 }

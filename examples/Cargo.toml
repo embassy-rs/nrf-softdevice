@@ -28,7 +28,7 @@ embassy-nrf = { version = "0.1.0", features = [ "defmt", "52840" ]}
 cortex-m        = { version = "0.6.4" }
 cortex-m-rt = "0.6.13"
 cortex-m-rtic = { version = "0.5.5", optional = true }
-defmt = "0.1.3"
+defmt = "0.2.0"
 nrf-softdevice-defmt-rtt = { path = "../nrf-softdevice-defmt-rtt", version = "0.1.0" }
 panic-probe = "0.1.0"
 nrf52840-hal    = { version = "0.12.0" }
