@@ -11,8 +11,9 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::{panic, *};
 use embassy::executor::{task, Executor};
+use embassy::gpio::WaitForLow;
 use embassy::util::Forever;
-use embassy_nrf::gpiote::{Gpiote, PortInputPolarity};
+use embassy_nrf::gpiote::{Gpiote, GpiotePin};
 use embassy_nrf::interrupt;
 use futures::pin_mut;
 use nrf52840_hal::gpio;
@@ -57,7 +58,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 
         let res = gatt_server::run(&conn, server, |e| match e {
             FooServiceEvent::FooWrite(val) => {
-                info!("wrote foo level: {:u16}", val);
+                info!("wrote foo level: {}", val);
                 if let Err(e) = server.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
@@ -78,18 +79,17 @@ async fn bluetooth_task(sd: &'static Softdevice, gpiote: pac::GPIOTE, p0: pac::P
     let server: FooService = unwrap!(gatt_server::register(sd));
 
     let port0 = gpio::p0::Parts::new(p0);
-    let gpiote = Gpiote::new(gpiote, interrupt::take!(GPIOTE));
+    let (gpiote, _) = Gpiote::new(gpiote, interrupt::take!(GPIOTE));
 
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
 
-    let button1 = port0.p0_11.into_pullup_input().degrade();
-    let button2 = port0.p0_12.into_pullup_input().degrade();
-
+    let button1 = GpiotePin::new(gpiote, port0.p0_11.into_pullup_input().degrade());
+    let button2 = GpiotePin::new(gpiote, port0.p0_12.into_pullup_input().degrade());
+    pin_mut!(button1);
+    pin_mut!(button2);
     loop {
-        gpiote
-            .wait_port_input(&button1, PortInputPolarity::Low)
-            .await;
+        button1.as_mut().wait_for_low().await;
         info!("Bluetooth ON!");
 
         // Create a future that will run the bluetooth loop.
@@ -98,9 +98,7 @@ async fn bluetooth_task(sd: &'static Softdevice, gpiote: pac::GPIOTE, p0: pac::P
 
         // Create a future that will resolve when the OFF button is pressed.
         let off_fut = async {
-            gpiote
-                .wait_port_input(&button2, PortInputPolarity::Low)
-                .await;
+            button2.as_mut().wait_for_low().await;
             info!("Bluetooth OFF!");
         };
 

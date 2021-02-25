@@ -23,13 +23,13 @@ fn alloc_error(_layout: Layout) -> ! {
 
 const HEAP_SIZE: usize = 32 * 1024; // in bytes
 
-#[defmt::timestamp]
-fn timestamp() -> u64 {
-    static COUNT: AtomicUsize = AtomicUsize::new(0);
-    // NOTE(no-CAS) `timestamps` runs with interrupts disabled
-    let n = COUNT.load(Ordering::Relaxed);
-    COUNT.store(n + 1, Ordering::Relaxed);
-    n as u64
+defmt::timestamp! {"{=u64}", {
+        static COUNT: AtomicUsize = AtomicUsize::new(0);
+        // NOTE(no-CAS) `timestamps` runs with interrupts disabled
+        let n = COUNT.load(Ordering::Relaxed);
+        COUNT.store(n + 1, Ordering::Relaxed);
+        n as u64
+    }
 }
 
 // Take peripherals, split by softdevice and application

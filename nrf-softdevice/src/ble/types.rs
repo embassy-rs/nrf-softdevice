@@ -138,8 +138,8 @@ impl Address {
 
 #[cfg(feature = "defmt")]
 impl defmt::Format for Address {
-    fn format(&self, fmt: &mut defmt::Formatter) {
-        defmt::write!(fmt, "{:?}:{:[u8;6]}", self.address_type(), self.bytes())
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "{:?}:{=[u8]:x}", self.address_type(), self.bytes())
     }
 }
 

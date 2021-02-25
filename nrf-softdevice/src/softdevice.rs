@@ -12,19 +12,19 @@ use crate::RawError;
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     match (id, info) {
         (raw::NRF_FAULT_ID_SD_ASSERT, _) => panic!(
-            "Softdevice assertion failed: an assertion inside the softdevice's code has failed. Most common cause is disabling interrupts for too long. Make sure you're using nrf_softdevice::interrupt::free instead of cortex_m::interrupt::free, which disables non-softdevice interrupts only. PC={:?}",
+            "Softdevice assertion failed: an assertion inside the softdevice's code has failed. Most common cause is disabling interrupts for too long. Make sure you're using nrf_softdevice::interrupt::free instead of cortex_m::interrupt::free, which disables non-softdevice interrupts only. PC={:x}",
             pc
         ),
         (raw::NRF_FAULT_ID_APP_MEMACC, 0) => panic!(
-            "Softdevice memory access violation. Your program accessed RAM reserved to the softdevice. PC={:?}",
+            "Softdevice memory access violation. Your program accessed RAM reserved to the softdevice. PC={:x}",
             pc
         ),
         (raw::NRF_FAULT_ID_APP_MEMACC, _) => panic!(
-            "Softdevice memory access violation. Your program accessed registers for a peripheral reserved to the softdevice. PC={:?} PREGION={:?}",
+            "Softdevice memory access violation. Your program accessed registers for a peripheral reserved to the softdevice. PC={:x} PREGION={:?}",
             pc, info
         ),
         _ => panic!(
-            "Softdevice unknown fault id={:?} pc={:?} info={:?}",
+            "Softdevice unknown fault id={:?} pc={:x} info={:?}",
             id, pc, info
         ),
     }
@@ -297,14 +297,14 @@ impl Softdevice {
                 if wanted_app_ram_base <= app_ram_base {
                     panic!("selected configuration has too high RAM requirements.")
                 } else {
-                    panic!("too little RAM for softdevice. Change your app's RAM start address to {:?}", wanted_app_ram_base);
+                    panic!("too little RAM for softdevice. Change your app's RAM start address to {:x}", wanted_app_ram_base);
                 }
             }
             Err(err) => panic!("sd_ble_enable err {:?}", err),
         }
 
         if wanted_app_ram_base < app_ram_base {
-            warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:?}", wanted_app_ram_base);
+            warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:x}", wanted_app_ram_base);
         }
 
         #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]

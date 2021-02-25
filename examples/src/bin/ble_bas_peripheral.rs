@@ -59,13 +59,13 @@ async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
             BatteryServiceEvent::BatteryLevelWrite(val) => {
-                info!("wrote battery level: {:u8}", val);
+                info!("wrote battery level: {}", val);
                 if let Err(e) = server.battery_level_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }
             BatteryServiceEvent::FooWrite(val) => {
-                info!("wrote battery level: {:u16}", val);
+                info!("wrote battery level: {}", val);
                 if let Err(e) = server.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
