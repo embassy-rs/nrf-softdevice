@@ -31,7 +31,7 @@ async fn ble_task(sd: &'static Softdevice) {
     let res = central::scan(sd, &config, |params| unsafe {
         info!("AdvReport!");
         info!(
-            "type: connectable={:u16} scannable={:u16} directed={:u16} scan_response={:u16} extended_pdu={:u16} status={:u16}",
+            "type: connectable={} scannable={} directed={} scan_response={} extended_pdu={} status={}",
             params.type_.connectable(),
             params.type_.scannable(),
             params.type_.directed(),
@@ -40,7 +40,7 @@ async fn ble_task(sd: &'static Softdevice) {
             params.type_.status()
         );
         info!(
-            "addr: resolved={:u8} type={:u8} addr={:[u8]}",
+            "addr: resolved={} type={} addr={:x}",
             params.peer_addr.addr_id_peer(),
             params.peer_addr.addr_type(),
             params.peer_addr.addr
@@ -58,7 +58,7 @@ async fn ble_task(sd: &'static Softdevice) {
             }
             let key = data[1];
             let value = &data[2..len+1];
-            info!("value {:u8}: {:[u8]}", key, value);
+            info!("value {}: {:x}", key, value);
             data = &data[len+1..];
         }
         None

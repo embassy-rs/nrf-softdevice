@@ -46,7 +46,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
 
     // Read
     let val = unwrap!(client.battery_level_read().await);
-    info!("read battery level: {:u8}", val);
+    info!("read battery level: {}", val);
 
     // Write, set it to 42
     unwrap!(client.battery_level_write(42).await);
@@ -54,7 +54,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
 
     // Read to check it's changed
     let val = unwrap!(client.battery_level_read().await);
-    info!("read battery level: {:u8}", val);
+    info!("read battery level: {}", val);
 }
 
 #[entry]

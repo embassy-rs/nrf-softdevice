@@ -124,7 +124,7 @@ const APP: () = {
         let sd = Softdevice::enable(sdp, &config);
 
         let temp = unwrap!(temperature_celsius(&sd));
-        info!("{:i32}°C", temp.to_num::<i32>());
+        info!("{}°C", temp.to_num::<i32>());
 
         let executor = EXECUTOR.put(Executor::new());
         executor.run(|spawner| {
