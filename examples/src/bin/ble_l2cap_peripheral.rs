@@ -11,11 +11,11 @@ use example_common::*;
 use core::mem;
 use core::ptr::NonNull;
 use cortex_m_rt::entry;
-use defmt::{panic, *};
+use defmt::*;
 
 use nrf_softdevice::ble;
-use nrf_softdevice::ble::{l2cap, peripheral, Connection};
-use nrf_softdevice::{raw, RawError, Softdevice};
+use nrf_softdevice::ble::{l2cap, peripheral};
+use nrf_softdevice::{raw, Softdevice};
 
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
@@ -64,8 +64,6 @@ async fn bluetooth_task(sd: &'static Softdevice) {
             let pkt = unwrap!(ch.rx().await);
             info!("rx: {:x}", pkt.0);
         }
-
-        futures::future::pending::<()>().await;
     }
 }
 
@@ -147,7 +145,7 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new());

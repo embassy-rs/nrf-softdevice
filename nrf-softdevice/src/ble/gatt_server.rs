@@ -4,7 +4,6 @@
 //! In a connection any device can be server and client, and even both can be both at the same time.
 
 use core::mem;
-use core::ptr;
 
 use crate::ble::*;
 use crate::fmt::{panic, *};
@@ -283,8 +282,8 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             );
 
             let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, mtu) };
-            if let Err(err) = RawError::convert(ret) {
-                warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", err);
+            if let Err(_err) = RawError::convert(ret) {
+                warn!("sd_ble_gatts_exchange_mtu_reply err {:?}", _err);
                 return;
             }
 

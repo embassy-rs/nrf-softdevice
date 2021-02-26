@@ -8,7 +8,7 @@ mod example_common;
 use example_common::*;
 
 use cortex_m_rt::entry;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 
@@ -23,7 +23,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 }
 
 #[task]
-async fn interrupt_task(sd: &'static Softdevice) {
+async fn interrupt_task(_sd: &'static Softdevice) {
     let enabled = interrupt::is_enabled(interrupt::SWI0_EGU0);
     info!("enabled: {:?}", enabled);
 
@@ -89,7 +89,7 @@ fn SWI1_EGU1() {
 fn main() -> ! {
     info!("Hello World!");
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &Default::default());
 
     let executor = EXECUTOR.put(Executor::new());

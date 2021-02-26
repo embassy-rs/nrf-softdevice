@@ -1,4 +1,4 @@
-use crate::fmt::{panic, *};
+use crate::fmt::*;
 use crate::raw;
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
@@ -9,9 +9,9 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     }
 }
 
-fn on_user_mem_request(ble_evt: *const raw::ble_evt_t) {
+fn on_user_mem_request(_ble_evt: *const raw::ble_evt_t) {
     trace!("on_user_mem_request");
 }
-fn on_user_mem_release(ble_evt: *const raw::ble_evt_t) {
+fn on_user_mem_release(_ble_evt: *const raw::ble_evt_t) {
     trace!("on_user_mem_release");
 }

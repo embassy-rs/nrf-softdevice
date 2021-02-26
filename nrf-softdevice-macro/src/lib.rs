@@ -2,7 +2,6 @@
 
 extern crate proc_macro;
 
-use core::str::FromStr;
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};

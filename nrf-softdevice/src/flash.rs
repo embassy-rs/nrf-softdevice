@@ -86,8 +86,8 @@ impl embassy::flash::Flash for Flash {
             let ret = unsafe { raw::sd_flash_write(address as _, words_ptr, words_len) };
             let ret = match RawError::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
-                Err(e) => {
-                    warn!("sd_flash_write err {:?}", e);
+                Err(_e) => {
+                    warn!("sd_flash_write err {:?}", _e);
                     Err(FlashError::Failed)
                 }
             };
@@ -109,8 +109,8 @@ impl embassy::flash::Flash for Flash {
             let ret = unsafe { raw::sd_flash_page_erase(page_number as u32) };
             let ret = match RawError::convert(ret) {
                 Ok(()) => SIGNAL.wait().await,
-                Err(e) => {
-                    warn!("sd_flash_page_erase err {:?}", e);
+                Err(_e) => {
+                    warn!("sd_flash_page_erase err {:?}", _e);
                     Err(FlashError::Failed)
                 }
             };

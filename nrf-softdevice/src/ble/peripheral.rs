@@ -141,8 +141,8 @@ pub async fn advertise(
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
-        if let Err(e) = RawError::convert(ret) {
-            warn!("sd_ble_gap_adv_stop: {:?}", e);
+        if let Err(_e) = RawError::convert(ret) {
+            warn!("sd_ble_gap_adv_stop: {:?}", _e);
         }
     });
 

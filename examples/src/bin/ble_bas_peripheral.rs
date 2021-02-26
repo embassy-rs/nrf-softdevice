@@ -10,10 +10,10 @@ use example_common::*;
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
-use defmt::{panic, *};
+use defmt::*;
 
-use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
-use nrf_softdevice::{raw, RawError, Softdevice};
+use nrf_softdevice::ble::{gatt_server, peripheral};
+use nrf_softdevice::{raw, Softdevice};
 
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
@@ -33,7 +33,7 @@ struct BatteryService {
 }
 
 #[task]
-async fn bluetooth_task(sd: &'static Softdevice, config: peripheral::Config) {
+async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryService = unwrap!(gatt_server::register(sd));
     #[rustfmt::skip]
     let adv_data = &[
@@ -125,12 +125,12 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, peripheral::Config::default())));
+        unwrap!(spawner.spawn(bluetooth_task(sd)));
     });
 }

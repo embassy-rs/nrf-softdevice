@@ -95,7 +95,7 @@ impl ConnectionState {
         );
 
         let ibh = index_by_handle(conn_handle);
-        let index = unwrap!(ibh.get(), "bug: conn_handle has no index");
+        let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
         ibh.set(None);
 
         self.conn_handle = None;
@@ -108,7 +108,7 @@ impl ConnectionState {
         #[cfg(feature = "ble-l2cap")]
         l2cap::portal(conn_handle).call(ble_evt);
 
-        trace!("conn {:?}: disconnected", index);
+        trace!("conn {:?}: disconnected", _index);
     }
 }
 

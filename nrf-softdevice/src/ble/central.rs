@@ -47,8 +47,8 @@ pub async fn connect(
 
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_connect_cancel() };
-        if let Err(e) = RawError::convert(ret) {
-            warn!("sd_ble_gap_connect_cancel: {:?}", e);
+        if let Err(_e) = RawError::convert(ret) {
+            warn!("sd_ble_gap_connect_cancel: {:?}", _e);
         }
     });
 
@@ -173,8 +173,8 @@ where
 
     let _d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_scan_stop() };
-        if let Err(e) = RawError::convert(ret) {
-            warn!("sd_ble_gap_scan_stop: {:?}", e);
+        if let Err(_e) = RawError::convert(ret) {
+            warn!("sd_ble_gap_scan_stop: {:?}", _e);
         }
     });
 

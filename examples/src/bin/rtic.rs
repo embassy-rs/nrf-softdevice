@@ -19,7 +19,7 @@ mod example_common;
 use example_common::*;
 
 use core::mem;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 use nrf52840_hal::pac::TIMER1;
@@ -56,7 +56,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
             adv_data,
             scan_data,
         };
-        let conn = unwrap!(peripheral::advertise(sd, adv, &config).await);
+        let _conn = unwrap!(peripheral::advertise(sd, adv, &config).await);
 
         info!("advertising done!");
     }
@@ -116,7 +116,7 @@ const APP: () = {
             ..Default::default()
         };
 
-        let (sdp, p) = take_peripherals();
+        let (sdp, _p) = take_peripherals();
 
         // Softdevice enable must not be done in RTIC init
         // because RTIC runs init with interrupts disabled, and the

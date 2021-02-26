@@ -13,13 +13,12 @@ use core::ptr::NonNull;
 use core::slice;
 use cortex_m_rt::entry;
 use defmt::info;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
-use heapless::consts::*;
 
 use nrf_softdevice::ble::l2cap::Packet as _;
-use nrf_softdevice::ble::{central, l2cap, Address, Connection, TxPower, Uuid};
+use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
@@ -171,7 +170,7 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new());

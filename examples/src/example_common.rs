@@ -18,7 +18,6 @@ static ALLOCATOR: CortexMHeap = CortexMHeap::empty();
 #[alloc_error_handler]
 fn alloc_error(_layout: Layout) -> ! {
     panic!("Alloc error");
-    loop {}
 }
 
 const HEAP_SIZE: usize = 32 * 1024; // in bytes

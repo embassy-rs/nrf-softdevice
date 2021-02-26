@@ -10,11 +10,11 @@ use example_common::*;
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::{task, Executor};
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::{central, gatt_client, Address, AddressType, Connection, Uuid};
+use nrf_softdevice::ble::{central, gatt_client, Address, AddressType};
 use nrf_softdevice::raw;
 use nrf_softdevice::Softdevice;
 
@@ -95,7 +95,7 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &config);
 
     let executor = EXECUTOR.put(Executor::new());

@@ -167,14 +167,12 @@ impl<P: Packet> L2cap<P> {
 
                         // default is 1
                         if config.credits != 1 {
-                            let ret = unsafe {
-                                raw::sd_ble_l2cap_ch_flow_control(
-                                    conn_handle,
-                                    cid,
-                                    config.credits,
-                                    ptr::null_mut(),
-                                )
-                            };
+                            let ret = raw::sd_ble_l2cap_ch_flow_control(
+                                conn_handle,
+                                cid,
+                                config.credits,
+                                ptr::null_mut(),
+                            );
                             if let Err(err) = RawError::convert(ret) {
                                 warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
                                 return Err(err.into());
@@ -239,14 +237,12 @@ impl<P: Packet> L2cap<P> {
 
                             // default is 1
                             if config.credits != 1 {
-                                let ret = unsafe {
-                                    raw::sd_ble_l2cap_ch_flow_control(
-                                        conn_handle,
-                                        cid,
-                                        config.credits,
-                                        ptr::null_mut(),
-                                    )
-                                };
+                                let ret = raw::sd_ble_l2cap_ch_flow_control(
+                                    conn_handle,
+                                    cid,
+                                    config.credits,
+                                    ptr::null_mut(),
+                                );
                                 if let Err(err) = RawError::convert(ret) {
                                     warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
                                     return Some(Err(err.into()));
@@ -266,8 +262,8 @@ impl<P: Packet> L2cap<P> {
                             };
 
                             let ret = raw::sd_ble_l2cap_ch_setup(conn_handle, &mut cid, &params);
-                            if let Err(err) = RawError::convert(ret) {
-                                warn!("sd_ble_l2cap_ch_setup err {:?}", err);
+                            if let Err(_err) = RawError::convert(ret) {
+                                warn!("sd_ble_l2cap_ch_setup err {:?}", _err);
                             }
 
                             None

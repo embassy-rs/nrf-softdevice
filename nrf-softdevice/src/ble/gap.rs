@@ -4,7 +4,7 @@ use core::ptr;
 use crate::ble::*;
 use crate::fmt::{panic, *};
 use crate::raw;
-use crate::util::{get_union_field, BoundedLifetime};
+use crate::util::get_union_field;
 use crate::RawError;
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
@@ -41,15 +41,15 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             });
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE => {
-            let conn_params = gap_evt.params.conn_param_update.conn_params;
+            let _conn_params = gap_evt.params.conn_param_update.conn_params;
 
             debug!(
                 "on_conn_param_update conn_handle={:?} conn_sup_timeout={:?} max_conn_interval={:?} min_conn_interval={:?} slave_latency={:?}",
                 gap_evt.conn_handle,
-                conn_params.conn_sup_timeout,
-                conn_params.max_conn_interval,
-                conn_params.min_conn_interval,
-                conn_params.slave_latency,
+                _conn_params.conn_sup_timeout,
+                _conn_params.max_conn_interval,
+                _conn_params.min_conn_interval,
+                _conn_params.slave_latency,
             );
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => {
@@ -92,32 +92,32 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 
             let ret = raw::sd_ble_gap_phy_update(conn_handle, &phys as *const raw::ble_gap_phys_t);
 
-            if let Err(err) = RawError::convert(ret) {
-                warn!("sd_ble_gap_phy_update err {:?}", err);
+            if let Err(_err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_phy_update err {:?}", _err);
             }
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_PHY_UPDATE => {
-            let phy_update = gap_evt.params.phy_update;
+            let _phy_update = gap_evt.params.phy_update;
 
             trace!(
                 "on_phy_update conn_handle={:?} status={:?} rx_phy={:?} tx_phy={:?}",
                 gap_evt.conn_handle,
-                phy_update.status,
-                phy_update.rx_phy,
-                phy_update.tx_phy
+                _phy_update.status,
+                _phy_update.rx_phy,
+                _phy_update.tx_phy
             );
         }
         #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST => {
-            let peer_params = gap_evt.params.data_length_update_request.peer_params;
+            let _peer_params = gap_evt.params.data_length_update_request.peer_params;
 
             trace!(
                 "on_data_length_update_request conn_handle={:?} max_rx_octets={:?} max_rx_time_us={:?} max_tx_octets={:?} max_tx_time_us={:?}",
                 gap_evt.conn_handle,
-                peer_params.max_rx_octets,
-                peer_params.max_rx_time_us,
-                peer_params.max_tx_octets,
-                peer_params.max_tx_time_us,
+                _peer_params.max_rx_octets,
+                _peer_params.max_rx_time_us,
+                _peer_params.max_tx_octets,
+                _peer_params.max_tx_time_us,
             );
 
             let conn_handle = gap_evt.conn_handle;
@@ -151,8 +151,8 @@ pub(crate) unsafe fn do_data_length_update(
 ) {
     let mut dl_limitation = mem::zeroed();
     let ret = raw::sd_ble_gap_data_length_update(conn_handle, params, &mut dl_limitation);
-    if let Err(err) = RawError::convert(ret) {
-        warn!("sd_ble_gap_data_length_update err {:?}", err);
+    if let Err(_err) = RawError::convert(ret) {
+        warn!("sd_ble_gap_data_length_update err {:?}", _err);
 
         if dl_limitation.tx_payload_limited_octets != 0
             || dl_limitation.rx_payload_limited_octets != 0

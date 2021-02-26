@@ -5,7 +5,7 @@ use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
-use crate::fmt::{assert, assert_ne, panic, unreachable, *};
+use crate::fmt::{assert, assert_ne, panic, unreachable};
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;
@@ -282,7 +282,7 @@ async fn discover_inner<T: Client>(
         let descs = {
             match discover_descriptors(conn, start_handle, end_handle).await {
                 Ok(descs) => descs,
-                Err(DiscoverError::Gatt(AtterrAttributeNotFound)) => Vec::new(),
+                Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => Vec::new(),
                 Err(err) => return Err(err),
             }
         };

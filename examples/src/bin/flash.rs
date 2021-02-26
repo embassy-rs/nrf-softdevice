@@ -8,7 +8,7 @@ mod example_common;
 use example_common::*;
 
 use cortex_m_rt::entry;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::{task, Executor};
 use embassy::flash::Flash as _;
 use embassy::util::Forever;
@@ -39,7 +39,7 @@ async fn flash_task(sd: &'static Softdevice) {
 fn main() -> ! {
     info!("Hello World!");
 
-    let (sdp, p) = take_peripherals();
+    let (sdp, _p) = take_peripherals();
     let sd = Softdevice::enable(sdp, &Default::default());
 
     let executor = EXECUTOR.put(Executor::new());

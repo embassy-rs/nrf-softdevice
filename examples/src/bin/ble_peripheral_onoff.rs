@@ -18,8 +18,8 @@ use embassy_nrf::interrupt;
 use futures::pin_mut;
 use nrf52840_hal::gpio;
 
-use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
-use nrf_softdevice::{pac, raw, RawError, Softdevice};
+use nrf_softdevice::ble::{gatt_server, peripheral};
+use nrf_softdevice::{pac, raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
