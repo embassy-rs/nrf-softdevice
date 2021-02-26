@@ -66,6 +66,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 const APP: () = {
     struct Resources {
         timer: Timer<TIMER1, Periodic>,
+        sd_peripherals: Option<nrf_softdevice::Peripherals>,
     }
 
     #[init()]
@@ -77,11 +78,36 @@ const APP: () = {
         let mut timer = timer.into_periodic();
         timer.start(1_000_000u32); // 1Mhz, so once per second
 
-        init::LateResources { timer }
+        let sd_peripherals = nrf_softdevice::Peripherals {
+            AAR: cx.device.AAR,
+            ACL: cx.device.ACL,
+            CCM: cx.device.CCM,
+            CLOCK: cx.device.CLOCK,
+            ECB: cx.device.ECB,
+            EGU1: cx.device.EGU1,
+            EGU2: cx.device.EGU2,
+            EGU5: cx.device.EGU5,
+            MWU: cx.device.MWU,
+            NVMC: cx.device.NVMC,
+            POWER: cx.device.POWER,
+            RADIO: cx.device.RADIO,
+            RNG: cx.device.RNG,
+            RTC0: cx.device.RTC0,
+            SWI1: cx.device.SWI1,
+            SWI2: cx.device.SWI2,
+            SWI5: cx.device.SWI5,
+            TEMP: cx.device.TEMP,
+            TIMER0: cx.device.TIMER0,
+        };
+
+        init::LateResources {
+            timer,
+            sd_peripherals: Some(sd_peripherals),
+        }
     }
 
-    #[idle]
-    fn idle(_: idle::Context) -> ! {
+    #[idle(resources=[sd_peripherals])]
+    fn idle(cx: idle::Context) -> ! {
         let config = nrf_softdevice::Config {
             clock: Some(raw::nrf_clock_lf_cfg_t {
                 source: raw::NRF_CLOCK_LF_SRC_XTAL as u8,
@@ -116,11 +142,10 @@ const APP: () = {
             ..Default::default()
         };
 
-        let (sdp, _p) = take_peripherals();
-
         // Softdevice enable must not be done in RTIC init
         // because RTIC runs init with interrupts disabled, and the
         // softdevice crashes if it's enabled with interrupts disabled.
+        let sdp = cx.resources.sd_peripherals.take().unwrap();
         let sd = Softdevice::enable(sdp, &config);
 
         let temp = unwrap!(temperature_celsius(&sd));
