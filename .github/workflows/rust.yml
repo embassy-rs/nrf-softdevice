@@ -31,7 +31,7 @@ jobs:
         components: rustfmt
 
     - name: Build
-      run: ./test-build.sh
+      run: ./ci.sh
 
     - name: Format
       run: cargo fmt --verbose

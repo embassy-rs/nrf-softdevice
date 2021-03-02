@@ -10,9 +10,10 @@ use example_common::*;
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy::executor::{task, Executor};
-use embassy::flash::Flash as _;
+use embassy::traits::flash::Flash as _;
 use embassy::util::Forever;
 
+use futures::pin_mut;
 use nrf_softdevice::{Flash, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -25,13 +26,14 @@ async fn softdevice_task(sd: &'static Softdevice) {
 #[task]
 async fn flash_task(sd: &'static Softdevice) {
     let mut f = Flash::take(sd);
+    pin_mut!(f);
 
     info!("starting erase");
-    unwrap!(f.erase(0x80000).await);
+    unwrap!(f.as_mut().erase(0x80000).await);
     info!("erased!");
 
     info!("starting write");
-    unwrap!(f.write(0x80000, &[1, 2, 3, 4]).await);
+    unwrap!(f.as_mut().write(0x80000, &[1, 2, 3, 4]).await);
     info!("write done!");
 }
 

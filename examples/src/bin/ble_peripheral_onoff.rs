@@ -11,7 +11,7 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::{panic, *};
 use embassy::executor::{task, Executor};
-use embassy::gpio::WaitForLow;
+use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
 use embassy_nrf::gpiote::{Gpiote, GpiotePin};
 use embassy_nrf::interrupt;

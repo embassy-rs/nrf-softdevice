@@ -24,6 +24,7 @@ exclude = [
 embassy = { git = "https://github.com/akiles/embassy" }
 embassy-nrf = { git = "https://github.com/akiles/embassy" }
 embassy-macros = { git = "https://github.com/akiles/embassy" }
+embassy-traits = { git = "https://github.com/akiles/embassy" }
 
 [profile.dev]
 codegen-units = 1
