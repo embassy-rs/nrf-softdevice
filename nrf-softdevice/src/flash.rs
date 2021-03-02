@@ -1,7 +1,8 @@
 use core::future::Future;
 use core::marker::PhantomData;
+use core::pin::Pin;
 use core::sync::atomic::{AtomicBool, Ordering};
-use embassy::flash::Error as FlashError;
+use embassy::traits::flash::Error as FlashError;
 
 use crate::fmt::{panic, *};
 use crate::raw;
@@ -48,12 +49,16 @@ pub(crate) fn on_flash_error() {
     SIGNAL.signal(Err(FlashError::Failed))
 }
 
-impl embassy::flash::Flash for Flash {
+impl embassy::traits::flash::Flash for Flash {
     type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
     type WriteFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
     type ErasePageFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
 
-    fn read<'a>(&'a mut self, address: usize, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
+    fn read<'a>(
+        self: Pin<&'a mut Self>,
+        address: usize,
+        data: &'a mut [u8],
+    ) -> Self::ReadFuture<'a> {
         async move {
             // Reading is simple since SoC flash is memory-mapped :)
             // TODO check addr/len is in bounds.
@@ -66,7 +71,7 @@ impl embassy::flash::Flash for Flash {
         }
     }
 
-    fn write<'a>(&'a mut self, address: usize, data: &'a [u8]) -> Self::WriteFuture<'a> {
+    fn write<'a>(self: Pin<&'a mut Self>, address: usize, data: &'a [u8]) -> Self::WriteFuture<'a> {
         async move {
             let data_ptr = data.as_ptr();
             let data_len = data.len() as u32;
@@ -97,7 +102,7 @@ impl embassy::flash::Flash for Flash {
         }
     }
 
-    fn erase<'a>(&'a mut self, address: usize) -> Self::ErasePageFuture<'a> {
+    fn erase<'a>(self: Pin<&'a mut Self>, address: usize) -> Self::ErasePageFuture<'a> {
         async move {
             if address % Self::PAGE_SIZE != 0 {
                 return Err(FlashError::AddressMisaligned);
