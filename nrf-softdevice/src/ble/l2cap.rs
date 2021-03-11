@@ -52,6 +52,7 @@ impl From<RawError> for TxError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RxError {
     Disconnected,
+    AllocateFailed,
     Raw(RawError),
 }
 
@@ -327,7 +328,7 @@ impl<P: Packet> Channel<P> {
     pub async fn rx(&self) -> Result<P, RxError> {
         let conn_handle = self.conn.with_state(|s| s.check_connected())?;
 
-        let ptr = unwrap!(P::allocate());
+        let ptr = P::allocate().ok_or(RxError::AllocateFailed)?;
         let data = raw::ble_data_t {
             p_data: ptr.as_ptr(),
             len: P::MTU as u16,
