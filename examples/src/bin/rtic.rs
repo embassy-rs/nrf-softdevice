@@ -12,6 +12,8 @@
 #![no_main]
 #![no_std]
 #![feature(type_alias_impl_trait)]
+#![feature(min_type_alias_impl_trait)]
+#![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
 
 #[path = "../example_common.rs"]
