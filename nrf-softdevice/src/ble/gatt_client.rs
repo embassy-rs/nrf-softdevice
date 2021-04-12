@@ -407,6 +407,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WriteError {
     Disconnected,
+    Timeout,
     Gatt(GattError),
     Raw(RawError),
 }
@@ -460,6 +461,9 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
                         Err(e) => return Some(Err(e.into())),
                     };
                     Some(Ok(()))
+                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => {
+                    return Some(Err(WriteError::Timeout));
                 }
                 _ => None,
             }
