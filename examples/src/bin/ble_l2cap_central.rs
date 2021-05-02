@@ -90,7 +90,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
     for i in 0..10 {
         let mut v = Vec::with_capacity(Packet::MTU);
         v.extend(&[i; Packet::MTU]);
-        unwrap!(ch.tx(Packet(v)));
+        unwrap!(ch.tx(Packet(v)).await);
         info!("l2cap tx done");
     }
     futures::future::pending::<()>().await;
@@ -98,6 +98,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
 
 use alloc::vec::Vec;
 
+#[derive(defmt::Format)]
 struct Packet(Vec<u8>);
 impl l2cap::Packet for Packet {
     const MTU: usize = 512;
