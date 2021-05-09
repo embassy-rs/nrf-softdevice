@@ -28,7 +28,7 @@ impl<T: Send> Signal<T> {
 
     pub fn signal(&self, val: T) {
         unsafe {
-            crate::interrupt::raw_free(|| {
+            cortex_m::interrupt::free(|_| {
                 let state = &mut *self.state.get();
                 match mem::replace(state, State::Signaled(val)) {
                     State::Waiting(waker) => waker.wake(),
@@ -52,7 +52,7 @@ impl<'a, T: Send> Future for WaitFuture<'a, T> {
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<T> {
         unsafe {
-            crate::interrupt::raw_free(|| {
+            cortex_m::interrupt::free(|_| {
                 let state = &mut *self.signal.state.get();
                 match state {
                     State::None => {

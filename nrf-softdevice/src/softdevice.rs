@@ -4,7 +4,6 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::util::Forever;
 
 use crate::fmt::{panic, *};
-use crate::interrupt;
 use crate::pac;
 use crate::raw;
 use crate::RawError;
@@ -307,10 +306,12 @@ impl Softdevice {
             warn!("You're giving more RAM to the softdevice than needed. You can change your app's RAM start address to {:x}", wanted_app_ram_base);
         }
 
-        #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
-        interrupt::enable(interrupt::Interrupt::SWI2);
-        #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
-        interrupt::enable(interrupt::Interrupt::SWI2_EGU2);
+        unsafe {
+            #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
+            pac::NVIC::unmask(pac::interrupt::SWI2);
+            #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
+            pac::NVIC::unmask(pac::interrupt::SWI2_EGU2);
+        }
 
         let att_mtu = config
             .conn_gatt

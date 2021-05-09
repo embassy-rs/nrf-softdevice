@@ -133,7 +133,8 @@ pub use nrf_softdevice_s140 as raw;
 // This mod MUST go first, so that the others see its macros.
 pub(crate) mod fmt;
 
-pub mod interrupt;
+#[cfg(feature = "critical-section-impl")]
+mod critical_section_impl;
 
 mod events;
 pub use events::*;

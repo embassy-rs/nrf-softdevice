@@ -30,9 +30,12 @@ ble-l2cap = []
 ble-gatt-server = []
 ble-gatt-client = []
 
+critical-section-impl = ["critical-section/custom-impl"]
+
 [dependencies]
 defmt = { version = "0.2.0", optional = true }
 log = { version = "0.4.11", optional = true }
+critical-section = { version = "0.1.0" }
 
 num_enum = { version = "0.5.1", default-features = false }
 embassy = { version = "0.1.0" }
