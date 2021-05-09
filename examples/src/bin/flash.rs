@@ -4,30 +4,30 @@
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
+#![allow(incomplete_features)]
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy::executor::{task, Executor};
+use embassy::executor::Executor;
 use embassy::traits::flash::Flash as _;
 use embassy::util::Forever;
-
 use futures::pin_mut;
+
 use nrf_softdevice::{Flash, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[task]
+#[embassy::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[task]
+#[embassy::task]
 async fn flash_task(sd: &'static Softdevice) {
-    let mut f = Flash::take(sd);
+    let f = Flash::take(sd);
     pin_mut!(f);
 
     info!("starting erase");
@@ -43,8 +43,7 @@ async fn flash_task(sd: &'static Softdevice) {
 fn main() -> ! {
     info!("Hello World!");
 
-    let (sdp, _p) = take_peripherals();
-    let sd = Softdevice::enable(sdp, &Default::default());
+    let sd = Softdevice::enable(&Default::default());
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {

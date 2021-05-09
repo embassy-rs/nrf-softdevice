@@ -4,28 +4,28 @@
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
+#![allow(incomplete_features)]
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::{panic, *};
-use embassy::executor::{task, Executor};
+use embassy::executor::Executor;
 use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
-use embassy_nrf::gpiote::{Gpiote, GpiotePin};
+use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
+use embassy_nrf::gpiote::{self, PortInput};
 use embassy_nrf::interrupt;
 use futures::pin_mut;
-use nrf52840_hal::gpio;
 
 use nrf_softdevice::ble::{gatt_server, peripheral};
-use nrf_softdevice::{pac, raw, Softdevice};
+use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[task]
+#[embassy::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -76,18 +76,20 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
     }
 }
 
-#[task]
-async fn bluetooth_task(sd: &'static Softdevice, gpiote: pac::GPIOTE, p0: pac::P0) {
+#[embassy::task]
+async fn bluetooth_task(
+    sd: &'static Softdevice,
+    gpiote: gpiote::Initialized,
+    button1: AnyPin,
+    button2: AnyPin,
+) {
     let server: FooService = unwrap!(gatt_server::register(sd));
-
-    let port0 = gpio::p0::Parts::new(p0);
-    let (gpiote, _) = Gpiote::new(gpiote, interrupt::take!(GPIOTE));
 
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
 
-    let button1 = GpiotePin::new(gpiote, port0.p0_11.into_pullup_input().degrade());
-    let button2 = GpiotePin::new(gpiote, port0.p0_12.into_pullup_input().degrade());
+    let button1 = PortInput::new(gpiote, Input::new(button1, Pull::Up));
+    let button2 = PortInput::new(gpiote, Input::new(button2, Pull::Up));
     pin_mut!(button1);
     pin_mut!(button2);
     loop {
@@ -163,12 +165,14 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, p) = take_peripherals();
-    let sd = Softdevice::enable(sdp, &config);
+    let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {
+        let p = embassy_nrf::Peripherals::take().unwrap();
+        let g = gpiote::initialize(p.GPIOTE, interrupt::take!(GPIOTE));
+
         unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, p.GPIOTE, p.P0,)));
+        unwrap!(spawner.spawn(bluetooth_task(sd, g, p.P0_11.degrade(), p.P0_12.degrade())));
     });
 }
