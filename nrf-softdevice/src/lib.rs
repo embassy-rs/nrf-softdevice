@@ -4,7 +4,7 @@
 #![feature(type_alias_impl_trait)]
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
-#![feature(const_fn)]
+#![feature(const_fn_trait_bound)]
 #![feature(cell_update)]
 #![allow(incomplete_features)]
 
@@ -109,15 +109,15 @@ compile_error!("The selected softdevice does not support ble-peripheral.");
 compile_error!("The selected softdevice does not support ble-l2cap.");
 
 #[cfg(feature = "nrf52810")]
-pub use nrf52810_pac as pac;
+use nrf52810_pac as pac;
 #[cfg(feature = "nrf52811")]
-pub use nrf52811_pac as pac;
+use nrf52811_pac as pac;
 #[cfg(feature = "nrf52832")]
-pub use nrf52832_pac as pac;
+use nrf52832_pac as pac;
 #[cfg(feature = "nrf52833")]
-pub use nrf52833_pac as pac;
+use nrf52833_pac as pac;
 #[cfg(feature = "nrf52840")]
-pub use nrf52840_pac as pac;
+use nrf52840_pac as pac;
 
 #[cfg(feature = "s112")]
 pub use nrf_softdevice_s112 as raw;
@@ -133,7 +133,8 @@ pub use nrf_softdevice_s140 as raw;
 // This mod MUST go first, so that the others see its macros.
 pub(crate) mod fmt;
 
-pub mod interrupt;
+#[cfg(feature = "critical-section-impl")]
+mod critical_section_impl;
 
 mod events;
 pub use events::*;

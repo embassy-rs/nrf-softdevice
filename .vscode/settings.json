@@ -6,6 +6,7 @@
   "rust-analyzer.checkOnSave.allTargets": false,
   "rust-analyzer.cargo.loadOutDirsFromCheck": true,
   "rust-analyzer.procMacro.enable": true,
+  "rust-analyzer.assist.importMergeBehavior": "last",
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,

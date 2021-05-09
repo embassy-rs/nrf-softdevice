@@ -4,24 +4,24 @@
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
+#![allow(incomplete_features)]
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 use defmt::*;
+use embassy::executor::Executor;
+use embassy::util::Forever;
 
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
-use embassy::executor::{task, Executor};
-use embassy::util::Forever;
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[task]
+#[embassy::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -34,7 +34,7 @@ struct BatteryService {
     foo: u16,
 }
 
-#[task]
+#[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     let server: BatteryService = unwrap!(gatt_server::register(sd));
     #[rustfmt::skip]
@@ -127,8 +127,7 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, _p) = take_peripherals();
-    let sd = Softdevice::enable(sdp, &config);
+    let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {

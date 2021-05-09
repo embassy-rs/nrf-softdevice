@@ -16,7 +16,6 @@ use core::{
     ptr::NonNull,
     sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering},
 };
-use nrf_softdevice::interrupt;
 
 // TODO make configurable
 // NOTE use a power of 2 for best performance
@@ -36,7 +35,7 @@ static INTERRUPTS_TOKEN: AtomicU8 = AtomicU8::new(0);
 
 unsafe impl defmt::Logger for Logger {
     fn acquire() -> Option<NonNull<dyn defmt::Write>> {
-        let token = unsafe { interrupt::disable_all() };
+        let token = unsafe { critical_section::acquire() };
         if !TAKEN.load(Ordering::Relaxed) {
             // no need for CAS because interrupts are disabled
             TAKEN.store(true, Ordering::Relaxed);
@@ -45,14 +44,14 @@ unsafe impl defmt::Logger for Logger {
 
             Some(NonNull::from(&Logger as &dyn defmt::Write))
         } else {
-            unsafe { interrupt::enable_all(token) };
+            unsafe { critical_section::release(token) };
             None
         }
     }
 
     unsafe fn release(_: NonNull<dyn defmt::Write>) {
         TAKEN.store(false, Ordering::Relaxed);
-        interrupt::enable_all(INTERRUPTS_TOKEN.load(Ordering::Relaxed));
+        critical_section::release(INTERRUPTS_TOKEN.load(Ordering::Relaxed));
     }
 }
 

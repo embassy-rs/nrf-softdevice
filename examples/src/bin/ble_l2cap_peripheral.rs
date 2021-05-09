@@ -4,33 +4,33 @@
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
+#![allow(incomplete_features)]
 extern crate alloc;
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use core::mem;
 use core::ptr::NonNull;
 use cortex_m_rt::entry;
 use defmt::*;
+use embassy::executor::Executor;
+use embassy::util::Forever;
 
-use nrf_softdevice::ble;
 use nrf_softdevice::ble::{l2cap, peripheral};
+use nrf_softdevice::{ble, RawError};
 use nrf_softdevice::{raw, Softdevice};
 
-use embassy::executor::{task, Executor};
-use embassy::util::Forever;
 static EXECUTOR: Forever<Executor> = Forever::new();
 
 const PSM: u16 = 0x2349;
 
-#[task]
+#[embassy::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[task]
+#[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     info!("My address: {:?}", ble::get_address(sd));
 
@@ -147,8 +147,9 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, _p) = take_peripherals();
-    let sd = Softdevice::enable(sdp, &config);
+    unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
+
+    let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {

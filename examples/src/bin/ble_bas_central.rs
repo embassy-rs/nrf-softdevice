@@ -4,16 +4,16 @@
 #![feature(min_type_alias_impl_trait)]
 #![feature(impl_trait_in_bindings)]
 #![feature(alloc_error_handler)]
+#![allow(incomplete_features)]
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use core::mem;
 use cortex_m_rt::entry;
 use defmt::info;
 use defmt::*;
-use embassy::executor::{task, Executor};
+use embassy::executor::Executor;
 use embassy::util::Forever;
 
 use nrf_softdevice::ble::{central, gatt_client, Address, AddressType};
@@ -22,7 +22,7 @@ use nrf_softdevice::Softdevice;
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[task]
+#[embassy::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -33,7 +33,7 @@ struct BatteryServiceClient {
     battery_level: u8,
 }
 
-#[task]
+#[embassy::task]
 async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[&Address::new(
         AddressType::RandomStatic,
@@ -97,8 +97,7 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    let (sdp, _p) = take_peripherals();
-    let sd = Softdevice::enable(sdp, &config);
+    let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {

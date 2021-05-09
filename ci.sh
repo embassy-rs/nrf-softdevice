@@ -5,7 +5,7 @@ set -euxo pipefail
 # build examples
 #==================
 
-(cd examples; cargo build --target thumbv7em-none-eabihf --features cortex-m-rtic --bins)
+(cd examples; cargo build --target thumbv7em-none-eabihf --bins)
 
 
 # build with log/defmt combinations
