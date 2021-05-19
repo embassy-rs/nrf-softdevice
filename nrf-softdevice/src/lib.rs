@@ -146,8 +146,6 @@ pub mod ble;
 mod softdevice;
 pub use softdevice::*;
 
-pub use cortex_m_rt::interrupt;
-
 mod temperature;
 pub use temperature::temperature_celsius;
 

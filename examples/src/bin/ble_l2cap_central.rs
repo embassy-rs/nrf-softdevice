@@ -9,7 +9,6 @@ extern crate alloc;
 
 #[path = "../example_common.rs"]
 mod example_common;
-use example_common::*;
 
 use core::mem;
 use core::ptr::NonNull;

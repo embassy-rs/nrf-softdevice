@@ -62,6 +62,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "autocfg"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
+
+[[package]]
 name = "az"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -87,6 +93,12 @@ name = "bitfield"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46afbd2983a5d5a7bd740ccb198caf5b82f45c40c09c0eed36052d91cb92e719"
+
+[[package]]
+name = "bytemuck"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bed57e2090563b83ba8f83366628ce535a7584c9afa4c9fc0612a03925c6df58"
 
 [[package]]
 name = "byteorder"
@@ -160,6 +172,17 @@ name = "critical-section"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48fd3697912f8f8a86f317ab6a67fb3aa46dcf7e0d1028f78520480cee82f295"
+dependencies = [
+ "bare-metal 1.0.0",
+ "cfg-if",
+ "cortex-m 0.7.2",
+]
+
+[[package]]
+name = "critical-section"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84c1ce814a497d4fbc869a34a0da005fbd712d7034e4a48ee91e7f3c795a8b17"
 dependencies = [
  "bare-metal 1.0.0",
  "cfg-if",
@@ -243,11 +266,12 @@ dependencies = [
 [[package]]
 name = "embassy"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#632572d1cb29ab6badb87c74a95c120b4238f7c6"
+source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
 dependencies = [
  "atomic-polyfill",
  "cast",
  "cortex-m 0.7.2",
+ "critical-section 0.2.1",
  "defmt",
  "embassy-macros",
  "embassy-traits",
@@ -258,7 +282,7 @@ dependencies = [
 [[package]]
 name = "embassy-extras"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#632572d1cb29ab6badb87c74a95c120b4238f7c6"
+source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
 dependencies = [
  "cortex-m 0.7.2",
  "embassy",
@@ -268,7 +292,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#632572d1cb29ab6badb87c74a95c120b4238f7c6"
+source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -279,10 +303,11 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#632572d1cb29ab6badb87c74a95c120b4238f7c6"
+source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
 dependencies = [
  "cortex-m 0.7.2",
  "cortex-m-rt",
+ "critical-section 0.2.1",
  "defmt",
  "embassy",
  "embassy-extras",
@@ -296,7 +321,7 @@ dependencies = [
 [[package]]
 name = "embassy-traits"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#632572d1cb29ab6badb87c74a95c120b4238f7c6"
+source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
 dependencies = [
  "defmt",
  "embedded-hal",
@@ -323,11 +348,12 @@ dependencies = [
 
 [[package]]
 name = "fixed"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "699e185585f30812375dab120221f3451b063aeff29dadf6fd3a3ac2e30c8486"
+checksum = "c97cabfe1ce0db024d64e9f688469e80a8e2b36cb792b09ba33e1ee8d21d00ae"
 dependencies = [
  "az",
+ "bytemuck",
  "half",
  "typenum",
 ]
@@ -340,9 +366,9 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "futures"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9d5813545e459ad3ca1bff9915e9ad7f1a47dc6a91b627ce321d5863b7dd253"
+checksum = "0e7e43a803dae2fa37c1f6a8fe121e1f7bf9548b4dfc0522a42f34145dadfc27"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -354,9 +380,9 @@ dependencies = [
 
 [[package]]
 name = "futures-channel"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce79c6a52a299137a6013061e0cf0e688fce5d7f1bc60125f520912fdb29ec25"
+checksum = "e682a68b29a882df0545c143dc3646daefe80ba479bcdede94d5a703de2871e2"
 dependencies = [
  "futures-core",
  "futures-sink",
@@ -364,34 +390,35 @@ dependencies = [
 
 [[package]]
 name = "futures-core"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "098cd1c6dda6ca01650f1a37a794245eb73181d0d4d4e955e2f3c37db7af1815"
+checksum = "0402f765d8a89a26043b889b26ce3c4679d268fa6bb22cd7c6aad98340e179d1"
 
 [[package]]
 name = "futures-io"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "365a1a1fb30ea1c03a830fdb2158f5236833ac81fa0ad12fe35b29cddc35cb04"
+checksum = "acc499defb3b348f8d8f3f66415835a9131856ff7714bf10dadfc4ec4bdb29a1"
 
 [[package]]
 name = "futures-sink"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c5629433c555de3d82861a7a4e3794a4c40040390907cfbfd7143a92a426c23"
+checksum = "a57bead0ceff0d6dde8f465ecd96c9338121bb7717d3e7b108059531870c4282"
 
 [[package]]
 name = "futures-task"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba7aa51095076f3ba6d9a1f702f74bd05ec65f555d70d2033d55ba8d69f581bc"
+checksum = "8a16bef9fc1a4dddb5bee51c989e3fbba26569cbb0e31f5b303c184e3dd33dae"
 
 [[package]]
 name = "futures-util"
-version = "0.3.14"
+version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c144ad54d60f23927f0a6b6d816e4271278b64f005ad65e4e35291d2de9c025"
+checksum = "feb5c238d27e2bf94ffdfd27b2c29e3df4a68c4193bb6427384259e2bf191967"
 dependencies = [
+ "autocfg",
  "futures-core",
  "futures-sink",
  "futures-task",
@@ -508,7 +535,7 @@ version = "0.1.0"
 dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "critical-section",
+ "critical-section 0.1.0",
  "defmt",
  "embassy",
  "fixed",
@@ -533,7 +560,7 @@ name = "nrf-softdevice-defmt-rtt"
 version = "0.1.0"
 dependencies = [
  "cortex-m 0.6.7",
- "critical-section",
+ "critical-section 0.1.0",
  "defmt",
  "nrf-softdevice",
 ]
