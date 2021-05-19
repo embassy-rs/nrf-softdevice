@@ -11,13 +11,12 @@ mod example_common;
 
 use core::mem;
 use cortex_m_rt::entry;
-use defmt::{panic, *};
+use defmt::*;
 use embassy::executor::Executor;
 use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
-use embassy_nrf::gpiote::{self, PortInput};
-use embassy_nrf::interrupt;
+use embassy_nrf::gpiote::PortInput;
 use futures::pin_mut;
 
 use nrf_softdevice::ble::{gatt_server, peripheral};
@@ -77,19 +76,14 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 }
 
 #[embassy::task]
-async fn bluetooth_task(
-    sd: &'static Softdevice,
-    gpiote: gpiote::Initialized,
-    button1: AnyPin,
-    button2: AnyPin,
-) {
+async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPin) {
     let server: FooService = unwrap!(gatt_server::register(sd));
 
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
 
-    let button1 = PortInput::new(gpiote, Input::new(button1, Pull::Up));
-    let button2 = PortInput::new(gpiote, Input::new(button2, Pull::Up));
+    let button1 = PortInput::new(Input::new(button1, Pull::Up));
+    let button2 = PortInput::new(Input::new(button2, Pull::Up));
     pin_mut!(button1);
     pin_mut!(button2);
     loop {
@@ -131,6 +125,8 @@ async fn bluetooth_task(
 fn main() -> ! {
     info!("Hello World!");
 
+    let p = embassy_nrf::init(embassy_nrf::config::Config::default());
+
     let config = nrf_softdevice::Config {
         clock: Some(raw::nrf_clock_lf_cfg_t {
             source: raw::NRF_CLOCK_LF_SRC_XTAL as u8,
@@ -169,10 +165,7 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {
-        let p = embassy_nrf::Peripherals::take().unwrap();
-        let g = gpiote::initialize(p.GPIOTE, interrupt::take!(GPIOTE));
-
         unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, g, p.P0_11.degrade(), p.P0_12.degrade())));
+        unwrap!(spawner.spawn(bluetooth_task(sd, p.P0_11.degrade(), p.P0_12.degrade())));
     });
 }
