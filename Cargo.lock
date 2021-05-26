@@ -148,9 +148,9 @@ dependencies = [
 
 [[package]]
 name = "cortex-m-rt"
-version = "0.6.13"
+version = "0.6.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "980c9d0233a909f355ed297ef122f257942de5e0a2cb1c39f60684b65bcb90fb"
+checksum = "b6d8353767db816419630a76d5f1ad5b09610d22b67ceb59647df6a8abc667f8"
 dependencies = [
  "cortex-m-rt-macros",
  "r0",
@@ -165,17 +165,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "critical-section"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48fd3697912f8f8a86f317ab6a67fb3aa46dcf7e0d1028f78520480cee82f295"
-dependencies = [
- "bare-metal 1.0.0",
- "cfg-if",
- "cortex-m 0.7.2",
 ]
 
 [[package]]
@@ -226,9 +215,9 @@ dependencies = [
 
 [[package]]
 name = "defmt"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "735ffd58278b045498da4ca9c5057a52faa6e18472cd63568b059ae592ca7602"
+checksum = "7aba21ce228b4769b8b5b6d2e2ee28c5dcfbe60c46f76b63d88b3a6677c8dc5b"
 dependencies = [
  "defmt-macros",
  "semver 0.11.0",
@@ -236,9 +225,9 @@ dependencies = [
 
 [[package]]
 name = "defmt-macros"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d35887971a66a572654b37f2dd6a82e17a9dadf65935402fc910cf422955e994"
+checksum = "0fec88b1676137530f3d2e89e7ba3c4b1eb9eac49f4133752a309adf8d4f5c3b"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -248,9 +237,9 @@ dependencies = [
 
 [[package]]
 name = "defmt-parser"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c816f778ec2147f95990a606795fe9dcc82781bcd98e222675c4103c2d250ea1"
+checksum = "fc63e313e87db4666440753288012024f117065b52e9b9f4d0d869e9fada6404"
 
 [[package]]
 name = "derivative"
@@ -266,12 +255,12 @@ dependencies = [
 [[package]]
 name = "embassy"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
+source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
 dependencies = [
  "atomic-polyfill",
  "cast",
  "cortex-m 0.7.2",
- "critical-section 0.2.1",
+ "critical-section",
  "defmt",
  "embassy-macros",
  "embassy-traits",
@@ -282,7 +271,7 @@ dependencies = [
 [[package]]
 name = "embassy-extras"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
+source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
 dependencies = [
  "cortex-m 0.7.2",
  "embassy",
@@ -292,7 +281,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
+source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -303,11 +292,11 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
+source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
 dependencies = [
  "cortex-m 0.7.2",
  "cortex-m-rt",
- "critical-section 0.2.1",
+ "critical-section",
  "defmt",
  "embassy",
  "embassy-extras",
@@ -321,7 +310,7 @@ dependencies = [
 [[package]]
 name = "embassy-traits"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#211fdb6e84462a84a79dc758301839659ef4a7c3"
+source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
 dependencies = [
  "defmt",
  "embedded-hal",
@@ -535,7 +524,7 @@ version = "0.1.0"
 dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
- "critical-section 0.1.0",
+ "critical-section",
  "defmt",
  "embassy",
  "fixed",
@@ -560,7 +549,7 @@ name = "nrf-softdevice-defmt-rtt"
 version = "0.1.0"
 dependencies = [
  "cortex-m 0.6.7",
- "critical-section 0.1.0",
+ "critical-section",
  "defmt",
  "nrf-softdevice",
 ]
@@ -755,9 +744,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.26"
+version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a152013215dca273577e18d2bf00fa862b89b24169fb78c4c95aeb07992c9cec"
+checksum = "f0d8caf72986c1a598726adc988bb5984792ef84f5ee5aa50209145ee8077038"
 dependencies = [
  "unicode-xid",
 ]
