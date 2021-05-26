@@ -17,6 +17,7 @@ use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
 use embassy_nrf::gpiote::PortInput;
+use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 
 use nrf_softdevice::ble::{gatt_server, peripheral};
@@ -125,7 +126,9 @@ async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPi
 fn main() -> ! {
     info!("Hello World!");
 
-    let p = embassy_nrf::init(embassy_nrf::config::Config::default());
+    let mut config = embassy_nrf::config::Config::default();
+    config.gpiote_interrupt_priority = Priority::P2;
+    let p = embassy_nrf::init(config);
 
     let config = nrf_softdevice::Config {
         clock: Some(raw::nrf_clock_lf_cfg_t {
