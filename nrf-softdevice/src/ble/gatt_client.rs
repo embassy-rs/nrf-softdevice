@@ -1,6 +1,5 @@
 //! Generic Attribute client. GATT clients consume functionality offered by GATT servers.
 
-use heapless::consts::*;
 use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
@@ -120,8 +119,8 @@ impl From<RawError> for DiscoverError {
     }
 }
 
-type DiscCharsMax = U6;
-type DiscDescsMax = U6;
+const DISC_CHARS_MAX: usize = 6;
+const DISC_DESCS_MAX: usize = 6;
 
 pub(crate) async fn discover_service(
     conn: &Connection,
@@ -170,7 +169,7 @@ async fn discover_characteristics(
     conn: &Connection,
     start_handle: u16,
     end_handle: u16,
-) -> Result<Vec<raw::ble_gattc_char_t, DiscCharsMax>, DiscoverError> {
+) -> Result<Vec<raw::ble_gattc_char_t, DISC_CHARS_MAX>, DiscoverError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe {
@@ -214,7 +213,7 @@ async fn discover_descriptors(
     conn: &Connection,
     start_handle: u16,
     end_handle: u16,
-) -> Result<Vec<raw::ble_gattc_desc_t, DiscDescsMax>, DiscoverError> {
+) -> Result<Vec<raw::ble_gattc_desc_t, DISC_DESCS_MAX>, DiscoverError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let ret = unsafe {
@@ -275,7 +274,7 @@ async fn discover_inner<T: Client>(
         props: curr.char_props,
     };
 
-    let mut descriptors: Vec<Descriptor, DiscDescsMax> = Vec::new();
+    let mut descriptors: Vec<Descriptor, DISC_DESCS_MAX> = Vec::new();
 
     // Only if range is non-empty, discover. (if it's empty there must be no descriptors)
     if start_handle <= end_handle {

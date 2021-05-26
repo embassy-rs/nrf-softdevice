@@ -451,21 +451,20 @@ checksum = "62aca2aba2d62b4a7f5b33f3712cb1b0692779a56fb510499d5c0aa594daeaf3"
 
 [[package]]
 name = "hash32"
-version = "0.1.1"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4041af86e63ac4298ce40e5cca669066e75b6f1aa3390fe2561ffa5e1d9f4cc"
+checksum = "b0c35f58762feb77d74ebe43bdbc3210f09be9fe6742234d573bacc26ed92b67"
 dependencies = [
  "byteorder",
 ]
 
 [[package]]
 name = "heapless"
-version = "0.5.6"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74911a68a1658cfcfb61bc0ccfbd536e3b6e906f8c2f7883ee50157e3e2184f1"
+checksum = "c7ee8a997d259962217f40279f34201fdf06e669bafa69d7c1f4c7ff1893b5f6"
 dependencies = [
- "as-slice",
- "generic-array 0.13.3",
+ "atomic-polyfill",
  "hash32",
  "stable_deref_trait",
 ]
@@ -522,7 +521,7 @@ checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
 name = "nrf-softdevice"
 version = "0.1.0"
 dependencies = [
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "critical-section",
  "defmt",
@@ -559,7 +558,7 @@ name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
  "alloc-cortex-m",
- "cortex-m 0.6.7",
+ "cortex-m 0.7.2",
  "cortex-m-rt",
  "defmt",
  "embassy",
@@ -693,12 +692,13 @@ dependencies = [
 
 [[package]]
 name = "panic-probe"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0de06adf67ed4f46572b31ac5340b8137f8a37d5e89fd68101d92767c9feb5f0"
+checksum = "45b5c81d6b51f415b3ba40b30dc598dfffb29ad4cf4a8815989754850ce6c0dc"
 dependencies = [
  "cortex-m 0.6.7",
  "cortex-m-rt",
+ "defmt",
 ]
 
 [[package]]

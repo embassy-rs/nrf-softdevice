@@ -39,9 +39,9 @@ critical-section = { version = "0.2.1" }
 
 num_enum = { version = "0.5.1", default-features = false }
 embassy = { version = "0.1.0" }
-cortex-m = "0.6.4"
+cortex-m = "0.7.2"
 cortex-m-rt = "0.6.13"
-heapless = "0.5.6"
+heapless = "0.7.1"
 fixed = "1.5.0"
 
 nrf52810-pac  = { version = "0.9.0", features = ["rt"], optional = true }
