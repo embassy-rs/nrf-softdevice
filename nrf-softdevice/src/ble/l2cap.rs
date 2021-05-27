@@ -378,10 +378,12 @@ impl<P: Packet> Channel<P> {
         }
 
         portal(conn_handle)
-            .wait_once(|ble_evt| unsafe {
+            .wait_many(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
-                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => Err(RxError::Disconnected),
-                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => Err(RxError::Disconnected),
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => Some(Err(RxError::Disconnected)),
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => {
+                        Some(Err(RxError::Disconnected))
+                    }
                     raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => {
                         let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
                         let evt = &l2cap_evt.params.rx;
@@ -389,9 +391,9 @@ impl<P: Packet> Channel<P> {
                         let ptr = unwrap!(NonNull::new(evt.sdu_buf.p_data));
                         let len = evt.sdu_len;
                         let pkt = Packet::from_raw_parts(ptr, len as usize);
-                        Ok(pkt)
+                        Some(Ok(pkt))
                     }
-                    _ => unreachable!(),
+                    _ => None,
                 }
             })
             .await
