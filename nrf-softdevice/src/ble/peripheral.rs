@@ -84,8 +84,8 @@ pub enum NonconnectableAdvertisement {
 }
 
 /// Error for [`advertise_start`]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug)]
 pub enum AdvertiseError {
     Timeout,
     NoFreeConn,

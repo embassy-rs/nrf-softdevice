@@ -13,6 +13,7 @@ use crate::raw;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{RawError, Softdevice};
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConnectError {
     Timeout,
@@ -129,6 +130,7 @@ impl<'a> Default for ConnectConfig<'a> {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ScanError {
     Timeout,
