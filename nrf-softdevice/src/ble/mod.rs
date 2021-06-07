@@ -28,7 +28,6 @@ pub mod l2cap;
 
 use core::mem;
 
-use crate::fmt::*;
 use crate::{raw, RawError, Softdevice};
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {

@@ -3,7 +3,6 @@ use core::cell::UnsafeCell;
 
 use crate::ble::types::*;
 use crate::ble::*;
-use crate::fmt::{assert, *};
 use crate::raw;
 use crate::RawError;
 

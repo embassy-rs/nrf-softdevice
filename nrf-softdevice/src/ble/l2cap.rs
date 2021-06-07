@@ -7,7 +7,6 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use core::u16;
 
 use crate::ble::*;
-use crate::fmt::{assert, panic, unreachable, *};
 use crate::raw;
 use crate::util::{get_union_field, Portal};
 use crate::{RawError, Softdevice};

@@ -9,7 +9,6 @@ use core::ptr;
 use crate::ble::gap;
 use crate::ble::types::*;
 use crate::ble::{Address, Connection};
-use crate::fmt::{assert, unreachable, *};
 use crate::raw;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{RawError, Softdevice};

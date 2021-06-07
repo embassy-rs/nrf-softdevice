@@ -4,7 +4,6 @@ use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
-use crate::fmt::{assert, assert_ne, panic, unreachable};
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;

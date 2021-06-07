@@ -2,7 +2,6 @@ use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::fmt::{panic, *};
 use crate::pac::interrupt;
 use crate::raw;
 use crate::util::Signal;

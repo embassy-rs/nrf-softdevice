@@ -2,7 +2,6 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
-use crate::fmt::{panic, *};
 use crate::raw;
 use crate::util::get_union_field;
 use crate::RawError;

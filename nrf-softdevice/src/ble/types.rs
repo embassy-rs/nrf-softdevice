@@ -1,6 +1,5 @@
 use core::mem;
 
-use crate::fmt::panic;
 use crate::raw;
 use crate::RawError;
 

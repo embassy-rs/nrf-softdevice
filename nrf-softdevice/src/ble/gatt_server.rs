@@ -6,7 +6,6 @@
 use core::mem;
 
 use crate::ble::*;
-use crate::fmt::{panic, *};
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, BoundedLifetime, Portal};
 use crate::RawError;
