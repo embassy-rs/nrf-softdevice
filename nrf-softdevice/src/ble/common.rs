@@ -1,4 +1,3 @@
-use crate::fmt::*;
 use crate::raw;
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {

@@ -6,7 +6,6 @@
 use core::mem;
 
 use crate::ble::*;
-use crate::fmt::{panic, *};
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, BoundedLifetime, Portal};
 use crate::RawError;
@@ -40,8 +39,8 @@ pub trait Server: Sized {
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug)]
 pub enum RegisterError {
     Raw(RawError),
 }
@@ -121,6 +120,7 @@ pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
     })
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RunError {
     Disconnected,
@@ -173,6 +173,7 @@ where
         .await
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum GetValueError {
     Truncated,
@@ -203,6 +204,7 @@ pub fn get_value(_sd: &Softdevice, handle: u16, buf: &mut [u8]) -> Result<usize,
     Ok(value.len as _)
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetValueError {
     Truncated,
@@ -229,6 +231,7 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
     Ok(())
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum NotifyValueError {
     Disconnected,

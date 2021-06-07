@@ -6,7 +6,7 @@ use crate::raw;
 #[rustfmt::skip]
 #[repr(u32)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug, IntoPrimitive, FromPrimitive)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, FromPrimitive)]
 pub enum RawError {
     /// This is not really an error, but is added here anyway, just in case someone mistakenly converts NRF_SUCCESS into RawError.
     Success = raw::NRF_SUCCESS,

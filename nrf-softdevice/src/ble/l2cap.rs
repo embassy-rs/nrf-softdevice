@@ -7,7 +7,6 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use core::u16;
 
 use crate::ble::*;
-use crate::fmt::{assert, panic, unreachable, *};
 use crate::raw;
 use crate::util::{get_union_field, Portal};
 use crate::{RawError, Softdevice};
@@ -33,6 +32,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     };
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TxError<P: Packet> {
     Disconnected,
@@ -51,6 +51,7 @@ impl<P: Packet> From<RawError> for TxError<P> {
         TxError::Raw(err)
     }
 }
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum RxError {
     Disconnected,
@@ -70,6 +71,7 @@ impl From<RawError> for RxError {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetupError {
     Disconnected,

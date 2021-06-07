@@ -4,7 +4,6 @@ use core::mem;
 use core::ptr;
 
 use crate::ble::*;
-use crate::fmt::{assert, unreachable, *};
 use crate::raw;
 use crate::util::get_union_field;
 use crate::util::{OnDrop, Portal};
@@ -85,8 +84,8 @@ pub enum NonconnectableAdvertisement {
 }
 
 /// Error for [`advertise_start`]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug)]
 pub enum AdvertiseError {
     Timeout,
     NoFreeConn,

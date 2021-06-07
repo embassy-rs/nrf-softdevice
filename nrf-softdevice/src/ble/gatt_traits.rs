@@ -2,8 +2,6 @@ use core::mem;
 use core::slice;
 use heapless::Vec;
 
-use crate::fmt::panic;
-
 pub enum FromGattError {
     InvalidLength,
 }

@@ -1,7 +1,5 @@
 use core::mem;
 
-use crate::fmt::panic;
-
 pub struct DropBomb {
     _private: (),
 }

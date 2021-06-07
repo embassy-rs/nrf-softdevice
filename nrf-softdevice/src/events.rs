@@ -2,7 +2,6 @@ use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::fmt::{panic, *};
 use crate::pac::interrupt;
 use crate::raw;
 use crate::util::Signal;
@@ -12,7 +11,7 @@ static SWI2_SIGNAL: Signal<()> = Signal::new();
 
 #[rustfmt::skip]
 #[repr(u32)]
-#[derive(IntoPrimitive, TryFromPrimitive, Debug)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 enum SocEvent {
     Hfclkstarted = raw::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,

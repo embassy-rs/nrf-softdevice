@@ -1,6 +1,5 @@
 use core::mem;
 
-use crate::fmt::panic;
 use crate::raw;
 use crate::RawError;
 
@@ -64,8 +63,8 @@ impl PartialEq for Uuid {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Role {
     #[cfg(feature = "ble-central")]
     Central,
@@ -86,8 +85,8 @@ impl Role {
 }
 
 #[repr(u8)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum AddressType {
     /// Public (identity) address
     Public = 0x00,

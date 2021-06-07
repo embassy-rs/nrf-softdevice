@@ -3,15 +3,16 @@ use core::cell::UnsafeCell;
 
 use crate::ble::types::*;
 use crate::ble::*;
-use crate::fmt::{assert, *};
 use crate::raw;
 use crate::RawError;
 
 const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub(crate) struct OutOfConnsError;
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct DisconnectedError;
 

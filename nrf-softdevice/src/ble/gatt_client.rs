@@ -4,7 +4,6 @@ use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
-use crate::fmt::{assert, assert_ne, panic, unreachable};
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;
@@ -54,7 +53,7 @@ pub trait Client {
 #[rustfmt::skip]
 #[repr(u32)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(IntoPrimitive, FromPrimitive)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, FromPrimitive)]
 pub enum GattError {
     // This is not really an error, but IMO it's better to add it
     // anyway, just in case someone mistakenly converts BLE_GATT_STATUS_SUCCESS into GattError.
@@ -89,6 +88,7 @@ pub enum GattError {
 }
 
 /// Error type for [`discover`]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DiscoverError {
     /// Connection is disconnected.
@@ -341,6 +341,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     Ok(client)
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ReadError {
     Disconnected,
@@ -403,6 +404,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
         .await
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WriteError {
     Disconnected,
@@ -509,6 +511,7 @@ pub async fn write_without_response(
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TryWriteError {
     Disconnected,
@@ -575,6 +578,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     portal(gattc_evt.conn_handle).call(ble_evt);
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum MtuExchangeError {
     /// Connection is disconnected.
