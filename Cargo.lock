@@ -27,17 +27,7 @@ version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a785a543aea40f5e4e2e93bb2655d31bc21bb391fff65697150973e383f16bb"
 dependencies = [
- "as-slice",
-]
-
-[[package]]
-name = "alloc-cortex-m"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5069e21ec61f3b243a4a4c56d920d3206e6ee86022a67c23e9fe36eb60fc1efd"
-dependencies = [
- "cortex-m 0.7.4",
- "linked_list_allocator",
+ "as-slice 0.1.5",
 ]
 
 [[package]]
@@ -53,12 +43,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "as-slice"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "516b6b4f0e40d50dcda9365d53964ec74560ad4284da2e7fc97122cd83174516"
+dependencies = [
+ "stable_deref_trait",
+]
+
+[[package]]
 name = "atomic-polyfill"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e14bf7b4f565e5e717d7a7a65b2a05c0b8c96e4db636d6f780f03b15108cdd1b"
 dependencies = [
  "critical-section",
+]
+
+[[package]]
+name = "atomic-pool"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b407ed6d721feca5f9432fcd24dec6857debbc8f5d86a75538d871ee85b8b1f"
+dependencies = [
+ "as-slice 0.1.5",
+ "as-slice 0.2.1",
+ "atomic-polyfill",
+ "stable_deref_trait",
 ]
 
 [[package]]
@@ -281,9 +292,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0db23d29972d99baa3de2ee2ae3f104c10564a6d05a346eb3f4c4f2c0525a06e"
 
 [[package]]
+name = "defmt-rtt"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d2cbbbd58847d508d97629b32cd9730a2d28532f71e219714614406029f18b1"
+dependencies = [
+ "critical-section",
+ "defmt",
+]
+
+[[package]]
 name = "embassy"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#604051777419591cf66f5d06196cf16d3e399752"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "atomic-polyfill",
  "cfg-if",
@@ -299,9 +320,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "embassy-cortex-m"
+version = "0.1.0"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
+dependencies = [
+ "atomic-polyfill",
+ "cfg-if",
+ "cortex-m 0.7.4",
+ "critical-section",
+ "embassy",
+ "embassy-hal-common",
+ "embassy-macros",
+]
+
+[[package]]
+name = "embassy-embedded-hal"
+version = "0.1.0"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
+dependencies = [
+ "embassy",
+ "embedded-hal 0.2.7",
+ "embedded-hal 1.0.0-alpha.8",
+ "embedded-hal-async",
+ "embedded-storage",
+ "embedded-storage-async",
+ "nb 1.0.0",
+]
+
+[[package]]
 name = "embassy-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#604051777419591cf66f5d06196cf16d3e399752"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "cortex-m 0.7.4",
  "embassy",
@@ -311,7 +360,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#604051777419591cf66f5d06196cf16d3e399752"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "darling 0.13.4",
  "proc-macro2",
@@ -322,7 +371,7 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#604051777419591cf66f5d06196cf16d3e399752"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "cfg-if",
  "cortex-m 0.7.4",
@@ -330,10 +379,11 @@ dependencies = [
  "critical-section",
  "defmt",
  "embassy",
+ "embassy-cortex-m",
+ "embassy-embedded-hal",
  "embassy-hal-common",
  "embassy-macros",
  "embassy-usb",
- "embedded-dma",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0-alpha.8",
  "embedded-hal-async",
@@ -349,20 +399,11 @@ dependencies = [
 [[package]]
 name = "embassy-usb"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#604051777419591cf66f5d06196cf16d3e399752"
+source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "defmt",
  "embassy",
  "heapless",
-]
-
-[[package]]
-name = "embedded-dma"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46c8c02e4347a0267ca60813c952017f4c5948c232474c6010a381a337f1bda4"
-dependencies = [
- "stable_deref_trait",
 ]
 
 [[package]]
@@ -386,21 +427,20 @@ dependencies = [
 
 [[package]]
 name = "embedded-hal-async"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9f684248ddba6d9f33c40386e7d8954ec13ad3c49705af3264cf995cce5abd"
+checksum = "022249738afde9b2b755a28a367ae20c9367e8e9c24b9aaf60bcc9255a255ec5"
 dependencies = [
  "embedded-hal 1.0.0-alpha.8",
 ]
 
 [[package]]
 name = "embedded-io"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fe1572ca75ff2cbb520a8b0b5a9eb589073524748c82e457adb34c6cf0e6af4"
+checksum = "36673b79844ff4ec0e3f00aeca0b2cfff564ff6739ab9801d13f45a8ec6cc1c7"
 dependencies = [
  "defmt",
- "futures",
 ]
 
 [[package]]
@@ -566,12 +606,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
-name = "linked_list_allocator"
-version = "0.8.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "822add9edb1860698b79522510da17bef885171f75aa395cff099d770c609c24"
-
-[[package]]
 name = "lock_api"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -656,10 +690,11 @@ dependencies = [
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
- "alloc-cortex-m",
+ "atomic-pool",
  "cortex-m 0.7.4",
  "cortex-m-rt",
  "defmt",
+ "defmt-rtt",
  "embassy",
  "embassy-nrf",
  "embedded-storage",
@@ -668,7 +703,6 @@ dependencies = [
  "futures",
  "heapless",
  "nrf-softdevice",
- "nrf-softdevice-defmt-rtt",
  "nrf-softdevice-s140",
  "panic-probe",
 ]

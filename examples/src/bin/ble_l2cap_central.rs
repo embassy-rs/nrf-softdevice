@@ -1,9 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(type_alias_impl_trait)]
-#![feature(alloc_error_handler)]
 #![allow(incomplete_features)]
-extern crate alloc;
 
 #[path = "../example_common.rs"]
 mod example_common;
@@ -82,39 +80,63 @@ async fn ble_central_task(sd: &'static Softdevice) {
     info!("l2cap connected");
 
     for i in 0..10 {
-        let mut v = Vec::with_capacity(Packet::MTU);
-        v.extend(&[i; Packet::MTU]);
-        unwrap!(ch.tx(Packet(v)).await);
+        unwrap!(ch.tx(Packet::new(&[i; Packet::MTU])).await);
         info!("l2cap tx done");
     }
     futures::future::pending::<()>().await;
 }
 
-use alloc::vec::Vec;
+use atomic_pool::{pool, Box};
 
-#[derive(defmt::Format)]
-struct Packet(Vec<u8>);
+pool!(PacketPool: [[u8; 512]; 10]);
+
+struct Packet {
+    len: usize,
+    buf: Box<PacketPool>,
+}
+
+impl Format for Packet {
+    fn format(&self, fmt: Formatter) {
+        defmt::write!(fmt, "Packet({:x})", &self.buf[..self.len])
+    }
+}
+
+impl Packet {
+    fn new(data: &[u8]) -> Self {
+        let mut buf = unwrap!(Box::<PacketPool>::new([0; 512]));
+        buf[..data.len()].copy_from_slice(data);
+        Packet {
+            len: data.len(),
+            buf,
+        }
+    }
+}
+
 impl l2cap::Packet for Packet {
     const MTU: usize = 512;
     fn allocate() -> Option<NonNull<u8>> {
-        let mut v = Vec::with_capacity(Self::MTU);
-        let ptr = v.as_mut_ptr();
-        mem::forget(v);
-        info!("allocate {:x}", ptr as u32);
-        NonNull::new(ptr)
+        if let Some(buf) = Box::<PacketPool>::new([0; 512]) {
+            let ptr = Box::into_raw(buf).cast::<u8>();
+            info!("allocate {}", ptr.as_ptr() as u32);
+            Some(ptr)
+        } else {
+            None
+        }
     }
 
-    fn into_raw_parts(mut self) -> (NonNull<u8>, usize) {
-        let ptr = self.0.as_mut_ptr();
-        let len = self.0.len();
-        mem::forget(self);
-        info!("into_raw_parts {:x}", ptr as u32);
-        (unwrap!(NonNull::new(ptr)), len)
+    fn into_raw_parts(self) -> (NonNull<u8>, usize) {
+        let ptr = Box::into_raw(self.buf).cast::<u8>();
+        let len = self.len;
+        info!("into_raw_parts {}", ptr.as_ptr() as u32);
+        (ptr, len)
     }
 
     unsafe fn from_raw_parts(ptr: NonNull<u8>, len: usize) -> Self {
-        info!("from_raw_parts {:x}", ptr.as_ptr() as u32);
-        Self(Vec::from_raw_parts(ptr.as_ptr(), len, Self::MTU))
+        info!("from_raw_parts {}", ptr.as_ptr() as u32);
+        Self {
+            len,
+            buf: Box::from_raw(ptr.cast::<[u8; 512]>()),
+        }
     }
 }
 
