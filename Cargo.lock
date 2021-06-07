@@ -225,9 +225,9 @@ dependencies = [
 
 [[package]]
 name = "defmt-macros"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fec88b1676137530f3d2e89e7ba3c4b1eb9eac49f4133752a309adf8d4f5c3b"
+checksum = "b101f3d11ecbbd6046cabd76e2c5b6b20eb493de5a83fea4c0704864b886dfd6"
 dependencies = [
  "defmt-parser",
  "proc-macro2",
@@ -255,7 +255,7 @@ dependencies = [
 [[package]]
 name = "embassy"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
+source = "git+https://github.com/embassy-rs/embassy#51d5f1998315b08d5cab6e0fb47359309a86c1a3"
 dependencies = [
  "atomic-polyfill",
  "cast",
@@ -271,7 +271,7 @@ dependencies = [
 [[package]]
 name = "embassy-extras"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
+source = "git+https://github.com/embassy-rs/embassy#51d5f1998315b08d5cab6e0fb47359309a86c1a3"
 dependencies = [
  "cortex-m 0.7.2",
  "embassy",
@@ -281,7 +281,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
+source = "git+https://github.com/embassy-rs/embassy#51d5f1998315b08d5cab6e0fb47359309a86c1a3"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -292,7 +292,7 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
+source = "git+https://github.com/embassy-rs/embassy#51d5f1998315b08d5cab6e0fb47359309a86c1a3"
 dependencies = [
  "cortex-m 0.7.2",
  "cortex-m-rt",
@@ -310,7 +310,7 @@ dependencies = [
 [[package]]
 name = "embassy-traits"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy#a126e17fb2d5544f1506aec860cc1b218008e9fd"
+source = "git+https://github.com/embassy-rs/embassy#51d5f1998315b08d5cab6e0fb47359309a86c1a3"
 dependencies = [
  "defmt",
  "embedded-hal",
