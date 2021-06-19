@@ -11,12 +11,11 @@ mod example_common;
 
 use core::mem;
 use cortex_m_rt::entry;
-use defmt::info;
-use defmt::*;
+use defmt::{info, unreachable, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::{gatt_server, peripheral};
+use nrf_softdevice::ble::peripheral;
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -26,17 +25,8 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[nrf_softdevice::gatt_server(uuid = "180f")]
-struct BatteryService {
-    #[characteristic(uuid = "2a19", read, write, notify)]
-    battery_level: u8,
-    #[characteristic(uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d", read, write, notify)]
-    foo: u16,
-}
-
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    let server: BatteryService = unwrap!(gatt_server::register(sd));
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -48,45 +38,16 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         0x03, 0x03, 0x09, 0x18,
     ];
 
-    loop {
-        let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data,
-            scan_data,
-        };
-        let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
+    let mut config = peripheral::Config::default();
+    config.interval = 50;
+    let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected {
+        adv_data,
+        scan_data,
+    };
+    unwrap!(peripheral::advertise(sd, adv, &config).await);
 
-        info!("advertising done!");
-
-        // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, &server, |e| match e {
-            BatteryServiceEvent::BatteryLevelWrite(val) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
-                }
-            }
-            BatteryServiceEvent::FooWrite(val) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.foo_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
-                }
-            }
-            BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
-                info!("battery notifications enabled")
-            }
-            BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
-                info!("battery notifications disabled")
-            }
-            BatteryServiceEvent::FooNotificationsEnabled => info!("foo notifications enabled"),
-            BatteryServiceEvent::FooNotificationsDisabled => info!("foo notifications disabled"),
-        })
-        .await;
-
-        if let Err(e) = res {
-            info!("gatt_server run exited with error: {:?}", e);
-        }
-    }
+    // advertise never returns
+    unreachable!();
 }
 
 #[entry]
