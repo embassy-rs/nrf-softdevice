@@ -54,7 +54,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
             adv_data,
             scan_data,
         };
-        let conn = unwrap!(peripheral::advertise(sd, adv, &config).await);
+        let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
 
@@ -111,7 +111,7 @@ async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPi
         // Since the bluetooth future never finishes, this can only happen when the Off button is pressed.
         // This will cause the bluetooth future to be dropped.
         //
-        // If it was advertising, the nested `peripheral::advertise` future will be dropped, which will cause
+        // If it was advertising, the nested `peripheral::advertise_connectable` future will be dropped, which will cause
         // the softdevice to stop advertising.
         // If it was connected, it will drop everything including the `Connection` instance, which
         // will tell the softdevice to disconnect it.
