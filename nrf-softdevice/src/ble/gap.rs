@@ -40,16 +40,39 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             });
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE => {
-            let _conn_params = gap_evt.params.conn_param_update.conn_params;
+            let conn_params = gap_evt.params.conn_param_update.conn_params;
 
             debug!(
                 "on_conn_param_update conn_handle={:?} conn_sup_timeout={:?} max_conn_interval={:?} min_conn_interval={:?} slave_latency={:?}",
                 gap_evt.conn_handle,
-                _conn_params.conn_sup_timeout,
-                _conn_params.max_conn_interval,
-                _conn_params.min_conn_interval,
-                _conn_params.slave_latency,
+                conn_params.conn_sup_timeout,
+                conn_params.max_conn_interval,
+                conn_params.min_conn_interval,
+                conn_params.slave_latency,
             );
+
+            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                state.conn_params = conn_params;
+            });
+        }
+        #[cfg(feature = "ble-central")]
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST => {
+            let conn_handle = gap_evt.conn_handle;
+            let conn_params = gap_evt.params.conn_param_update_request.conn_params;
+            debug!(
+                "on_conn_param_update_request conn_handle={:?} conn_sup_timeout={:?} max_conn_interval={:?} min_conn_interval={:?} slave_latency={:?}",
+                gap_evt.conn_handle,
+                conn_params.conn_sup_timeout,
+                conn_params.max_conn_interval,
+                conn_params.min_conn_interval,
+                conn_params.slave_latency,
+            );
+
+            let ret = raw::sd_ble_gap_conn_param_update(conn_handle, &conn_params);
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_conn_param_update err {:?}", err);
+                return;
+            }
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => {
             trace!("on_timeout conn_handle={:?}", gap_evt.conn_handle);

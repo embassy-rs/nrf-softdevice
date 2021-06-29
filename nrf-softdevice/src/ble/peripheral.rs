@@ -298,9 +298,10 @@ pub async fn advertise_connectable(
                     let conn_handle = gap_evt.conn_handle;
                     let role = Role::from_raw(params.role);
                     let peer_address = Address::from_raw(params.peer_addr);
+                    let conn_params = params.conn_params;
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
-                    match Connection::new(conn_handle, role, peer_address) {
+                    match Connection::new(conn_handle, role, peer_address, conn_params) {
                         Ok(conn) => {
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                             gap::do_data_length_update(conn_handle, ptr::null());
