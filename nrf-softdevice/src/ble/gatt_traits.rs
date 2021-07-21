@@ -76,7 +76,7 @@ impl<const N: usize> GattValue for Vec<u8, N> {
     const MAX_SIZE: usize = N;
 
     fn from_gatt(data: &[u8]) -> Self {
-        Self::from_slice(data).unwrap()
+        unwrap!(Self::from_slice(data))
     }
 
     fn to_gatt(&self) -> &[u8] {
