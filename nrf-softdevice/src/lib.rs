@@ -2,8 +2,6 @@
 #![feature(asm)]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
-#![feature(min_type_alias_impl_trait)]
-#![feature(impl_trait_in_bindings)]
 #![feature(const_fn_trait_bound)]
 #![feature(cell_update)]
 #![allow(incomplete_features)]
