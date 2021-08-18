@@ -97,6 +97,7 @@ impl<T> Portal<T> {
         }
     }
 
+    #[allow(unused)]
     pub fn wait_many<'a, R, F>(&'a self, mut func: F) -> impl Future<Output = R> + 'a
     where
         F: FnMut(T) -> Option<R> + 'a,

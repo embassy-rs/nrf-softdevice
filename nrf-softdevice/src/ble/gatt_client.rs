@@ -605,6 +605,7 @@ impl From<RawError> for MtuExchangeError {
     }
 }
 
+#[cfg(feature = "ble-central")]
 pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), MtuExchangeError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 

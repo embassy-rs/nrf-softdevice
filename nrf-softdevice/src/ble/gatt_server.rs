@@ -7,7 +7,7 @@ use core::mem;
 
 use crate::ble::*;
 use crate::raw;
-use crate::util::{get_flexarray, get_union_field, BoundedLifetime, Portal};
+use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;
 use crate::Softdevice;
 
@@ -151,8 +151,7 @@ where
                     return Some(Err(RunError::Disconnected))
                 }
                 raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => {
-                    let bounded = BoundedLifetime;
-                    let evt = bounded.deref(ble_evt);
+                    let evt = &*ble_evt;
                     let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
                     let params = get_union_field(ble_evt, &gatts_evt.params.write);
                     let v = get_flexarray(ble_evt, &params.data, params.len as usize);

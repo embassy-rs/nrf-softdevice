@@ -6,7 +6,6 @@
 use core::mem;
 use core::ptr;
 
-use crate::ble::gap;
 use crate::ble::types::*;
 use crate::ble::{Address, Connection};
 use crate::raw;
@@ -32,7 +31,7 @@ pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
 pub async fn connect(
-    sd: &Softdevice,
+    _sd: &Softdevice,
     config: &ConnectConfig<'_>,
 ) -> Result<Connection, ConnectError> {
     if let Some(w) = config.scan_config.whitelist {
@@ -75,7 +74,7 @@ pub async fn connect(
                     match Connection::new(conn_handle, role, peer_address, conn_params) {
                         Ok(conn) => {
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-                            gap::do_data_length_update(conn_handle, ptr::null());
+                            crate::ble::gap::do_data_length_update(conn_handle, ptr::null());
 
                             Ok(conn)
                         }
@@ -98,7 +97,7 @@ pub async fn connect(
 
     #[cfg(feature = "ble-gatt-client")]
     {
-        let mtu = config.att_mtu.unwrap_or(sd.att_mtu);
+        let mtu = config.att_mtu.unwrap_or(_sd.att_mtu);
         unwrap!(crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await);
     }
 

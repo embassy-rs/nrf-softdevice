@@ -1,6 +1,3 @@
-use core::mem;
-use core::ptr;
-
 use crate::ble::*;
 use crate::raw;
 use crate::util::get_union_field;
@@ -143,7 +140,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             );
 
             let conn_handle = gap_evt.conn_handle;
-            do_data_length_update(conn_handle, ptr::null());
+            do_data_length_update(conn_handle, core::ptr::null());
         }
         #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE => {
@@ -171,7 +168,7 @@ pub(crate) unsafe fn do_data_length_update(
     conn_handle: u16,
     params: *const raw::ble_gap_data_length_params_t,
 ) {
-    let mut dl_limitation = mem::zeroed();
+    let mut dl_limitation = core::mem::zeroed();
     let ret = raw::sd_ble_gap_data_length_update(conn_handle, params, &mut dl_limitation);
     if let Err(_err) = RawError::convert(ret) {
         warn!("sd_ble_gap_data_length_update err {:?}", _err);

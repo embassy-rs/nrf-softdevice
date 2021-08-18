@@ -11,19 +11,12 @@ pub use on_drop::*;
 
 use crate::raw;
 
-pub(crate) struct BoundedLifetime;
-
-impl BoundedLifetime {
-    pub(crate) unsafe fn deref<T>(&self, ptr: *const T) -> &T {
-        &*ptr
-    }
-}
-
 /// Create a slice from a variable-length array in a BLE event.
 ///
 /// This function is a workaround for UB in __IncompleteArrayField
 /// see https://github.com/rust-lang/rust-bindgen/issues/1892
 /// see https://github.com/rust-lang/unsafe-code-guidelines/issues/134
+#[allow(unused)]
 pub(crate) unsafe fn get_flexarray<T>(
     orig_ptr: *const raw::ble_evt_t,
     array: &raw::__IncompleteArrayField<T>,

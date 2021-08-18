@@ -12,8 +12,10 @@ defmt-info = []
 defmt-warn = []
 defmt-error = []
 
+nrf52805 = ["nrf52805-pac"]
 nrf52810 = ["nrf52810-pac"]
 nrf52811 = ["nrf52811-pac"]
+nrf52820 = ["nrf52820-pac"]
 nrf52832 = ["nrf52832-pac"]
 nrf52833 = ["nrf52833-pac"]
 nrf52840 = ["nrf52840-pac"]
@@ -27,8 +29,9 @@ s140 = ["nrf-softdevice-s140"]
 ble-peripheral = []
 ble-central = []
 ble-l2cap = []
-ble-gatt-server = []
-ble-gatt-client = []
+ble-gatt = []
+ble-gatt-server = ["ble-gatt"]
+ble-gatt-client = ["ble-gatt"]
 
 critical-section-impl = ["critical-section/custom-impl"]
 
@@ -44,11 +47,13 @@ cortex-m-rt = "0.6.13"
 heapless = "0.7.1"
 fixed = "1.5.0"
 
-nrf52810-pac  = { version = "0.9.0", features = ["rt"], optional = true }
-nrf52811-pac  = { version = "0.9.0", features = ["rt"], optional = true }
-nrf52832-pac  = { version = "0.9.0", features = ["rt"], optional = true }
-nrf52833-pac  = { version = "0.9.0", features = ["rt"], optional = true }
-nrf52840-pac  = { version = "0.9.0", features = ["rt"], optional = true }
+nrf52805-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52810-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52811-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52820-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52832-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52833-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52840-pac  = { version = "0.10.0", features = ["rt"], optional = true }
 
 nrf-softdevice-s112 = { version = "0.1.1", path = "../nrf-softdevice-s112", optional = true }
 nrf-softdevice-s113 = { version = "0.1.1", path = "../nrf-softdevice-s113", optional = true }

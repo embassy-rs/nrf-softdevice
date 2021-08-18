@@ -80,13 +80,13 @@ pub(crate) async fn run() {
     }
 }
 
-#[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
+#[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
 #[interrupt]
 unsafe fn SWI2() {
     SWI2_SIGNAL.signal(());
 }
 
-#[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
+#[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
 #[interrupt]
 unsafe fn SWI2_EGU2() {
     SWI2_SIGNAL.signal(());

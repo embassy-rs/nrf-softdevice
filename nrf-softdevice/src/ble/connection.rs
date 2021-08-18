@@ -3,11 +3,11 @@ use core::cell::UnsafeCell;
 
 use raw::ble_gap_conn_params_t;
 
-use crate::ble::types::*;
-use crate::ble::*;
+use crate::ble::types::{Address, AddressType, Role};
 use crate::raw;
 use crate::RawError;
 
+#[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -66,6 +66,7 @@ pub(crate) struct ConnectionState {
 
     pub conn_params: ble_gap_conn_params_t,
 
+    #[cfg(feature = "ble-gatt")]
     pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
     pub data_length_effective: u8, // Effective data length (in bytes).
@@ -90,6 +91,7 @@ impl ConnectionState {
                 min_conn_interval: 0,
                 slave_latency: 0,
             },
+            #[cfg(feature = "ble-gatt")]
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
@@ -118,7 +120,7 @@ impl ConnectionState {
         Ok(())
     }
 
-    pub(crate) fn on_disconnected(&mut self, ble_evt: *const raw::ble_evt_t) {
+    pub(crate) fn on_disconnected(&mut self, _ble_evt: *const raw::ble_evt_t) {
         let conn_handle = unwrap!(
             self.conn_handle,
             "bug: on_disconnected when already disconnected"
@@ -132,11 +134,11 @@ impl ConnectionState {
 
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
-        gatt_client::portal(conn_handle).call(ble_evt);
+        crate::ble::gatt_client::portal(conn_handle).call(_ble_evt);
         #[cfg(feature = "ble-gatt-server")]
-        gatt_server::portal(conn_handle).call(ble_evt);
+        crate::ble::gatt_server::portal(conn_handle).call(_ble_evt);
         #[cfg(feature = "ble-l2cap")]
-        l2cap::portal(conn_handle).call(ble_evt);
+        crate::ble::l2cap::portal(conn_handle).call(_ble_evt);
 
         trace!("conn {:?}: disconnected", _index);
     }
@@ -215,6 +217,8 @@ impl Connection {
                 disconnecting: false,
 
                 conn_params,
+
+                #[cfg(feature = "ble-gatt")]
                 att_mtu: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
 
                 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -234,6 +238,12 @@ impl Connection {
     /// Get the currently active connection params.
     pub fn conn_params(&self) -> ble_gap_conn_params_t {
         with_state(self.index, |s| s.conn_params)
+    }
+
+    /// Get the currently active ATT MTU.
+    #[cfg(feature = "ble-gatt")]
+    pub fn att_mtu(&self) -> u16 {
+        with_state(self.index, |s| s.att_mtu)
     }
 
     /// Set the connection params.
