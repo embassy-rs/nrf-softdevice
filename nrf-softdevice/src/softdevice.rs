@@ -37,6 +37,8 @@ unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
 pub struct Softdevice {
     // Prevent Send, Sync
     _private: PhantomData<*mut ()>,
+    #[cfg(feature = "ble-gatt")]
+    #[allow(unused)]
     pub(crate) att_mtu: u16,
     #[cfg(feature = "ble-l2cap")]
     pub(crate) l2cap_rx_mps: u16,
@@ -277,12 +279,13 @@ impl Softdevice {
         }
 
         unsafe {
-            #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
+            #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
             pac::NVIC::unmask(pac::interrupt::SWI2);
-            #[cfg(not(any(feature = "nrf52810", feature = "nrf52811")))]
+            #[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
             pac::NVIC::unmask(pac::interrupt::SWI2_EGU2);
         }
 
+        #[cfg(feature = "ble-gatt")]
         let att_mtu = config
             .conn_gatt
             .map(|x| x.att_mtu)
@@ -296,7 +299,10 @@ impl Softdevice {
 
         SOFTDEVICE.put(Softdevice {
             _private: PhantomData,
+
+            #[cfg(feature = "ble-gatt")]
             att_mtu,
+
             #[cfg(feature = "ble-l2cap")]
             l2cap_rx_mps,
         })

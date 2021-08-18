@@ -3,6 +3,8 @@
 use nrf_softdevice_defmt_rtt as _; // global logger
 use panic_probe as _;
 
+use embassy_nrf as _;
+
 use alloc_cortex_m::CortexMHeap;
 use core::alloc::Layout;
 use core::sync::atomic::{AtomicUsize, Ordering};

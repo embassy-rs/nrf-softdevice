@@ -18,25 +18,16 @@ cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,log
 
 
-# build all softdevice+chip combinations (with all supported features enabled)
+# build softdevice+chip combinations (with all supported features enabled)
+# This htis each softdevice and each chip at least once.
 #================================================================================
 
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52810,ble-peripheral,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52811,ble-peripheral,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52832,ble-peripheral,ble-gatt-client,ble-gatt-server
-
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s112,nrf52805,ble-peripheral,ble-gatt-client,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s113,nrf52810,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s113,nrf52811,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s113,nrf52832,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s113,nrf52833,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s122,nrf52833,ble-central,ble-gatt-client,ble-gatt-server
-
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s132,nrf52810,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s132,nrf52832,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52811,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52833,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52820,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
 
 
