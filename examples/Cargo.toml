@@ -25,7 +25,7 @@ ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
 [dependencies]
 embassy = { version = "0.1.0", features = ["defmt"]}
 embassy-traits = { version = "0.1.0", features = ["defmt"]}
-embassy-nrf = { version = "0.1.0", features = [ "defmt", "nrf52840" ]}
+embassy-nrf = { version = "0.1.0", features = [ "defmt", "nrf52840", "gpiote", "time-driver-rtc1" ]}
 cortex-m        = { version = "0.7.2" }
 cortex-m-rt = "0.6.13"
 defmt = { version = "0.2.0", features = ["alloc"] }
