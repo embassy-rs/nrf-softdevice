@@ -573,7 +573,7 @@ version = "0.1.0"
 dependencies = [
  "alloc-cortex-m",
  "cortex-m 0.7.3",
- "cortex-m-rt 0.6.14",
+ "cortex-m-rt 0.7.0",
  "defmt",
  "embassy",
  "embassy-nrf",
