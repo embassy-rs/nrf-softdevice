@@ -27,7 +27,7 @@ embassy = { version = "0.1.0", features = ["defmt"]}
 embassy-traits = { version = "0.1.0", features = ["defmt"]}
 embassy-nrf = { version = "0.1.0", features = [ "defmt", "nrf52840", "gpiote", "time-driver-rtc1" ]}
 cortex-m        = { version = "0.7.2" }
-cortex-m-rt = "0.6.13"
+cortex-m-rt = "0.7.0"
 defmt = { version = "0.2.0", features = ["alloc"] }
 nrf-softdevice-defmt-rtt = { path = "../nrf-softdevice-defmt-rtt", version = "0.1.0" }
 panic-probe = { version = "0.2.0", features= ["print-defmt"] }
