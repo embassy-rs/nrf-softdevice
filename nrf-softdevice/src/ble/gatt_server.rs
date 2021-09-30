@@ -285,7 +285,11 @@ impl From<DisconnectedError> for IndicateValueError {
     }
 }
 
-pub fn indicate_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), IndicateValueError> {
+pub fn indicate_value(
+    conn: &Connection,
+    handle: u16,
+    val: &[u8],
+) -> Result<(), IndicateValueError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let mut len: u16 = val.len() as _;
