@@ -122,6 +122,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let get_fn = format_ident!("{}_get", ch.name);
         let set_fn = format_ident!("{}_set", ch.name);
         let notify_fn = format_ident!("{}_notify", ch.name);
+        let indicate_fn = format_ident!("{}_indicate", ch.name);
 
         let uuid = ch.args.uuid;
         let read = ch.args.read;
@@ -209,6 +210,35 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 ) -> Result<(), #ble::gatt_server::NotifyValueError> {
                     let buf = #ty_as_val::to_gatt(&val);
                     #ble::gatt_server::notify_value(conn, self.#value_handle, buf)
+                }
+            ));
+
+            code_event_enum.extend(quote_spanned!(ch.span=>
+                #case_enabled,
+                #case_disabled,
+            ));
+            code_on_write.extend(quote_spanned!(ch.span=>
+                if handle == self.#cccd_handle {
+                    if data.len() != 0 && data[0] & 0x01 != 0 {
+                        return Some(#event_enum_name::#case_enabled);
+                    } else {
+                        return Some(#event_enum_name::#case_disabled);
+                    }
+                }
+            ));
+        }
+        if indicate {
+            let case_enabled = format_ident!("{}IndicationsEnabled", name_pascal);
+            let case_disabled = format_ident!("{}IndicationsDisabled", name_pascal);
+
+            code_impl.extend(quote_spanned!(ch.span=>
+                fn #indicate_fn(
+                    &self,
+                    conn: &#ble::Connection,
+                    val: #ty,
+                ) -> Result<(), #ble::gatt_server::IndicateValueError> {
+                    let buf = #ty_as_val::to_gatt(&val);
+                    #ble::gatt_server::indicate_value(conn, self.#value_handle, buf)
                 }
             ));
 
