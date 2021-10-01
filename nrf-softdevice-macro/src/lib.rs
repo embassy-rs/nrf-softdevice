@@ -248,7 +248,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#cccd_handle {
-                    if data.len() != 0 && data[0] & 0x01 != 0 {
+                    if data.len() != 0 && data[0] & 0x02 != 0 {
                         return Some(#event_enum_name::#case_enabled);
                     } else {
                         return Some(#event_enum_name::#case_disabled);
