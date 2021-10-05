@@ -109,10 +109,19 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
     let mut code_impl = TokenStream2::new();
     let mut code_register_chars = TokenStream2::new();
     let mut code_register_init = TokenStream2::new();
-    let mut code_on_write = TokenStream2::new();
+    let mut code_on_event = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
 
     let ble = quote!(::nrf_softdevice::ble);
+
+    let service_handle = format_ident!("service_handle");
+    fields.push(syn::Field {
+        ident: Some(service_handle),
+        ty: syn::Type::Verbatim(quote!(u16).into()),
+        attrs: Vec::new(),
+        colon_token: Default::default(),
+        vis: syn::Visibility::Inherited,
+    });
 
     for ch in &chars {
         let name_pascal = inflector::cases::pascalcase::to_pascal_case(&ch.name);
@@ -191,9 +200,9 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_write(#ty),
             ));
-            code_on_write.extend(quote_spanned!(ch.span=>
-                if handle == self.#value_handle {
-                    return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(&data)));
+            code_on_event.extend(quote_spanned!(ch.span=>
+                if event.handle == self.#value_handle {
+                    handler(#event_enum_name::#case_write(#ty_as_val::from_gatt(event.data)));
                 }
             ));
         }
@@ -216,12 +225,13 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 #case_enabled,
                 #case_disabled,
             ));
-            code_on_write.extend(quote_spanned!(ch.span=>
-                if handle == self.#cccd_handle {
+            code_on_event.extend(quote_spanned!(ch.span=>
+                if event.handle == self.#cccd_handle {
+                    let data = event.data;
                     if data.len() != 0 && data[0] & 0x01 != 0 {
-                        return Some(#event_enum_name::#case_enabled);
+                        handler(#event_enum_name::#case_enabled);
                     } else {
-                        return Some(#event_enum_name::#case_disabled);
+                        handler(#event_enum_name::#case_disabled);
                     }
                 }
             ));
@@ -252,13 +262,14 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 #code_register_chars
 
                 Ok(Self {
+                    service_handle,
                     #code_register_init
                 })
             }
 
-            fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
-                #code_on_write
-                None
+            fn on_event<'m, F>(&self, event: &#ble::gatt_server::GattEvent<'m>, mut handler: F)
+                where F: FnMut(Self::Event) {
+                #code_on_event
             }
         }
 

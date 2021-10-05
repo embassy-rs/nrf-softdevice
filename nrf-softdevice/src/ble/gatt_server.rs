@@ -28,15 +28,23 @@ pub struct CharacteristicHandles {
     pub sccd_handle: u16,
 }
 
+pub struct GattEvent<'a> {
+    pub handle: u16,
+    pub data: &'a [u8],
+}
+
 pub trait Server: Sized {
     type Event;
 
     fn uuid() -> Uuid;
+
     fn register<F>(service_handle: u16, register_char: F) -> Result<Self, RegisterError>
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
+    fn on_event<'m, F>(&self, event: &GattEvent<'m>, f: F)
+    where
+        F: FnMut(Self::Event);
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -139,9 +147,9 @@ impl From<DisconnectedError> for RunError {
     }
 }
 
-pub async fn run<S: Server, F>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
+pub async fn run<'m, F>(conn: &Connection, mut f: F) -> Result<(), RunError>
 where
-    F: FnMut(S::Event),
+    F: FnMut(GattEvent<'m>),
 {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
     portal(conn_handle)
@@ -163,7 +171,10 @@ where
                         panic!("gatt_server auth_required not yet supported");
                     }
 
-                    server.on_write(params.handle, v).map(|e| f(e));
+                    f(GattEvent {
+                        handle: params.handle,
+                        data: &v,
+                    });
                 }
                 _ => {}
             }
