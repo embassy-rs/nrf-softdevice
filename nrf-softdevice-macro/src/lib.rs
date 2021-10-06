@@ -114,15 +114,6 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let ble = quote!(::nrf_softdevice::ble);
 
-    let service_handle = format_ident!("service_handle");
-    fields.push(syn::Field {
-        ident: Some(service_handle),
-        ty: syn::Type::Verbatim(quote!(u16).into()),
-        attrs: Vec::new(),
-        colon_token: Default::default(),
-        vis: syn::Visibility::Inherited,
-    });
-
     for ch in &chars {
         let name_pascal = inflector::cases::pascalcase::to_pascal_case(&ch.name);
         let char_name = format_ident!("{}", ch.name);
@@ -262,7 +253,6 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 #code_register_chars
 
                 Ok(Self {
-                    service_handle,
                     #code_register_init
                 })
             }

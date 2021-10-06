@@ -30,8 +30,8 @@ pub struct CharacteristicHandles {
 
 #[derive(Clone)]
 pub struct GattEvent<'a> {
-    handle: u16,
-    data: &'a [u8],
+    pub handle: u16,
+    pub data: &'a [u8],
 }
 
 pub trait Server: Sized {
