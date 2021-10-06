@@ -109,7 +109,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
     let mut code_impl = TokenStream2::new();
     let mut code_register_chars = TokenStream2::new();
     let mut code_register_init = TokenStream2::new();
-    let mut code_on_write = TokenStream2::new();
+    let mut code_on_event = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
 
     let ble = quote!(::nrf_softdevice::ble);
@@ -191,7 +191,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_write(#ty),
             ));
-            code_on_write.extend(quote_spanned!(ch.span=>
+            code_on_event.extend(quote_spanned!(ch.span=>
                 if event.handle == self.#value_handle {
                     return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(event.data)));
                 }
@@ -216,7 +216,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 #case_enabled,
                 #case_disabled,
             ));
-            code_on_write.extend(quote_spanned!(ch.span=>
+            code_on_event.extend(quote_spanned!(ch.span=>
                 if event.handle == self.#cccd_handle {
                     let data = event.data;
                     if data.len() != 0 && data[0] & 0x01 != 0 {
@@ -257,8 +257,8 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 })
             }
 
-            fn on_write<'m>(&self, event: #ble::gatt_server::GattEvent<'m>) -> Some<Self::Event> {
-                #code_on_write
+            fn on_event<'m>(&self, event: #ble::gatt_server::GattEvent<'m>) -> Option<Self::Event> {
+                #code_on_event
                 None
             }
         }
