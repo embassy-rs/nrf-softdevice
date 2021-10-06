@@ -28,9 +28,10 @@ pub struct CharacteristicHandles {
     pub sccd_handle: u16,
 }
 
+#[derive(Clone)]
 pub struct GattEvent<'a> {
-    pub handle: u16,
-    pub data: &'a [u8],
+    handle: u16,
+    data: &'a [u8],
 }
 
 pub trait Server: Sized {
@@ -42,9 +43,7 @@ pub trait Server: Sized {
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
-    fn on_event<'m, F>(&self, event: &GattEvent<'m>, f: F)
-    where
-        F: FnMut(Self::Event);
+    fn on_write<'m>(&self, event: GattEvent<'m>) -> Option<Self::Event>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

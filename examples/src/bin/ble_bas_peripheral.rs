@@ -14,7 +14,10 @@ use defmt::*;
 use embassy::executor::Executor;
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::{gatt_server::{self, Server}, peripheral};
+use nrf_softdevice::ble::{
+    gatt_server::{self, Server},
+    peripheral,
+};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -57,31 +60,32 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         info!("advertising done!");
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, |e| {
-            server.on_event(&e, |e| match e {
-                BatteryServiceEvent::BatteryLevelWrite(val) => {
-                    info!("wrote battery level: {}", val);
-                    if let Err(e) = server.battery_level_notify(&conn, val + 1) {
-                        info!("send notification error: {:?}", e);
-                    }
+        let res = gatt_server::run(&conn, |e| match server.on_event(e) {
+            Some(BatteryServiceEvent::BatteryLevelWrite(val)) => {
+                info!("wrote battery level: {}", val);
+                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
+                    info!("send notification error: {:?}", e);
                 }
-                BatteryServiceEvent::FooWrite(val) => {
-                    info!("wrote battery level: {}", val);
-                    if let Err(e) = server.foo_notify(&conn, val + 1) {
-                        info!("send notification error: {:?}", e);
-                    }
+            }
+            Some(BatteryServiceEvent::FooWrite(val)) => {
+                info!("wrote battery level: {}", val);
+                if let Err(e) = server.foo_notify(&conn, val + 1) {
+                    info!("send notification error: {:?}", e);
                 }
-                BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
-                    info!("battery notifications enabled")
-                }
-                BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
-                    info!("battery notifications disabled")
-                }
-                BatteryServiceEvent::FooNotificationsEnabled => info!("foo notifications enabled"),
-                BatteryServiceEvent::FooNotificationsDisabled => {
-                    info!("foo notifications disabled")
-                }
-            })
+            }
+            Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled) => {
+                info!("battery notifications enabled")
+            }
+            Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled) => {
+                info!("battery notifications disabled")
+            }
+            Some(BatteryServiceEvent::FooNotificationsEnabled) => {
+                info!("foo notifications enabled")
+            }
+            Some(BatteryServiceEvent::FooNotificationsDisabled) => {
+                info!("foo notifications disabled")
+            }
+            None => {}
         })
         .await;
 
