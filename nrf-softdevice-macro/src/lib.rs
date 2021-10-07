@@ -231,6 +231,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
+    let visibility = struc.vis.clone();
 
     let result = quote! {
         #struc
@@ -263,7 +264,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        enum #event_enum_name {
+        #visibility enum #event_enum_name {
             #code_event_enum
         }
     };
