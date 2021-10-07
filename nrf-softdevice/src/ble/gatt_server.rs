@@ -43,7 +43,7 @@ pub trait Server: Sized {
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
-    fn on_event<'m>(&self, event: GattEvent<'m>) -> Option<Self::Event>;
+    fn on_write<'m>(&self, event: GattEvent<'m>) -> Option<Self::Event>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
