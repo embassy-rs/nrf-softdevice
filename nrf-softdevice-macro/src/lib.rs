@@ -36,6 +36,7 @@ struct Characteristic {
     ty: syn::Type,
     args: CharacteristicArgs,
     span: Span,
+    vis: syn::Visibility,
 }
 
 #[proc_macro_attribute]
@@ -90,6 +91,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 ty: field.ty.clone(),
                 args,
                 span: field.ty.span(),
+                vis: field.vis.clone(),
             });
 
             false
@@ -122,6 +124,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let get_fn = format_ident!("{}_get", ch.name);
         let set_fn = format_ident!("{}_set", ch.name);
         let notify_fn = format_ident!("{}_notify", ch.name);
+        let fn_vis = ch.vis.clone();
 
         let uuid = ch.args.uuid;
         let read = ch.args.read;
@@ -159,14 +162,14 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         ));
 
         code_impl.extend(quote_spanned!(ch.span=>
-            fn #get_fn(&self) -> Result<#ty, #ble::gatt_server::GetValueError> {
+            #fn_vis fn #get_fn(&self) -> Result<#ty, #ble::gatt_server::GetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = &mut [0u8; #ty_as_val::MAX_SIZE];
                 let size = #ble::gatt_server::get_value(sd, self.#value_handle, buf)?;
                 Ok(#ty_as_val::from_gatt(&buf[..size]))
             }
 
-            fn #set_fn(&self, val: #ty) -> Result<(), #ble::gatt_server::SetValueError> {
+            #fn_vis fn #set_fn(&self, val: #ty) -> Result<(), #ble::gatt_server::SetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = #ty_as_val::to_gatt(&val);
                 #ble::gatt_server::set_value(sd, self.#value_handle, buf)
@@ -202,7 +205,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             let case_disabled = format_ident!("{}NotificationsDisabled", name_pascal);
 
             code_impl.extend(quote_spanned!(ch.span=>
-                fn #notify_fn(
+                #fn_vis fn #notify_fn(
                     &self,
                     conn: &#ble::Connection,
                     val: #ty,
@@ -231,7 +234,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
-    let visibility = struc.vis.clone();
+    let struc_vis = struc.vis.clone();
 
     let result = quote! {
         #struc
@@ -264,7 +267,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        #visibility enum #event_enum_name {
+        #struc_vis enum #event_enum_name {
             #code_event_enum
         }
     };
@@ -323,6 +326,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                 ty: field.ty.clone(),
                 args,
                 span: field.ty.span(),
+                vis: field.vis.clone(),
             });
 
             false
