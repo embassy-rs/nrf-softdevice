@@ -18,7 +18,10 @@ use embassy_nrf::gpiote::PortInput;
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 
-use nrf_softdevice::ble::{gatt_server, peripheral};
+use nrf_softdevice::ble::{
+    gatt_server::{self, Server},
+    peripheral,
+};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -56,15 +59,16 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 
         info!("advertising done!");
 
-        let res = gatt_server::run(&conn, server, |e| match e {
-            FooServiceEvent::FooWrite(val) => {
+        let res = gatt_server::run(&conn, |e| match server.on_write(e) {
+            Some(FooServiceEvent::FooWrite(val)) => {
                 info!("wrote foo level: {}", val);
                 if let Err(e) = server.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            FooServiceEvent::FooNotificationsEnabled => info!("notifications enabled"),
-            FooServiceEvent::FooNotificationsDisabled => info!("notifications disabled"),
+            Some(FooServiceEvent::FooNotificationsEnabled) => info!("notifications enabled"),
+            Some(FooServiceEvent::FooNotificationsDisabled) => info!("notifications disabled"),
+            None => {}
         })
         .await;
 
