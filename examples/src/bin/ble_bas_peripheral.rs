@@ -31,13 +31,18 @@ async fn softdevice_task(sd: &'static Softdevice) {
 struct BatteryService {
     #[characteristic(uuid = "2a19", read, write, notify)]
     battery_level: u8,
-    #[characteristic(uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d", read, write, notify)]
+}
+
+#[nrf_softdevice::gatt_server(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
+struct FooService {
+    #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify)]
     foo: u16,
 }
 
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    let server: BatteryService = unwrap!(gatt_server::register(sd));
+    let battery_service: BatteryService = unwrap!(gatt_server::register(sd));
+    let foo_service: FooService = unwrap!(gatt_server::register(sd));
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -60,32 +65,38 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         info!("advertising done!");
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, |e| match server.on_write(e) {
-            Some(BatteryServiceEvent::BatteryLevelWrite(val)) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
+        let res = gatt_server::run(&conn, |e| {
+            match battery_service.on_write(e.clone()) {
+                Some(BatteryServiceEvent::BatteryLevelWrite(val)) => {
+                    info!("wrote battery level: {}", val);
+                    if let Err(e) = battery_service.battery_level_notify(&conn, val + 1) {
+                        info!("send notification error: {:?}", e);
+                    }
                 }
-            }
-            Some(BatteryServiceEvent::FooWrite(val)) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.foo_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
+
+                Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled) => {
+                    info!("battery notifications enabled")
                 }
+                Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled) => {
+                    info!("battery notifications disabled")
+                }
+                None => {}
             }
-            Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled) => {
-                info!("battery notifications enabled")
+            match foo_service.on_write(e) {
+                Some(FooServiceEvent::FooWrite(val)) => {
+                    info!("wrote battery level: {}", val);
+                    if let Err(e) = foo_service.foo_notify(&conn, val + 1) {
+                        info!("send notification error: {:?}", e);
+                    }
+                }
+                Some(FooServiceEvent::FooNotificationsEnabled) => {
+                    info!("foo notifications enabled")
+                }
+                Some(FooServiceEvent::FooNotificationsDisabled) => {
+                    info!("foo notifications disabled")
+                }
+                None => {}
             }
-            Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled) => {
-                info!("battery notifications disabled")
-            }
-            Some(BatteryServiceEvent::FooNotificationsEnabled) => {
-                info!("foo notifications enabled")
-            }
-            Some(BatteryServiceEvent::FooNotificationsDisabled) => {
-                info!("foo notifications disabled")
-            }
-            None => {}
         })
         .await;
 
