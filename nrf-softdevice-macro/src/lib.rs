@@ -14,7 +14,7 @@ mod uuid;
 use crate::uuid::Uuid;
 
 #[derive(Debug, FromMeta)]
-struct ServerArgs {
+struct ServiceArgs {
     uuid: Uuid,
 }
 #[derive(Debug, FromMeta)]
@@ -40,11 +40,11 @@ struct Characteristic {
 }
 
 #[proc_macro_attribute]
-pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
+pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
-    let args = match ServerArgs::from_list(&args) {
+    let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
             return e.write_errors().into();
@@ -60,7 +60,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 .ident
                 .span()
                 .unwrap()
-                .error("gatt_server structs must have named fields, not tuples.")
+                .error("gatt_service structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }
@@ -243,7 +243,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_impl
         }
 
-        impl #ble::gatt_server::Server for #struct_name {
+        impl #ble::gatt_server::Service for #struct_name {
             type Event = #event_enum_name;
 
             fn uuid() -> #ble::Uuid {
@@ -279,7 +279,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
-    let args = match ServerArgs::from_list(&args) {
+    let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
             return e.write_errors().into();

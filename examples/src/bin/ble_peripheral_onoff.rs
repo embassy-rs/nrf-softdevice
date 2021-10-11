@@ -19,7 +19,7 @@ use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 
 use nrf_softdevice::ble::{
-    gatt_server::{self, Server},
+    gatt_server::{self, Service},
     peripheral,
 };
 use nrf_softdevice::{raw, Softdevice};
@@ -31,7 +31,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[nrf_softdevice::gatt_server(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
+#[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
 struct FooService {
     #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify)]
     foo: u16,

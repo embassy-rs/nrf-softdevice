@@ -34,7 +34,7 @@ pub struct GattEvent<'a> {
     pub data: &'a [u8],
 }
 
-pub trait Server: Sized {
+pub trait Service: Sized {
     type Event;
 
     fn uuid() -> Uuid;
@@ -58,7 +58,7 @@ impl From<RawError> for RegisterError {
     }
 }
 
-pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
+pub fn register<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError> {
     let mut service_handle: u16 = 0;
     let ret = unsafe {
         raw::sd_ble_gatts_service_add(
