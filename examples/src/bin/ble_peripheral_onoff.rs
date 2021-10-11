@@ -28,13 +28,18 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[nrf_softdevice::gatt_server(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
+#[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
 struct FooService {
     #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify)]
     foo: u16,
 }
 
-async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
+#[nrf_softdevice::gatt_server]
+struct Server {
+    foo: FooService,
+}
+
+async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -57,14 +62,18 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
         info!("advertising done!");
 
         let res = gatt_server::run(&conn, server, |e| match e {
-            FooServiceEvent::FooWrite(val) => {
+            ServerEvent::Foo(FooServiceEvent::FooWrite(val)) => {
                 info!("wrote foo level: {}", val);
-                if let Err(e) = server.foo_notify(&conn, val + 1) {
+                if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            FooServiceEvent::FooNotificationsEnabled => info!("notifications enabled"),
-            FooServiceEvent::FooNotificationsDisabled => info!("notifications disabled"),
+            ServerEvent::Foo(FooServiceEvent::FooNotificationsEnabled) => {
+                info!("notifications enabled")
+            }
+            ServerEvent::Foo(FooServiceEvent::FooNotificationsDisabled) => {
+                info!("notifications disabled")
+            }
         })
         .await;
 
@@ -76,7 +85,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPin) {
-    let server: FooService = unwrap!(gatt_server::register(sd));
+    let server: Server = unwrap!(gatt_server::register(sd));
 
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");

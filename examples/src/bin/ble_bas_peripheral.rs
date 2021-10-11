@@ -24,17 +24,28 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[nrf_softdevice::gatt_server(uuid = "180f")]
+#[nrf_softdevice::gatt_service(uuid = "180f")]
 struct BatteryService {
-    #[characteristic(uuid = "2a19", read, write, notify)]
+    #[characteristic(uuid = "2a19", read, notify)]
     battery_level: u8,
-    #[characteristic(uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d", read, write, notify)]
+}
+
+#[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
+struct FooService {
+    #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify)]
     foo: u16,
+}
+
+#[nrf_softdevice::gatt_server]
+struct Server {
+    bas: BatteryService,
+    foo: FooService,
 }
 
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    let server: BatteryService = unwrap!(gatt_server::register(sd));
+    let server: Server = unwrap!(gatt_server::register(sd));
+
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -58,26 +69,28 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
-            BatteryServiceEvent::BatteryLevelWrite(val) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.battery_level_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
+            ServerEvent::Bas(e) => match e {
+                BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
+                    info!("battery notifications enabled")
                 }
-            }
-            BatteryServiceEvent::FooWrite(val) => {
-                info!("wrote battery level: {}", val);
-                if let Err(e) = server.foo_notify(&conn, val + 1) {
-                    info!("send notification error: {:?}", e);
+                BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
+                    info!("battery notifications disabled")
                 }
-            }
-            BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
-                info!("battery notifications enabled")
-            }
-            BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
-                info!("battery notifications disabled")
-            }
-            BatteryServiceEvent::FooNotificationsEnabled => info!("foo notifications enabled"),
-            BatteryServiceEvent::FooNotificationsDisabled => info!("foo notifications disabled"),
+            },
+            ServerEvent::Foo(e) => match e {
+                FooServiceEvent::FooWrite(val) => {
+                    info!("wrote foo: {}", val);
+                    if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
+                        info!("send notification error: {:?}", e);
+                    }
+                }
+                FooServiceEvent::FooNotificationsEnabled => {
+                    info!("foo notifications enabled")
+                }
+                FooServiceEvent::FooNotificationsDisabled => {
+                    info!("foo notifications disabled")
+                }
+            },
         })
         .await;
 
