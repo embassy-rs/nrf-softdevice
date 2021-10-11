@@ -18,10 +18,7 @@ use embassy_nrf::gpiote::PortInput;
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 
-use nrf_softdevice::ble::{
-    gatt_server::{self, Service},
-    peripheral,
-};
+use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -37,7 +34,12 @@ struct FooService {
     foo: u16,
 }
 
-async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
+#[nrf_softdevice::gatt_server]
+struct Server {
+    foo: FooService,
+}
+
+async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -59,16 +61,19 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 
         info!("advertising done!");
 
-        let res = gatt_server::run(&conn, |e| match server.on_write(e) {
-            Some(FooServiceEvent::FooWrite(val)) => {
+        let res = gatt_server::run(&conn, server, |e| match e {
+            ServerEvent::FooService(FooServiceEvent::FooWrite(val)) => {
                 info!("wrote foo level: {}", val);
-                if let Err(e) = server.foo_notify(&conn, val + 1) {
+                if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            Some(FooServiceEvent::FooNotificationsEnabled) => info!("notifications enabled"),
-            Some(FooServiceEvent::FooNotificationsDisabled) => info!("notifications disabled"),
-            None => {}
+            ServerEvent::FooService(FooServiceEvent::FooNotificationsEnabled) => {
+                info!("notifications enabled")
+            }
+            ServerEvent::FooService(FooServiceEvent::FooNotificationsDisabled) => {
+                info!("notifications disabled")
+            }
         })
         .await;
 
@@ -80,7 +85,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &FooService) {
 
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPin) {
-    let server: FooService = unwrap!(gatt_server::register(sd));
+    let server: Server = unwrap!(gatt_server::register(sd));
 
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");

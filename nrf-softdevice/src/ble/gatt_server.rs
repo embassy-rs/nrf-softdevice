@@ -28,10 +28,10 @@ pub struct CharacteristicHandles {
     pub sccd_handle: u16,
 }
 
-#[derive(Clone)]
-pub struct GattEvent<'a> {
-    pub handle: u16,
-    pub data: &'a [u8],
+pub trait Server: Sized {
+    type Event;
+    fn register(sd: &Softdevice) -> Result<Self, RegisterError>;
+    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
 pub trait Service: Sized {
@@ -43,7 +43,7 @@ pub trait Service: Sized {
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
-    fn on_write<'m>(&self, event: GattEvent<'m>) -> Option<Self::Event>;
+    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -58,12 +58,17 @@ impl From<RawError> for RegisterError {
     }
 }
 
-pub fn register<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError> {
+pub fn register<S: Server>(sd: &Softdevice) -> Result<S, RegisterError> {
+    S::register(sd)
+}
+
+pub fn register_service<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError> {
+    let uuid = S::uuid();
     let mut service_handle: u16 = 0;
     let ret = unsafe {
         raw::sd_ble_gatts_service_add(
             raw::BLE_GATTS_SRVC_TYPE_PRIMARY as u8,
-            S::uuid().as_raw_ptr(),
+            uuid.as_raw_ptr(),
             &mut service_handle as _,
         )
     };
@@ -146,9 +151,10 @@ impl From<DisconnectedError> for RunError {
     }
 }
 
-pub async fn run<'m, F>(conn: &Connection, mut f: F) -> Result<(), RunError>
+pub async fn run<'m, F, S>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
 where
-    F: FnMut(GattEvent<'m>),
+    F: FnMut(S::Event),
+    S: Server,
 {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
     portal(conn_handle)
@@ -170,10 +176,7 @@ where
                         panic!("gatt_server auth_required not yet supported");
                     }
 
-                    f(GattEvent {
-                        handle: params.handle,
-                        data: &v,
-                    });
+                    server.on_write(params.handle, &v).map(|e| f(e));
                 }
                 _ => {}
             }

@@ -14,10 +14,7 @@ use defmt::*;
 use embassy::executor::Executor;
 use embassy::util::Forever;
 
-use nrf_softdevice::ble::{
-    gatt_server::{self, Service},
-    peripheral,
-};
+use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
@@ -39,10 +36,16 @@ struct FooService {
     foo: u16,
 }
 
+#[nrf_softdevice::gatt_server]
+struct Server {
+    bas: BatteryService,
+    foo: FooService,
+}
+
 #[embassy::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
-    let battery_service: BatteryService = unwrap!(gatt_server::register(sd));
-    let foo_service: FooService = unwrap!(gatt_server::register(sd));
+    let server: Server = unwrap!(gatt_server::register(sd));
+
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -65,31 +68,29 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         info!("advertising done!");
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, |e| {
-            match battery_service.on_write(e.clone()) {
-                Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled) => {
+        let res = gatt_server::run(&conn, &server, |e| match e {
+            ServerEvent::BatteryService(e) => match e {
+                BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
                     info!("battery notifications enabled")
                 }
-                Some(BatteryServiceEvent::BatteryLevelNotificationsDisabled) => {
+                BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
                     info!("battery notifications disabled")
                 }
-                None => {}
-            }
-            match foo_service.on_write(e) {
-                Some(FooServiceEvent::FooWrite(val)) => {
-                    info!("wrote battery level: {}", val);
-                    if let Err(e) = foo_service.foo_notify(&conn, val + 1) {
+            },
+            ServerEvent::FooService(e) => match e {
+                FooServiceEvent::FooWrite(val) => {
+                    info!("wrote foo: {}", val);
+                    if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
                         info!("send notification error: {:?}", e);
                     }
                 }
-                Some(FooServiceEvent::FooNotificationsEnabled) => {
+                FooServiceEvent::FooNotificationsEnabled => {
                     info!("foo notifications enabled")
                 }
-                Some(FooServiceEvent::FooNotificationsDisabled) => {
+                FooServiceEvent::FooNotificationsDisabled => {
                     info!("foo notifications disabled")
                 }
-                None => {}
-            }
+            },
         })
         .await;
 
