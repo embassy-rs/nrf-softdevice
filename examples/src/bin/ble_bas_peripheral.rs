@@ -29,7 +29,7 @@ async fn softdevice_task(sd: &'static Softdevice) {
 
 #[nrf_softdevice::gatt_server(uuid = "180f")]
 struct BatteryService {
-    #[characteristic(uuid = "2a19", read, write, notify)]
+    #[characteristic(uuid = "2a19", read, notify)]
     battery_level: u8,
 }
 
@@ -67,13 +67,6 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, |e| {
             match battery_service.on_write(e.clone()) {
-                Some(BatteryServiceEvent::BatteryLevelWrite(val)) => {
-                    info!("wrote battery level: {}", val);
-                    if let Err(e) = battery_service.battery_level_notify(&conn, val + 1) {
-                        info!("send notification error: {:?}", e);
-                    }
-                }
-
                 Some(BatteryServiceEvent::BatteryLevelNotificationsEnabled) => {
                     info!("battery notifications enabled")
                 }
