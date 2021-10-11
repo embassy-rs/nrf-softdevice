@@ -62,16 +62,16 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
         info!("advertising done!");
 
         let res = gatt_server::run(&conn, server, |e| match e {
-            ServerEvent::FooService(FooServiceEvent::FooWrite(val)) => {
+            ServerEvent::Foo(FooServiceEvent::FooWrite(val)) => {
                 info!("wrote foo level: {}", val);
                 if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            ServerEvent::FooService(FooServiceEvent::FooNotificationsEnabled) => {
+            ServerEvent::Foo(FooServiceEvent::FooNotificationsEnabled) => {
                 info!("notifications enabled")
             }
-            ServerEvent::FooService(FooServiceEvent::FooNotificationsDisabled) => {
+            ServerEvent::Foo(FooServiceEvent::FooNotificationsDisabled) => {
                 info!("notifications disabled")
             }
         })

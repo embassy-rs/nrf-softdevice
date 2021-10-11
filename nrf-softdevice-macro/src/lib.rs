@@ -78,15 +78,19 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
         ));
 
         if let syn::Type::Path(p) = &field.ty {
+            let name_pascal = format_ident!(
+                "{}",
+                inflector::cases::pascalcase::to_pascal_case(&name.to_string())
+            );
             let event_enum_ty = p.path.get_ident().unwrap();
             let event_enum_variant = format_ident!("{}Event", event_enum_ty);
             code_event_enum.extend(quote_spanned!(span=>
-                #event_enum_ty(#event_enum_variant),
+                #name_pascal(#event_enum_variant),
             ));
 
             code_on_write.extend(quote_spanned!(span=>
                 if let Some(e) = self.#name.on_write(handle, data) {
-                    return Some(#event_enum_name::#event_enum_ty(e));
+                    return Some(#event_enum_name::#name_pascal(e));
                 }
             ));
         }
