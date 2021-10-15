@@ -249,6 +249,7 @@ impl From<DisconnectedError> for NotifyValueError {
     }
 }
 
+/// Multiple notifications can be queued. Will fail when the queue is full.
 pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), NotifyValueError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
@@ -285,6 +286,7 @@ impl From<DisconnectedError> for IndicateValueError {
     }
 }
 
+/// This will fail if an indication is already in progress
 pub fn indicate_value(
     conn: &Connection,
     handle: u16,
