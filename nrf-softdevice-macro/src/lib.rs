@@ -14,7 +14,7 @@ mod uuid;
 use crate::uuid::Uuid;
 
 #[derive(Debug, FromMeta)]
-struct ServerArgs {
+struct ServiceArgs {
     uuid: Uuid,
 }
 #[derive(Debug, FromMeta)]
@@ -36,14 +36,106 @@ struct Characteristic {
     ty: syn::Type,
     args: CharacteristicArgs,
     span: Span,
+    vis: syn::Visibility,
 }
 
 #[proc_macro_attribute]
-pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
+pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
+    let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+    let struct_fields = match &mut struc.fields {
+        syn::Fields::Named(n) => n,
+        _ => {
+            struc
+                .ident
+                .span()
+                .unwrap()
+                .error("gatt_server structs must have named fields, not tuples.")
+                .emit();
+            return TokenStream::new();
+        }
+    };
+    let fields = struct_fields
+        .named
+        .iter()
+        .cloned()
+        .collect::<Vec<syn::Field>>();
+
+    let struct_name = struc.ident.clone();
+    let event_enum_name = format_ident!("{}Event", struct_name);
+
+    let mut code_register_init = TokenStream2::new();
+    let mut code_on_write = TokenStream2::new();
+    let mut code_event_enum = TokenStream2::new();
+
+    let ble = quote!(::nrf_softdevice::ble);
+
+    for field in fields.iter() {
+        let name = field.ident.as_ref().unwrap();
+        let span = field.ty.span();
+        code_register_init.extend(quote_spanned!(span=>
+            #name: #ble::gatt_server::register_service(sd)?,
+        ));
+
+        if let syn::Type::Path(p) = &field.ty {
+            let name_pascal = format_ident!(
+                "{}",
+                inflector::cases::pascalcase::to_pascal_case(&name.to_string())
+            );
+            let event_enum_ty = p.path.get_ident().unwrap();
+            let event_enum_variant = format_ident!("{}Event", event_enum_ty);
+            code_event_enum.extend(quote_spanned!(span=>
+                #name_pascal(#event_enum_variant),
+            ));
+
+            code_on_write.extend(quote_spanned!(span=>
+                if let Some(e) = self.#name.on_write(handle, data) {
+                    return Some(#event_enum_name::#name_pascal(e));
+                }
+            ));
+        }
+    }
+
+    struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
+    let struc_vis = struc.vis.clone();
+
+    let result = quote! {
+        #struc
+
+        impl #struct_name {
+        }
+
+        #struc_vis enum #event_enum_name {
+            #code_event_enum
+        }
+
+        impl #ble::gatt_server::Server for #struct_name {
+            type Event = #event_enum_name;
+
+            fn register(sd: &::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
+            {
+                Ok(Self {
+                    #code_register_init
+                })
+            }
+
+            fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+                use #ble::gatt_server::Service;
+
+                #code_on_write
+                None
+            }
+        }
+    };
+    result.into()
+}
+
+#[proc_macro_attribute]
+pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
-    let args = match ServerArgs::from_list(&args) {
+    let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
             return e.write_errors().into();
@@ -59,7 +151,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 .ident
                 .span()
                 .unwrap()
-                .error("gatt_server structs must have named fields, not tuples.")
+                .error("gatt_service structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }
@@ -90,6 +182,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
                 ty: field.ty.clone(),
                 args,
                 span: field.ty.span(),
+                vis: field.vis.clone(),
             });
 
             false
@@ -123,6 +216,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         let set_fn = format_ident!("{}_set", ch.name);
         let notify_fn = format_ident!("{}_notify", ch.name);
         let indicate_fn = format_ident!("{}_indicate", ch.name);
+        let fn_vis = ch.vis.clone();
 
         let uuid = ch.args.uuid;
         let read = ch.args.read;
@@ -160,14 +254,14 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         ));
 
         code_impl.extend(quote_spanned!(ch.span=>
-            fn #get_fn(&self) -> Result<#ty, #ble::gatt_server::GetValueError> {
+            #fn_vis fn #get_fn(&self) -> Result<#ty, #ble::gatt_server::GetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = &mut [0u8; #ty_as_val::MAX_SIZE];
                 let size = #ble::gatt_server::get_value(sd, self.#value_handle, buf)?;
                 Ok(#ty_as_val::from_gatt(&buf[..size]))
             }
 
-            fn #set_fn(&self, val: #ty) -> Result<(), #ble::gatt_server::SetValueError> {
+            #fn_vis fn #set_fn(&self, val: #ty) -> Result<(), #ble::gatt_server::SetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
                 let buf = #ty_as_val::to_gatt(&val);
                 #ble::gatt_server::set_value(sd, self.#value_handle, buf)
@@ -194,14 +288,14 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#value_handle {
-                    return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(&data)));
+                    return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(data)));
                 }
             ));
         }
 
         if notify {
             code_impl.extend(quote_spanned!(ch.span=>
-                fn #notify_fn(
+                #fn_vis fn #notify_fn(
                     &self,
                     conn: &#ble::Connection,
                     val: #ty,
@@ -281,6 +375,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
+    let struc_vis = struc.vis.clone();
 
     let result = quote! {
         #struc
@@ -289,7 +384,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_impl
         }
 
-        impl #ble::gatt_server::Server for #struct_name {
+        impl #ble::gatt_server::Service for #struct_name {
             type Event = #event_enum_name;
 
             fn uuid() -> #ble::Uuid {
@@ -313,7 +408,7 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        enum #event_enum_name {
+        #struc_vis enum #event_enum_name {
             #code_event_enum
         }
     };
@@ -325,7 +420,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
-    let args = match ServerArgs::from_list(&args) {
+    let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
             return e.write_errors().into();
@@ -372,6 +467,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                 ty: field.ty.clone(),
                 args,
                 span: field.ty.span(),
+                vis: field.vis.clone(),
             });
 
             false

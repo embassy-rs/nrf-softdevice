@@ -30,8 +30,15 @@ pub struct CharacteristicHandles {
 
 pub trait Server: Sized {
     type Event;
+    fn register(sd: &Softdevice) -> Result<Self, RegisterError>;
+    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
+}
+
+pub trait Service: Sized {
+    type Event;
 
     fn uuid() -> Uuid;
+
     fn register<F>(service_handle: u16, register_char: F) -> Result<Self, RegisterError>
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
@@ -51,12 +58,17 @@ impl From<RawError> for RegisterError {
     }
 }
 
-pub fn register<S: Server>(_sd: &Softdevice) -> Result<S, RegisterError> {
+pub fn register<S: Server>(sd: &Softdevice) -> Result<S, RegisterError> {
+    S::register(sd)
+}
+
+pub fn register_service<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError> {
+    let uuid = S::uuid();
     let mut service_handle: u16 = 0;
     let ret = unsafe {
         raw::sd_ble_gatts_service_add(
             raw::BLE_GATTS_SRVC_TYPE_PRIMARY as u8,
-            S::uuid().as_raw_ptr(),
+            uuid.as_raw_ptr(),
             &mut service_handle as _,
         )
     };
@@ -139,9 +151,10 @@ impl From<DisconnectedError> for RunError {
     }
 }
 
-pub async fn run<S: Server, F>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
+pub async fn run<'m, F, S>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
 where
     F: FnMut(S::Event),
+    S: Server,
 {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
     portal(conn_handle)
@@ -163,7 +176,7 @@ where
                         panic!("gatt_server auth_required not yet supported");
                     }
 
-                    server.on_write(params.handle, v).map(|e| f(e));
+                    server.on_write(params.handle, &v).map(|e| f(e));
                 }
                 _ => {}
             }
