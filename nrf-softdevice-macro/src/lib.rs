@@ -215,6 +215,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let get_fn = format_ident!("{}_get", ch.name);
         let set_fn = format_ident!("{}_set", ch.name);
         let notify_fn = format_ident!("{}_notify", ch.name);
+        let indicate_fn = format_ident!("{}_indicate", ch.name);
         let fn_vis = ch.vis.clone();
 
         let uuid = ch.args.uuid;
@@ -291,10 +292,8 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 }
             ));
         }
-        if notify {
-            let case_enabled = format_ident!("{}NotificationsEnabled", name_pascal);
-            let case_disabled = format_ident!("{}NotificationsDisabled", name_pascal);
 
+        if notify {
             code_impl.extend(quote_spanned!(ch.span=>
                 #fn_vis fn #notify_fn(
                     &self,
@@ -306,17 +305,68 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 }
             ));
 
+            if !indicate {
+                let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
+
+                code_event_enum.extend(quote_spanned!(ch.span=>
+                    #case_cccd_write{notifications: bool},
+                ));
+                code_on_write.extend(quote_spanned!(ch.span=>
+                    if handle == self.#cccd_handle && data.len() != 0 {
+                        match data[0] & 0x01 {
+                            0x00 => return Some(#event_enum_name::#case_cccd_write{notifications: false}),
+                            0x01 => return Some(#event_enum_name::#case_cccd_write{notifications: true}),
+                            _ => {},
+                        }
+                    }
+                ));
+            }
+        }
+
+        if indicate {
+            code_impl.extend(quote_spanned!(ch.span=>
+                fn #indicate_fn(
+                    &self,
+                    conn: &#ble::Connection,
+                    val: #ty,
+                ) -> Result<(), #ble::gatt_server::IndicateValueError> {
+                    let buf = #ty_as_val::to_gatt(&val);
+                    #ble::gatt_server::indicate_value(conn, self.#value_handle, buf)
+                }
+            ));
+
+            if !notify {
+                let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
+
+                code_event_enum.extend(quote_spanned!(ch.span=>
+                    #case_cccd_write{indications: bool},
+                ));
+                code_on_write.extend(quote_spanned!(ch.span=>
+                    if handle == self.#cccd_handle && data.len() != 0 {
+                        match data[0] & 0x02 {
+                            0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false}),
+                            0x02 => return Some(#event_enum_name::#case_cccd_write{indications: true}),
+                            _ => {},
+                        }
+                    }
+                ));
+            }
+        }
+
+        if indicate && notify {
+            let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
+
             code_event_enum.extend(quote_spanned!(ch.span=>
-                #case_enabled,
-                #case_disabled,
+                #case_cccd_write{indications: bool, notifications: bool},
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
-                if handle == self.#cccd_handle {
-                    let data = data;
-                    if data.len() != 0 && data[0] & 0x01 != 0 {
-                        return Some(#event_enum_name::#case_enabled);
-                    } else {
-                        return Some(#event_enum_name::#case_disabled);
+                if handle == self.#cccd_handle && data.len() != 0 {
+                    match data[0] & 0x03 {
+                        0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: false}),
+                        0x01 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: true}),
+                        0x02 => return Some(#event_enum_name::#case_cccd_write{indications: true, notifications: false}),
+                        0x03 => return Some(#event_enum_name::#case_cccd_write{indications: true, notifications: true}),
+                        _ => {},
                     }
                 }
             ));

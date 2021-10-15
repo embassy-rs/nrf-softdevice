@@ -32,7 +32,13 @@ struct BatteryService {
 
 #[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
 struct FooService {
-    #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify)]
+    #[characteristic(
+        uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38",
+        read,
+        write,
+        notify,
+        indicate
+    )]
     foo: u16,
 }
 
@@ -70,11 +76,8 @@ async fn bluetooth_task(sd: &'static Softdevice) {
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let res = gatt_server::run(&conn, &server, |e| match e {
             ServerEvent::Bas(e) => match e {
-                BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
-                    info!("battery notifications enabled")
-                }
-                BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
-                    info!("battery notifications disabled")
+                BatteryServiceEvent::BatteryLevelCccdWrite { notifications } => {
+                    info!("battery notifications: {}", notifications)
                 }
             },
             ServerEvent::Foo(e) => match e {
@@ -84,11 +87,14 @@ async fn bluetooth_task(sd: &'static Softdevice) {
                         info!("send notification error: {:?}", e);
                     }
                 }
-                FooServiceEvent::FooNotificationsEnabled => {
-                    info!("foo notifications enabled")
-                }
-                FooServiceEvent::FooNotificationsDisabled => {
-                    info!("foo notifications disabled")
+                FooServiceEvent::FooCccdWrite {
+                    indications,
+                    notifications,
+                } => {
+                    info!(
+                        "foo indications: {}, notifications: {}",
+                        indications, notifications
+                    )
                 }
             },
         })

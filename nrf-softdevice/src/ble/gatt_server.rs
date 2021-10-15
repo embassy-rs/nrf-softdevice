@@ -262,6 +262,7 @@ impl From<DisconnectedError> for NotifyValueError {
     }
 }
 
+/// Multiple notifications can be queued. Will fail when the queue is full.
 pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), NotifyValueError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
@@ -269,6 +270,47 @@ pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), No
     let params = raw::ble_gatts_hvx_params_t {
         handle,
         type_: raw::BLE_GATT_HVX_NOTIFICATION as u8,
+        offset: 0,
+        p_data: val.as_ptr() as _,
+        p_len: &mut len,
+    };
+    let ret = unsafe { raw::sd_ble_gatts_hvx(conn_handle, &params) };
+    RawError::convert(ret)?;
+
+    Ok(())
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum IndicateValueError {
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<RawError> for IndicateValueError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+impl From<DisconnectedError> for IndicateValueError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+/// This will fail if an indication is already in progress
+pub fn indicate_value(
+    conn: &Connection,
+    handle: u16,
+    val: &[u8],
+) -> Result<(), IndicateValueError> {
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
+
+    let mut len: u16 = val.len() as _;
+    let params = raw::ble_gatts_hvx_params_t {
+        handle,
+        type_: raw::BLE_GATT_HVX_INDICATION as u8,
         offset: 0,
         p_data: val.as_ptr() as _,
         p_len: &mut len,

@@ -68,11 +68,8 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            ServerEvent::Foo(FooServiceEvent::FooNotificationsEnabled) => {
-                info!("notifications enabled")
-            }
-            ServerEvent::Foo(FooServiceEvent::FooNotificationsDisabled) => {
-                info!("notifications disabled")
+            ServerEvent::Foo(FooServiceEvent::FooCccdWrite { notifications }) => {
+                info!("foo notifications: {}", notifications)
             }
         })
         .await;
