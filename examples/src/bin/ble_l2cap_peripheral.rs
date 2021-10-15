@@ -145,9 +145,9 @@ fn main() -> ! {
         ..Default::default()
     };
 
-    unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
-
     let sd = Softdevice::enable(&config);
+
+    unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(|spawner| {
