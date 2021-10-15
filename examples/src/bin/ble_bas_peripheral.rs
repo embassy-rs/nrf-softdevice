@@ -28,7 +28,13 @@ async fn softdevice_task(sd: &'static Softdevice) {
 struct BatteryService {
     #[characteristic(uuid = "2a19", read, write, notify)]
     battery_level: u8,
-    #[characteristic(uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d", read, write, notify)]
+    #[characteristic(
+        uuid = "3a4a1f7e-22d8-11eb-a3aa-1b3b1d4e4a0d",
+        read,
+        write,
+        notify,
+        indicate
+    )]
     foo: u16,
 }
 
@@ -70,14 +76,18 @@ async fn bluetooth_task(sd: &'static Softdevice) {
                     info!("send notification error: {:?}", e);
                 }
             }
-            BatteryServiceEvent::BatteryLevelNotificationsEnabled => {
-                info!("battery notifications enabled")
+            BatteryServiceEvent::BatteryLevelCccdWrite { notifications } => {
+                info!("battery notifications: {}", notifications)
             }
-            BatteryServiceEvent::BatteryLevelNotificationsDisabled => {
-                info!("battery notifications disabled")
+            BatteryServiceEvent::FooCccdWrite {
+                indications,
+                notifications,
+            } => {
+                info!(
+                    "foo indications: {}, notifications: {}",
+                    indications, notifications
+                )
             }
-            BatteryServiceEvent::FooNotificationsEnabled => info!("foo notifications enabled"),
-            BatteryServiceEvent::FooNotificationsDisabled => info!("foo notifications disabled"),
         })
         .await;
 

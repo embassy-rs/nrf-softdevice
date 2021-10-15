@@ -212,19 +212,17 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
 
             if !indicate {
-                let case_enabled = format_ident!("{}NotificationsEnabled", name_pascal);
-                let case_disabled = format_ident!("{}NotificationsDisabled", name_pascal);
+                let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
 
                 code_event_enum.extend(quote_spanned!(ch.span=>
-                    #case_enabled,
-                    #case_disabled,
+                    #case_cccd_write{notifications: bool},
                 ));
                 code_on_write.extend(quote_spanned!(ch.span=>
-                    if handle == self.#cccd_handle {
-                        if data.len() != 0 && data[0] & 0x01 != 0 {
-                            return Some(#event_enum_name::#case_enabled);
-                        } else {
-                            return Some(#event_enum_name::#case_disabled);
+                    if handle == self.#cccd_handle && data.len() != 0 {
+                        match data[0] & 0x01 {
+                            0x00 => return Some(#event_enum_name::#case_cccd_write{notifications: false}),
+                            0x01 => return Some(#event_enum_name::#case_cccd_write{notifications: true}),
+                            _ => {},
                         }
                     }
                 ));
@@ -244,19 +242,17 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
 
             if !notify {
-                let case_enabled = format_ident!("{}IndicationsEnabled", name_pascal);
-                let case_disabled = format_ident!("{}IndicationsDisabled", name_pascal);
+                let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
 
                 code_event_enum.extend(quote_spanned!(ch.span=>
-                    #case_enabled,
-                    #case_disabled,
+                    #case_cccd_write{indications: bool},
                 ));
                 code_on_write.extend(quote_spanned!(ch.span=>
-                    if handle == self.#cccd_handle {
-                        if data.len() != 0 && data[0] & 0x02 != 0 {
-                            return Some(#event_enum_name::#case_enabled);
-                        } else {
-                            return Some(#event_enum_name::#case_disabled);
+                    if handle == self.#cccd_handle && data.len() != 0 {
+                        match data[0] & 0x02 {
+                            0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false}),
+                            0x02 => return Some(#event_enum_name::#case_cccd_write{indications: true}),
+                            _ => {},
                         }
                     }
                 ));
@@ -264,28 +260,18 @@ pub fn gatt_server(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         if indicate && notify {
-            let case_disabled_disabled =
-                format_ident!("{}IndicationsDisabledNotificationsDisabled", name_pascal);
-            let case_disabled_enabled =
-                format_ident!("{}IndicationsDisabledNotificationsEnabled", name_pascal);
-            let case_enabled_disabled =
-                format_ident!("{}IndicationsEnabledNotificationsDisabled", name_pascal);
-            let case_enabled_enabled =
-                format_ident!("{}IndicationsEnabledNotificationsEnabled", name_pascal);
+            let case_cccd_write = format_ident!("{}CccdWrite", name_pascal);
 
             code_event_enum.extend(quote_spanned!(ch.span=>
-                #case_disabled_disabled,
-                #case_disabled_enabled,
-                #case_enabled_disabled,
-                #case_enabled_enabled,
+                #case_cccd_write{indications: bool, notifications: bool},
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#cccd_handle && data.len() != 0 {
                     match data[0] & 0x03 {
-                        0x00 => return Some(#event_enum_name::#case_disabled_disabled),
-                        0x01 => return Some(#event_enum_name::#case_disabled_enabled),
-                        0x02 => return Some(#event_enum_name::#case_enabled_disabled),
-                        0x03 => return Some(#event_enum_name::#case_enabled_enabled),
+                        0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: false}),
+                        0x01 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: true}),
+                        0x02 => return Some(#event_enum_name::#case_cccd_write{indications: true, notifications: false}),
+                        0x03 => return Some(#event_enum_name::#case_cccd_write{indications: true, notifications: true}),
                         _ => {},
                     }
                 }
