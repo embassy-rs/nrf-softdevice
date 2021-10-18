@@ -136,13 +136,14 @@ impl<P: Packet> L2cap<P> {
         &self,
         conn: &Connection,
         config: &Config,
+        psm: u16,
     ) -> Result<Channel<P>, SetupError> {
         let sd = unsafe { Softdevice::steal() };
 
         let conn_handle = conn.with_state(|state| state.check_connected())?;
         let mut cid: u16 = raw::BLE_L2CAP_CID_INVALID as _;
         let params = raw::ble_l2cap_ch_setup_params_t {
-            le_psm: config.psm,
+            le_psm: psm,
             status: 0, // only used when responding
             rx_params: raw::ble_l2cap_ch_rx_params_t {
                 rx_mps: sd.l2cap_rx_mps,
@@ -205,7 +206,19 @@ impl<P: Packet> L2cap<P> {
         &self,
         conn: &Connection,
         config: &Config,
+        psm: u16,
     ) -> Result<Channel<P>, SetupError> {
+        self.listen_with(conn, config, move |got_psm| got_psm == psm)
+            .await
+            .map(|(_, ch)| ch)
+    }
+
+    pub async fn listen_with(
+        &self,
+        conn: &Connection,
+        config: &Config,
+        mut accept_psm: impl FnMut(u16) -> bool,
+    ) -> Result<(u16, Channel<P>), SetupError> {
         let sd = unsafe { Softdevice::steal() };
         let conn_handle = conn.with_state(|state| state.check_connected())?;
 
@@ -220,7 +233,7 @@ impl<P: Packet> L2cap<P> {
                         let evt = &l2cap_evt.params.ch_setup_request;
 
                         let mut cid: u16 = l2cap_evt.local_cid;
-                        if evt.le_psm == config.psm {
+                        if accept_psm(evt.le_psm) {
                             let params = raw::ble_l2cap_ch_setup_params_t {
                                 le_psm: evt.le_psm,
                                 status: raw::BLE_L2CAP_CH_STATUS_CODE_SUCCESS as _,
@@ -254,11 +267,14 @@ impl<P: Packet> L2cap<P> {
                                 }
                             }
 
-                            Some(Ok(Channel {
-                                _private: PhantomData,
-                                cid,
-                                conn: conn.clone(),
-                            }))
+                            Some(Ok((
+                                evt.le_psm,
+                                Channel {
+                                    _private: PhantomData,
+                                    cid,
+                                    conn: conn.clone(),
+                                },
+                            )))
                         } else {
                             let params = raw::ble_l2cap_ch_setup_params_t {
                                 le_psm: evt.le_psm,
@@ -282,7 +298,6 @@ impl<P: Packet> L2cap<P> {
 }
 
 pub struct Config {
-    pub psm: u16,
     pub credits: u16,
 }
 
