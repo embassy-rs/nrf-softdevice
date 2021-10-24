@@ -2,6 +2,12 @@
 
 Rust bindings for Nordic Semiconductor nRF series SoftDevices.
 
+SoftDevices are a closed source C binary written by Nordic for their microcontrollers that sits at the bottom of flash and is called first on startup. The softdevice then calls your application or bootloader or whatever is sitting directly after it in flash.
+
+They are full featured, battle tested, and pre qualified for bluetooth certification and thus make valuable bluetooth stacks when bindgened to Rust -- at least until we get a Rust bluetooth stack certified to be shipped commercially. Different SoftDevices support specific chips as well as certain features, like working only as a peripheral, or both a peripheral and central, or even offer alternate radio configuration like ant.
+
+Besides the handicap of being closed source, the cost of SoftDevices is they steal away resources like ram and flash as well as timer peripherals and several priorities of interrupts from your application.
+
 ## High-level bindings
 
 The `nrf-softdevice` crate contains high-level easy-to-use Rust async/await bindings for the Softdevice.
@@ -69,6 +75,67 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 To run an example, simply use `cargo run` from the `examples` folder:
 
 - `cd examples && cargo run --bin ble_bas_peripheral`
+
+## Configuring a SoftDevice
+
+The first thing to do is find out how much flash the SoftDevice you've chosen uses. Look in the release notes, or google for your SoftDevice version and "memory map". For an s132 v7.3 its listed as 0x26000, or in human readable numbers 152K (0x26000 in hex is 155648 in decimal / 1024 bytes = 152K)
+
+Set the memory.x to move your applications flash start to after the SoftDevice size and subtract it from the total avialable size:
+
+```bash
+MEMORY
+{
+  /* NOTE 1 K = 1 KiBi = 1024 bytes */
+  /* These values correspond to the NRF52832 with SoftDevices S132 7.3.0 */
+  FLASH : ORIGIN = 0x00000000 + 152K, LENGTH = 512K - 152K
+  RAM : ORIGIN = 0x20000000 + 44K, LENGTH = 64K - 44K
+}
+```
+
+You can pick mostly anything for ram right now as if you have defmt logging enabled, the SoftDevice will tell you what the right number is when you call enable:
+
+```bash
+1 INFO  softdevice RAM: 41600 bytes
+└─ nrf_softdevice::softdevice::{impl#0}::enable @ /home/jacob/.cargo/git/checkouts/nrf-softdevice-03ef4aef10e777e4/fa369be/nrf-softdevice/src/fmt.rs:138
+2 ERROR panicked at 'too little RAM for softdevice. Change your app's RAM start address to 2000a280'
+```
+
+You have some control over that number by tweaking the SoftDevice configuration parameters. See especially the concurrent connection parameters. If you dont need to support multiple connections these can really decrease your ram size:
+
+- conn_gap.conn_count The number of concurrent connections the application can create with this configuration
+- periph_role_count Maximum number of connections concurrently acting as a peripheral
+- central_role_count Maximum number of connections concurrently acting as a central
+
+Next you need to find out if your board has an external oscillator (which provides better battery life) But if in doubt just assume it doesnt and set the SoftDevice to use an internal clock. A common no external crystal configuration for nRF52 might be
+
+```rust
+        clock: Some(raw::nrf_clock_lf_cfg_t {
+            source: raw::NRF_CLOCK_LF_SRC_RC as u8,
+            rc_ctiv: 16,
+            rc_temp_ctiv: 2,
+            accuracy: raw::NRF_CLOCK_LF_ACCURACY_250_PPM as u8,
+        }),
+```
+
+The SoftDevice steals interrupts 0,1, and 3 from your application. So make sure route around those. If you're using embassy and you have the `gpiote` and the `time-driver-rtc1` features enabled for instance you'll need to edit your embassy_config to move those priorities:
+
+```rust
+/ 0 is Highest. Lower prio number can preempt higher prio number
+// Softdevice has reserved priorities 0, 1 and 3
+pub fn embassy_config() -> embassy_nrf::config::Config {
+    let mut config = embassy_nrf::config::Config::default();
+    config.hfclk_source = embassy_nrf::config::HfclkSource::Internal;
+    config.lfclk_source = embassy_nrf::config::LfclkSource::InternalRC;
+    config.time_interrupt_priority = interrupt::Priority::P2;
+    // if we see button misses lower this
+    config.gpiote_interrupt_priority = interrupt::Priority::P7;
+    config
+}
+```
+
+## Troubleshooting
+
+If your SoftDevice is hardfaulting on enable and you think you have everything right, mak sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
 
 ## Low-level raw bindings
 
