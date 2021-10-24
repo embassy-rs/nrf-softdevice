@@ -117,7 +117,7 @@ Next you need to find out if your board has an external oscillator (which provid
         }),
 ```
 
-The SoftDevice steals interrupts 0,1, and 3 from your application. So make sure route around those. If you're using embassy and you have the `gpiote` and the `time-driver-rtc1` features enabled for instance you'll need to edit your embassy_config to move those priorities:
+The SoftDevice steals interrupt priority levels 0, 1, and 3 from your application. So make sure route around those. If you're using embassy and you have the `gpiote` and the `time-driver-rtc1` features enabled for instance you'll need to edit your embassy_config to move those priorities:
 
 ```rust
 / 0 is Highest. Lower prio number can preempt higher prio number
