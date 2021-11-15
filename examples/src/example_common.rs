@@ -20,8 +20,6 @@ fn alloc_error(_layout: Layout) -> ! {
     panic!("Alloc error");
 }
 
-const HEAP_SIZE: usize = 32 * 1024; // in bytes
-
 defmt::timestamp! {"{=u64}", {
         static COUNT: AtomicUsize = AtomicUsize::new(0);
         // NOTE(no-CAS) `timestamps` runs with interrupts disabled

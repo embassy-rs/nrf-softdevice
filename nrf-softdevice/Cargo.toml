@@ -5,12 +5,6 @@ authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 edition = "2018"
 
 [features]
-defmt-default = []
-defmt-trace = []
-defmt-debug = []
-defmt-info = []
-defmt-warn = []
-defmt-error = []
 
 nrf52805 = ["nrf52805-pac"]
 nrf52810 = ["nrf52810-pac"]
@@ -36,7 +30,7 @@ ble-gatt-client = ["ble-gatt"]
 critical-section-impl = ["critical-section/custom-impl"]
 
 [dependencies]
-defmt = { version = "0.2.0", optional = true }
+defmt = { version = "0.3", optional = true }
 log = { version = "0.4.11", optional = true }
 critical-section = { version = "0.2.1" }
 

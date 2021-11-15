@@ -8,51 +8,69 @@
 //! // src/main.rs or src/bin/my-app.rs
 //! use defmt_rtt as _;
 //! ```
+//!
+//! # Blocking/Non-blocking
+//!
+//! `probe-run` puts RTT into blocking-mode, to avoid losing data.
+//!
+//! As an effect this implementation may block forever if `probe-run` disconnects on runtime. This
+//! is because the RTT buffer will fill up and writing will eventually halt the program execution.
+//!
+//! `defmt::flush` would also block forever in that case.
 
 #![no_std]
 
-use core::{
-    ptr,
-    ptr::NonNull,
-    sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering},
-};
+mod channel;
 
-// TODO make configurable
-// NOTE use a power of 2 for best performance
-const SIZE: usize = 1024;
+use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
+
+use crate::channel::Channel;
 
 #[defmt::global_logger]
 struct Logger;
 
-impl defmt::Write for Logger {
-    fn write(&mut self, bytes: &[u8]) {
-        unsafe { handle().write_all(bytes) }
-    }
-}
-
+/// Global logger lock.
 static TAKEN: AtomicBool = AtomicBool::new(false);
 static INTERRUPTS_TOKEN: AtomicU8 = AtomicU8::new(0);
+static mut ENCODER: defmt::Encoder = defmt::Encoder::new();
 
 unsafe impl defmt::Logger for Logger {
-    fn acquire() -> Option<NonNull<dyn defmt::Write>> {
+    fn acquire() {
         let token = unsafe { critical_section::acquire() };
+
         if !TAKEN.load(Ordering::Relaxed) {
             // no need for CAS because interrupts are disabled
             TAKEN.store(true, Ordering::Relaxed);
 
             INTERRUPTS_TOKEN.store(token, Ordering::Relaxed);
 
-            Some(NonNull::from(&Logger as &dyn defmt::Write))
+            // safety: accessing the `static mut` is OK because we have disabled interrupts.
+            unsafe { ENCODER.start_frame(do_write) }
         } else {
             unsafe { critical_section::release(token) };
-            None
         }
     }
 
-    unsafe fn release(_: NonNull<dyn defmt::Write>) {
+    unsafe fn flush() {
+        // SAFETY: if we get here, the global logger mutex is currently acquired
+        handle().flush();
+    }
+
+    unsafe fn release() {
+        // safety: accessing the `static mut` is OK because we have disabled interrupts.
+        ENCODER.end_frame(do_write);
         TAKEN.store(false, Ordering::Relaxed);
         critical_section::release(INTERRUPTS_TOKEN.load(Ordering::Relaxed));
     }
+
+    unsafe fn write(bytes: &[u8]) {
+        // safety: accessing the `static mut` is OK because we have disabled interrupts.
+        ENCODER.write(bytes, do_write);
+    }
+}
+
+fn do_write(bytes: &[u8]) {
+    unsafe { handle().write_all(bytes) }
 }
 
 #[repr(C)]
@@ -63,127 +81,15 @@ struct Header {
     up_channel: Channel,
 }
 
-#[repr(C)]
-struct Channel {
-    name: *const u8,
-    buffer: *mut u8,
-    size: usize,
-    write: AtomicUsize,
-    read: AtomicUsize,
-    flags: AtomicUsize,
-}
+const MODE_MASK: usize = 0b11;
+/// Block the application if the RTT buffer is full, wait for the host to read data.
+const MODE_BLOCK_IF_FULL: usize = 2;
+/// Don't block if the RTT buffer is full. Truncate data to output as much as fits.
+const MODE_NON_BLOCKING_TRIM: usize = 1;
 
-const BLOCK_IF_FULL: usize = 2;
-const NOBLOCK_TRIM: usize = 1;
-
-impl Channel {
-    fn write_all(&self, mut bytes: &[u8]) {
-        // NOTE `flags` is modified by the host after RAM initialization while the device is halted
-        // it cannot otherwise be modified so we don't need to check its state more often than
-        // just here
-        if self.flags.load(Ordering::Relaxed) == BLOCK_IF_FULL {
-            while !bytes.is_empty() {
-                let consumed = self.blocking_write(bytes);
-                if consumed != 0 {
-                    bytes = &bytes[consumed..];
-                }
-            }
-        } else {
-            while !bytes.is_empty() {
-                let consumed = self.nonblocking_write(bytes);
-                if consumed != 0 {
-                    bytes = &bytes[consumed..];
-                }
-            }
-        }
-    }
-
-    fn blocking_write(&self, bytes: &[u8]) -> usize {
-        if bytes.is_empty() {
-            return 0;
-        }
-
-        let read = self.read.load(Ordering::Relaxed);
-        let write = self.write.load(Ordering::Acquire);
-        let available = if read > write {
-            read - write - 1
-        } else if read == 0 {
-            SIZE - write - 1
-        } else {
-            SIZE - write
-        };
-
-        if available == 0 {
-            return 0;
-        }
-
-        let cursor = write;
-        let len = bytes.len().min(available);
-
-        unsafe {
-            if cursor + len > SIZE {
-                // split memcpy
-                let pivot = SIZE - cursor;
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr(),
-                    self.buffer.add(cursor.into()),
-                    pivot.into(),
-                );
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr().add(pivot.into()),
-                    self.buffer,
-                    (len - pivot).into(),
-                );
-            } else {
-                // single memcpy
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr(),
-                    self.buffer.add(cursor.into()),
-                    len.into(),
-                );
-            }
-        }
-        self.write
-            .store(write.wrapping_add(len) % SIZE, Ordering::Release);
-
-        len
-    }
-
-    fn nonblocking_write(&self, bytes: &[u8]) -> usize {
-        let write = self.write.load(Ordering::Acquire);
-        let cursor = write;
-        // NOTE truncate at SIZE to avoid more than one "wrap-around" in a single `write` call
-        let len = bytes.len().min(SIZE);
-
-        unsafe {
-            if cursor + len > SIZE {
-                // split memcpy
-                let pivot = SIZE - cursor;
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr(),
-                    self.buffer.add(cursor.into()),
-                    pivot.into(),
-                );
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr().add(pivot.into()),
-                    self.buffer,
-                    (len - pivot).into(),
-                );
-            } else {
-                // single memcpy
-                ptr::copy_nonoverlapping(
-                    bytes.as_ptr(),
-                    self.buffer.add(cursor.into()),
-                    len.into(),
-                );
-            }
-        }
-        self.write
-            .store(write.wrapping_add(len) % SIZE, Ordering::Release);
-
-        len
-    }
-}
+// TODO make configurable
+// NOTE use a power of 2 for best performance
+const SIZE: usize = 1024;
 
 // make sure we only get shared references to the header/channel (avoid UB)
 /// # Safety
@@ -205,11 +111,12 @@ unsafe fn handle() -> &'static Channel {
             size: SIZE,
             write: AtomicUsize::new(0),
             read: AtomicUsize::new(0),
-            flags: AtomicUsize::new(NOBLOCK_TRIM),
+            flags: AtomicUsize::new(MODE_NON_BLOCKING_TRIM),
         },
     };
 
-    #[link_section = ".uninit.defmt-rtt.BUFFER"]
+    #[cfg_attr(target_os = "macos", link_section = ".uninit,defmt-rtt.BUFFER")]
+    #[cfg_attr(not(target_os = "macos"), link_section = ".uninit.defmt-rtt.BUFFER")]
     static mut BUFFER: [u8; SIZE] = [0; SIZE];
 
     static NAME: &[u8] = b"defmt\0";
