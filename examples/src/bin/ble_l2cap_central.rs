@@ -13,7 +13,7 @@ use core::ptr::NonNull;
 use core::slice;
 use cortex_m_rt::entry;
 use defmt::info;
-use defmt::*;
+use defmt::{unreachable, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
 
