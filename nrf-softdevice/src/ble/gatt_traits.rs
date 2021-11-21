@@ -1,9 +1,12 @@
+use core::convert::TryInto;
 use core::mem;
 use core::slice;
-use heapless::Vec;
+use heapless::{String, Vec};
 
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum FromGattError {
     InvalidLength,
+    InvalidCharacter,
 }
 
 pub trait FixedGattValue: Sized {
@@ -81,5 +84,33 @@ impl<const N: usize> GattValue for Vec<u8, N> {
 
     fn to_gatt(&self) -> &[u8] {
         &self
+    }
+}
+
+impl<const N: usize> GattValue for [u8; N] {
+    const MIN_SIZE: usize = 0;
+    const MAX_SIZE: usize = N;
+
+    fn from_gatt(data: &[u8]) -> Self {
+        unwrap!(data.try_into())
+    }
+
+    fn to_gatt(&self) -> &[u8] {
+        self.as_slice()
+    }
+}
+
+impl<const N: usize> GattValue for String<N> {
+    const MIN_SIZE: usize = 0;
+    const MAX_SIZE: usize = N;
+
+    fn from_gatt(data: &[u8]) -> Self {
+        String::from(unwrap!(
+            core::str::from_utf8(data).map_err(|_| FromGattError::InvalidCharacter)
+        ))
+    }
+
+    fn to_gatt(&self) -> &[u8] {
+        self.as_ref()
     }
 }
