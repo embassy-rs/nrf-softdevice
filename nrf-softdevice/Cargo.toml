@@ -40,6 +40,7 @@ cortex-m = "0.7.2"
 cortex-m-rt = ">=0.6.15,<0.8"
 heapless = "0.7.1"
 fixed = "1.5.0"
+futures = { version = "0.3.17", default-features = false }
 
 nrf52805-pac  = { version = "0.10.0", features = ["rt"], optional = true }
 nrf52810-pac  = { version = "0.10.0", features = ["rt"], optional = true }

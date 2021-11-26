@@ -1,13 +1,15 @@
 use core::convert::TryFrom;
 use core::mem::MaybeUninit;
+use core::task::Poll;
+use embassy::waitqueue::AtomicWaker;
+use futures::future::poll_fn;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::pac::interrupt;
 use crate::raw;
-use crate::util::Signal;
 use crate::RawError;
 
-static SWI2_SIGNAL: Signal<()> = Signal::new();
+static SWI2_WAKER: AtomicWaker = AtomicWaker::new();
 
 #[rustfmt::skip]
 #[repr(u32)]
@@ -49,45 +51,46 @@ fn on_soc_evt(evt: u32) {
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
 pub(crate) async fn run() {
-    loop {
-        SWI2_SIGNAL.wait().await;
+    poll_fn(|cx| unsafe {
+        SWI2_WAKER.register(cx.waker());
 
-        unsafe {
-            let mut evt: u32 = 0;
-            loop {
-                match RawError::convert(raw::sd_evt_get(&mut evt as _)) {
-                    Ok(()) => on_soc_evt(evt),
-                    Err(RawError::NotFound) => break,
-                    Err(err) => panic!("sd_evt_get err {:?}", err),
-                }
-            }
-
-            // Using u32 since the buffer has to be aligned to 4
-            let mut evt: MaybeUninit<[u32; BLE_EVT_MAX_SIZE as usize / 4]> = MaybeUninit::uninit();
-
-            loop {
-                let mut len: u16 = BLE_EVT_MAX_SIZE;
-                let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
-                match RawError::convert(ret) {
-                    Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
-                    Err(RawError::NotFound) => break,
-                    Err(RawError::BleNotEnabled) => break,
-                    Err(RawError::NoMem) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
-                    Err(err) => panic!("sd_ble_evt_get err {:?}", err),
-                }
+        let mut evt: u32 = 0;
+        loop {
+            match RawError::convert(raw::sd_evt_get(&mut evt as _)) {
+                Ok(()) => on_soc_evt(evt),
+                Err(RawError::NotFound) => break,
+                Err(err) => panic!("sd_evt_get err {:?}", err),
             }
         }
-    }
+
+        // Using u32 since the buffer has to be aligned to 4
+        let mut evt: MaybeUninit<[u32; BLE_EVT_MAX_SIZE as usize / 4]> = MaybeUninit::uninit();
+
+        loop {
+            let mut len: u16 = BLE_EVT_MAX_SIZE;
+            let ret = raw::sd_ble_evt_get(evt.as_mut_ptr() as *mut u8, &mut len as _);
+            match RawError::convert(ret) {
+                Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
+                Err(RawError::NotFound) => break,
+                Err(RawError::BleNotEnabled) => break,
+                Err(RawError::NoMem) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                Err(err) => panic!("sd_ble_evt_get err {:?}", err),
+            }
+        }
+
+        Poll::<()>::Pending
+    })
+    .await;
 }
 
 #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
 #[interrupt]
 unsafe fn SWI2() {
-    SWI2_SIGNAL.signal(());
+    SWI2_WAKER.wake();
 }
 
 #[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
 #[interrupt]
 unsafe fn SWI2_EGU2() {
-    SWI2_SIGNAL.signal(());
+    SWI2_WAKER.wake();
 }
