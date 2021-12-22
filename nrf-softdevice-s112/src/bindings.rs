@@ -1621,7 +1621,7 @@ fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
 #[inline(always)]
 pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
-    asm!("svc 44",
+    core::arch::asm!("svc 44",
         inout("r0") to_asm(p_mutex) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1640,7 +1640,7 @@ pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
-    asm!("svc 45",
+    core::arch::asm!("svc 45",
         inout("r0") to_asm(p_mutex) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1658,7 +1658,7 @@ pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
     let ret: u32;
-    asm!("svc 46",
+    core::arch::asm!("svc 46",
         inout("r0") to_asm(p_mutex) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1676,7 +1676,7 @@ pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 47",
+    core::arch::asm!("svc 47",
         inout("r0") to_asm(p_pool_capacity) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1694,7 +1694,7 @@ pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) ->
 #[inline(always)]
 pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 48",
+    core::arch::asm!("svc 48",
         inout("r0") to_asm(p_bytes_available) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1714,7 +1714,7 @@ pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8
 #[inline(always)]
 pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32 {
     let ret: u32;
-    asm!("svc 49",
+    core::arch::asm!("svc 49",
         inout("r0") to_asm(p_buff) => ret,
         inout("r1") to_asm(length) => _,
         lateout("r2") _,
@@ -1732,7 +1732,7 @@ pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32
 #[inline(always)]
 pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 52",
+    core::arch::asm!("svc 52",
         inout("r0") to_asm(p_reset_reason) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1750,7 +1750,7 @@ pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 53",
+    core::arch::asm!("svc 53",
         inout("r0") to_asm(reset_reason_clr_msk) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1769,7 +1769,7 @@ pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
     let ret: u32;
-    asm!("svc 50",
+    core::arch::asm!("svc 50",
         inout("r0") to_asm(power_mode) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1785,7 +1785,7 @@ pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_system_off() -> u32 {
     let ret: u32;
-    asm!("svc 51",
+    core::arch::asm!("svc 51",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1806,7 +1806,7 @@ pub unsafe fn sd_power_system_off() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
     let ret: u32;
-    asm!("svc 54",
+    core::arch::asm!("svc 54",
         inout("r0") to_asm(pof_enable) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1826,7 +1826,7 @@ pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
     let ret: u32;
-    asm!("svc 55",
+    core::arch::asm!("svc 55",
         inout("r0") to_asm(threshold) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1845,7 +1845,7 @@ pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
     let ret: u32;
-    asm!("svc 57",
+    core::arch::asm!("svc 57",
         inout("r0") to_asm(index) => ret,
         inout("r1") to_asm(ram_powerset) => _,
         lateout("r2") _,
@@ -1864,7 +1864,7 @@ pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
     let ret: u32;
-    asm!("svc 58",
+    core::arch::asm!("svc 58",
         inout("r0") to_asm(index) => ret,
         inout("r1") to_asm(ram_powerclr) => _,
         lateout("r2") _,
@@ -1883,7 +1883,7 @@ pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 59",
+    core::arch::asm!("svc 59",
         inout("r0") to_asm(index) => ret,
         inout("r1") to_asm(p_ram_power) => _,
         lateout("r2") _,
@@ -1902,7 +1902,7 @@ pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 60",
+    core::arch::asm!("svc 60",
         inout("r0") to_asm(gpregret_id) => ret,
         inout("r1") to_asm(gpregret_msk) => _,
         lateout("r2") _,
@@ -1921,7 +1921,7 @@ pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 61",
+    core::arch::asm!("svc 61",
         inout("r0") to_asm(gpregret_id) => ret,
         inout("r1") to_asm(gpregret_msk) => _,
         lateout("r2") _,
@@ -1940,7 +1940,7 @@ pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 
 #[inline(always)]
 pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 62",
+    core::arch::asm!("svc 62",
         inout("r0") to_asm(gpregret_id) => ret,
         inout("r1") to_asm(p_gpregret) => _,
         lateout("r2") _,
@@ -1959,7 +1959,7 @@ pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u
 #[inline(always)]
 pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
     let ret: u32;
-    asm!("svc 63",
+    core::arch::asm!("svc 63",
         inout("r0") to_asm(dcdc_mode) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -1981,7 +1981,7 @@ pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_request() -> u32 {
     let ret: u32;
-    asm!("svc 66",
+    core::arch::asm!("svc 66",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2002,7 +2002,7 @@ pub unsafe fn sd_clock_hfclk_request() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_release() -> u32 {
     let ret: u32;
-    asm!("svc 67",
+    core::arch::asm!("svc 67",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2023,7 +2023,7 @@ pub unsafe fn sd_clock_hfclk_release() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 68",
+    core::arch::asm!("svc 68",
         inout("r0") to_asm(p_is_running) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2061,7 +2061,7 @@ pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_app_evt_wait() -> u32 {
     let ret: u32;
-    asm!("svc 65",
+    core::arch::asm!("svc 65",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2079,7 +2079,7 @@ pub unsafe fn sd_app_evt_wait() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 32",
+    core::arch::asm!("svc 32",
         inout("r0") to_asm(p_channel_enable) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2097,7 +2097,7 @@ pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 33",
+    core::arch::asm!("svc 33",
         inout("r0") to_asm(channel_enable_set_msk) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2115,7 +2115,7 @@ pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_channel_enable_clr(channel_enable_clr_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 34",
+    core::arch::asm!("svc 34",
         inout("r0") to_asm(channel_enable_clr_msk) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2140,7 +2140,7 @@ pub unsafe fn sd_ppi_channel_assign(
     task_endpoint: *const self::c_void,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 35",
+    core::arch::asm!("svc 35",
         inout("r0") to_asm(channel_num) => ret,
         inout("r1") to_asm(evt_endpoint) => _,
         inout("r2") to_asm(task_endpoint) => _,
@@ -2159,7 +2159,7 @@ pub unsafe fn sd_ppi_channel_assign(
 #[inline(always)]
 pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
     let ret: u32;
-    asm!("svc 36",
+    core::arch::asm!("svc 36",
         inout("r0") to_asm(group_num) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2178,7 +2178,7 @@ pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
     let ret: u32;
-    asm!("svc 37",
+    core::arch::asm!("svc 37",
         inout("r0") to_asm(group_num) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2198,7 +2198,7 @@ pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
     let ret: u32;
-    asm!("svc 38",
+    core::arch::asm!("svc 38",
         inout("r0") to_asm(group_num) => ret,
         inout("r1") to_asm(channel_msk) => _,
         lateout("r2") _,
@@ -2218,7 +2218,7 @@ pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 39",
+    core::arch::asm!("svc 39",
         inout("r0") to_asm(group_num) => ret,
         inout("r1") to_asm(p_channel_msk) => _,
         lateout("r2") _,
@@ -2259,7 +2259,7 @@ pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
     let ret: u32;
-    asm!("svc 69",
+    core::arch::asm!("svc 69",
         inout("r0") to_asm(type_) => ret,
         inout("r1") to_asm(distance) => _,
         lateout("r2") _,
@@ -2285,7 +2285,7 @@ pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
     let ret: u32;
-    asm!("svc 70",
+    core::arch::asm!("svc 70",
         inout("r0") to_asm(p_ecb_data) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2315,7 +2315,7 @@ pub unsafe fn sd_ecb_blocks_encrypt(
     p_data_blocks: *mut nrf_ecb_hal_data_block_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 71",
+    core::arch::asm!("svc 71",
         inout("r0") to_asm(block_count) => ret,
         inout("r1") to_asm(p_data_blocks) => _,
         lateout("r2") _,
@@ -2336,7 +2336,7 @@ pub unsafe fn sd_ecb_blocks_encrypt(
 #[inline(always)]
 pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 75",
+    core::arch::asm!("svc 75",
         inout("r0") to_asm(p_evt_id) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2357,7 +2357,7 @@ pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
     let ret: u32;
-    asm!("svc 76",
+    core::arch::asm!("svc 76",
         inout("r0") to_asm(p_temp) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2404,7 +2404,7 @@ pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u32 {
     let ret: u32;
-    asm!("svc 41",
+    core::arch::asm!("svc 41",
         inout("r0") to_asm(p_dst) => ret,
         inout("r1") to_asm(p_src) => _,
         inout("r2") to_asm(size) => _,
@@ -2445,7 +2445,7 @@ pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u
 #[inline(always)]
 pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
     let ret: u32;
-    asm!("svc 40",
+    core::arch::asm!("svc 40",
         inout("r0") to_asm(page_number) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2482,7 +2482,7 @@ pub unsafe fn sd_flash_protect(
     block_cfg3: u32,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 42",
+    core::arch::asm!("svc 42",
         inout("r0") to_asm(block_cfg0) => ret,
         inout("r1") to_asm(block_cfg1) => _,
         inout("r2") to_asm(block_cfg2) => _,
@@ -2514,7 +2514,7 @@ pub unsafe fn sd_flash_protect(
 #[inline(always)]
 pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_callback_t) -> u32 {
     let ret: u32;
-    asm!("svc 72",
+    core::arch::asm!("svc 72",
         inout("r0") to_asm(p_radio_signal_callback) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2537,7 +2537,7 @@ pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_ca
 #[inline(always)]
 pub unsafe fn sd_radio_session_close() -> u32 {
     let ret: u32;
-    asm!("svc 73",
+    core::arch::asm!("svc 73",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2584,7 +2584,7 @@ pub unsafe fn sd_radio_session_close() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
     let ret: u32;
-    asm!("svc 74",
+    core::arch::asm!("svc 74",
         inout("r0") to_asm(p_request) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2615,7 +2615,7 @@ pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_protected_register_write(p_register: *mut u32, value: u32) -> u32 {
     let ret: u32;
-    asm!("svc 43",
+    core::arch::asm!("svc 43",
         inout("r0") to_asm(p_register) => ret,
         inout("r1") to_asm(value) => _,
         lateout("r2") _,
@@ -2785,7 +2785,7 @@ pub unsafe fn sd_softdevice_enable(
     fault_handler: nrf_fault_handler_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 16",
+    core::arch::asm!("svc 16",
         inout("r0") to_asm(p_clock_lf_cfg) => ret,
         inout("r1") to_asm(fault_handler) => _,
         lateout("r2") _,
@@ -2810,7 +2810,7 @@ pub unsafe fn sd_softdevice_enable(
 #[inline(always)]
 pub unsafe fn sd_softdevice_disable() -> u32 {
     let ret: u32;
-    asm!("svc 17",
+    core::arch::asm!("svc 17",
         lateout("r0") ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2828,7 +2828,7 @@ pub unsafe fn sd_softdevice_disable() -> u32 {
 #[inline(always)]
 pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 18",
+    core::arch::asm!("svc 18",
         inout("r0") to_asm(p_softdevice_enabled) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -2848,7 +2848,7 @@ pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_softdevice_vector_table_base_set(address: u32) -> u32 {
     let ret: u32;
-    asm!("svc 19",
+    core::arch::asm!("svc 19",
         inout("r0") to_asm(address) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -3676,7 +3676,7 @@ fn bindgen_test_layout_sd_mbr_command_t() {
 #[inline(always)]
 pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
     let ret: u32;
-    asm!("svc 24",
+    core::arch::asm!("svc 24",
         inout("r0") to_asm(param) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -7659,7 +7659,7 @@ fn bindgen_test_layout_ble_gap_opt_t() {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_addr_set(p_addr: *const ble_gap_addr_t) -> u32 {
     let ret: u32;
-    asm!("svc 108",
+    core::arch::asm!("svc 108",
         inout("r0") to_asm(p_addr) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -7681,7 +7681,7 @@ pub unsafe fn sd_ble_gap_addr_set(p_addr: *const ble_gap_addr_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_addr_get(p_addr: *mut ble_gap_addr_t) -> u32 {
     let ret: u32;
-    asm!("svc 109",
+    core::arch::asm!("svc 109",
         inout("r0") to_asm(p_addr) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -7709,7 +7709,7 @@ pub unsafe fn sd_ble_gap_addr_get(p_addr: *mut ble_gap_addr_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_adv_addr_get(adv_handle: u8, p_addr: *mut ble_gap_addr_t) -> u32 {
     let ret: u32;
-    asm!("svc 147",
+    core::arch::asm!("svc 147",
         inout("r0") to_asm(adv_handle) => ret,
         inout("r1") to_asm(p_addr) => _,
         lateout("r2") _,
@@ -7739,7 +7739,7 @@ pub unsafe fn sd_ble_gap_adv_addr_get(adv_handle: u8, p_addr: *mut ble_gap_addr_
 #[inline(always)]
 pub unsafe fn sd_ble_gap_whitelist_set(pp_wl_addrs: *const *const ble_gap_addr_t, len: u8) -> u32 {
     let ret: u32;
-    asm!("svc 110",
+    core::arch::asm!("svc 110",
         inout("r0") to_asm(pp_wl_addrs) => ret,
         inout("r1") to_asm(len) => _,
         lateout("r2") _,
@@ -7780,7 +7780,7 @@ pub unsafe fn sd_ble_gap_device_identities_set(
     len: u8,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 111",
+    core::arch::asm!("svc 111",
         inout("r0") to_asm(pp_id_keys) => ret,
         inout("r1") to_asm(pp_local_irks) => _,
         inout("r2") to_asm(len) => _,
@@ -7811,7 +7811,7 @@ pub unsafe fn sd_ble_gap_device_identities_set(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_privacy_set(p_privacy_params: *const ble_gap_privacy_params_t) -> u32 {
     let ret: u32;
-    asm!("svc 112",
+    core::arch::asm!("svc 112",
         inout("r0") to_asm(p_privacy_params) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -7834,7 +7834,7 @@ pub unsafe fn sd_ble_gap_privacy_set(p_privacy_params: *const ble_gap_privacy_pa
 #[inline(always)]
 pub unsafe fn sd_ble_gap_privacy_get(p_privacy_params: *mut ble_gap_privacy_params_t) -> u32 {
     let ret: u32;
-    asm!("svc 113",
+    core::arch::asm!("svc 113",
         inout("r0") to_asm(p_privacy_params) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -7893,7 +7893,7 @@ pub unsafe fn sd_ble_gap_adv_set_configure(
     p_adv_params: *const ble_gap_adv_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 114",
+    core::arch::asm!("svc 114",
         inout("r0") to_asm(p_adv_handle) => ret,
         inout("r1") to_asm(p_adv_data) => _,
         inout("r2") to_asm(p_adv_params) => _,
@@ -7948,7 +7948,7 @@ pub unsafe fn sd_ble_gap_adv_set_configure(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_adv_start(adv_handle: u8, conn_cfg_tag: u8) -> u32 {
     let ret: u32;
-    asm!("svc 115",
+    core::arch::asm!("svc 115",
         inout("r0") to_asm(adv_handle) => ret,
         inout("r1") to_asm(conn_cfg_tag) => _,
         lateout("r2") _,
@@ -7972,7 +7972,7 @@ pub unsafe fn sd_ble_gap_adv_start(adv_handle: u8, conn_cfg_tag: u8) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_adv_stop(adv_handle: u8) -> u32 {
     let ret: u32;
-    asm!("svc 116",
+    core::arch::asm!("svc 116",
         inout("r0") to_asm(adv_handle) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8013,7 +8013,7 @@ pub unsafe fn sd_ble_gap_conn_param_update(
     p_conn_params: *const ble_gap_conn_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 117",
+    core::arch::asm!("svc 117",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_conn_params) => _,
         lateout("r2") _,
@@ -8046,7 +8046,7 @@ pub unsafe fn sd_ble_gap_conn_param_update(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_disconnect(conn_handle: u16, hci_status_code: u8) -> u32 {
     let ret: u32;
-    asm!("svc 118",
+    core::arch::asm!("svc 118",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(hci_status_code) => _,
         lateout("r2") _,
@@ -8080,7 +8080,7 @@ pub unsafe fn sd_ble_gap_disconnect(conn_handle: u16, hci_status_code: u8) -> u3
 #[inline(always)]
 pub unsafe fn sd_ble_gap_tx_power_set(role: u8, handle: u16, tx_power: i8) -> u32 {
     let ret: u32;
-    asm!("svc 119",
+    core::arch::asm!("svc 119",
         inout("r0") to_asm(role) => ret,
         inout("r1") to_asm(handle) => _,
         inout("r2") to_asm(tx_power) => _,
@@ -8099,7 +8099,7 @@ pub unsafe fn sd_ble_gap_tx_power_set(role: u8, handle: u16, tx_power: i8) -> u3
 #[inline(always)]
 pub unsafe fn sd_ble_gap_appearance_set(appearance: u16) -> u32 {
     let ret: u32;
-    asm!("svc 120",
+    core::arch::asm!("svc 120",
         inout("r0") to_asm(appearance) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8118,7 +8118,7 @@ pub unsafe fn sd_ble_gap_appearance_set(appearance: u16) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_appearance_get(p_appearance: *mut u16) -> u32 {
     let ret: u32;
-    asm!("svc 121",
+    core::arch::asm!("svc 121",
         inout("r0") to_asm(p_appearance) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8140,7 +8140,7 @@ pub unsafe fn sd_ble_gap_appearance_get(p_appearance: *mut u16) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_ppcp_set(p_conn_params: *const ble_gap_conn_params_t) -> u32 {
     let ret: u32;
-    asm!("svc 122",
+    core::arch::asm!("svc 122",
         inout("r0") to_asm(p_conn_params) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8161,7 +8161,7 @@ pub unsafe fn sd_ble_gap_ppcp_set(p_conn_params: *const ble_gap_conn_params_t) -
 #[inline(always)]
 pub unsafe fn sd_ble_gap_ppcp_get(p_conn_params: *mut ble_gap_conn_params_t) -> u32 {
     let ret: u32;
-    asm!("svc 123",
+    core::arch::asm!("svc 123",
         inout("r0") to_asm(p_conn_params) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8192,7 +8192,7 @@ pub unsafe fn sd_ble_gap_device_name_set(
     len: u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 124",
+    core::arch::asm!("svc 124",
         inout("r0") to_asm(p_write_perm) => ret,
         inout("r1") to_asm(p_dev_name) => _,
         inout("r2") to_asm(len) => _,
@@ -8218,7 +8218,7 @@ pub unsafe fn sd_ble_gap_device_name_set(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_device_name_get(p_dev_name: *mut u8, p_len: *mut u16) -> u32 {
     let ret: u32;
-    asm!("svc 125",
+    core::arch::asm!("svc 125",
         inout("r0") to_asm(p_dev_name) => ret,
         inout("r1") to_asm(p_len) => _,
         lateout("r2") _,
@@ -8267,7 +8267,7 @@ pub unsafe fn sd_ble_gap_authenticate(
     p_sec_params: *const ble_gap_sec_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 126",
+    core::arch::asm!("svc 126",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_sec_params) => _,
         lateout("r2") _,
@@ -8330,7 +8330,7 @@ pub unsafe fn sd_ble_gap_sec_params_reply(
     p_sec_keyset: *const ble_gap_sec_keyset_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 127",
+    core::arch::asm!("svc 127",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(sec_status) => _,
         inout("r2") to_asm(p_sec_params) => _,
@@ -8370,7 +8370,7 @@ pub unsafe fn sd_ble_gap_sec_params_reply(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_auth_key_reply(conn_handle: u16, key_type: u8, p_key: *const u8) -> u32 {
     let ret: u32;
-    asm!("svc 128",
+    core::arch::asm!("svc 128",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(key_type) => _,
         inout("r2") to_asm(p_key) => _,
@@ -8413,7 +8413,7 @@ pub unsafe fn sd_ble_gap_lesc_dhkey_reply(
     p_dhkey: *const ble_gap_lesc_dhkey_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 129",
+    core::arch::asm!("svc 129",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_dhkey) => _,
         lateout("r2") _,
@@ -8443,7 +8443,7 @@ pub unsafe fn sd_ble_gap_lesc_dhkey_reply(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_keypress_notify(conn_handle: u16, kp_not: u8) -> u32 {
     let ret: u32;
-    asm!("svc 130",
+    core::arch::asm!("svc 130",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(kp_not) => _,
         lateout("r2") _,
@@ -8476,7 +8476,7 @@ pub unsafe fn sd_ble_gap_lesc_oob_data_get(
     p_oobd_own: *mut ble_gap_lesc_oob_data_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 131",
+    core::arch::asm!("svc 131",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_pk_own) => _,
         inout("r2") to_asm(p_oobd_own) => _,
@@ -8520,7 +8520,7 @@ pub unsafe fn sd_ble_gap_lesc_oob_data_set(
     p_oobd_peer: *const ble_gap_lesc_oob_data_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 132",
+    core::arch::asm!("svc 132",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_oobd_own) => _,
         inout("r2") to_asm(p_oobd_peer) => _,
@@ -8560,7 +8560,7 @@ pub unsafe fn sd_ble_gap_sec_info_reply(
     p_sign_info: *const ble_gap_sign_info_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 134",
+    core::arch::asm!("svc 134",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_enc_info) => _,
         inout("r2") to_asm(p_id_info) => _,
@@ -8584,7 +8584,7 @@ pub unsafe fn sd_ble_gap_conn_sec_get(
     p_conn_sec: *mut ble_gap_conn_sec_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 135",
+    core::arch::asm!("svc 135",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_conn_sec) => _,
         lateout("r2") _,
@@ -8619,7 +8619,7 @@ pub unsafe fn sd_ble_gap_conn_sec_get(
 #[inline(always)]
 pub unsafe fn sd_ble_gap_rssi_start(conn_handle: u16, threshold_dbm: u8, skip_count: u8) -> u32 {
     let ret: u32;
-    asm!("svc 136",
+    core::arch::asm!("svc 136",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(threshold_dbm) => _,
         inout("r2") to_asm(skip_count) => _,
@@ -8647,7 +8647,7 @@ pub unsafe fn sd_ble_gap_rssi_start(conn_handle: u16, threshold_dbm: u8, skip_co
 #[inline(always)]
 pub unsafe fn sd_ble_gap_rssi_stop(conn_handle: u16) -> u32 {
     let ret: u32;
-    asm!("svc 137",
+    core::arch::asm!("svc 137",
         inout("r0") to_asm(conn_handle) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -8677,7 +8677,7 @@ pub unsafe fn sd_ble_gap_rssi_stop(conn_handle: u16) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_gap_rssi_get(conn_handle: u16, p_rssi: *mut i8, p_ch_index: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 142",
+    core::arch::asm!("svc 142",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_rssi) => _,
         inout("r2") to_asm(p_ch_index) => _,
@@ -8737,7 +8737,7 @@ pub unsafe fn sd_ble_gap_rssi_get(conn_handle: u16, p_rssi: *mut i8, p_ch_index:
 #[inline(always)]
 pub unsafe fn sd_ble_gap_phy_update(conn_handle: u16, p_gap_phys: *const ble_gap_phys_t) -> u32 {
     let ret: u32;
-    asm!("svc 143",
+    core::arch::asm!("svc 143",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_gap_phys) => _,
         lateout("r2") _,
@@ -8770,7 +8770,7 @@ pub unsafe fn sd_ble_gap_phy_update(conn_handle: u16, p_gap_phys: *const ble_gap
 #[inline(always)]
 pub unsafe fn sd_ble_gap_next_conn_evt_counter_get(conn_handle: u16, p_counter: *mut u16) -> u32 {
     let ret: u32;
-    asm!("svc 148",
+    core::arch::asm!("svc 148",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_counter) => _,
         lateout("r2") _,
@@ -10435,7 +10435,7 @@ pub unsafe fn sd_ble_gattc_primary_services_discover(
     p_srvc_uuid: *const ble_uuid_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 155",
+    core::arch::asm!("svc 155",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(start_handle) => _,
         inout("r2") to_asm(p_srvc_uuid) => _,
@@ -10474,7 +10474,7 @@ pub unsafe fn sd_ble_gattc_relationships_discover(
     p_handle_range: *const ble_gattc_handle_range_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 156",
+    core::arch::asm!("svc 156",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_handle_range) => _,
         lateout("r2") _,
@@ -10515,7 +10515,7 @@ pub unsafe fn sd_ble_gattc_characteristics_discover(
     p_handle_range: *const ble_gattc_handle_range_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 157",
+    core::arch::asm!("svc 157",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_handle_range) => _,
         lateout("r2") _,
@@ -10553,7 +10553,7 @@ pub unsafe fn sd_ble_gattc_descriptors_discover(
     p_handle_range: *const ble_gattc_handle_range_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 158",
+    core::arch::asm!("svc 158",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_handle_range) => _,
         lateout("r2") _,
@@ -10593,7 +10593,7 @@ pub unsafe fn sd_ble_gattc_char_value_by_uuid_read(
     p_handle_range: *const ble_gattc_handle_range_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 160",
+    core::arch::asm!("svc 160",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_uuid) => _,
         inout("r2") to_asm(p_handle_range) => _,
@@ -10629,7 +10629,7 @@ pub unsafe fn sd_ble_gattc_char_value_by_uuid_read(
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_read(conn_handle: u16, handle: u16, offset: u16) -> u32 {
     let ret: u32;
-    asm!("svc 161",
+    core::arch::asm!("svc 161",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(handle) => _,
         inout("r2") to_asm(offset) => _,
@@ -10668,7 +10668,7 @@ pub unsafe fn sd_ble_gattc_char_values_read(
     handle_count: u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 162",
+    core::arch::asm!("svc 162",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_handles) => _,
         inout("r2") to_asm(handle_count) => _,
@@ -10727,7 +10727,7 @@ pub unsafe fn sd_ble_gattc_write(
     p_write_params: *const ble_gattc_write_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 163",
+    core::arch::asm!("svc 163",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_write_params) => _,
         lateout("r2") _,
@@ -10754,7 +10754,7 @@ pub unsafe fn sd_ble_gattc_write(
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_hv_confirm(conn_handle: u16, handle: u16) -> u32 {
     let ret: u32;
-    asm!("svc 164",
+    core::arch::asm!("svc 164",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(handle) => _,
         lateout("r2") _,
@@ -10785,7 +10785,7 @@ pub unsafe fn sd_ble_gattc_attr_info_discover(
     p_handle_range: *const ble_gattc_handle_range_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 159",
+    core::arch::asm!("svc 159",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_handle_range) => _,
         lateout("r2") _,
@@ -10828,7 +10828,7 @@ pub unsafe fn sd_ble_gattc_attr_info_discover(
 #[inline(always)]
 pub unsafe fn sd_ble_gattc_exchange_mtu_request(conn_handle: u16, client_rx_mtu: u16) -> u32 {
     let ret: u32;
-    asm!("svc 165",
+    core::arch::asm!("svc 165",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(client_rx_mtu) => _,
         lateout("r2") _,
@@ -12509,7 +12509,7 @@ pub unsafe fn sd_ble_gatts_service_add(
     p_handle: *mut u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 168",
+    core::arch::asm!("svc 168",
         inout("r0") to_asm(type_) => ret,
         inout("r1") to_asm(p_uuid) => _,
         inout("r2") to_asm(p_handle) => _,
@@ -12548,7 +12548,7 @@ pub unsafe fn sd_ble_gatts_include_add(
     p_include_handle: *mut u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 169",
+    core::arch::asm!("svc 169",
         inout("r0") to_asm(service_handle) => ret,
         inout("r1") to_asm(inc_srvc_handle) => _,
         inout("r2") to_asm(p_include_handle) => _,
@@ -12591,7 +12591,7 @@ pub unsafe fn sd_ble_gatts_characteristic_add(
     p_handles: *mut ble_gatts_char_handles_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 170",
+    core::arch::asm!("svc 170",
         inout("r0") to_asm(service_handle) => ret,
         inout("r1") to_asm(p_char_md) => _,
         inout("r2") to_asm(p_attr_char_value) => _,
@@ -12627,7 +12627,7 @@ pub unsafe fn sd_ble_gatts_descriptor_add(
     p_handle: *mut u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 171",
+    core::arch::asm!("svc 171",
         inout("r0") to_asm(char_handle) => ret,
         inout("r1") to_asm(p_attr) => _,
         inout("r2") to_asm(p_handle) => _,
@@ -12664,7 +12664,7 @@ pub unsafe fn sd_ble_gatts_value_set(
     p_value: *mut ble_gatts_value_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 172",
+    core::arch::asm!("svc 172",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(handle) => _,
         inout("r2") to_asm(p_value) => _,
@@ -12702,7 +12702,7 @@ pub unsafe fn sd_ble_gatts_value_get(
     p_value: *mut ble_gatts_value_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 173",
+    core::arch::asm!("svc 173",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(handle) => _,
         inout("r2") to_asm(p_value) => _,
@@ -12780,7 +12780,7 @@ pub unsafe fn sd_ble_gatts_hvx(
     p_hvx_params: *const ble_gatts_hvx_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 174",
+    core::arch::asm!("svc 174",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_hvx_params) => _,
         lateout("r2") _,
@@ -12830,7 +12830,7 @@ pub unsafe fn sd_ble_gatts_service_changed(
     end_handle: u16,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 175",
+    core::arch::asm!("svc 175",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(start_handle) => _,
         inout("r2") to_asm(end_handle) => _,
@@ -12876,7 +12876,7 @@ pub unsafe fn sd_ble_gatts_rw_authorize_reply(
     p_rw_authorize_reply_params: *const ble_gatts_rw_authorize_reply_params_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 176",
+    core::arch::asm!("svc 176",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_rw_authorize_reply_params) => _,
         lateout("r2") _,
@@ -12934,7 +12934,7 @@ pub unsafe fn sd_ble_gatts_sys_attr_set(
     flags: u32,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 177",
+    core::arch::asm!("svc 177",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_sys_attr_data) => _,
         inout("r2") to_asm(len) => _,
@@ -12981,7 +12981,7 @@ pub unsafe fn sd_ble_gatts_sys_attr_get(
     flags: u32,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 178",
+    core::arch::asm!("svc 178",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_sys_attr_data) => _,
         inout("r2") to_asm(p_len) => _,
@@ -13000,7 +13000,7 @@ pub unsafe fn sd_ble_gatts_sys_attr_get(
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_initial_user_handle_get(p_handle: *mut u16) -> u32 {
     let ret: u32;
-    asm!("svc 179",
+    core::arch::asm!("svc 179",
         inout("r0") to_asm(p_handle) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -13027,7 +13027,7 @@ pub unsafe fn sd_ble_gatts_attr_get(
     p_md: *mut ble_gatts_attr_md_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 180",
+    core::arch::asm!("svc 180",
         inout("r0") to_asm(handle) => ret,
         inout("r1") to_asm(p_uuid) => _,
         inout("r2") to_asm(p_md) => _,
@@ -13067,7 +13067,7 @@ pub unsafe fn sd_ble_gatts_attr_get(
 #[inline(always)]
 pub unsafe fn sd_ble_gatts_exchange_mtu_reply(conn_handle: u16, server_rx_mtu: u16) -> u32 {
     let ret: u32;
-    asm!("svc 181",
+    core::arch::asm!("svc 181",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(server_rx_mtu) => _,
         lateout("r2") _,
@@ -14241,7 +14241,7 @@ fn bindgen_test_layout_ble_cfg_t() {
 #[inline(always)]
 pub unsafe fn sd_ble_enable(p_app_ram_base: *mut u32) -> u32 {
     let ret: u32;
-    asm!("svc 96",
+    core::arch::asm!("svc 96",
         inout("r0") to_asm(p_app_ram_base) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -14287,7 +14287,7 @@ pub unsafe fn sd_ble_enable(p_app_ram_base: *mut u32) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_cfg_set(cfg_id: u32, p_cfg: *const ble_cfg_t, app_ram_base: u32) -> u32 {
     let ret: u32;
-    asm!("svc 105",
+    core::arch::asm!("svc 105",
         inout("r0") to_asm(cfg_id) => ret,
         inout("r1") to_asm(p_cfg) => _,
         inout("r2") to_asm(app_ram_base) => _,
@@ -14335,7 +14335,7 @@ pub unsafe fn sd_ble_cfg_set(cfg_id: u32, p_cfg: *const ble_cfg_t, app_ram_base:
 #[inline(always)]
 pub unsafe fn sd_ble_evt_get(p_dest: *mut u8, p_len: *mut u16) -> u32 {
     let ret: u32;
-    asm!("svc 97",
+    core::arch::asm!("svc 97",
         inout("r0") to_asm(p_dest) => ret,
         inout("r1") to_asm(p_len) => _,
         lateout("r2") _,
@@ -14373,7 +14373,7 @@ pub unsafe fn sd_ble_evt_get(p_dest: *mut u8, p_len: *mut u16) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_vs_add(p_vs_uuid: *const ble_uuid128_t, p_uuid_type: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 98",
+    core::arch::asm!("svc 98",
         inout("r0") to_asm(p_vs_uuid) => ret,
         inout("r1") to_asm(p_uuid_type) => _,
         lateout("r2") _,
@@ -14403,7 +14403,7 @@ pub unsafe fn sd_ble_uuid_vs_add(p_vs_uuid: *const ble_uuid128_t, p_uuid_type: *
 #[inline(always)]
 pub unsafe fn sd_ble_uuid_vs_remove(p_uuid_type: *mut u8) -> u32 {
     let ret: u32;
-    asm!("svc 106",
+    core::arch::asm!("svc 106",
         inout("r0") to_asm(p_uuid_type) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -14437,7 +14437,7 @@ pub unsafe fn sd_ble_uuid_decode(
     p_uuid: *mut ble_uuid_t,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 99",
+    core::arch::asm!("svc 99",
         inout("r0") to_asm(uuid_le_len) => ret,
         inout("r1") to_asm(p_uuid_le) => _,
         inout("r2") to_asm(p_uuid) => _,
@@ -14465,7 +14465,7 @@ pub unsafe fn sd_ble_uuid_encode(
     p_uuid_le: *mut u8,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 100",
+    core::arch::asm!("svc 100",
         inout("r0") to_asm(p_uuid) => ret,
         inout("r1") to_asm(p_uuid_le_len) => _,
         inout("r2") to_asm(p_uuid_le) => _,
@@ -14487,7 +14487,7 @@ pub unsafe fn sd_ble_uuid_encode(
 #[inline(always)]
 pub unsafe fn sd_ble_version_get(p_version: *mut ble_version_t) -> u32 {
     let ret: u32;
-    asm!("svc 101",
+    core::arch::asm!("svc 101",
         inout("r0") to_asm(p_version) => ret,
         lateout("r1") _,
         lateout("r2") _,
@@ -14522,7 +14522,7 @@ pub unsafe fn sd_ble_version_get(p_version: *mut ble_version_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_user_mem_reply(conn_handle: u16, p_block: *const ble_user_mem_block_t) -> u32 {
     let ret: u32;
-    asm!("svc 102",
+    core::arch::asm!("svc 102",
         inout("r0") to_asm(conn_handle) => ret,
         inout("r1") to_asm(p_block) => _,
         lateout("r2") _,
@@ -14548,7 +14548,7 @@ pub unsafe fn sd_ble_user_mem_reply(conn_handle: u16, p_block: *const ble_user_m
 #[inline(always)]
 pub unsafe fn sd_ble_opt_set(opt_id: u32, p_opt: *const ble_opt_t) -> u32 {
     let ret: u32;
-    asm!("svc 103",
+    core::arch::asm!("svc 103",
         inout("r0") to_asm(opt_id) => ret,
         inout("r1") to_asm(p_opt) => _,
         lateout("r2") _,
@@ -14576,7 +14576,7 @@ pub unsafe fn sd_ble_opt_set(opt_id: u32, p_opt: *const ble_opt_t) -> u32 {
 #[inline(always)]
 pub unsafe fn sd_ble_opt_get(opt_id: u32, p_opt: *mut ble_opt_t) -> u32 {
     let ret: u32;
-    asm!("svc 104",
+    core::arch::asm!("svc 104",
         inout("r0") to_asm(opt_id) => ret,
         inout("r1") to_asm(p_opt) => _,
         lateout("r2") _,

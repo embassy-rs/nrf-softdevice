@@ -130,7 +130,7 @@ fn main() {
             .collect::<Vec<&str>>();
 
         writeln!(&mut res, "    let ret: u32;",).unwrap();
-        writeln!(&mut res, "    asm!(\"svc {}\",", num).unwrap();
+        writeln!(&mut res, "    core::arch::asm!(\"svc {}\",", num).unwrap();
 
         assert!(arg_names.len() <= 4);
         for r in 0..4 {
