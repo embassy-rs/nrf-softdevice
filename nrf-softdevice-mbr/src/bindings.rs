@@ -620,7 +620,7 @@ fn bindgen_test_layout_sd_mbr_command_t() {
 #[inline(always)]
 pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
     let ret: u32;
-    asm!("svc 24",
+    core::arch::asm!("svc 24",
         inout("r0") to_asm(param) => ret,
         lateout("r1") _,
         lateout("r2") _,

@@ -14,7 +14,6 @@ use embassy::executor::Executor;
 use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
-use embassy_nrf::gpiote::PortInput;
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 
@@ -87,8 +86,8 @@ async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPi
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
 
-    let button1 = PortInput::new(Input::new(button1, Pull::Up));
-    let button2 = PortInput::new(Input::new(button2, Pull::Up));
+    let button1 = Input::new(button1, Pull::Up);
+    let button2 = Input::new(button2, Pull::Up);
     pin_mut!(button1);
     pin_mut!(button2);
     loop {

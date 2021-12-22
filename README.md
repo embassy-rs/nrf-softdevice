@@ -156,7 +156,7 @@ pub unsafe fn sd_ble_gap_connect(
       conn_cfg_tag: u8,
 ) -> u32 {
     let ret: u32;
-    asm!("svc 140",
+    core::arch::asm!("svc 140",
         inout("r0") p_peer_addr => res,
         inout("r1") p_scan_params => _,
         inout("r2") p_conn_params => _,

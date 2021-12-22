@@ -1,4 +1,5 @@
 use crate::pac::{Interrupt, NVIC};
+use core::arch::asm;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 
 #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]

@@ -12,8 +12,7 @@ use core::mem;
 use core::ptr::NonNull;
 use core::slice;
 use cortex_m_rt::entry;
-use defmt::info;
-use defmt::{unreachable, *};
+use defmt::{info, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
 
