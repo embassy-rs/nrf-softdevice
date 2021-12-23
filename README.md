@@ -70,7 +70,12 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 
 - Download SoftDevice S140 from Nordic's website [here](https://www.nordicsemi.com/Software-and-tools/Software/S140/Download). Supported versions are 7.x.x
 - Unzip
-- `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
+- As a debug client, if you are using 
+  - probe-rs:
+    - Erase the flash with `probe-rs-cli erase --chip nrf52840`
+    - Flash the SoftDevice with `probe-rs-cli download --chip nrf52840 --format hex s140_nrf52_7.X.X_softdevice.hex`
+  - nrfjprog:
+    - Flash the SoftDevice with `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
 
 To run an example, simply use `cargo run` from the `examples` folder:
 
