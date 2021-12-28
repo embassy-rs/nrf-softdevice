@@ -125,7 +125,7 @@ Next you need to find out if your board has an external oscillator (which provid
 The SoftDevice steals interrupt priority levels 0, 1, and 3 from your application. So make sure route around those. If you're using embassy and you have the `gpiote` and the `time-driver-rtc1` features enabled for instance you'll need to edit your embassy_config to move those priorities:
 
 ```rust
-/ 0 is Highest. Lower prio number can preempt higher prio number
+// 0 is Highest. Lower prio number can preempt higher prio number
 // Softdevice has reserved priorities 0, 1 and 3
 pub fn embassy_config() -> embassy_nrf::config::Config {
     let mut config = embassy_nrf::config::Config::default();
@@ -141,6 +141,14 @@ pub fn embassy_config() -> embassy_nrf::config::Config {
 ## Troubleshooting
 
 If your SoftDevice is hardfaulting on enable and you think you have everything right, mak sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
+
+If the following linking error occurs
+```
+rust-lld: error: undefined symbol: _critical_section_release
+```
+make sure the feature `critical-section-impl` is enabled and also that the softdevice is included in the code, e.g. `use nrf_softdevice as _;`.
+
+If running the firmware timeouts after flashing, make sure the size and location of the RAM and FLASH region in the linker script is correct.
 
 ## Low-level raw bindings
 
