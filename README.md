@@ -122,7 +122,33 @@ Next you need to find out if your board has an external oscillator (which provid
         }),
 ```
 
-The SoftDevice steals interrupt priority levels 0, 1, and 3 from your application. So make sure route around those. If you're using embassy and you have the `gpiote` and the `time-driver-rtc1` features enabled for instance you'll need to edit your embassy_config to move those priorities:
+## Interrupts
+
+The SoftDevice does time-critical radio processing at high priorities. If its timing is disrupted, it will raise "assertion failed" errors. There's two common mistakes to avoid: (temporarily) disabling the softdevice's interrupts, and running your interrupts at too high priority.
+
+### Critical sections
+
+Interrupts for certain peripherals and SWI/EGUs are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/sd_resource_reqs/hw_block_interrupt_vector.html?cp=4_7_4_0_6_0). Interrupt handlers for them are reserved by the softdevice, the handlers in your application won't be called.
+
+DO NOT disable the softdevice's interrupts. You MUST NOT use the widely-used `cortex_m::interrupt::free` for "disable all interrupts" critical sections. Use `nrf_softdevice::interrupt::free` instead, which disables all non-reserved interrupts.
+
+You can also use the [`critical-section`](https://crates.io/crates/critical-section) crate, enabling the `critical-section-impl` Cargo feature for `nrf-softdevice`. This make `critical-section` use the custom implementation that disables non-reserved interrupts only.
+
+Make sure you're not using any library that internally uses `cortex_m::interrupt::free` as well.
+
+### Interrupt priority
+
+Interrupt priority levels 0, 1, and 4 are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/processor_avail_interrupt_latency/exception_mgmt_sd.html?cp=4_7_4_0_15_1). Make sure to not use them. 
+
+The default priority level for interrupts is 0, so for *every single interrupt* you enable, make sure to set the priority level explicitly. For example:
+
+```rust
+let mut irq = interrupt::take!(SPIM3);
+irq.set_priority(interrupt::Priority::P3);
+let mut spim = spim::Spim::new( p.SPI3, irq, p.P0_13, p.P0_16, p.P0_15, config);
+```
+
+If you're using Embassy with the `gpiote` or `time-driver-rtc1` features enabled, you'll need to edit your embassy_config to move those priorities:
 
 ```rust
 // 0 is Highest. Lower prio number can preempt higher prio number
