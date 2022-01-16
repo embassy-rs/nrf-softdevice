@@ -152,7 +152,7 @@ If you're using Embassy with the `gpiote` or `time-driver-rtc1` features enabled
 
 ```rust
 // 0 is Highest. Lower prio number can preempt higher prio number
-// Softdevice has reserved priorities 0, 1 and 3
+// Softdevice has reserved priorities 0, 1 and 4
 pub fn embassy_config() -> embassy_nrf::config::Config {
     let mut config = embassy_nrf::config::Config::default();
     config.hfclk_source = embassy_nrf::config::HfclkSource::Internal;
