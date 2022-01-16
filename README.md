@@ -85,7 +85,7 @@ To run an example, simply use `cargo run` from the `examples` folder:
 
 The first thing to do is find out how much flash the SoftDevice you've chosen uses. Look in the release notes, or google for your SoftDevice version and "memory map". For an s132 v7.3 its listed as 0x26000, or in human readable numbers 152K (0x26000 in hex is 155648 in decimal / 1024 bytes = 152K)
 
-Set the memory.x to move your applications flash start to after the SoftDevice size and subtract it from the total avialable size:
+Set the memory.x to move your applications flash start to after the SoftDevice size and subtract it from the total available size:
 
 ```bash
 MEMORY
@@ -140,7 +140,7 @@ pub fn embassy_config() -> embassy_nrf::config::Config {
 
 ## Troubleshooting
 
-If your SoftDevice is hardfaulting on enable and you think you have everything right, mak sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
+If your SoftDevice is hardfaulting on enable and you think you have everything right, make sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
 
 If the following linking error occurs
 ```
