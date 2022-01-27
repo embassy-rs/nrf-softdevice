@@ -10,8 +10,8 @@ mod example_common;
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy::executor::Executor;
-use embassy::traits::flash::Flash as _;
 use embassy::util::Forever;
+use embedded_storage_async::nor_flash::*;
 use futures::pin_mut;
 
 use nrf_softdevice::{Flash, Softdevice};
@@ -29,7 +29,7 @@ async fn flash_task(sd: &'static Softdevice) {
     pin_mut!(f);
 
     info!("starting erase");
-    unwrap!(f.as_mut().erase(0x80000).await);
+    unwrap!(f.as_mut().erase(0x80000, 0x81000).await);
     info!("erased!");
 
     info!("starting write");
