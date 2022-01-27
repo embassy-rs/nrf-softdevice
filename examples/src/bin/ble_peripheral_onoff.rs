@@ -11,7 +11,6 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy::executor::Executor;
-use embassy::traits::gpio::WaitForLow;
 use embassy::util::Forever;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;

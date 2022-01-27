@@ -185,7 +185,6 @@ static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 pub(crate) static ADV_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), AdvertiseError> {
-    // TODO make these configurable, only the right params based on type?
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
     adv_params.properties.type_ = adv.kind;
     adv_params.primary_phy = config.primary_phy as u8;
