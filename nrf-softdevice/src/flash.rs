@@ -1,11 +1,31 @@
 use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
-use embassy::traits::flash::Error as FlashError;
+use embedded_storage::nor_flash::{NorFlashError, NorFlashErrorKind};
+use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
 use crate::raw;
 use crate::util::{DropBomb, Signal};
 use crate::{RawError, Softdevice};
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[non_exhaustive]
+pub enum FlashError {
+    Failed,
+    AddressMisaligned,
+    BufferMisaligned,
+}
+
+impl NorFlashError for FlashError {
+    fn kind(&self) -> NorFlashErrorKind {
+        match self {
+            Self::Failed => NorFlashErrorKind::Other,
+            Self::AddressMisaligned => NorFlashErrorKind::NotAligned,
+            Self::BufferMisaligned => NorFlashErrorKind::NotAligned,
+        }
+    }
+}
 
 /// Singleton instance of the Flash softdevice functionality.
 pub struct Flash {
@@ -47,11 +67,11 @@ pub(crate) fn on_flash_error() {
     SIGNAL.signal(Err(FlashError::Failed))
 }
 
-impl embassy::traits::flash::Flash for Flash {
-    type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    type WriteFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    type ErasePageFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
+impl AsyncReadNorFlash for Flash {
+    const READ_SIZE: usize = 1;
+    type Error = FlashError;
 
+    type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
     fn read<'a>(&'a mut self, address: usize, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
         async move {
             // Reading is simple since SoC flash is memory-mapped :)
@@ -65,11 +85,22 @@ impl embassy::traits::flash::Flash for Flash {
         }
     }
 
-    fn write<'a>(&'a mut self, address: usize, data: &'a [u8]) -> Self::WriteFuture<'a> {
+    fn capacity(&self) -> usize {
+        256 * 4096
+    }
+}
+
+impl AsyncNorFlash for Flash {
+    const WRITE_SIZE: usize = 4;
+    const ERASE_SIZE: usize = 4096;
+
+    type WriteFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
+    fn write<'a>(&'a mut self, offset: u32, data: &'a [u8]) -> Self::WriteFuture<'a> {
         async move {
             let data_ptr = data.as_ptr();
             let data_len = data.len() as u32;
 
+            let address = offset as usize;
             if address % 4 != 0 {
                 return Err(FlashError::AddressMisaligned);
             }
@@ -96,42 +127,39 @@ impl embassy::traits::flash::Flash for Flash {
         }
     }
 
-    fn erase<'a>(&'a mut self, address: usize) -> Self::ErasePageFuture<'a> {
+    type EraseFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
+    fn erase<'a>(&'a mut self, from: u32, to: u32) -> Self::EraseFuture<'a> {
         async move {
-            if address % Self::PAGE_SIZE != 0 {
+            if from as usize % Self::PAGE_SIZE != 0 {
+                return Err(FlashError::AddressMisaligned);
+            }
+            if to as usize % Self::PAGE_SIZE != 0 {
                 return Err(FlashError::AddressMisaligned);
             }
 
-            let page_number = address / Self::PAGE_SIZE;
-
             let bomb = DropBomb::new();
-            let ret = unsafe { raw::sd_flash_page_erase(page_number as u32) };
-            let ret = match RawError::convert(ret) {
-                Ok(()) => SIGNAL.wait().await,
-                Err(_e) => {
-                    warn!("sd_flash_page_erase err {:?}", _e);
-                    Err(FlashError::Failed)
+            for address in (from as usize..to as usize).step_by(Self::PAGE_SIZE) {
+                let page_number = (address / Self::PAGE_SIZE) as u32;
+                let ret = unsafe { raw::sd_flash_page_erase(page_number) };
+                match RawError::convert(ret) {
+                    Ok(()) => match SIGNAL.wait().await {
+                        Err(_e) => {
+                            warn!("sd_flash_page_erase err {:?}", _e);
+                            bomb.defuse();
+                            return Err(_e);
+                        }
+                        _ => {}
+                    },
+                    Err(_e) => {
+                        warn!("sd_flash_page_erase err {:?}", _e);
+                        bomb.defuse();
+                        return Err(FlashError::Failed);
+                    }
                 }
-            };
+            }
 
             bomb.defuse();
-            ret
+            Ok(())
         }
-    }
-
-    fn size(&self) -> usize {
-        256 * 4096
-    }
-
-    fn read_size(&self) -> usize {
-        1
-    }
-
-    fn write_size(&self) -> usize {
-        4
-    }
-
-    fn erase_size(&self) -> usize {
-        4096
     }
 }
