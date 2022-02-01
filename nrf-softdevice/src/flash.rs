@@ -72,7 +72,7 @@ impl AsyncReadNorFlash for Flash {
     type Error = FlashError;
 
     type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    fn read<'a>(&'a mut self, address: usize, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
+    fn read<'a>(&'a mut self, address: u32, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
         async move {
             // Reading is simple since SoC flash is memory-mapped :)
             // TODO check addr/len is in bounds.

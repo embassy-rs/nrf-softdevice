@@ -401,12 +401,12 @@ checksum = "723dce4e9f25b6e6c5f35628e144794e5b459216ed7da97b7c4b66cdb3fa82ca"
 [[package]]
 name = "embedded-storage"
 version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#24309dcc22dffb1dda10fccf37b4cde92c94bd69"
+source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#de0c533dfdd2ce1c59083c85185c101b0c26e764"
 
 [[package]]
 name = "embedded-storage-async"
 version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#24309dcc22dffb1dda10fccf37b4cde92c94bd69"
+source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#de0c533dfdd2ce1c59083c85185c101b0c26e764"
 dependencies = [
  "embedded-storage 0.2.0 (git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy)",
 ]
@@ -565,9 +565,9 @@ checksum = "822add9edb1860698b79522510da17bef885171f75aa395cff099d770c609c24"
 
 [[package]]
 name = "lock_api"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "712a4d093c9976e24e7dbca41db895dabcbac38eb5f4045393d17a95bdfb1109"
+checksum = "88943dd7ef4a2e5a4bfa2753aaab3013e34ce2533d1996fb18ef591e315e2b3b"
 dependencies = [
  "scopeguard",
 ]
