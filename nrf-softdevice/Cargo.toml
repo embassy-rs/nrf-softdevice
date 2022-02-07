@@ -41,8 +41,8 @@ cortex-m-rt = ">=0.6.15,<0.8"
 heapless = "0.7.1"
 fixed = "1.5.0"
 futures = { version = "0.3.17", default-features = false }
-embedded-storage = { git = "https://github.com/embassy-rs/embedded-storage.git", branch = "embassy" }
-embedded-storage-async = { git = "https://github.com/embassy-rs/embedded-storage.git", branch = "embassy" }
+embedded-storage = "0.3.0"
+embedded-storage-async = "0.3.0"
 
 nrf52805-pac  = { version = "0.10.0", features = ["rt"], optional = true }
 nrf52810-pac  = { version = "0.10.0", features = ["rt"], optional = true }
