@@ -336,7 +336,7 @@ dependencies = [
  "embassy-macros",
  "embedded-dma",
  "embedded-hal 0.2.6",
- "embedded-storage 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "embedded-storage 0.2.0",
  "fixed",
  "futures",
  "nrf-usbd",
@@ -400,15 +400,17 @@ checksum = "723dce4e9f25b6e6c5f35628e144794e5b459216ed7da97b7c4b66cdb3fa82ca"
 
 [[package]]
 name = "embedded-storage"
-version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#de0c533dfdd2ce1c59083c85185c101b0c26e764"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "156d7a2fdd98ebbf9ae579cbceca3058cff946e13f8e17b90e3511db0508c723"
 
 [[package]]
 name = "embedded-storage-async"
-version = "0.2.0"
-source = "git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy#de0c533dfdd2ce1c59083c85185c101b0c26e764"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ff04af74e47e9bb4315bd7aa2b01f3d1b05f33c03a6c4e9c3b20e9ce9cd8d79"
 dependencies = [
- "embedded-storage 0.2.0 (git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy)",
+ "embedded-storage 0.3.0",
 ]
 
 [[package]]
@@ -611,7 +613,7 @@ dependencies = [
  "critical-section",
  "defmt",
  "embassy",
- "embedded-storage 0.2.0 (git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy)",
+ "embedded-storage 0.3.0",
  "embedded-storage-async",
  "fixed",
  "futures",
@@ -654,7 +656,7 @@ dependencies = [
  "embassy",
  "embassy-nrf",
  "embassy-traits",
- "embedded-storage 0.2.0 (git+https://github.com/embassy-rs/embedded-storage.git?branch=embassy)",
+ "embedded-storage 0.3.0",
  "embedded-storage-async",
  "fixed",
  "futures",

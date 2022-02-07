@@ -1,7 +1,7 @@
 use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
-use embedded_storage::nor_flash::{NorFlashError, NorFlashErrorKind};
+use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind};
 use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
 use crate::raw;
@@ -67,9 +67,12 @@ pub(crate) fn on_flash_error() {
     SIGNAL.signal(Err(FlashError::Failed))
 }
 
+impl ErrorType for Flash {
+    type Error = FlashError;
+}
+
 impl AsyncReadNorFlash for Flash {
     const READ_SIZE: usize = 1;
-    type Error = FlashError;
 
     type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
     fn read<'a>(&'a mut self, address: u32, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
