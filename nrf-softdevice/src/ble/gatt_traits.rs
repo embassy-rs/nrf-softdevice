@@ -75,6 +75,21 @@ impl<T: Primitive> FixedGattValue for T {
     }
 }
 
+impl FixedGattValue for bool {
+    const SIZE: usize = 1;
+
+    fn from_gatt(data: &[u8]) -> Self {
+        data != [0x00]
+    }
+
+    fn to_gatt(&self) -> &[u8] {
+        match self {
+            true => &[0x01],
+            false => &[0x00],
+        }
+    }
+}
+
 impl<const N: usize> GattValue for Vec<u8, N> {
     const MIN_SIZE: usize = 0;
     const MAX_SIZE: usize = N;
