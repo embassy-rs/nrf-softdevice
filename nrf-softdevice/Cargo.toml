@@ -44,13 +44,13 @@ futures = { version = "0.3.17", default-features = false }
 embedded-storage = "0.3.0"
 embedded-storage-async = "0.3.0"
 
-nrf52805-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52810-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52811-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52820-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52832-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52833-pac  = { version = "0.10.0", features = ["rt"], optional = true }
-nrf52840-pac  = { version = "0.10.0", features = ["rt"], optional = true }
+nrf52805-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52810-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52811-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52820-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52832-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52833-pac  = { version = "0.11.0", features = ["rt"], optional = true }
+nrf52840-pac  = { version = "0.11.0", features = ["rt"], optional = true }
 
 nrf-softdevice-s112 = { version = "0.1.1", path = "../nrf-softdevice-s112", optional = true }
 nrf-softdevice-s113 = { version = "0.1.1", path = "../nrf-softdevice-s113", optional = true }

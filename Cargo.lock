@@ -340,7 +340,7 @@ dependencies = [
  "fixed",
  "futures",
  "nrf-usbd",
- "nrf52840-pac",
+ "nrf52840-pac 0.10.1",
  "rand_core",
  "usb-device",
 ]
@@ -631,7 +631,7 @@ dependencies = [
  "nrf52820-pac",
  "nrf52832-pac",
  "nrf52833-pac",
- "nrf52840-pac",
+ "nrf52840-pac 0.11.0",
  "num_enum",
 ]
 
@@ -718,9 +718,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52805-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4d2636b974cd6bc0b7f321e86fb51014fa9ab3e46156cb870db2335b5909713"
+checksum = "f0cd69f02212c43d0abf0f29b2b38657efe06f60719606398427e307ef2141da"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -729,9 +729,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52810-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4c6dd53b0fb1b7a5bde99de9d9f61f6714e7708e9eedaad9d7ed0534c452d1b"
+checksum = "c781b61666a97f249989d25c2997cefcf72a29721a2628cf666a4195566933b9"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -740,9 +740,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52811-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "088b039a15924edec8a97c185e3f45b2da203c0a90696f342f1a9cba736085bf"
+checksum = "be89f9a72ea52c1fc1712db6cb9adebf95fb16598d5919e7d3dbd6e13b7913ce"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52820-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "438e40c226811dc90f0ce34b7466ae6f4a012018f31bd4afe9c3d37cd8407951"
+checksum = "ccfc0d290dc3bf619206bd32d012778692c62401b14eda67091609feff1629e0"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -762,9 +762,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52832-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76f5dec47cf294f40a53cc62b6d9032a5ffae998c045c517cce5acaf482350d7"
+checksum = "e649284d1cde4aef5c43ea32588553cfd31a9b7ce5fccdac98f012399382c33a"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -773,9 +773,9 @@ dependencies = [
 
 [[package]]
 name = "nrf52833-pac"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd69bdb25903e18e098c040ef31dc863814437af010dea8bd55aa31f686cb461"
+checksum = "7dd2b96c950afd2887102113c5194cb5c985a13aff0eac5fb976a76cd6e62a21"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
@@ -787,6 +787,17 @@ name = "nrf52840-pac"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "209c71d29ce1c0e9249b59ffff1ff5035c68b65070bf4c1315767fa4c93103ac"
+dependencies = [
+ "cortex-m 0.7.4",
+ "cortex-m-rt",
+ "vcell",
+]
+
+[[package]]
+name = "nrf52840-pac"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9efa9d1e910e3b825fd7e28f369363a8e036b386b77e21035b9f0e510de199cf"
 dependencies = [
  "cortex-m 0.7.4",
  "cortex-m-rt",
