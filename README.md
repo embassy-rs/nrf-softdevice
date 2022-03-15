@@ -130,9 +130,11 @@ The SoftDevice does time-critical radio processing at high priorities. If its ti
 
 Interrupts for certain peripherals and SWI/EGUs are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/sd_resource_reqs/hw_block_interrupt_vector.html?cp=4_7_4_0_6_0). Interrupt handlers for them are reserved by the softdevice, the handlers in your application won't be called.
 
-DO NOT disable the softdevice's interrupts. You MUST NOT use the widely-used `cortex_m::interrupt::free` for "disable all interrupts" critical sections. Use `nrf_softdevice::interrupt::free` instead, which disables all non-reserved interrupts.
+DO NOT disable the softdevice's interrupts. You MUST NOT use the widely-used `cortex_m::interrupt::free` for "disable all interrupts" critical sections. Instead, use the [`critical-section`](https://crates.io/crates/critical-section) crate, which allows custom critical-section implementations:
 
-You can also use the [`critical-section`](https://crates.io/crates/critical-section) crate, enabling the `critical-section-impl` Cargo feature for `nrf-softdevice`. This make `critical-section` use the custom implementation that disables non-reserved interrupts only.
+- Make sure the `critical-section-impl` Cargo feature is enabled for `nrf-softdevice`. This makes `nrf-softdevice` emit a custom critical section implementation that disables only non-softdevice interrupts.
+- Use `critical_section::with` instead of `cortex_m::interrupt::free`. This uses the custom critical-section impl.
+- Use `embassy::blocking_mutex::CriticalSectionMutex` instead of `cortex_m::interrupt::Mutex`.
 
 Make sure you're not using any library that internally uses `cortex_m::interrupt::free` as well.
 
