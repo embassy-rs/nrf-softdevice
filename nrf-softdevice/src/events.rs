@@ -50,7 +50,7 @@ fn on_soc_evt(evt: u32) {
 // TODO actually derive this from the headers + the ATT_MTU
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
-pub(crate) async fn run() {
+pub(crate) async fn run() -> ! {
     poll_fn(|cx| unsafe {
         SWI2_WAKER.register(cx.waker());
 
@@ -78,9 +78,9 @@ pub(crate) async fn run() {
             }
         }
 
-        Poll::<()>::Pending
+        Poll::Pending
     })
-    .await;
+    .await
 }
 
 #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]

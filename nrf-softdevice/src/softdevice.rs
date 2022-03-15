@@ -319,7 +319,7 @@ impl Softdevice {
     ///
     /// It must be called in its own async task after enabling the softdevice
     /// and before doing any operation. Failure to doing so will cause async operations to never finish.
-    pub async fn run(&self) {
-        crate::events::run().await;
+    pub async fn run(&self) -> ! {
+        crate::events::run().await
     }
 }
