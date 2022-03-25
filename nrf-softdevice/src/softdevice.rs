@@ -3,9 +3,9 @@ use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
 use embassy::util::Forever;
 
-use crate::pac;
 use crate::raw;
 use crate::RawError;
+use crate::{pac, SocEvent};
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     match (id, info) {
@@ -320,6 +320,14 @@ impl Softdevice {
     /// It must be called in its own async task after enabling the softdevice
     /// and before doing any operation. Failure to doing so will cause async operations to never finish.
     pub async fn run(&self) -> ! {
-        crate::events::run().await
+        self.run_with_callback(|_| {}).await
+    }
+
+    /// Runs the softdevice event handling loop.
+    ///
+    /// It must be called in its own async task after enabling the softdevice
+    /// and before doing any operation. Failure to doing so will cause async operations to never finish.
+    pub async fn run_with_callback<F: FnMut(SocEvent)>(&self, f: F) -> ! {
+        crate::events::run(f).await
     }
 }
