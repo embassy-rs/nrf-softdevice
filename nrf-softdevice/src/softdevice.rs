@@ -323,10 +323,11 @@ impl Softdevice {
         self.run_with_callback(|_| {}).await
     }
 
-    /// Runs the softdevice event handling loop.
+    /// Runs the softdevice event handling loop with a callback for [`SocEvent`]s.
     ///
-    /// It must be called in its own async task after enabling the softdevice
-    /// and before doing any operation. Failure to doing so will cause async operations to never finish.
+    /// It must be called under the same conditions as [`Softdevice::run()`]. This
+    /// version allows the application to provide a callback to receive SoC events
+    /// from the softdevice (other than flash events which are handled by [`Flash`](crate::flash::Flash)).
     pub async fn run_with_callback<F: FnMut(SocEvent)>(&self, f: F) -> ! {
         crate::events::run(f).await
     }
