@@ -11,15 +11,14 @@ use crate::RawError;
 
 static SWI2_WAKER: AtomicWaker = AtomicWaker::new();
 
+/// SoC events reported by the softdevice.
 #[rustfmt::skip]
 #[repr(u32)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-enum SocEvent {
+pub enum SocEvent {
     Hfclkstarted = raw::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,
     PowerFailureWarning = raw::NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING,
-    FlashOperationSuccess = raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS,
-    FlashOperationError = raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR,
     RadioBlocked = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_BLOCKED,
     RadioCanceled = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_CANCELED,
     RadioSignalCallbackInvalidReturn = raw::NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN,
@@ -33,31 +32,34 @@ enum SocEvent {
     PowerUsbRemoved = raw::NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED,
 }
 
-fn on_soc_evt(evt: u32) {
-    let evt = match SocEvent::try_from(evt) {
-        Ok(evt) => evt,
-        Err(_) => panic!("Unknown soc evt {:?}", evt),
-    };
-
+fn on_soc_evt<F: FnMut(SocEvent)>(evt: u32, evt_handler: &mut F) {
     info!("soc evt {:?}", evt);
+
     match evt {
-        SocEvent::FlashOperationError => crate::flash::on_flash_error(),
-        SocEvent::FlashOperationSuccess => crate::flash::on_flash_success(),
-        _ => {}
+        raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR => crate::flash::on_flash_error(),
+        raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS => crate::flash::on_flash_success(),
+        _ => {
+            let evt = match SocEvent::try_from(evt) {
+                Ok(evt) => evt,
+                Err(_) => panic!("Unknown soc evt {:?}", evt),
+            };
+
+            evt_handler(evt)
+        }
     }
 }
 
 // TODO actually derive this from the headers + the ATT_MTU
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
-pub(crate) async fn run() -> ! {
+pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
     poll_fn(|cx| unsafe {
         SWI2_WAKER.register(cx.waker());
 
         let mut evt: u32 = 0;
         loop {
             match RawError::convert(raw::sd_evt_get(&mut evt as _)) {
-                Ok(()) => on_soc_evt(evt),
+                Ok(()) => on_soc_evt(evt, &mut soc_evt_handler),
                 Err(RawError::NotFound) => break,
                 Err(err) => panic!("sd_evt_get err {:?}", err),
             }
