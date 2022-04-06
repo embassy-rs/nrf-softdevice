@@ -165,7 +165,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     fields.retain(|field| {
         if let Some(attr) = field.attrs.iter().find(|attr| {
             attr.path.segments.len() == 1
-                && attr.path.segments.first().unwrap().ident.to_string() == "characteristic"
+                && attr.path.segments.first().unwrap().ident == "characteristic"
         }) {
             let args = attr.parse_meta().unwrap();
 
@@ -228,7 +228,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
-            ty: syn::Type::Verbatim(quote!(u16).into()),
+            ty: syn::Type::Verbatim(quote!(u16)),
             attrs: Vec::new(),
             colon_token: Default::default(),
             vis: syn::Visibility::Inherited,
@@ -271,7 +271,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         if indicate || notify {
             fields.push(syn::Field {
                 ident: Some(cccd_handle.clone()),
-                ty: syn::Type::Verbatim(quote!(u16).into()),
+                ty: syn::Type::Verbatim(quote!(u16)),
                 attrs: Vec::new(),
                 colon_token: Default::default(),
                 vis: syn::Visibility::Inherited,
@@ -312,7 +312,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     #case_cccd_write{notifications: bool},
                 ));
                 code_on_write.extend(quote_spanned!(ch.span=>
-                    if handle == self.#cccd_handle && data.len() != 0 {
+                    if handle == self.#cccd_handle && !data.is_empty() {
                         match data[0] & 0x01 {
                             0x00 => return Some(#event_enum_name::#case_cccd_write{notifications: false}),
                             0x01 => return Some(#event_enum_name::#case_cccd_write{notifications: true}),
@@ -342,7 +342,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     #case_cccd_write{indications: bool},
                 ));
                 code_on_write.extend(quote_spanned!(ch.span=>
-                    if handle == self.#cccd_handle && data.len() != 0 {
+                    if handle == self.#cccd_handle && !data.is_empty() {
                         match data[0] & 0x02 {
                             0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false}),
                             0x02 => return Some(#event_enum_name::#case_cccd_write{indications: true}),
@@ -360,7 +360,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 #case_cccd_write{indications: bool, notifications: bool},
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
-                if handle == self.#cccd_handle && data.len() != 0 {
+                if handle == self.#cccd_handle && !data.is_empty() {
                     match data[0] & 0x03 {
                         0x00 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: false}),
                         0x01 => return Some(#event_enum_name::#case_cccd_write{indications: false, notifications: true}),
@@ -408,6 +408,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
+        #[allow(dead_code)]
         #struc_vis enum #event_enum_name {
             #code_event_enum
         }
@@ -450,7 +451,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     fields.retain(|field| {
         if let Some(attr) = field.attrs.iter().find(|attr| {
             attr.path.segments.len() == 1
-                && attr.path.segments.first().unwrap().ident.to_string() == "characteristic"
+                && attr.path.segments.first().unwrap().ident == "characteristic"
         }) {
             let args = attr.parse_meta().unwrap();
 
@@ -494,7 +495,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
     fields.push(syn::Field {
         ident: Some(format_ident!("conn")),
-        ty: syn::Type::Verbatim(quote!(#ble::Connection).into()),
+        ty: syn::Type::Verbatim(quote!(#ble::Connection)),
         attrs: Vec::new(),
         colon_token: Default::default(),
         vis: syn::Visibility::Inherited,
@@ -520,7 +521,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
-            ty: syn::Type::Verbatim(quote!(u16).into()),
+            ty: syn::Type::Verbatim(quote!(u16)),
             attrs: Vec::new(),
             colon_token: Default::default(),
             vis: syn::Visibility::Inherited,
@@ -528,7 +529,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
         fields.push(syn::Field {
             ident: Some(uuid_field.clone()),
-            ty: syn::Type::Verbatim(quote!(#ble::Uuid).into()),
+            ty: syn::Type::Verbatim(quote!(#ble::Uuid)),
             attrs: Vec::new(),
             colon_token: Default::default(),
             vis: syn::Visibility::Inherited,
@@ -598,7 +599,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         if indicate || notify {
             fields.push(syn::Field {
                 ident: Some(cccd_handle.clone()),
-                ty: syn::Type::Verbatim(quote!(u16).into()),
+                ty: syn::Type::Verbatim(quote!(u16)),
                 attrs: Vec::new(),
                 colon_token: Default::default(),
                 vis: syn::Visibility::Inherited,
