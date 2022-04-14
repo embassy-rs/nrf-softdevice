@@ -97,7 +97,7 @@ impl Softdevice {
     /// - Panics if the requested configuration requires more memory than reserved for the softdevice. In that case, you can give more memory to the softdevice by editing the RAM start address in `memory.x`. The required start address is logged prior to panic.
     /// - Panics if the requested configuration has too high memory requirements for the softdevice. The softdevice supports a maximum dynamic memory size of 64kb.
     /// - Panics if called multiple times. Must be called at most once.
-    pub fn enable(config: &Config) -> &'static Softdevice {
+    pub fn enable(config: &Config) -> &'static mut Softdevice {
         if ENABLED
             .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
             .is_err()
@@ -310,7 +310,8 @@ impl Softdevice {
 
     /// Return an instance to the softdevice without checking whether
     /// it is enabled or not. This is only safe if the softdevice is enabled
-    /// (a call to [`enable`] has returned without error)
+    /// (a call to [`enable`] has returned without error) and no `&mut` references
+    /// to the softdevice are active
     pub unsafe fn steal() -> &'static Softdevice {
         SOFTDEVICE.steal()
     }

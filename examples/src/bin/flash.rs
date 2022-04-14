@@ -44,7 +44,7 @@ fn main() -> ! {
     let sd = Softdevice::enable(&Default::default());
 
     let executor = EXECUTOR.put(Executor::new());
-    executor.run(|spawner| {
+    executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(flash_task(sd)));
     });
