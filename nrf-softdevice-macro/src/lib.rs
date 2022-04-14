@@ -112,7 +112,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         impl #ble::gatt_server::Server for #struct_name {
-            type Event = #event_enum_name;
+            type Event<'a> = #event_enum_name;
 
             fn register(sd: &::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
             {
@@ -121,7 +121,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
                 })
             }
 
-            fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+            fn on_write<'a>(&self, handle: u16, data: &'a [u8]) -> Option<Self::Event<'a>> {
                 use #ble::gatt_server::Service;
 
                 #code_on_write
@@ -389,7 +389,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         impl #ble::gatt_server::Service for #struct_name {
-            type Event = #event_enum_name;
+            type Event<'a> = #event_enum_name;
 
             fn uuid() -> #ble::Uuid {
                 #uuid
@@ -406,7 +406,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 })
             }
 
-            fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+            fn on_write<'a>(&self, handle: u16, data: &'a [u8]) -> Option<Self::Event<'a>> {
                 #code_on_write
                 None
             }

@@ -2,6 +2,7 @@
 #![no_main]
 #![feature(type_alias_impl_trait)]
 #![feature(alloc_error_handler)]
+#![feature(generic_associated_types)]
 #![allow(incomplete_features)]
 
 #[path = "../example_common.rs"]

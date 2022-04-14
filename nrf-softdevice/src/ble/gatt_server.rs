@@ -30,13 +30,13 @@ pub struct CharacteristicHandles {
 }
 
 pub trait Server: Sized {
-    type Event;
+    type Event<'a>;
     fn register(sd: &Softdevice) -> Result<Self, RegisterError>;
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
+    fn on_write<'a>(&self, handle: u16, data: &'a [u8]) -> Option<Self::Event<'a>>;
 }
 
 pub trait Service: Sized {
-    type Event;
+    type Event<'a>;
 
     fn uuid() -> Uuid;
 
@@ -44,7 +44,7 @@ pub trait Service: Sized {
     where
         F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
+    fn on_write<'a>(&self, handle: u16, data: &'a [u8]) -> Option<Self::Event<'a>>;
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -155,9 +155,9 @@ impl From<DisconnectedError> for RunError {
     }
 }
 
-pub async fn run<'m, F, S>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
+pub async fn run<'a, F, S>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
 where
-    F: FnMut(S::Event),
+    F: FnMut(S::Event<'a>),
     S: Server,
 {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
