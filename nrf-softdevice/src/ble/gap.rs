@@ -62,7 +62,6 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             let ret = raw::sd_ble_gap_conn_param_update(conn_handle, &conn_params);
             if let Err(err) = RawError::convert(ret) {
                 warn!("sd_ble_gap_conn_param_update err {:?}", err);
-                return;
             }
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => {
@@ -163,6 +162,147 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 };
             });
         }
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_PARAMS_REQUEST => {
+            let params = &gap_evt.params.sec_params_request;
+            let peer_params = params.peer_params;
+            trace!("ble evt sec params request conn={:x}, bond={:?}, io_caps={:?}, keypress={:?}, lesc={:?}, mitm={:?}, oob={:?}, key_size={}..={}",
+                    gap_evt.conn_handle, peer_params.bond(), peer_params.io_caps(), peer_params.keypress(), peer_params.lesc(), peer_params.mitm(), peer_params.oob(),
+                    peer_params.min_key_size, peer_params.max_key_size);
+
+            let (sec_params, keyset) = connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                let mut sec_params: raw::ble_gap_sec_params_t = core::mem::zeroed();
+
+                sec_params.min_key_size = 7;
+                sec_params.max_key_size = 16;
+
+                sec_params.kdist_own.set_enc(1);
+                sec_params.kdist_own.set_id(1);
+                sec_params.kdist_peer.set_enc(1);
+                sec_params.kdist_peer.set_id(1);
+
+                if let Some(bonder) = state.bonder {
+                    sec_params.set_bond(1);
+                    sec_params.set_io_caps(bonder.io_capabilities().to_io_caps());
+                } else {
+                    sec_params.set_io_caps(raw::BLE_GAP_IO_CAPS_NONE as u8);
+                }
+
+                (sec_params, state.keyset())
+            });
+
+            let ret = raw::sd_ble_gap_sec_params_reply(
+                gap_evt.conn_handle,
+                raw::BLE_GAP_SEC_STATUS_SUCCESS as u8,
+                &sec_params,
+                &keyset,
+            );
+
+            if let Err(_err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_sec_params_reply err {:?}", _err);
+            }
+        }
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_PASSKEY_DISPLAY => {
+            let params = &gap_evt.params.passkey_display;
+            debug_assert_eq!(params.match_request(), 0);
+            trace!(
+                "on_passkey_display passkey={}",
+                core::str::from_utf8_unchecked(&params.passkey)
+            );
+            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                if let Some(bonder) = state.bonder {
+                    unwrap!(bonder.display_passkey(&params.passkey))
+                }
+            });
+        }
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_KEY_REQUEST => {
+            let params = &gap_evt.params.auth_key_request;
+            trace!("on_auth_key_request key_type={}", params.key_type);
+
+            let handled = connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                state.bonder.and_then(|bonder| match u32::from(params.key_type) {
+                    raw::BLE_GAP_AUTH_KEY_TYPE_PASSKEY => Connection::from_handle(gap_evt.conn_handle)
+                        .map(|conn| bonder.enter_passkey(PasskeyReply::new(conn))),
+                    raw::BLE_GAP_AUTH_KEY_TYPE_OOB => Connection::from_handle(gap_evt.conn_handle)
+                        .map(|conn| bonder.recv_out_of_band(OutOfBandReply::new(conn))),
+                    _ => None,
+                })
+            })
+            .is_some();
+
+            if !handled {
+                let ret = raw::sd_ble_gap_auth_key_reply(
+                    gap_evt.conn_handle,
+                    raw::BLE_GAP_AUTH_KEY_TYPE_NONE as u8,
+                    core::ptr::null(),
+                );
+
+                if let Err(_err) = RawError::convert(ret) {
+                    warn!("sd_ble_gap_auth_key_reply err {:?}", _err);
+                }
+            }
+        }
+        #[cfg(feature = "ble-peripheral")]
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_SEC_INFO_REQUEST => {
+            let params = &gap_evt.params.sec_info_request;
+            trace!("ble evt sec info request: enc_info={}, id_info={}, sign_info={}, master_id: {{ ediv: {:x}, rand: {:?} }}, peer_addr: {{ addr: {:?}, addr_id_peer: {}, addr_type: {} }}",
+                params.enc_info(), params.id_info(), params.sign_info(), params.master_id.ediv, params.master_id.rand,
+                params.peer_addr.addr, params.peer_addr.addr_id_peer(), params.peer_addr.addr_type());
+
+            let key = Connection::from_handle(gap_evt.conn_handle).and_then(|conn| {
+                conn.with_state(|state| state.bonder.and_then(|x| x.get_key(&conn, params.master_id)))
+            });
+
+            let ret = raw::sd_ble_gap_sec_info_reply(
+                gap_evt.conn_handle,
+                key.as_ref().map(|x| x as *const _).unwrap_or(core::ptr::null()),
+                core::ptr::null(),
+                core::ptr::null(),
+            );
+
+            if let Err(_err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_sec_info_reply err {:?}", _err);
+            }
+        }
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_SEC_UPDATE => {
+            let params = &gap_evt.params.conn_sec_update;
+            trace!("ble evt conn sec update");
+            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default()
+            });
+        }
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_STATUS => {
+            let params = &gap_evt.params.auth_status;
+            trace!(
+                "ble evt auth status: bonded={}, error_src={}, lesc={}, kdist_own={}, kdist_peer={}",
+                params.bonded(),
+                params.error_src(),
+                params.lesc(),
+                params.kdist_own._bitfield_1.get(0, 8),
+                params.kdist_peer._bitfield_1.get(0, 8)
+            );
+            if u32::from(params.auth_status) == raw::BLE_GAP_SEC_STATUS_SUCCESS {
+                if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
+                    conn.with_state(|state| {
+                        if params.bonded() != 0 {
+                            if let Some(bonder) = state.bonder {
+                                bonder.on_bonded(
+                                    &conn,
+                                    &state.own_enc_key,
+                                    (params.kdist_peer.id() != 0).then(|| &state.peer_id),
+                                    (params.kdist_peer.enc() != 0).then(|| &state.peer_enc_key),
+                                );
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        // BLE_GAP_EVTS_BLE_GAP_EVT_KEY_PRESSED (LESC central bonding)
+        // BLE_GAP_EVTS_BLE_GAP_EVT_LESC_DHKEY_REQUEST (LESC key calculation)
+        // BLE_GAP_EVTS_BLE_GAP_EVT_SEC_REQUEST (Peripheral-initiated security request)
+        // BLE_GAP_EVTS_BLE_GAP_EVT_RSSI_CHANGED
+        // BLE_GAP_EVTS_BLE_GAP_EVT_SCAN_REQ_REPORT
+        // BLE_GAP_EVTS_BLE_GAP_EVT_QOS_CHANNEL_SURVEY_REPORT
         _ => {}
     }
 }

@@ -2,6 +2,7 @@
 
 use core::{mem, ptr};
 
+use crate::ble::bond::BondHandler;
 use crate::ble::*;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{raw, RawError, Softdevice};
@@ -208,7 +209,7 @@ fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), Advertise
         err
     })?;
 
-    let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1 as u8) };
+    let ret = unsafe { raw::sd_ble_gap_adv_start(ADV_HANDLE, 1u8) };
     RawError::convert(ret).map_err(|err| {
         warn!("sd_ble_gap_adv_start err {:?}", err);
         err
@@ -249,9 +250,27 @@ pub async fn advertise(
 
 /// Perform connectable advertising, returning the connection that's established as a result.
 pub async fn advertise_connectable(
-    _sd: &Softdevice,
+    sd: &Softdevice,
     adv: ConnectableAdvertisement<'_>,
     config: &Config,
+) -> Result<Connection, AdvertiseError> {
+    advertise_inner(sd, adv, config, None).await
+}
+
+pub async fn advertise_bondable<'a>(
+    sd: &'a Softdevice,
+    adv: ConnectableAdvertisement<'a>,
+    config: &'a Config,
+    bonder: &'static dyn BondHandler,
+) -> Result<Connection, AdvertiseError> {
+    advertise_inner(sd, adv, config, Some(bonder)).await
+}
+
+pub async fn advertise_inner<'a>(
+    _sd: &'a Softdevice,
+    adv: ConnectableAdvertisement<'a>,
+    config: &'a Config,
+    bonder: Option<&'static dyn BondHandler>,
 ) -> Result<Connection, AdvertiseError> {
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
@@ -275,7 +294,7 @@ pub async fn advertise_connectable(
                     let conn_params = params.conn_params;
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
-                    match Connection::new(conn_handle, role, peer_address, conn_params) {
+                    match Connection::new(conn_handle, role, peer_address, conn_params, bonder) {
                         Ok(conn) => {
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                             gap::do_data_length_update(conn_handle, ptr::null());

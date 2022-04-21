@@ -2,14 +2,18 @@
 
 mod connection;
 mod gatt_traits;
+mod replies;
 mod types;
 
 pub use connection::*;
 pub use gatt_traits::*;
+pub use replies::*;
 pub use types::*;
 
 mod common;
 mod gap;
+
+pub mod bond;
 
 #[cfg(feature = "ble-central")]
 pub mod central;
