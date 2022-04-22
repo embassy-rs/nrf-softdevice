@@ -11,6 +11,9 @@ use crate::util::{get_flexarray, get_union_field, Portal};
 use crate::RawError;
 use crate::Softdevice;
 
+pub mod builder;
+pub mod characteristic;
+
 pub struct Characteristic {
     pub uuid: Uuid,
     pub can_read: bool,
@@ -27,6 +30,36 @@ pub struct CharacteristicHandles {
     pub user_desc_handle: u16,
     pub cccd_handle: u16,
     pub sccd_handle: u16,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct ServiceHandle(u16);
+
+impl ServiceHandle {
+    pub fn handle(&self) -> u16 {
+        self.0
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct IncludedServiceHandle(u16);
+
+impl IncludedServiceHandle {
+    pub fn handle(&self) -> u16 {
+        self.0
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct DescriptorHandle(u16);
+
+impl DescriptorHandle {
+    pub fn handle(&self) -> u16 {
+        self.0
+    }
 }
 
 pub trait Server: Sized {

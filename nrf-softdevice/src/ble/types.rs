@@ -84,6 +84,55 @@ impl Role {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum SecurityMode {
+    NoAccess,
+    Open,
+    JustWorks,
+    Mitm,
+    LescMitm,
+    Signed,
+    SignedMitm,
+}
+
+impl Default for SecurityMode {
+    fn default() -> Self {
+        Self::Open
+    }
+}
+
+impl SecurityMode {
+    pub fn try_from_raw(raw: raw::ble_gap_conn_sec_mode_t) -> Option<Self> {
+        match (raw.sm(), raw.lv()) {
+            (0, 0) => Some(SecurityMode::NoAccess),
+            (1, 1) => Some(SecurityMode::Open),
+            (1, 2) => Some(SecurityMode::JustWorks),
+            (1, 3) => Some(SecurityMode::Mitm),
+            (1, 4) => Some(SecurityMode::LescMitm),
+            (2, 1) => Some(SecurityMode::Signed),
+            (2, 2) => Some(SecurityMode::SignedMitm),
+            _ => None,
+        }
+    }
+
+    pub fn into_raw(self) -> raw::ble_gap_conn_sec_mode_t {
+        let (sm, lv) = match self {
+            SecurityMode::NoAccess => (0, 0),
+            SecurityMode::Open => (1, 1),
+            SecurityMode::JustWorks => (1, 2),
+            SecurityMode::Mitm => (1, 3),
+            SecurityMode::LescMitm => (1, 4),
+            SecurityMode::Signed => (2, 1),
+            SecurityMode::SignedMitm => (2, 2),
+        };
+
+        raw::ble_gap_conn_sec_mode_t {
+            _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(sm, lv),
+        }
+    }
+}
+
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
