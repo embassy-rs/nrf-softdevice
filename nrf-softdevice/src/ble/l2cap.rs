@@ -167,6 +167,12 @@ impl<P: Packet> L2cap<P> {
                     raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
                         return Err(SetupError::Disconnected)
                     }
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => {
+                        // It is possible to get L2CAP_EVT_CH_RELEASED for the
+                        // "half-setup" channel if the conn gets disconnected while
+                        // setting it up.
+                        return Err(SetupError::Disconnected);
+                    }
                     raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP => {
                         let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
                         let _evt = &l2cap_evt.params.ch_setup;
