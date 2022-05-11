@@ -4,13 +4,16 @@
   "rust-analyzer.checkOnSave.allFeatures": false,
   "rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
   "rust-analyzer.checkOnSave.allTargets": false,
-  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
+  "rust-analyzer.cargo.runBuildScripts": true,
+  "rust-analyzer.experimental.procAttrMacros": false,
   "rust-analyzer.procMacro.enable": true,
-  "rust-analyzer.assist.importMergeBehavior": "last",
+  "rust-analyzer.assist.importGranularity": "module",
+  "rust-analyzer.linkedProjects": [
+    "examples/Cargo.toml"
+  ],
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/target/**": true,
   },
-  "cmake.configureOnOpen": false
 }
