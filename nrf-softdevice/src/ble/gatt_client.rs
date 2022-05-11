@@ -157,7 +157,7 @@ pub(crate) async fn discover_service(
                         }
                     }
                 }
-                _ => unreachable!(),
+                e => panic!("unexpected event {}", e),
             }
         })
         .await
@@ -201,7 +201,7 @@ async fn discover_characteristics(
                     });
                     Ok(v)
                 }
-                _ => unreachable!(),
+                e => panic!("unexpected event {}", e),
             }
         })
         .await
@@ -245,7 +245,7 @@ async fn discover_descriptors(
                     });
                     Ok(v)
                 }
-                _ => unreachable!(),
+                e => panic!("unexpected event {}", e),
             }
         })
         .await
@@ -648,7 +648,7 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
 
                     Ok(())
                 }
-                _ => unreachable!(),
+                e => panic!("unexpected event {}", e),
             }
         })
         .await

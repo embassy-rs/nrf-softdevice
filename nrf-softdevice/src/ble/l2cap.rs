@@ -196,7 +196,7 @@ impl<P: Packet> L2cap<P> {
                         let _evt = &l2cap_evt.params.ch_setup_refused;
                         Err(SetupError::Refused)
                     }
-                    _ => unreachable!(),
+                    e => panic!("unexpected event {}", e),
                 }
             })
             .await
@@ -290,7 +290,7 @@ impl<P: Packet> L2cap<P> {
                             None
                         }
                     }
-                    _ => unreachable!(),
+                    e => panic!("unexpected event {}", e),
                 }
             })
             .await

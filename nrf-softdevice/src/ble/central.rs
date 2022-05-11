@@ -88,7 +88,7 @@ pub async fn connect(
                     }
                 }
                 raw::BLE_GAP_EVTS_BLE_GAP_EVT_TIMEOUT => Err(ConnectError::Timeout),
-                _ => unreachable!(),
+                e => panic!("unexpected event {}", e),
             }
         })
         .await?;
