@@ -66,6 +66,9 @@ pub(crate) struct ConnectionState {
 
     pub conn_params: ble_gap_conn_params_t,
 
+    #[cfg(feature = "ble-rssi")]
+    pub rssi: Option<i8>,
+
     #[cfg(feature = "ble-gatt")]
     pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -91,6 +94,8 @@ impl ConnectionState {
                 min_conn_interval: 0,
                 slave_latency: 0,
             },
+            #[cfg(feature = "ble-rssi")]
+            rssi: None,
             #[cfg(feature = "ble-gatt")]
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -218,6 +223,9 @@ impl Connection {
 
                 conn_params,
 
+                #[cfg(feature = "ble-rssi")]
+                rssi: None,
+
                 #[cfg(feature = "ble-gatt")]
                 att_mtu: raw::BLE_GATT_ATT_MTU_DEFAULT as _,
 
@@ -233,6 +241,26 @@ impl Connection {
             trace!("conn {:?}: connected", index);
             Self { index }
         })
+    }
+
+    /// Start measuring RSSI on this connection.
+    #[cfg(feature = "ble-rssi")]
+    pub fn start_rssi(&self) {
+        if let Ok(conn_handle) = self.with_state(|state| state.check_connected()) {
+            let ret = unsafe { raw::sd_ble_gap_rssi_start(conn_handle, 0, 0) };
+            if let Err(err) = RawError::convert(ret) {
+                warn!("sd_ble_gap_rssi_start err {:?}", err);
+            }
+        }
+    }
+
+    /// Get the connection's RSSI.
+    ///
+    /// This will return None if `start_rssi` has not been called yet, or if
+    /// no measurement has been done yet.
+    #[cfg(feature = "ble-rssi")]
+    pub fn rssi(&self) -> Option<i8> {
+        self.with_state(|state| state.rssi)
     }
 
     /// Get the currently active connection params.

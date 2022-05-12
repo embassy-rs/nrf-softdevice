@@ -20,6 +20,7 @@ s122 = ["nrf-softdevice-s122"]
 s132 = ["nrf-softdevice-s132"]
 s140 = ["nrf-softdevice-s140"]
 
+ble-rssi = []
 ble-peripheral = []
 ble-central = []
 ble-l2cap = []

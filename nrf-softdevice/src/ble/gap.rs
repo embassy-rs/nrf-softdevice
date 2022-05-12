@@ -159,6 +159,16 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 effective_params.max_tx_time_us,
             );
         }
+        #[cfg(feature = "ble-rssi")]
+        raw::BLE_GAP_EVTS_BLE_GAP_EVT_RSSI_CHANGED => {
+            let new_rssi = gap_evt.params.rssi_changed.rssi;
+            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
+                state.rssi = match state.rssi {
+                    None => Some(new_rssi),
+                    Some(old_rssi) => Some((((old_rssi as i16) * 7 + (new_rssi as i16)) / 8) as i8),
+                };
+            });
+        }
         _ => {}
     }
 }
