@@ -1,9 +1,6 @@
 #![no_std]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
-#![feature(const_fn_trait_bound)]
-#![feature(cell_update)]
-#![allow(incomplete_features)]
 
 pub(crate) mod util;
 
