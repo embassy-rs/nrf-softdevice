@@ -11,6 +11,41 @@ use crate::raw;
 use crate::util::{get_union_field, Portal};
 use crate::{RawError, Softdevice};
 
+#[cfg(feature = "ble-l2cap-credit-wrokaround")]
+fn credit_hack_refill(conn: u16, cid: u16) {
+    const CREDITS_MAX: u16 = 0xFFFF;
+    const CREDITS_MIN: u16 = 1024;
+
+    let mut credits = 0;
+    let ret = unsafe { raw::sd_ble_l2cap_ch_flow_control(conn, cid, 0, &mut credits) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_l2cap_ch_flow_control credits query err {:?}", err);
+        return;
+    }
+    info!("sd_ble_l2cap_ch_flow_control credits={=u16:x}", credits);
+
+    if credits > CREDITS_MIN {
+        // Still enough credits, no need to refill.
+        return;
+    }
+
+    info!("refilling credits");
+
+    let ret = unsafe { raw::sd_ble_l2cap_ch_flow_control(conn, cid, CREDITS_MAX, ptr::null_mut()) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!(
+            "sd_ble_l2cap_ch_flow_control credits=CREDITS_MAX err {:?}",
+            err
+        );
+        return;
+    }
+
+    let ret = unsafe { raw::sd_ble_l2cap_ch_flow_control(conn, cid, 0, ptr::null_mut()) };
+    if let Err(err) = RawError::convert(ret) {
+        warn!("sd_ble_l2cap_ch_flow_control credits=0 err {:?}", err);
+    }
+}
+
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
     match (*ble_evt).header.evt_id as u32 {
@@ -178,6 +213,8 @@ impl<P: Packet> L2cap<P> {
                         let _evt = &l2cap_evt.params.ch_setup;
 
                         // default is 1
+                        let _ = config.credits;
+                        #[cfg(not(feature = "ble-l2cap-credit-wrokaround"))]
                         if config.credits != 1 {
                             let ret = raw::sd_ble_l2cap_ch_flow_control(
                                 conn_handle,
@@ -260,6 +297,8 @@ impl<P: Packet> L2cap<P> {
                             }
 
                             // default is 1
+                            let _ = config.credits;
+                            #[cfg(not(feature = "ble-l2cap-credit-wrokaround"))]
                             if config.credits != 1 {
                                 let ret = raw::sd_ble_l2cap_ch_flow_control(
                                     conn_handle,
@@ -399,6 +438,9 @@ impl<P: Packet> Channel<P> {
             unsafe { P::from_raw_parts(ptr, 0) };
             return Err(err.into());
         }
+
+        #[cfg(feature = "ble-l2cap-credit-wrokaround")]
+        credit_hack_refill(conn_handle, self.cid);
 
         portal(conn_handle)
             .wait_many(|ble_evt| unsafe {
