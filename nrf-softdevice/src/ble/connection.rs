@@ -1,5 +1,6 @@
 use core::cell::Cell;
 use core::cell::UnsafeCell;
+use core::iter::FusedIterator;
 
 use raw::ble_gap_conn_params_t;
 
@@ -300,7 +301,45 @@ impl Connection {
     pub(crate) fn with_state<T>(&self, f: impl FnOnce(&mut ConnectionState) -> T) -> T {
         with_state(self.index, f)
     }
+
+    pub fn iter() -> ConnectionIter {
+        ConnectionIter(0)
+    }
 }
+
+pub struct ConnectionIter(u8);
+
+impl Iterator for ConnectionIter {
+    type Item = Connection;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let n = usize::from(self.0);
+        if n < CONNS_MAX {
+            unsafe {
+                for (i, s) in STATES[n..].iter().enumerate() {
+                    let state = &mut *s.get();
+                    if state.conn_handle.is_some() {
+                        let index = (n + i) as u8;
+                        state.refcount = unwrap!(
+                            state.refcount.checked_add(1),
+                            "Too many references to same connection"
+                        );
+                        self.0 = index + 1;
+                        return Some(Connection { index });
+                    }
+                }
+            }
+            self.0 = CONNS_MAX as u8;
+        }
+        None
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (0, Some(CONNS_MAX - usize::from(self.0)))
+    }
+}
+
+impl FusedIterator for ConnectionIter {}
 
 // ConnectionStates by index.
 const DUMMY_STATE: UnsafeCell<ConnectionState> = UnsafeCell::new(ConnectionState::dummy());
