@@ -15,6 +15,7 @@ pub struct Characteristic {
     pub uuid: Uuid,
     pub can_read: bool,
     pub can_write: bool,
+    pub can_write_without_response: bool,
     pub can_notify: bool,
     pub can_indicate: bool,
     pub max_len: usize,
@@ -107,6 +108,9 @@ pub fn register_service<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError
         let mut char_md: raw::ble_gatts_char_md_t = unsafe { mem::zeroed() };
         char_md.char_props.set_read(char.can_read as u8);
         char_md.char_props.set_write(char.can_write as u8);
+        char_md
+            .char_props
+            .set_write_wo_resp(char.can_write_without_response as u8);
         char_md.char_props.set_notify(char.can_notify as u8);
         char_md.char_props.set_indicate(char.can_indicate as u8);
         char_md.p_cccd_md = &mut cccd_attr_md;
