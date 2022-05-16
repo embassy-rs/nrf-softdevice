@@ -25,6 +25,8 @@ struct CharacteristicArgs {
     #[darling(default)]
     write: bool,
     #[darling(default)]
+    write_without_response: bool,
+    #[darling(default)]
     notify: bool,
     #[darling(default)]
     indicate: bool,
@@ -221,6 +223,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let uuid = ch.args.uuid;
         let read = ch.args.read;
         let write = ch.args.write;
+        let write_without_response = ch.args.write_without_response;
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
         let ty = &ch.ty;
@@ -240,6 +243,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     uuid: #uuid,
                     can_read: #read,
                     can_write: #write,
+                    can_write_without_response: #write_without_response,
                     can_notify: #notify,
                     can_indicate: #indicate,
                     max_len: #ty_as_val::MAX_SIZE as _,
@@ -281,7 +285,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
         }
 
-        if write {
+        if write || write_without_response {
             let case_write = format_ident!("{}Write", name_pascal);
             code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_write(#ty),
