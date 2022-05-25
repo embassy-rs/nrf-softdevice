@@ -157,13 +157,20 @@ where
 
     // Buffer to store received advertisement data.
     const BUF_LEN: usize = 256;
-    let mut buf = [0u8; BUF_LEN];
-    let buf_data = raw::ble_data_t {
-        p_data: buf.as_mut_ptr(),
+
+    // Both of these are intentionally static because Softdevice will,
+    // sometimes, write to the buffer after scan_stop() has been
+    // called, somewhere around evt_get().
+    //
+    // This can result in UB as a use-after-free, given the buffer
+    // has been dropped and the scanning has been stopped.
+    static mut BUF: [u8; BUF_LEN] = [0u8; BUF_LEN];
+    static mut BUF_DATA: raw::ble_data_t = raw::ble_data_t {
+        p_data: unsafe { BUF.as_mut_ptr() },
         len: BUF_LEN as u16,
     };
 
-    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, &buf_data) };
+    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, &BUF_DATA) };
     match RawError::convert(ret) {
         Ok(()) => {}
         Err(err) => {
@@ -192,7 +199,7 @@ where
                     }
 
                     // Resume scan
-                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), &buf_data);
+                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), &BUF_DATA);
                     match RawError::convert(ret) {
                         Ok(()) => {}
                         Err(err) => {
