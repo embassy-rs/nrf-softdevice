@@ -39,17 +39,20 @@ impl From<RawError> for SetConnParamsError {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg(feature = "ble-peripheral")]
 pub enum IgnoreSlaveLatencyError {
     Disconnected,
     Raw(RawError),
 }
 
+#[cfg(feature = "ble-peripheral")]
 impl From<DisconnectedError> for IgnoreSlaveLatencyError {
     fn from(_err: DisconnectedError) -> Self {
         Self::Disconnected
     }
 }
 
+#[cfg(feature = "ble-peripheral")]
 impl From<RawError> for IgnoreSlaveLatencyError {
     fn from(err: RawError) -> Self {
         Self::Raw(err)
@@ -331,6 +334,7 @@ impl Connection {
     /// at every single conn interval, to lower the latency.
     ///
     /// This only works on peripheral connections.
+    #[cfg(feature = "ble-peripheral")]
     pub fn ignore_slave_latency(&mut self, ignore: bool) -> Result<(), IgnoreSlaveLatencyError> {
         let conn_handle = self.with_state(|state| state.check_connected())?;
 
