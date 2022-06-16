@@ -27,13 +27,32 @@ pub enum SetConnParamsError {
 
 impl From<DisconnectedError> for SetConnParamsError {
     fn from(_err: DisconnectedError) -> Self {
-        SetConnParamsError::Disconnected
+        Self::Disconnected
     }
 }
 
 impl From<RawError> for SetConnParamsError {
     fn from(err: RawError) -> Self {
-        SetConnParamsError::Raw(err)
+        Self::Raw(err)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum IgnoreSlaveLatencyError {
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for IgnoreSlaveLatencyError {
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+impl From<RawError> for IgnoreSlaveLatencyError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
     }
 }
 
@@ -291,6 +310,46 @@ impl Connection {
         let ret = unsafe { raw::sd_ble_gap_conn_param_update(conn_handle, &conn_params) };
         if let Err(err) = RawError::convert(ret) {
             warn!("sd_ble_gap_conn_param_update err {:?}", err);
+            return Err(err.into());
+        }
+
+        Ok(())
+    }
+
+    /// Temporarily ignore slave latency for peripehral connections.
+    ///
+    /// "Slave latency" is a setting in the conn params that allows the peripheral
+    /// to intentionally sleep through and miss up to N connection events if it doesn't
+    /// have any data to send to the central.
+    ///
+    /// Slave latency is useful because it can yield the same power savings on the peripheral
+    /// as increasing the conn interval, but it only impacts latency in the central->peripheral
+    /// direction, not both.
+    ///
+    /// However, in some cases, if the peripheral knows the central will send it some data soon
+    /// it might be useful to temporarily force ignoring the slave latency setting, ie waking up
+    /// at every single conn interval, to lower the latency.
+    ///
+    /// This only works on peripheral connections.
+    pub fn ignore_slave_latency(&mut self, ignore: bool) -> Result<(), IgnoreSlaveLatencyError> {
+        let conn_handle = self.with_state(|state| state.check_connected())?;
+
+        let mut disable: raw::ble_gap_opt_slave_latency_disable_t = unsafe { core::mem::zeroed() };
+        disable.conn_handle = conn_handle;
+        disable.set_disable(ignore as u8); // 0 or 1
+
+        let ret = unsafe {
+            raw::sd_ble_opt_set(
+                raw::BLE_GAP_OPTS_BLE_GAP_OPT_SLAVE_LATENCY_DISABLE,
+                &raw::ble_opt_t {
+                    gap_opt: raw::ble_gap_opt_t {
+                        slave_latency_disable: disable,
+                    },
+                },
+            )
+        };
+        if let Err(err) = RawError::convert(ret) {
+            warn!("ignore_slave_latency sd_ble_opt_set err {:?}", err);
             return Err(err.into());
         }
 
