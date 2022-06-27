@@ -182,6 +182,12 @@ where
 
                     server.on_write(params.handle, &v).map(|e| f(e));
                 }
+                raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => {
+                    info!("initializing gatt sys att");
+                    let ret =
+                        raw::sd_ble_gatts_sys_attr_set(conn_handle, ::core::ptr::null(), 0, 0);
+                    RawError::convert(ret).err();
+                }
                 _ => {}
             }
             None
