@@ -1,7 +1,7 @@
 use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
-use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind};
+use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
 use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
 use crate::raw;
@@ -71,25 +71,35 @@ impl ErrorType for Flash {
     type Error = FlashError;
 }
 
+impl ReadNorFlash for Flash {
+    const READ_SIZE: usize = 1;
+
+    fn read(&mut self, address: u32, data: &mut [u8]) -> Result<(), Self::Error> {
+        // Reading is simple since SoC flash is memory-mapped :)
+        // TODO check addr/len is in bounds.
+
+        data.copy_from_slice(unsafe {
+            core::slice::from_raw_parts(address as *const u8, data.len())
+        });
+
+        Ok(())
+    }
+
+    fn capacity(&self) -> usize {
+        256 * 4096
+    }
+}
+
 impl AsyncReadNorFlash for Flash {
     const READ_SIZE: usize = 1;
 
     type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
     fn read<'a>(&'a mut self, address: u32, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
-        async move {
-            // Reading is simple since SoC flash is memory-mapped :)
-            // TODO check addr/len is in bounds.
-
-            data.copy_from_slice(unsafe {
-                core::slice::from_raw_parts(address as *const u8, data.len())
-            });
-
-            Ok(())
-        }
+        async move { <Self as ReadNorFlash>::read(self, address, data) }
     }
 
     fn capacity(&self) -> usize {
-        256 * 4096
+        <Self as ReadNorFlash>::capacity(self)
     }
 }
 
