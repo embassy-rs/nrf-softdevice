@@ -22,14 +22,14 @@ fn credit_hack_refill(conn: u16, cid: u16) {
         warn!("sd_ble_l2cap_ch_flow_control credits query err {:?}", err);
         return;
     }
-    info!("sd_ble_l2cap_ch_flow_control credits={=u16:x}", credits);
+    trace!("sd_ble_l2cap_ch_flow_control credits={=u16:x}", credits);
 
     if credits > CREDITS_MIN {
         // Still enough credits, no need to refill.
         return;
     }
 
-    info!("refilling credits");
+    debug!("refilling credits");
 
     let ret = unsafe { raw::sd_ble_l2cap_ch_flow_control(conn, cid, CREDITS_MAX, ptr::null_mut()) };
     if let Err(err) = RawError::convert(ret) {
@@ -194,7 +194,7 @@ impl<P: Packet> L2cap<P> {
             warn!("sd_ble_l2cap_ch_setup err {:?}", err);
             return Err(err.into());
         }
-        info!("cid {:?}", cid);
+        debug!("cid {:?}", cid);
 
         portal(conn_handle)
             .wait_once(|ble_evt| unsafe {

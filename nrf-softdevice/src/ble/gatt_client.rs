@@ -612,14 +612,14 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
     let current_mtu = conn.with_state(|state| state.att_mtu);
 
     if current_mtu >= mtu {
-        info!(
+        debug!(
             "att mtu exchange: want mtu {:?}, already got {:?}. Doing nothing.",
             mtu, current_mtu
         );
         return Ok(());
     }
 
-    info!(
+    debug!(
         "att mtu exchange: want mtu {:?}, got only {:?}, doing exchange...",
         mtu, current_mtu
     );
@@ -643,7 +643,7 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
                     };
                     let params = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
                     let mtu = params.server_rx_mtu;
-                    info!("att mtu exchange: got mtu {:?}", mtu);
+                    debug!("att mtu exchange: got mtu {:?}", mtu);
                     conn.with_state(|state| state.att_mtu = mtu);
 
                     Ok(())
