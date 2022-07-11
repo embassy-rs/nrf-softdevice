@@ -49,9 +49,7 @@ struct Server {
 }
 
 #[embassy::task]
-async fn bluetooth_task(sd: &'static Softdevice) {
-    let server: Server = unwrap!(gatt_server::register(sd));
-
+async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
@@ -148,7 +146,8 @@ fn main() -> ! {
 
     let executor = EXECUTOR.put(Executor::new());
     executor.run(move |spawner| {
+        let server = unwrap!(Server::new(sd));
         unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd)));
+        unwrap!(spawner.spawn(bluetooth_task(sd, server)));
     });
 }

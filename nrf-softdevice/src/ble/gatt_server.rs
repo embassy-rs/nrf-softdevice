@@ -3,8 +3,6 @@
 //! Typically the peripheral device is the GATT server, but it is not necessary.
 //! In a connection any device can be server and client, and even both can be both at the same time.
 
-use core::mem;
-
 use crate::ble::*;
 use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
@@ -64,18 +62,11 @@ impl DescriptorHandle {
 
 pub trait Server: Sized {
     type Event;
-    fn register(sd: &Softdevice) -> Result<Self, RegisterError>;
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
 
 pub trait Service: Sized {
     type Event;
-
-    fn uuid() -> Uuid;
-
-    fn register<F>(service_handle: u16, register_char: F) -> Result<Self, RegisterError>
-    where
-        F: FnMut(Characteristic, &[u8]) -> Result<CharacteristicHandles, RegisterError>;
 
     fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
 }
@@ -90,83 +81,6 @@ impl From<RawError> for RegisterError {
     fn from(err: RawError) -> Self {
         RegisterError::Raw(err)
     }
-}
-
-pub fn register<S: Server>(sd: &Softdevice) -> Result<S, RegisterError> {
-    S::register(sd)
-}
-
-pub fn register_service<S: Service>(_sd: &Softdevice) -> Result<S, RegisterError> {
-    let uuid = S::uuid();
-    let mut service_handle: u16 = 0;
-    let ret = unsafe {
-        raw::sd_ble_gatts_service_add(
-            raw::BLE_GATTS_SRVC_TYPE_PRIMARY as u8,
-            uuid.as_raw_ptr(),
-            &mut service_handle as _,
-        )
-    };
-    RawError::convert(ret)?;
-
-    S::register(service_handle, |char, initial_value| {
-        let mut cccd_attr_md: raw::ble_gatts_attr_md_t = unsafe { mem::zeroed() };
-        cccd_attr_md.read_perm = raw::ble_gap_conn_sec_mode_t {
-            _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-        };
-        cccd_attr_md.write_perm = raw::ble_gap_conn_sec_mode_t {
-            _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-        };
-        cccd_attr_md.set_vloc(raw::BLE_GATTS_VLOC_STACK as u8);
-
-        let mut attr_md: raw::ble_gatts_attr_md_t = unsafe { mem::zeroed() };
-        attr_md.read_perm = raw::ble_gap_conn_sec_mode_t {
-            _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-        };
-        attr_md.write_perm = raw::ble_gap_conn_sec_mode_t {
-            _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(1, 1),
-        };
-        attr_md.set_vloc(raw::BLE_GATTS_VLOC_STACK as u8);
-        if char.vlen {
-            attr_md.set_vlen(1);
-        }
-
-        let mut attr: raw::ble_gatts_attr_t = unsafe { mem::zeroed() };
-        attr.p_uuid = unsafe { char.uuid.as_raw_ptr() };
-        attr.p_attr_md = &attr_md as _;
-        attr.max_len = char.max_len as _;
-
-        attr.p_value = initial_value.as_ptr() as *mut u8;
-        attr.init_len = initial_value.len() as _;
-
-        let mut char_md: raw::ble_gatts_char_md_t = unsafe { mem::zeroed() };
-        char_md.char_props.set_read(char.can_read as u8);
-        char_md.char_props.set_write(char.can_write as u8);
-        char_md
-            .char_props
-            .set_write_wo_resp(char.can_write_without_response as u8);
-        char_md.char_props.set_notify(char.can_notify as u8);
-        char_md.char_props.set_indicate(char.can_indicate as u8);
-        char_md.p_cccd_md = &mut cccd_attr_md;
-
-        let mut handles: raw::ble_gatts_char_handles_t = unsafe { mem::zeroed() };
-
-        let ret = unsafe {
-            raw::sd_ble_gatts_characteristic_add(
-                service_handle,
-                &mut char_md as _,
-                &mut attr as _,
-                &mut handles as _,
-            )
-        };
-        RawError::convert(ret)?;
-
-        Ok(CharacteristicHandles {
-            value_handle: handles.value_handle,
-            user_desc_handle: handles.user_desc_handle,
-            cccd_handle: handles.cccd_handle,
-            sccd_handle: handles.sccd_handle,
-        })
-    })
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
