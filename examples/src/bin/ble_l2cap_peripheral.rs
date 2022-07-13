@@ -147,7 +147,7 @@ fn main() -> ! {
     unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
 
     let executor = EXECUTOR.put(Executor::new());
-    executor.run(|spawner| {
+    executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(bluetooth_task(sd)));
     });

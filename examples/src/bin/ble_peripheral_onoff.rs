@@ -79,9 +79,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
 }
 
 #[embassy::task]
-async fn bluetooth_task(sd: &'static Softdevice, button1: AnyPin, button2: AnyPin) {
-    let server: Server = unwrap!(gatt_server::register(sd));
-
+async fn bluetooth_task(sd: &'static Softdevice, server: Server, button1: AnyPin, button2: AnyPin) {
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
 
@@ -170,8 +168,14 @@ fn main() -> ! {
     let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
-    executor.run(|spawner| {
+    executor.run(move |spawner| {
+        let server = unwrap!(Server::new(sd));
         unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, p.P0_11.degrade(), p.P0_12.degrade())));
+        unwrap!(spawner.spawn(bluetooth_task(
+            sd,
+            server,
+            p.P0_11.degrade(),
+            p.P0_12.degrade()
+        )));
     });
 }

@@ -45,6 +45,7 @@ struct Characteristic {
 pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
+    let struct_vis = &struc.vis;
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
@@ -74,9 +75,10 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
 
     for field in fields.iter() {
         let name = field.ident.as_ref().unwrap();
+        let ty = &field.ty;
         let span = field.ty.span();
         code_register_init.extend(quote_spanned!(span=>
-            #name: #ble::gatt_server::register_service(sd)?,
+            #name: #ty::new(sd)?,
         ));
 
         if let syn::Type::Path(p) = &field.ty {
@@ -105,6 +107,12 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
         #struc
 
         impl #struct_name {
+            #struct_vis fn new(sd: &mut ::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
+            {
+                Ok(Self {
+                    #code_register_init
+                })
+            }
         }
 
         #struc_vis enum #event_enum_name {
@@ -113,13 +121,6 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
 
         impl #ble::gatt_server::Server for #struct_name {
             type Event = #event_enum_name;
-
-            fn register(sd: &::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
-            {
-                Ok(Self {
-                    #code_register_init
-                })
-            }
 
             fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
                 use #ble::gatt_server::Service;
@@ -146,6 +147,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut chars = Vec::new();
 
+    let struct_vis = &struc.vis;
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
@@ -202,8 +204,8 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let event_enum_name = format_ident!("{}Event", struct_name);
 
     let mut code_impl = TokenStream2::new();
-    let mut code_register_chars = TokenStream2::new();
-    let mut code_register_init = TokenStream2::new();
+    let mut code_build_chars = TokenStream2::new();
+    let mut code_struct_init = TokenStream2::new();
     let mut code_on_write = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
 
@@ -237,23 +239,27 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             vis: syn::Visibility::Inherited,
         });
 
-        code_register_chars.extend(quote_spanned!(ch.span=>
-            let #char_name = register_char(
-                #ble::gatt_server::Characteristic {
-                    uuid: #uuid,
-                    can_read: #read,
-                    can_write: #write,
-                    can_write_without_response: #write_without_response,
-                    can_notify: #notify,
-                    can_indicate: #indicate,
-                    max_len: #ty_as_val::MAX_SIZE as _,
-                    vlen: #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE,
-                },
-                &[123],
-            )?;
+        code_build_chars.extend(quote_spanned!(ch.span=>
+            let #char_name = {
+                let val = [123u8; #ty_as_val::MIN_SIZE];
+                let mut attr = #ble::gatt_server::characteristic::Attribute::new(&val);
+                if #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE {
+                    attr = attr.variable_len(#ty_as_val::MAX_SIZE as u16);
+                }
+                let props = #ble::gatt_server::characteristic::Properties {
+                    read: #read,
+                    write: #write,
+                    write_without_response: #write_without_response,
+                    notify: #notify,
+                    indicate: #indicate,
+                    ..Default::default()
+                };
+                let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
+                service_builder.add_characteristic(#uuid, attr, metadata)?.build()
+            };
         ));
 
-        code_register_init.extend(quote_spanned!(ch.span=>
+        code_struct_init.extend(quote_spanned!(ch.span=>
             #value_handle: #char_name.value_handle,
         ));
 
@@ -280,7 +286,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 colon_token: Default::default(),
                 vis: syn::Visibility::Inherited,
             });
-            code_register_init.extend(quote_spanned!(ch.span=>
+            code_struct_init.extend(quote_spanned!(ch.span=>
                 #cccd_handle: #char_name.cccd_handle,
             ));
         }
@@ -385,26 +391,24 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         #struc
 
         impl #struct_name {
+            #struct_vis fn new(sd: &mut ::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
+            {
+                let mut service_builder = #ble::gatt_server::builder::ServiceBuilder::new(sd, #uuid)?;
+
+                #code_build_chars
+
+                let _ = service_builder.build();
+
+                Ok(Self {
+                    #code_struct_init
+                })
+            }
+
             #code_impl
         }
 
         impl #ble::gatt_server::Service for #struct_name {
             type Event = #event_enum_name;
-
-            fn uuid() -> #ble::Uuid {
-                #uuid
-            }
-
-            fn register<F>(service_handle: u16, mut register_char: F) -> Result<Self, #ble::gatt_server::RegisterError>
-            where
-                F: FnMut(#ble::gatt_server::Characteristic, &[u8]) -> Result<#ble::gatt_server::CharacteristicHandles, #ble::gatt_server::RegisterError>,
-            {
-                #code_register_chars
-
-                Ok(Self {
-                    #code_register_init
-                })
-            }
 
             fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
                 #code_on_write

@@ -170,7 +170,7 @@ fn main() -> ! {
     let sd = Softdevice::enable(&config);
 
     let executor = EXECUTOR.put(Executor::new());
-    executor.run(|spawner| {
+    executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(ble_central_task(sd)));
     });
