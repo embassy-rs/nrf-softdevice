@@ -7,7 +7,7 @@ repository = "https://github.com/embassy-rs/nrf-softdevice"
 categories = ["embedded", "hardware-support", "no-std"]
 keywords = ["arm", "cortex-m", "nrf52", "nrf-softdevice"]
 license-file = "LICENSE-NORDIC"
-edition = "2018"
+edition = "2021"
 
 [package.metadata.docs.rs]
 targets = ["thumbv7em-none-eabihf"]

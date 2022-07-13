@@ -1,6 +1,6 @@
 [package]
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
-edition = "2018"
+edition = "2021"
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 
