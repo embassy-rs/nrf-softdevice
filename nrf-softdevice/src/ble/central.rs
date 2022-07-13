@@ -57,7 +57,7 @@ pub async fn connect(
         return Err(err.into());
     }
 
-    info!("connect started");
+    debug!("connect started");
 
     let conn = CONNECT_PORTAL
         .wait_once(|ble_evt| unsafe {
@@ -186,7 +186,7 @@ where
         }
     });
 
-    info!("Scan started");
+    debug!("Scan started");
     let res = SCAN_PORTAL
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {

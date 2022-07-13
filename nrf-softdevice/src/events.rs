@@ -33,7 +33,7 @@ pub enum SocEvent {
 }
 
 fn on_soc_evt<F: FnMut(SocEvent)>(evt: u32, evt_handler: &mut F) {
-    info!("soc evt {:?}", evt);
+    trace!("soc evt {:?}", evt);
 
     match evt {
         raw::NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR => crate::flash::on_flash_error(),
