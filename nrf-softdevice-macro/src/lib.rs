@@ -381,6 +381,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let result = quote! {
         #struc
 
+        #[allow(unused)]
         impl #struct_name {
             #struct_vis fn new(sd: &mut ::nrf_softdevice::Softdevice) -> Result<Self, #ble::gatt_server::RegisterError>
             {
@@ -407,7 +408,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        #[allow(dead_code)]
+        #[allow(unused)]
         #struc_vis enum #event_enum_name {
             #code_event_enum
         }
@@ -624,6 +625,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let result = quote! {
         #struc
 
+        #[allow(unused)]
         impl #struct_name {
             #code_impl
         }
