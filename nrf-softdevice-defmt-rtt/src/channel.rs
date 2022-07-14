@@ -1,7 +1,5 @@
-use core::{
-    ptr,
-    sync::atomic::{AtomicUsize, Ordering},
-};
+use core::ptr;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::{MODE_BLOCK_IF_FULL, MODE_MASK, SIZE};
 
@@ -68,8 +66,7 @@ impl Channel {
                 ptr::copy_nonoverlapping(bytes.as_ptr(), self.buffer.add(cursor), len);
             }
         }
-        self.write
-            .store(write.wrapping_add(len) % SIZE, Ordering::Release);
+        self.write.store(write.wrapping_add(len) % SIZE, Ordering::Release);
 
         len
     }
@@ -91,8 +88,7 @@ impl Channel {
                 ptr::copy_nonoverlapping(bytes.as_ptr(), self.buffer.add(cursor), len);
             }
         }
-        self.write
-            .store(write.wrapping_add(len) % SIZE, Ordering::Release);
+        self.write.store(write.wrapping_add(len) % SIZE, Ordering::Release);
 
         len
     }

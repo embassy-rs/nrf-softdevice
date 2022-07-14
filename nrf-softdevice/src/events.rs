@@ -1,13 +1,13 @@
 use core::convert::TryFrom;
 use core::mem::MaybeUninit;
 use core::task::Poll;
+
 use embassy::waitqueue::AtomicWaker;
 use futures::future::poll_fn;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::pac::interrupt;
-use crate::raw;
-use crate::RawError;
+use crate::{raw, RawError};
 
 static SWI2_WAKER: AtomicWaker = AtomicWaker::new();
 

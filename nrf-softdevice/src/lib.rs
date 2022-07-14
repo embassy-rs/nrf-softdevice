@@ -5,9 +5,7 @@
 pub(crate) mod util;
 
 #[cfg(not(any(feature = "ble-central", feature = "ble-peripheral",)))]
-compile_error!(
-    "You must activate at least one of the following features: ble-central, ble-peripheral"
-);
+compile_error!("You must activate at least one of the following features: ble-central, ble-peripheral");
 
 #[cfg(not(any(
     feature = "s112",
@@ -135,7 +133,6 @@ use nrf52832_pac as pac;
 use nrf52833_pac as pac;
 #[cfg(feature = "nrf52840")]
 use nrf52840_pac as pac;
-
 #[cfg(feature = "s112")]
 pub use nrf_softdevice_s112 as raw;
 #[cfg(feature = "s113")]
@@ -167,6 +164,5 @@ mod temperature;
 pub use temperature::temperature_celsius;
 
 mod random;
-pub use random::random_bytes;
-
 pub use nrf_softdevice_macro::*;
+pub use random::random_bytes;

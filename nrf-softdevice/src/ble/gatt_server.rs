@@ -4,10 +4,8 @@
 //! In a connection any device can be server and client, and even both can be both at the same time.
 
 use crate::ble::*;
-use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
-use crate::RawError;
-use crate::Softdevice;
+use crate::{raw, RawError, Softdevice};
 
 pub mod builder;
 pub mod characteristic;
@@ -111,9 +109,7 @@ where
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Some(Err(RunError::Disconnected))
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(RunError::Disconnected)),
                 raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_WRITE => {
                     let evt = &*ble_evt;
                     let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
@@ -131,8 +127,7 @@ where
                 }
                 raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => {
                     debug!("initializing gatt sys att");
-                    let ret =
-                        raw::sd_ble_gatts_sys_attr_set(conn_handle, ::core::ptr::null(), 0, 0);
+                    let ret = raw::sd_ble_gatts_sys_attr_set(conn_handle, ::core::ptr::null(), 0, 0);
                     RawError::convert(ret).err();
                 }
                 _ => {}
@@ -161,9 +156,7 @@ pub fn get_value(_sd: &Softdevice, handle: u16, buf: &mut [u8]) -> Result<usize,
         len: buf.len() as _,
         offset: 0,
     };
-    let ret = unsafe {
-        raw::sd_ble_gatts_value_get(raw::BLE_CONN_HANDLE_INVALID as u16, handle, &mut value)
-    };
+    let ret = unsafe { raw::sd_ble_gatts_value_get(raw::BLE_CONN_HANDLE_INVALID as u16, handle, &mut value) };
     RawError::convert(ret)?;
 
     if value.len as usize > buf.len() {
@@ -192,9 +185,7 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
         len: val.len() as _,
         offset: 0,
     };
-    let ret = unsafe {
-        raw::sd_ble_gatts_value_set(raw::BLE_CONN_HANDLE_INVALID as u16, handle, &mut value)
-    };
+    let ret = unsafe { raw::sd_ble_gatts_value_set(raw::BLE_CONN_HANDLE_INVALID as u16, handle, &mut value) };
     RawError::convert(ret)?;
 
     Ok(())
@@ -257,11 +248,7 @@ impl From<DisconnectedError> for IndicateValueError {
 }
 
 /// This will fail if an indication is already in progress
-pub fn indicate_value(
-    conn: &Connection,
-    handle: u16,
-    val: &[u8],
-) -> Result<(), IndicateValueError> {
+pub fn indicate_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), IndicateValueError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     let mut len: u16 = val.len() as _;
@@ -286,14 +273,8 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             let params = get_union_field(ble_evt, &gatts_evt.params.exchange_mtu_request);
             let want_mtu = params.client_rx_mtu;
             let max_mtu = crate::Softdevice::steal().att_mtu;
-            let mtu = want_mtu
-                .min(max_mtu)
-                .max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
-            trace!(
-                "att mtu exchange: peer wants mtu {:?}, granting {:?}",
-                want_mtu,
-                mtu
-            );
+            let mtu = want_mtu.min(max_mtu).max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+            trace!("att mtu exchange: peer wants mtu {:?}, granting {:?}", want_mtu, mtu);
 
             let ret = { raw::sd_ble_gatts_exchange_mtu_reply(conn_handle, mtu) };
             if let Err(_err) = RawError::convert(ret) {

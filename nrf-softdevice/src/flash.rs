@@ -1,12 +1,12 @@
 use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
+
 use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
 use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
-use crate::raw;
 use crate::util::{DropBomb, Signal};
-use crate::{RawError, Softdevice};
+use crate::{raw, RawError, Softdevice};
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -51,9 +51,7 @@ impl Flash {
             panic!("nrf_softdevice::Softdevice::take_flash() called multiple times.")
         }
 
-        Flash {
-            _private: PhantomData,
-        }
+        Flash { _private: PhantomData }
     }
 }
 
@@ -78,9 +76,7 @@ impl ReadNorFlash for Flash {
         // Reading is simple since SoC flash is memory-mapped :)
         // TODO check addr/len is in bounds.
 
-        data.copy_from_slice(unsafe {
-            core::slice::from_raw_parts(address as *const u8, data.len())
-        });
+        data.copy_from_slice(unsafe { core::slice::from_raw_parts(address as *const u8, data.len()) });
 
         Ok(())
     }

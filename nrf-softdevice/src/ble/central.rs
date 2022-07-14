@@ -3,14 +3,12 @@
 //! Typically the Central device is the higher-powered device, such as a smartphone or laptop, since scanning is more
 //! power-hungry than advertising.
 
-use core::mem;
-use core::ptr;
+use core::{mem, ptr};
 
 use crate::ble::types::*;
 use crate::ble::{Address, Connection};
-use crate::raw;
 use crate::util::{get_union_field, OnDrop, Portal};
-use crate::{RawError, Softdevice};
+use crate::{raw, RawError, Softdevice};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -30,10 +28,7 @@ impl From<RawError> for ConnectError {
 pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
-pub async fn connect(
-    _sd: &Softdevice,
-    config: &ConnectConfig<'_>,
-) -> Result<Connection, ConnectError> {
+pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Connection, ConnectError> {
     if let Some(w) = config.scan_config.whitelist {
         if w.len() == 0 {
             return Err(ConnectError::NoAddresses);
@@ -145,11 +140,7 @@ impl From<RawError> for ScanError {
 
 pub(crate) static SCAN_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
-pub async fn scan<'a, F, R>(
-    _sd: &Softdevice,
-    config: &ScanConfig<'a>,
-    mut f: F,
-) -> Result<R, ScanError>
+pub async fn scan<'a, F, R>(_sd: &Softdevice, config: &ScanConfig<'a>, mut f: F) -> Result<R, ScanError>
 where
     F: for<'b> FnMut(&'b raw::ble_gap_evt_adv_report_t) -> Option<R>,
 {

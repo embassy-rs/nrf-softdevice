@@ -11,7 +11,6 @@ use embassy::executor::Executor;
 use embassy::util::Forever;
 use embedded_storage_async::nor_flash::*;
 use futures::pin_mut;
-
 use nrf_softdevice::{Flash, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();

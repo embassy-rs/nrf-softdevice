@@ -1,6 +1,7 @@
-use crate::pac::{Interrupt, NVIC};
 use core::arch::asm;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
+
+use crate::pac::{Interrupt, NVIC};
 
 #[cfg(any(feature = "nrf52810", feature = "nrf52811"))]
 const RESERVED_IRQS: u32 = (1 << (Interrupt::POWER_CLOCK as u8))

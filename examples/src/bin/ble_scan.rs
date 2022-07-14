@@ -5,16 +5,14 @@
 #[path = "../example_common.rs"]
 mod example_common;
 
-use core::mem;
-use core::slice;
+use core::{mem, slice};
+
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy::executor::Executor;
 use embassy::util::Forever;
-
 use nrf_softdevice::ble::central;
-use nrf_softdevice::raw;
-use nrf_softdevice::Softdevice;
+use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
@@ -46,7 +44,7 @@ async fn ble_task(sd: &'static Softdevice) {
         let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
         while data.len() != 0 {
             let len = data[0] as usize;
-            if data.len() < len+1 {
+            if data.len() < len + 1 {
                 warn!("Advertisement data truncated?");
                 break;
             }
@@ -55,9 +53,9 @@ async fn ble_task(sd: &'static Softdevice) {
                 break;
             }
             let key = data[1];
-            let value = &data[2..len+1];
+            let value = &data[2..len + 1];
             info!("value {}: {:x}", key, value);
-            data = &data[len+1..];
+            data = &data[len + 1..];
         }
         None
     })
@@ -82,9 +80,7 @@ fn main() -> ! {
             event_length: 6,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 128 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
-            attr_tab_size: 32768,
-        }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -97,9 +93,7 @@ fn main() -> ! {
             current_len: 9,
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
+            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
         }),
         ..Default::default()
     };

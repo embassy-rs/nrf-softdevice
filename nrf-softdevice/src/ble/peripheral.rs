@@ -1,13 +1,10 @@
 //! Bluetooth Peripheral operations. Peripheral devices emit advertisements, and optionally accept connections from Central devices.
 
-use core::mem;
-use core::ptr;
+use core::{mem, ptr};
 
 use crate::ble::*;
-use crate::raw;
-use crate::util::get_union_field;
-use crate::util::{OnDrop, Portal};
-use crate::{RawError, Softdevice};
+use crate::util::{get_union_field, OnDrop, Portal};
+use crate::{raw, RawError, Softdevice};
 
 struct RawAdvertisement<'a> {
     kind: u8,
@@ -40,10 +37,7 @@ pub enum ConnectableAdvertisement<'a> {
 impl<'a> From<ConnectableAdvertisement<'a>> for RawAdvertisement<'a> {
     fn from(val: ConnectableAdvertisement<'a>) -> RawAdvertisement<'a> {
         match val {
-            ConnectableAdvertisement::ScannableUndirected {
-                adv_data,
-                scan_data,
-            } => RawAdvertisement {
+            ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data } => RawAdvertisement {
                 kind: raw::BLE_GAP_ADV_TYPE_CONNECTABLE_SCANNABLE_UNDIRECTED as u8,
                 adv_data: Some(adv_data),
                 scan_data: Some(scan_data),
@@ -53,30 +47,23 @@ impl<'a> From<ConnectableAdvertisement<'a>> for RawAdvertisement<'a> {
                 adv_data: None,
                 scan_data: Some(scan_data),
             },
-            ConnectableAdvertisement::NonscannableDirectedHighDuty { scan_data } => {
-                RawAdvertisement {
-                    kind: raw::BLE_GAP_ADV_TYPE_CONNECTABLE_NONSCANNABLE_DIRECTED_HIGH_DUTY_CYCLE
-                        as u8,
-                    adv_data: None,
-                    scan_data: Some(scan_data),
-                }
-            }
+            ConnectableAdvertisement::NonscannableDirectedHighDuty { scan_data } => RawAdvertisement {
+                kind: raw::BLE_GAP_ADV_TYPE_CONNECTABLE_NONSCANNABLE_DIRECTED_HIGH_DUTY_CYCLE as u8,
+                adv_data: None,
+                scan_data: Some(scan_data),
+            },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            ConnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => {
-                RawAdvertisement {
-                    kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_UNDIRECTED as u8,
-                    adv_data: Some(adv_data),
-                    scan_data: None,
-                }
-            }
+            ConnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => RawAdvertisement {
+                kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_UNDIRECTED as u8,
+                adv_data: Some(adv_data),
+                scan_data: None,
+            },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            ConnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => {
-                RawAdvertisement {
-                    kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_DIRECTED as u8,
-                    adv_data: Some(adv_data),
-                    scan_data: None,
-                }
-            }
+            ConnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => RawAdvertisement {
+                kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_CONNECTABLE_NONSCANNABLE_DIRECTED as u8,
+                adv_data: Some(adv_data),
+                scan_data: None,
+            },
         }
     }
 }
@@ -114,10 +101,7 @@ pub enum NonconnectableAdvertisement<'a> {
 impl<'a> From<NonconnectableAdvertisement<'a>> for RawAdvertisement<'a> {
     fn from(val: NonconnectableAdvertisement<'a>) -> RawAdvertisement<'a> {
         match val {
-            NonconnectableAdvertisement::ScannableUndirected {
-                adv_data,
-                scan_data,
-            } => RawAdvertisement {
+            NonconnectableAdvertisement::ScannableUndirected { adv_data, scan_data } => RawAdvertisement {
                 kind: raw::BLE_GAP_ADV_TYPE_NONCONNECTABLE_SCANNABLE_UNDIRECTED as _,
                 adv_data: Some(adv_data),
                 scan_data: Some(scan_data),
@@ -128,40 +112,29 @@ impl<'a> From<NonconnectableAdvertisement<'a>> for RawAdvertisement<'a> {
                 scan_data: None,
             },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            NonconnectableAdvertisement::ExtendedScannableUndirected {
-                adv_data,
-                scan_data,
-            } => RawAdvertisement {
+            NonconnectableAdvertisement::ExtendedScannableUndirected { adv_data, scan_data } => RawAdvertisement {
                 kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_SCANNABLE_UNDIRECTED as _,
                 adv_data: Some(adv_data),
                 scan_data: Some(scan_data),
             },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            NonconnectableAdvertisement::ExtendedScannableDirected {
-                adv_data,
-                scan_data,
-            } => RawAdvertisement {
+            NonconnectableAdvertisement::ExtendedScannableDirected { adv_data, scan_data } => RawAdvertisement {
                 kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_SCANNABLE_DIRECTED as _,
                 adv_data: Some(adv_data),
                 scan_data: Some(scan_data),
             },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            NonconnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => {
-                RawAdvertisement {
-                    kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_NONSCANNABLE_UNDIRECTED
-                        as _,
-                    adv_data: Some(adv_data),
-                    scan_data: None,
-                }
-            }
+            NonconnectableAdvertisement::ExtendedNonscannableUndirected { adv_data } => RawAdvertisement {
+                kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_NONSCANNABLE_UNDIRECTED as _,
+                adv_data: Some(adv_data),
+                scan_data: None,
+            },
             #[cfg(any(feature = "s132", feature = "s140"))]
-            NonconnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => {
-                RawAdvertisement {
-                    kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_NONSCANNABLE_DIRECTED as _,
-                    adv_data: Some(adv_data),
-                    scan_data: None,
-                }
-            }
+            NonconnectableAdvertisement::ExtendedNonscannableDirected { adv_data } => RawAdvertisement {
+                kind: raw::BLE_GAP_ADV_TYPE_EXTENDED_NONCONNECTABLE_NONSCANNABLE_DIRECTED as _,
+                adv_data: Some(adv_data),
+                scan_data: None,
+            },
         }
     }
 }
@@ -213,9 +186,7 @@ fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), Advertise
         scan_rsp_data: map_data(adv.scan_data),
     };
 
-    let ret = unsafe {
-        raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _)
-    };
+    let ret = unsafe { raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _) };
     RawError::convert(ret).map_err(|err| {
         warn!("sd_ble_gap_adv_set_configure err {:?}", err);
         err

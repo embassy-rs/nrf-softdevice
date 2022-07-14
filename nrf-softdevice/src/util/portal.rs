@@ -22,8 +22,7 @@ unsafe impl<T> Sync for Portal<T> {}
 
 fn assert_thread_mode() {
     assert!(
-        cortex_m::peripheral::SCB::vect_active()
-            == cortex_m::peripheral::scb::VectActive::ThreadMode,
+        cortex_m::peripheral::SCB::vect_active() == cortex_m::peripheral::scb::VectActive::ThreadMode,
         "portals are not usable from interrupts"
     );
 }

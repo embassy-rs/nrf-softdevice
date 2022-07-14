@@ -1,6 +1,6 @@
 use core::convert::TryInto;
-use core::mem;
-use core::slice;
+use core::{mem, slice};
+
 use heapless::{String, Vec};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

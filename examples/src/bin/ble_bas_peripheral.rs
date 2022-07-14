@@ -6,12 +6,11 @@
 mod example_common;
 
 use core::mem;
+
 use cortex_m_rt::entry;
-use defmt::info;
-use defmt::*;
+use defmt::{info, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
-
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
@@ -30,13 +29,7 @@ struct BatteryService {
 
 #[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
 struct FooService {
-    #[characteristic(
-        uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38",
-        read,
-        write,
-        notify,
-        indicate
-    )]
+    #[characteristic(uuid = "9e7312e0-2354-11eb-9f10-fbc30a63cf38", read, write, notify, indicate)]
     foo: u16,
 }
 
@@ -61,10 +54,7 @@ async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data,
-            scan_data,
-        };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
@@ -87,10 +77,7 @@ async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
                     indications,
                     notifications,
                 } => {
-                    info!(
-                        "foo indications: {}, notifications: {}",
-                        indications, notifications
-                    )
+                    info!("foo indications: {}, notifications: {}", indications, notifications)
                 }
             },
         })
@@ -118,9 +105,7 @@ fn main() -> ! {
             event_length: 24,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
-            attr_tab_size: 32768,
-        }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -133,9 +118,7 @@ fn main() -> ! {
             current_len: 9,
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
+            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
         }),
         ..Default::default()
     };

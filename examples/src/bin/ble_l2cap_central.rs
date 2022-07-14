@@ -5,18 +5,16 @@
 #[path = "../example_common.rs"]
 mod example_common;
 
-use core::mem;
 use core::ptr::NonNull;
-use core::slice;
+use core::{mem, slice};
+
 use cortex_m_rt::entry;
 use defmt::{info, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
-
 use nrf_softdevice::ble::l2cap::Packet as _;
 use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
-use nrf_softdevice::raw;
-use nrf_softdevice::Softdevice;
+use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
@@ -52,8 +50,7 @@ async fn ble_central_task(sd: &'static Softdevice) {
             if key == 0x06
                 && value
                     == &[
-                        0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f,
-                        0x18, 0xce, 0x9c, 0x82,
+                        0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
                     ]
             {
                 return Some(Address::from_raw(params.peer_addr));
@@ -104,10 +101,7 @@ impl Packet {
     fn new(data: &[u8]) -> Self {
         let mut buf = unwrap!(Box::<PacketPool>::new([0; 512]));
         buf[..data.len()].copy_from_slice(data);
-        Packet {
-            len: data.len(),
-            buf,
-        }
+        Packet { len: data.len(), buf }
     }
 }
 
@@ -158,9 +152,7 @@ fn main() -> ! {
         conn_gattc: Some(raw::ble_gattc_conn_cfg_t {
             write_cmd_tx_queue_size: 0,
         }),
-        conn_gatts: Some(raw::ble_gatts_conn_cfg_t {
-            hvn_tx_queue_size: 0,
-        }),
+        conn_gatts: Some(raw::ble_gatts_conn_cfg_t { hvn_tx_queue_size: 0 }),
         gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 512 }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
@@ -174,9 +166,7 @@ fn main() -> ! {
             current_len: 9,
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
+            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
         }),
         conn_l2cap: Some(raw::ble_l2cap_conn_cfg_t {
             ch_count: 1,

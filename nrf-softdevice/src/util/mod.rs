@@ -32,10 +32,7 @@ pub(crate) unsafe fn get_flexarray<T>(
 /// This function is a workaround for UB in __BindgenUnionField
 /// see https://github.com/rust-lang/rust-bindgen/issues/1892
 /// see https://github.com/rust-lang/unsafe-code-guidelines/issues/134
-pub(crate) unsafe fn get_union_field<T>(
-    orig_ptr: *const raw::ble_evt_t,
-    member: &raw::__BindgenUnionField<T>,
-) -> &T {
+pub(crate) unsafe fn get_union_field<T>(orig_ptr: *const raw::ble_evt_t, member: &raw::__BindgenUnionField<T>) -> &T {
     let offs = member as *const _ as usize - orig_ptr as usize;
     let sanitized_ptr = (orig_ptr as *const u8).add(offs) as *const T;
     &*sanitized_ptr

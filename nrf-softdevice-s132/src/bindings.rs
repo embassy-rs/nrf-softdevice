@@ -982,73 +982,57 @@ pub const NRF_POWER_DCDC_MODES_NRF_POWER_DCDC_ENABLE: NRF_POWER_DCDC_MODES = 1;
 #[doc = "@brief DC/DC converter modes."]
 pub type NRF_POWER_DCDC_MODES = self::c_uint;
 #[doc = "< The event does not have a notification."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_NONE:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 0;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_NONE: NRF_RADIO_NOTIFICATION_DISTANCES = 0;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_800US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 1;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_800US: NRF_RADIO_NOTIFICATION_DISTANCES = 1;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_1740US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 2;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_1740US: NRF_RADIO_NOTIFICATION_DISTANCES = 2;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_2680US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 3;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_2680US: NRF_RADIO_NOTIFICATION_DISTANCES = 3;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_3620US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 4;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_3620US: NRF_RADIO_NOTIFICATION_DISTANCES = 4;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_4560US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 5;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_4560US: NRF_RADIO_NOTIFICATION_DISTANCES = 5;
 #[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_5500US:
-    NRF_RADIO_NOTIFICATION_DISTANCES = 6;
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_5500US: NRF_RADIO_NOTIFICATION_DISTANCES = 6;
 #[doc = "@brief Radio notification distances."]
 pub type NRF_RADIO_NOTIFICATION_DISTANCES = self::c_uint;
 #[doc = "< The event does not have a radio notification signal."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_NONE:
-    NRF_RADIO_NOTIFICATION_TYPES = 0;
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_NONE: NRF_RADIO_NOTIFICATION_TYPES = 0;
 #[doc = "< Using interrupt for notification when the radio will be enabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_ACTIVE:
-    NRF_RADIO_NOTIFICATION_TYPES = 1;
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_ACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 1;
 #[doc = "< Using interrupt for notification when the radio has been disabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE:
-    NRF_RADIO_NOTIFICATION_TYPES = 2;
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 2;
 #[doc = "< Using interrupt for notification both when the radio will be enabled and disabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_BOTH:
-    NRF_RADIO_NOTIFICATION_TYPES = 3;
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_BOTH: NRF_RADIO_NOTIFICATION_TYPES = 3;
 #[doc = "@brief Radio notification types."]
 pub type NRF_RADIO_NOTIFICATION_TYPES = self::c_uint;
 #[doc = "< This signal indicates the start of the radio timeslot."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_START:
-    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 0;
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_START: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 0;
 #[doc = "< This signal indicates the NRF_TIMER0 interrupt."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0:
-    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 1;
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 1;
 #[doc = "< This signal indicates the NRF_RADIO interrupt."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO:
-    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 2;
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 2;
 #[doc = "< This signal indicates extend action failed."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_FAILED:
-    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 3;
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_FAILED: NRF_RADIO_CALLBACK_SIGNAL_TYPE =
+    3;
 #[doc = "< This signal indicates extend action succeeded."]
 pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_SUCCEEDED:
     NRF_RADIO_CALLBACK_SIGNAL_TYPE = 4;
 #[doc = "@brief The Radio signal callback types."]
 pub type NRF_RADIO_CALLBACK_SIGNAL_TYPE = self::c_uint;
 #[doc = "< Return without action."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_NONE:
-    NRF_RADIO_SIGNAL_CALLBACK_ACTION = 0;
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_NONE: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 0;
 #[doc = "< Request an extension of the current"]
 #[doc = "timeslot. Maximum execution time for this action:"]
 #[doc = "@ref NRF_RADIO_MAX_EXTENSION_PROCESSING_TIME_US."]
 #[doc = "This action must be started at least"]
 #[doc = "@ref NRF_RADIO_MIN_EXTENSION_MARGIN_US before"]
 #[doc = "the end of the timeslot."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND:
-    NRF_RADIO_SIGNAL_CALLBACK_ACTION = 1;
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND: NRF_RADIO_SIGNAL_CALLBACK_ACTION =
+    1;
 #[doc = "< End the current radio timeslot."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_END:
-    NRF_RADIO_SIGNAL_CALLBACK_ACTION = 2;
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_END: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 2;
 #[doc = "< Request a new radio timeslot and end the current timeslot."]
 pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_REQUEST_AND_END:
     NRF_RADIO_SIGNAL_CALLBACK_ACTION = 3;
@@ -1135,9 +1119,7 @@ fn bindgen_test_layout_nrf_radio_request_earliest_t() {
         concat!("Alignment of ", stringify!(nrf_radio_request_earliest_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).hfclk as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).hfclk as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -1147,9 +1129,7 @@ fn bindgen_test_layout_nrf_radio_request_earliest_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).priority as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).priority as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -1159,9 +1139,7 @@ fn bindgen_test_layout_nrf_radio_request_earliest_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).length_us as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).length_us as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -1171,10 +1149,7 @@ fn bindgen_test_layout_nrf_radio_request_earliest_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).timeout_us as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).timeout_us as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -1210,9 +1185,7 @@ fn bindgen_test_layout_nrf_radio_request_normal_t() {
         concat!("Alignment of ", stringify!(nrf_radio_request_normal_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).hfclk as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).hfclk as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -1222,9 +1195,7 @@ fn bindgen_test_layout_nrf_radio_request_normal_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).priority as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).priority as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -1234,9 +1205,7 @@ fn bindgen_test_layout_nrf_radio_request_normal_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).distance_us as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).distance_us as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -1246,9 +1215,7 @@ fn bindgen_test_layout_nrf_radio_request_normal_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).length_us as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).length_us as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -1286,16 +1253,10 @@ fn bindgen_test_layout_nrf_radio_request_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::align_of::<nrf_radio_request_t__bindgen_ty_1>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(nrf_radio_request_t__bindgen_ty_1)
-        )
+        concat!("Alignment of ", stringify!(nrf_radio_request_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).earliest as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).earliest as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -1305,10 +1266,7 @@ fn bindgen_test_layout_nrf_radio_request_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).normal as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).normal as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -1331,9 +1289,7 @@ fn bindgen_test_layout_nrf_radio_request_t() {
         concat!("Alignment of ", stringify!(nrf_radio_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_request_t>())).request_type as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t>())).request_type as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -1380,8 +1336,7 @@ pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1 
 #[test]
 fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1() {
     assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(
-        ),
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
         4usize,
         concat!(
             "Size of: ",
@@ -1389,8 +1344,7 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__b
         )
     );
     assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(
-        ),
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
         4usize,
         concat!(
             "Alignment of ",
@@ -1399,10 +1353,8 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__b
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<
-                nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1,
-            >()))
-            .p_next as *const _ as usize
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>())).p_next
+                as *const _ as usize
         },
         0usize,
         concat!(
@@ -1422,8 +1374,7 @@ pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2 
 #[test]
 fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2() {
     assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(
-        ),
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
         4usize,
         concat!(
             "Size of: ",
@@ -1431,8 +1382,7 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__b
         )
     );
     assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(
-        ),
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
         4usize,
         concat!(
             "Alignment of ",
@@ -1441,10 +1391,8 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__b
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<
-                nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2,
-            >()))
-            .length_us as *const _ as usize
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>())).length_us
+                as *const _ as usize
         },
         0usize,
         concat!(
@@ -1475,8 +1423,8 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1() 
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>()))
-                .request as *const _ as usize
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).request as *const _
+                as usize
         },
         0usize,
         concat!(
@@ -1488,8 +1436,8 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1() 
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>()))
-                .extend as *const _ as usize
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).extend as *const _
+                as usize
         },
         0usize,
         concat!(
@@ -1505,23 +1453,16 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t() {
     assert_eq!(
         ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t>(),
         8usize,
-        concat!(
-            "Size of: ",
-            stringify!(nrf_radio_signal_callback_return_param_t)
-        )
+        concat!("Size of: ", stringify!(nrf_radio_signal_callback_return_param_t))
     );
     assert_eq!(
         ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(nrf_radio_signal_callback_return_param_t)
-        )
+        concat!("Alignment of ", stringify!(nrf_radio_signal_callback_return_param_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).callback_action
-                as *const _ as usize
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).callback_action as *const _ as usize
         },
         0usize,
         concat!(
@@ -1532,10 +1473,7 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).params as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).params as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -1556,9 +1494,8 @@ fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t() {
 #[doc = " @param[in] signal_type Type of signal, see @ref NRF_RADIO_CALLBACK_SIGNAL_TYPE."]
 #[doc = ""]
 #[doc = " @return Pointer to structure containing action requested by the application."]
-pub type nrf_radio_signal_callback_t = ::core::option::Option<
-    unsafe extern "C" fn(signal_type: u8) -> *mut nrf_radio_signal_callback_return_param_t,
->;
+pub type nrf_radio_signal_callback_t =
+    ::core::option::Option<unsafe extern "C" fn(signal_type: u8) -> *mut nrf_radio_signal_callback_return_param_t>;
 #[doc = "@brief AES ECB parameter typedefs"]
 pub type soc_ecb_key_t = [u8; 16usize];
 pub type soc_ecb_cleartext_t = [u8; 16usize];
@@ -1652,9 +1589,7 @@ fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_cleartext as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_cleartext as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -1664,9 +1599,7 @@ fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_ciphertext as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_ciphertext as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -2374,10 +2307,7 @@ pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
 #[doc = ""]
 #[doc = " @retval ::NRF_SUCCESS"]
 #[inline(always)]
-pub unsafe fn sd_ecb_blocks_encrypt(
-    block_count: u8,
-    p_data_blocks: *mut nrf_ecb_hal_data_block_t,
-) -> u32 {
+pub unsafe fn sd_ecb_blocks_encrypt(block_count: u8, p_data_blocks: *mut nrf_ecb_hal_data_block_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 71",
         inout("r0") to_asm(block_count) => ret,
@@ -2539,12 +2469,7 @@ pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
 #[doc = " @retval ::NRF_ERROR_NOT_SUPPORTED Non-zero value supplied to one or more of the unsupported parameters."]
 #[doc = " @retval ::NRF_SUCCESS Values successfully written to configuration registers."]
 #[inline(always)]
-pub unsafe fn sd_flash_protect(
-    block_cfg0: u32,
-    block_cfg1: u32,
-    block_cfg2: u32,
-    block_cfg3: u32,
-) -> u32 {
+pub unsafe fn sd_flash_protect(block_cfg0: u32, block_cfg1: u32, block_cfg2: u32, block_cfg3: u32) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 42",
         inout("r0") to_asm(block_cfg0) => ret,
@@ -2771,9 +2696,7 @@ fn bindgen_test_layout_nrf_clock_lf_cfg_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_temp_ctiv as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_temp_ctiv as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -2812,8 +2735,7 @@ fn bindgen_test_layout_nrf_clock_lf_cfg_t() {
 #[doc = ""]
 #[doc = " @note When id is set to @ref NRF_FAULT_ID_APP_MEMACC, pc will contain the address of the instruction being executed at the time when"]
 #[doc = " the fault is detected by the CPU. The CPU program counter may have advanced up to 2 instructions (no branching) after the one that triggered the fault."]
-pub type nrf_fault_handler_t =
-    ::core::option::Option<unsafe extern "C" fn(id: u32, pc: u32, info: u32)>;
+pub type nrf_fault_handler_t = ::core::option::Option<unsafe extern "C" fn(id: u32, pc: u32, info: u32)>;
 
 #[doc = "@brief Enables the SoftDevice and by extension the protocol stack."]
 #[doc = ""]
@@ -2976,22 +2898,12 @@ fn bindgen_test_layout_ble_uuid_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_uuid_t>())).uuid as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_uuid_t),
-            "::",
-            stringify!(uuid)
-        )
+        concat!("Offset of field: ", stringify!(ble_uuid_t), "::", stringify!(uuid))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_uuid_t>())).type_ as *const _ as usize },
         2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_uuid_t),
-            "::",
-            stringify!(type_)
-        )
+        concat!("Offset of field: ", stringify!(ble_uuid_t), "::", stringify!(type_))
     );
 }
 #[doc = "@brief Data structure."]
@@ -3018,22 +2930,12 @@ fn bindgen_test_layout_ble_data_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_data_t>())).p_data as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_data_t),
-            "::",
-            stringify!(p_data)
-        )
+        concat!("Offset of field: ", stringify!(ble_data_t), "::", stringify!(p_data))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_data_t>())).len as *const _ as usize },
         4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_data_t),
-            "::",
-            stringify!(len)
-        )
+        concat!("Offset of field: ", stringify!(ble_data_t), "::", stringify!(len))
     );
 }
 #[doc = " @brief BLE GATT connection configuration parameters, set with @ref sd_ble_cfg_set."]
@@ -3180,8 +3082,7 @@ impl ble_gatt_char_props_t {
         indicate: u8,
         auth_signed_wr: u8,
     ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let broadcast: u8 = unsafe { ::core::mem::transmute(broadcast) };
             broadcast as u64
@@ -3257,8 +3158,7 @@ impl ble_gatt_char_ext_props_t {
     }
     #[inline]
     pub fn new_bitfield_1(reliable_wr: u8, wr_aux: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let reliable_wr: u8 = unsafe { ::core::mem::transmute(reliable_wr) };
             reliable_wr as u64
@@ -3451,9 +3351,7 @@ fn bindgen_test_layout_sd_mbr_command_copy_bl_t() {
         concat!("Alignment of ", stringify!(sd_mbr_command_copy_bl_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_src as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_src as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3463,9 +3361,7 @@ fn bindgen_test_layout_sd_mbr_command_copy_bl_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_len as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_len as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -3507,24 +3403,15 @@ fn bindgen_test_layout_sd_mbr_command_vector_table_base_set_t() {
     assert_eq!(
         ::core::mem::size_of::<sd_mbr_command_vector_table_base_set_t>(),
         4usize,
-        concat!(
-            "Size of: ",
-            stringify!(sd_mbr_command_vector_table_base_set_t)
-        )
+        concat!("Size of: ", stringify!(sd_mbr_command_vector_table_base_set_t))
     );
     assert_eq!(
         ::core::mem::align_of::<sd_mbr_command_vector_table_base_set_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(sd_mbr_command_vector_table_base_set_t)
-        )
+        concat!("Alignment of ", stringify!(sd_mbr_command_vector_table_base_set_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_vector_table_base_set_t>())).address as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_vector_table_base_set_t>())).address as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3551,24 +3438,15 @@ fn bindgen_test_layout_sd_mbr_command_irq_forward_address_set_t() {
     assert_eq!(
         ::core::mem::size_of::<sd_mbr_command_irq_forward_address_set_t>(),
         4usize,
-        concat!(
-            "Size of: ",
-            stringify!(sd_mbr_command_irq_forward_address_set_t)
-        )
+        concat!("Size of: ", stringify!(sd_mbr_command_irq_forward_address_set_t))
     );
     assert_eq!(
         ::core::mem::align_of::<sd_mbr_command_irq_forward_address_set_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(sd_mbr_command_irq_forward_address_set_t)
-        )
+        concat!("Alignment of ", stringify!(sd_mbr_command_irq_forward_address_set_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_irq_forward_address_set_t>())).address
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_irq_forward_address_set_t>())).address as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3619,9 +3497,7 @@ fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(sd_mbr_command_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_sd as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_sd as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3631,9 +3507,7 @@ fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).compare as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).compare as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3643,9 +3517,7 @@ fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_bl as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_bl as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3655,10 +3527,7 @@ fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).base_set as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).base_set as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -3669,8 +3538,7 @@ fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).irq_forward_address_set
-                as *const _ as usize
+            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).irq_forward_address_set as *const _ as usize
         },
         0usize,
         concat!(
@@ -3978,12 +3846,8 @@ impl ble_gap_adv_properties_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        anonymous: u8,
-        include_tx_power: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(anonymous: u8, include_tx_power: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let anonymous: u8 = unsafe { ::core::mem::transmute(anonymous) };
             anonymous as u64
@@ -4103,8 +3967,7 @@ impl ble_gap_adv_report_type_t {
         status: u16,
         reserved: u16,
     ) -> __BindgenBitfieldUnit<[u8; 2usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u16> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u16> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let connectable: u16 = unsafe { ::core::mem::transmute(connectable) };
             connectable as u64
@@ -4158,9 +4021,7 @@ fn bindgen_test_layout_ble_gap_aux_pointer_t() {
         concat!("Alignment of ", stringify!(ble_gap_aux_pointer_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_aux_pointer_t>())).aux_offset as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_aux_pointer_t>())).aux_offset as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -4204,12 +4065,7 @@ fn bindgen_test_layout_ble_gap_addr_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_gap_addr_t>())).addr as *const _ as usize },
         1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_gap_addr_t),
-            "::",
-            stringify!(addr)
-        )
+        concat!("Offset of field: ", stringify!(ble_gap_addr_t), "::", stringify!(addr))
     );
 }
 impl ble_gap_addr_t {
@@ -4236,12 +4092,8 @@ impl ble_gap_addr_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        addr_id_peer: u8,
-        addr_type: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(addr_id_peer: u8, addr_type: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let addr_id_peer: u8 = unsafe { ::core::mem::transmute(addr_id_peer) };
             addr_id_peer as u64
@@ -4288,10 +4140,7 @@ fn bindgen_test_layout_ble_gap_conn_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_conn_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_params_t>())).min_conn_interval as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_params_t>())).min_conn_interval as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -4301,10 +4150,7 @@ fn bindgen_test_layout_ble_gap_conn_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_params_t>())).max_conn_interval as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_params_t>())).max_conn_interval as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -4314,9 +4160,7 @@ fn bindgen_test_layout_ble_gap_conn_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_params_t>())).slave_latency as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_params_t>())).slave_latency as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -4326,9 +4170,7 @@ fn bindgen_test_layout_ble_gap_conn_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_params_t>())).conn_sup_timeout as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_params_t>())).conn_sup_timeout as *const _ as usize },
         6usize,
         concat!(
             "Offset of field: ",
@@ -4390,8 +4232,7 @@ impl ble_gap_conn_sec_mode_t {
     }
     #[inline]
     pub fn new_bitfield_1(sm: u8, lv: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 4u8, {
             let sm: u8 = unsafe { ::core::mem::transmute(sm) };
             sm as u64
@@ -4435,9 +4276,7 @@ fn bindgen_test_layout_ble_gap_conn_sec_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_sec_t>())).encr_key_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_sec_t>())).encr_key_size as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -4469,12 +4308,7 @@ fn bindgen_test_layout_ble_gap_irk_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_gap_irk_t>())).irk as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_gap_irk_t),
-            "::",
-            stringify!(irk)
-        )
+        concat!("Offset of field: ", stringify!(ble_gap_irk_t), "::", stringify!(irk))
     );
 }
 #[doc = "@brief Channel mask (40 bits)."]
@@ -4561,9 +4395,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_adv_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).properties as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).properties as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -4573,9 +4405,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).p_peer_addr as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).p_peer_addr as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -4605,9 +4435,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).max_adv_evts as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).max_adv_evts as *const _ as usize },
         14usize,
         concat!(
             "Offset of field: ",
@@ -4617,9 +4445,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).channel_mask as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).channel_mask as *const _ as usize },
         15usize,
         concat!(
             "Offset of field: ",
@@ -4629,9 +4455,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).filter_policy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).filter_policy as *const _ as usize },
         20usize,
         concat!(
             "Offset of field: ",
@@ -4641,9 +4465,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).primary_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).primary_phy as *const _ as usize },
         21usize,
         concat!(
             "Offset of field: ",
@@ -4653,9 +4475,7 @@ fn bindgen_test_layout_ble_gap_adv_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_params_t>())).secondary_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_params_t>())).secondary_phy as *const _ as usize },
         22usize,
         concat!(
             "Offset of field: ",
@@ -4689,19 +4509,14 @@ impl ble_gap_adv_params_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        set_id: u8,
-        scan_req_notification: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(set_id: u8, scan_req_notification: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 4u8, {
             let set_id: u8 = unsafe { ::core::mem::transmute(set_id) };
             set_id as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let scan_req_notification: u8 =
-                unsafe { ::core::mem::transmute(scan_req_notification) };
+            let scan_req_notification: u8 = unsafe { ::core::mem::transmute(scan_req_notification) };
             scan_req_notification as u64
         });
         __bindgen_bitfield_unit
@@ -4754,9 +4569,7 @@ fn bindgen_test_layout_ble_gap_adv_data_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_adv_data_t>())).scan_rsp_data as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_adv_data_t>())).scan_rsp_data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -4811,9 +4624,7 @@ fn bindgen_test_layout_ble_gap_scan_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_scan_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_scan_params_t>())).scan_phys as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_scan_params_t>())).scan_phys as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -4853,9 +4664,7 @@ fn bindgen_test_layout_ble_gap_scan_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_scan_params_t>())).channel_mask as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_scan_params_t>())).channel_mask as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -4917,15 +4726,13 @@ impl ble_gap_scan_params_t {
         active: u8,
         filter_policy: u8,
     ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let extended: u8 = unsafe { ::core::mem::transmute(extended) };
             extended as u64
         });
         __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let report_incomplete_evts: u8 =
-                unsafe { ::core::mem::transmute(report_incomplete_evts) };
+            let report_incomplete_evts: u8 = unsafe { ::core::mem::transmute(report_incomplete_evts) };
             report_incomplete_evts as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
@@ -4982,9 +4789,7 @@ fn bindgen_test_layout_ble_gap_privacy_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_privacy_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).privacy_mode as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).privacy_mode as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -4994,10 +4799,7 @@ fn bindgen_test_layout_ble_gap_privacy_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).private_addr_type as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).private_addr_type as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -5007,10 +4809,7 @@ fn bindgen_test_layout_ble_gap_privacy_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).private_addr_cycle_s as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).private_addr_cycle_s as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -5020,9 +4819,7 @@ fn bindgen_test_layout_ble_gap_privacy_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).p_device_irk as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_privacy_params_t>())).p_device_irk as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -5145,14 +4942,8 @@ impl ble_gap_sec_kdist_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        enc: u8,
-        id: u8,
-        sign: u8,
-        link: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(enc: u8, id: u8, sign: u8, link: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enc: u8 = unsafe { ::core::mem::transmute(enc) };
             enc as u64
@@ -5199,9 +4990,7 @@ fn bindgen_test_layout_ble_gap_sec_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_sec_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_sec_params_t>())).min_key_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_sec_params_t>())).min_key_size as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -5211,9 +5000,7 @@ fn bindgen_test_layout_ble_gap_sec_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_sec_params_t>())).max_key_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_sec_params_t>())).max_key_size as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -5233,9 +5020,7 @@ fn bindgen_test_layout_ble_gap_sec_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_sec_params_t>())).kdist_peer as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_sec_params_t>())).kdist_peer as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -5321,8 +5106,7 @@ impl ble_gap_sec_params_t {
         io_caps: u8,
         oob: u8,
     ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let bond: u8 = unsafe { ::core::mem::transmute(bond) };
             bond as u64
@@ -5416,13 +5200,8 @@ impl ble_gap_enc_info_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        lesc: u8,
-        auth: u8,
-        ltk_len: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(lesc: u8, auth: u8, ltk_len: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let lesc: u8 = unsafe { ::core::mem::transmute(lesc) };
             lesc as u64
@@ -5657,9 +5436,7 @@ fn bindgen_test_layout_ble_gap_evt_connected_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_connected_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).peer_addr as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).peer_addr as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5679,9 +5456,7 @@ fn bindgen_test_layout_ble_gap_evt_connected_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).conn_params as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).conn_params as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -5691,9 +5466,7 @@ fn bindgen_test_layout_ble_gap_evt_connected_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).adv_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).adv_handle as *const _ as usize },
         16usize,
         concat!(
             "Offset of field: ",
@@ -5703,9 +5476,7 @@ fn bindgen_test_layout_ble_gap_evt_connected_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).adv_data as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_connected_t>())).adv_data as *const _ as usize },
         20usize,
         concat!(
             "Offset of field: ",
@@ -5735,9 +5506,7 @@ fn bindgen_test_layout_ble_gap_evt_disconnected_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_disconnected_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_disconnected_t>())).reason as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_disconnected_t>())).reason as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5767,10 +5536,7 @@ fn bindgen_test_layout_ble_gap_evt_conn_param_update_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_conn_param_update_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_conn_param_update_t>())).conn_params as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_conn_param_update_t>())).conn_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5797,15 +5563,11 @@ fn bindgen_test_layout_ble_gap_evt_phy_update_request_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_phy_update_request_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_phy_update_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_phy_update_request_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_phy_update_request_t>())).peer_preferred_phys
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_phy_update_request_t>())).peer_preferred_phys as *const _ as usize
         },
         0usize,
         concat!(
@@ -5840,9 +5602,7 @@ fn bindgen_test_layout_ble_gap_evt_phy_update_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_phy_update_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).status as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).status as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5852,9 +5612,7 @@ fn bindgen_test_layout_ble_gap_evt_phy_update_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).tx_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).tx_phy as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -5864,9 +5622,7 @@ fn bindgen_test_layout_ble_gap_evt_phy_update_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).rx_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_phy_update_t>())).rx_phy as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -5893,16 +5649,10 @@ fn bindgen_test_layout_ble_gap_evt_sec_params_request_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_sec_params_request_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_sec_params_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_sec_params_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_sec_params_request_t>())).peer_params as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_sec_params_request_t>())).peer_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5936,10 +5686,7 @@ fn bindgen_test_layout_ble_gap_evt_sec_info_request_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_sec_info_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_sec_info_request_t>())).peer_addr as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_sec_info_request_t>())).peer_addr as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -5949,10 +5696,7 @@ fn bindgen_test_layout_ble_gap_evt_sec_info_request_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_sec_info_request_t>())).master_id as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_sec_info_request_t>())).master_id as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -5997,13 +5741,8 @@ impl ble_gap_evt_sec_info_request_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        enc_info: u8,
-        id_info: u8,
-        sign_info: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(enc_info: u8, id_info: u8, sign_info: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enc_info: u8 = unsafe { ::core::mem::transmute(enc_info) };
             enc_info as u64
@@ -6040,9 +5779,7 @@ fn bindgen_test_layout_ble_gap_evt_passkey_display_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_passkey_display_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_passkey_display_t>())).passkey as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_passkey_display_t>())).passkey as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6066,8 +5803,7 @@ impl ble_gap_evt_passkey_display_t {
     }
     #[inline]
     pub fn new_bitfield_1(match_request: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let match_request: u8 = unsafe { ::core::mem::transmute(match_request) };
             match_request as u64
@@ -6095,9 +5831,7 @@ fn bindgen_test_layout_ble_gap_evt_key_pressed_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_key_pressed_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_key_pressed_t>())).kp_not as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_key_pressed_t>())).kp_not as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6127,10 +5861,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_key_request_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_auth_key_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_key_request_t>())).key_type as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_key_request_t>())).key_type as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6160,16 +5891,10 @@ fn bindgen_test_layout_ble_gap_evt_lesc_dhkey_request_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_lesc_dhkey_request_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_lesc_dhkey_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_lesc_dhkey_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_lesc_dhkey_request_t>())).p_pk_peer as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_lesc_dhkey_request_t>())).p_pk_peer as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6193,8 +5918,7 @@ impl ble_gap_evt_lesc_dhkey_request_t {
     }
     #[inline]
     pub fn new_bitfield_1(oobd_req: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let oobd_req: u8 = unsafe { ::core::mem::transmute(oobd_req) };
             oobd_req as u64
@@ -6268,14 +5992,8 @@ impl ble_gap_sec_levels_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        lv1: u8,
-        lv2: u8,
-        lv3: u8,
-        lv4: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(lv1: u8, lv2: u8, lv3: u8, lv4: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let lv1: u8 = unsafe { ::core::mem::transmute(lv1) };
             lv1 as u64
@@ -6514,10 +6232,7 @@ fn bindgen_test_layout_ble_gap_data_length_params_t() {
         concat!("Alignment of ", stringify!(ble_gap_data_length_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_tx_octets as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_tx_octets as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6527,10 +6242,7 @@ fn bindgen_test_layout_ble_gap_data_length_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_rx_octets as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_rx_octets as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -6540,10 +6252,7 @@ fn bindgen_test_layout_ble_gap_data_length_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_tx_time_us as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_tx_time_us as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -6553,10 +6262,7 @@ fn bindgen_test_layout_ble_gap_data_length_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_rx_time_us as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_data_length_params_t>())).max_rx_time_us as *const _ as usize },
         6usize,
         concat!(
             "Offset of field: ",
@@ -6587,15 +6293,11 @@ fn bindgen_test_layout_ble_gap_data_length_limitation_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_data_length_limitation_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_data_length_limitation_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_data_length_limitation_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).tx_payload_limited_octets
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).tx_payload_limited_octets as *const _ as usize
         },
         0usize,
         concat!(
@@ -6607,8 +6309,7 @@ fn bindgen_test_layout_ble_gap_data_length_limitation_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).rx_payload_limited_octets
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).rx_payload_limited_octets as *const _ as usize
         },
         2usize,
         concat!(
@@ -6620,8 +6321,7 @@ fn bindgen_test_layout_ble_gap_data_length_limitation_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).tx_rx_time_limited_us
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_data_length_limitation_t>())).tx_rx_time_limited_us as *const _ as usize
         },
         4usize,
         concat!(
@@ -6661,9 +6361,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_status_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_auth_status_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).auth_status as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).auth_status as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6673,9 +6371,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_status_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).sm1_levels as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).sm1_levels as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -6685,9 +6381,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_status_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).sm2_levels as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).sm2_levels as *const _ as usize },
         3usize,
         concat!(
             "Offset of field: ",
@@ -6697,9 +6391,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_status_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).kdist_own as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).kdist_own as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -6709,9 +6401,7 @@ fn bindgen_test_layout_ble_gap_evt_auth_status_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).kdist_peer as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_auth_status_t>())).kdist_peer as *const _ as usize },
         5usize,
         concat!(
             "Offset of field: ",
@@ -6756,13 +6446,8 @@ impl ble_gap_evt_auth_status_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        error_src: u8,
-        bonded: u8,
-        lesc: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(error_src: u8, bonded: u8, lesc: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 2u8, {
             let error_src: u8 = unsafe { ::core::mem::transmute(error_src) };
             error_src as u64
@@ -6798,9 +6483,7 @@ fn bindgen_test_layout_ble_gap_evt_conn_sec_update_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_conn_sec_update_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_conn_sec_update_t>())).conn_sec as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_conn_sec_update_t>())).conn_sec as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6837,15 +6520,11 @@ fn bindgen_test_layout_ble_gap_evt_timeout_t__bindgen_ty_1() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_timeout_t__bindgen_ty_1>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_timeout_t__bindgen_ty_1)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_timeout_t__bindgen_ty_1))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_timeout_t__bindgen_ty_1>())).adv_report_buffer
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_timeout_t__bindgen_ty_1>())).adv_report_buffer as *const _ as usize
         },
         0usize,
         concat!(
@@ -6911,9 +6590,7 @@ fn bindgen_test_layout_ble_gap_evt_rssi_changed_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_rssi_changed_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_rssi_changed_t>())).rssi as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_rssi_changed_t>())).rssi as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6923,9 +6600,7 @@ fn bindgen_test_layout_ble_gap_evt_rssi_changed_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_rssi_changed_t>())).ch_index as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_rssi_changed_t>())).ch_index as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -6962,16 +6637,10 @@ fn bindgen_test_layout_ble_gap_evt_adv_set_terminated_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_adv_set_terminated_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_adv_set_terminated_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_adv_set_terminated_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).reason as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).reason as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -6981,10 +6650,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_set_terminated_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).adv_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).adv_handle as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -6995,8 +6661,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_set_terminated_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).num_completed_adv_events
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).num_completed_adv_events as *const _ as usize
         },
         2usize,
         concat!(
@@ -7007,10 +6672,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_set_terminated_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).adv_data as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_set_terminated_t>())).adv_data as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -7099,9 +6761,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).peer_addr as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).peer_addr as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -7111,9 +6771,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).direct_addr as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).direct_addr as *const _ as usize },
         9usize,
         concat!(
             "Offset of field: ",
@@ -7123,9 +6781,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).primary_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).primary_phy as *const _ as usize },
         16usize,
         concat!(
             "Offset of field: ",
@@ -7135,9 +6791,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).secondary_phy as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).secondary_phy as *const _ as usize },
         17usize,
         concat!(
             "Offset of field: ",
@@ -7147,9 +6801,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).tx_power as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).tx_power as *const _ as usize },
         18usize,
         concat!(
             "Offset of field: ",
@@ -7169,9 +6821,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).ch_index as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).ch_index as *const _ as usize },
         20usize,
         concat!(
             "Offset of field: ",
@@ -7181,9 +6831,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).set_id as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).set_id as *const _ as usize },
         21usize,
         concat!(
             "Offset of field: ",
@@ -7203,9 +6851,7 @@ fn bindgen_test_layout_ble_gap_evt_adv_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).aux_pointer as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_adv_report_t>())).aux_pointer as *const _ as usize },
         32usize,
         concat!(
             "Offset of field: ",
@@ -7229,8 +6875,7 @@ impl ble_gap_evt_adv_report_t {
     }
     #[inline]
     pub fn new_bitfield_1(data_id: u16) -> __BindgenBitfieldUnit<[u8; 2usize], u16> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u16> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize], u16> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 12u8, {
             let data_id: u16 = unsafe { ::core::mem::transmute(data_id) };
             data_id as u64
@@ -7303,14 +6948,8 @@ impl ble_gap_evt_sec_request_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        bond: u8,
-        mitm: u8,
-        lesc: u8,
-        keypress: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(bond: u8, mitm: u8, lesc: u8, keypress: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let bond: u8 = unsafe { ::core::mem::transmute(bond) };
             bond as u64
@@ -7342,23 +6981,16 @@ fn bindgen_test_layout_ble_gap_evt_conn_param_update_request_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gap_evt_conn_param_update_request_t>(),
         8usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gap_evt_conn_param_update_request_t)
-        )
+        concat!("Size of: ", stringify!(ble_gap_evt_conn_param_update_request_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_conn_param_update_request_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_conn_param_update_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_conn_param_update_request_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_conn_param_update_request_t>())).conn_params
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_conn_param_update_request_t>())).conn_params as *const _ as usize
         },
         0usize,
         concat!(
@@ -7394,10 +7026,7 @@ fn bindgen_test_layout_ble_gap_evt_scan_req_report_t() {
         concat!("Alignment of ", stringify!(ble_gap_evt_scan_req_report_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).adv_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).adv_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7407,9 +7036,7 @@ fn bindgen_test_layout_ble_gap_evt_scan_req_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).rssi as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).rssi as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -7419,10 +7046,7 @@ fn bindgen_test_layout_ble_gap_evt_scan_req_report_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).peer_addr as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_scan_req_report_t>())).peer_addr as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -7444,23 +7068,16 @@ fn bindgen_test_layout_ble_gap_evt_data_length_update_request_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gap_evt_data_length_update_request_t>(),
         8usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gap_evt_data_length_update_request_t)
-        )
+        concat!("Size of: ", stringify!(ble_gap_evt_data_length_update_request_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_data_length_update_request_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_data_length_update_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_data_length_update_request_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_data_length_update_request_t>())).peer_params
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_data_length_update_request_t>())).peer_params as *const _ as usize
         },
         0usize,
         concat!(
@@ -7488,16 +7105,10 @@ fn bindgen_test_layout_ble_gap_evt_data_length_update_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_data_length_update_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_data_length_update_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_data_length_update_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_data_length_update_t>())).effective_params
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_data_length_update_t>())).effective_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7522,23 +7133,16 @@ fn bindgen_test_layout_ble_gap_evt_qos_channel_survey_report_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gap_evt_qos_channel_survey_report_t>(),
         40usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gap_evt_qos_channel_survey_report_t)
-        )
+        concat!("Size of: ", stringify!(ble_gap_evt_qos_channel_survey_report_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gap_evt_qos_channel_survey_report_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_evt_qos_channel_survey_report_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_evt_qos_channel_survey_report_t))
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_qos_channel_survey_report_t>())).channel_energy
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_qos_channel_survey_report_t>())).channel_energy as *const _ as usize
         },
         0usize,
         concat!(
@@ -7622,9 +7226,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_gap_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).connected as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).connected as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7634,10 +7236,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).disconnected as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).disconnected as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7647,10 +7246,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_param_update as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_param_update as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7660,10 +7256,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_params_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_params_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7673,10 +7266,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_info_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_info_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7686,10 +7276,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).passkey_display as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).passkey_display as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7699,10 +7286,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).key_pressed as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).key_pressed as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7712,10 +7296,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).auth_key_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).auth_key_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7725,10 +7306,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).lesc_dhkey_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).lesc_dhkey_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7738,10 +7316,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).auth_status as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).auth_status as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7751,10 +7326,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_sec_update as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_sec_update as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7764,9 +7336,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).timeout as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).timeout as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7776,10 +7346,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).rssi_changed as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).rssi_changed as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7789,9 +7356,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).adv_report as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).adv_report as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7801,10 +7366,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).adv_set_terminated as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).adv_set_terminated as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7814,10 +7376,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).sec_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7828,8 +7387,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_param_update_request
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).conn_param_update_request as *const _ as usize
         },
         0usize,
         concat!(
@@ -7840,10 +7398,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).scan_req_report as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).scan_req_report as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7853,10 +7408,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).phy_update_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).phy_update_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7866,9 +7418,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).phy_update as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).phy_update as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7879,8 +7429,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).data_length_update_request
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).data_length_update_request as *const _ as usize
         },
         0usize,
         concat!(
@@ -7891,10 +7440,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).data_length_update as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).data_length_update as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -7905,8 +7451,7 @@ fn bindgen_test_layout_ble_gap_evt_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).qos_channel_survey_report
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_evt_t__bindgen_ty_1>())).qos_channel_survey_report as *const _ as usize
         },
         0usize,
         concat!(
@@ -7942,12 +7487,7 @@ fn bindgen_test_layout_ble_gap_evt_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_gap_evt_t>())).params as *const _ as usize },
         4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_gap_evt_t),
-            "::",
-            stringify!(params)
-        )
+        concat!("Offset of field: ", stringify!(ble_gap_evt_t), "::", stringify!(params))
     );
 }
 #[doc = " @brief BLE GAP connection configuration parameters, set with @ref sd_ble_cfg_set."]
@@ -7992,9 +7532,7 @@ fn bindgen_test_layout_ble_gap_conn_cfg_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_cfg_t>())).event_length as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_cfg_t>())).event_length as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -8040,9 +7578,7 @@ fn bindgen_test_layout_ble_gap_cfg_role_count_t() {
         concat!("Alignment of ", stringify!(ble_gap_cfg_role_count_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).adv_set_count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).adv_set_count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8052,10 +7588,7 @@ fn bindgen_test_layout_ble_gap_cfg_role_count_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).periph_role_count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).periph_role_count as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -8065,10 +7598,7 @@ fn bindgen_test_layout_ble_gap_cfg_role_count_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).central_role_count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).central_role_count as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -8078,10 +7608,7 @@ fn bindgen_test_layout_ble_gap_cfg_role_count_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).central_sec_count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_role_count_t>())).central_sec_count as *const _ as usize },
         3usize,
         concat!(
             "Offset of field: ",
@@ -8104,11 +7631,8 @@ impl ble_gap_cfg_role_count_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        qos_channel_survey_role_available: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(qos_channel_survey_role_available: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let qos_channel_survey_role_available: u8 =
                 unsafe { ::core::mem::transmute(qos_channel_survey_role_available) };
@@ -8169,9 +7693,7 @@ fn bindgen_test_layout_ble_gap_cfg_device_name_t() {
         concat!("Alignment of ", stringify!(ble_gap_cfg_device_name_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).write_perm as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).write_perm as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8181,9 +7703,7 @@ fn bindgen_test_layout_ble_gap_cfg_device_name_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).p_value as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).p_value as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -8193,9 +7713,7 @@ fn bindgen_test_layout_ble_gap_cfg_device_name_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).current_len as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).current_len as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -8205,9 +7723,7 @@ fn bindgen_test_layout_ble_gap_cfg_device_name_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).max_len as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_device_name_t>())).max_len as *const _ as usize },
         10usize,
         concat!(
             "Offset of field: ",
@@ -8231,8 +7747,7 @@ impl ble_gap_cfg_device_name_t {
     }
     #[inline]
     pub fn new_bitfield_1(vloc: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 2u8, {
             let vloc: u8 = unsafe { ::core::mem::transmute(vloc) };
             vloc as u64
@@ -8261,10 +7776,7 @@ fn bindgen_test_layout_ble_gap_cfg_ppcp_incl_cfg_t() {
         concat!("Alignment of ", stringify!(ble_gap_cfg_ppcp_incl_cfg_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_ppcp_incl_cfg_t>())).include_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_ppcp_incl_cfg_t>())).include_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8295,9 +7807,7 @@ fn bindgen_test_layout_ble_gap_cfg_car_incl_cfg_t() {
         concat!("Alignment of ", stringify!(ble_gap_cfg_car_incl_cfg_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_cfg_car_incl_cfg_t>())).include_cfg as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_cfg_car_incl_cfg_t>())).include_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8419,9 +7929,7 @@ fn bindgen_test_layout_ble_gap_opt_ch_map_t() {
         concat!("Alignment of ", stringify!(ble_gap_opt_ch_map_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_ch_map_t>())).conn_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_ch_map_t>())).conn_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8482,16 +7990,10 @@ fn bindgen_test_layout_ble_gap_opt_local_conn_latency_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_opt_local_conn_latency_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_opt_local_conn_latency_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_opt_local_conn_latency_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).conn_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).conn_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8501,10 +8003,7 @@ fn bindgen_test_layout_ble_gap_opt_local_conn_latency_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).requested_latency
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).requested_latency as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -8514,10 +8013,7 @@ fn bindgen_test_layout_ble_gap_opt_local_conn_latency_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).p_actual_latency
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_local_conn_latency_t>())).p_actual_latency as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -8556,16 +8052,10 @@ fn bindgen_test_layout_ble_gap_opt_slave_latency_disable_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_opt_slave_latency_disable_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_opt_slave_latency_disable_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_opt_slave_latency_disable_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_slave_latency_disable_t>())).conn_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_slave_latency_disable_t>())).conn_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8589,8 +8079,7 @@ impl ble_gap_opt_slave_latency_disable_t {
     }
     #[inline]
     pub fn new_bitfield_1(disable: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let disable: u8 = unsafe { ::core::mem::transmute(disable) };
             disable as u64
@@ -8631,9 +8120,7 @@ fn bindgen_test_layout_ble_gap_opt_passkey_t() {
         concat!("Alignment of ", stringify!(ble_gap_opt_passkey_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_passkey_t>())).p_passkey as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_passkey_t>())).p_passkey as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8689,8 +8176,7 @@ impl ble_gap_opt_compat_mode_1_t {
     }
     #[inline]
     pub fn new_bitfield_1(enable: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enable: u8 = unsafe { ::core::mem::transmute(enable) };
             enable as u64
@@ -8734,16 +8220,10 @@ fn bindgen_test_layout_ble_gap_opt_auth_payload_timeout_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gap_opt_auth_payload_timeout_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gap_opt_auth_payload_timeout_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gap_opt_auth_payload_timeout_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_auth_payload_timeout_t>())).conn_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_auth_payload_timeout_t>())).conn_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8754,8 +8234,7 @@ fn bindgen_test_layout_ble_gap_opt_auth_payload_timeout_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_auth_payload_timeout_t>())).auth_payload_timeout
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_opt_auth_payload_timeout_t>())).auth_payload_timeout as *const _ as usize
         },
         2usize,
         concat!(
@@ -8799,17 +8278,10 @@ fn bindgen_test_layout_ble_gap_opt_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_gap_opt_t>())).ch_map as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_gap_opt_t),
-            "::",
-            stringify!(ch_map)
-        )
+        concat!("Offset of field: ", stringify!(ble_gap_opt_t), "::", stringify!(ch_map))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_t>())).local_conn_latency as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_t>())).local_conn_latency as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8839,9 +8311,7 @@ fn bindgen_test_layout_ble_gap_opt_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_t>())).auth_payload_timeout as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_t>())).auth_payload_timeout as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8851,9 +8321,7 @@ fn bindgen_test_layout_ble_gap_opt_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_opt_t>())).slave_latency_disable as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_opt_t>())).slave_latency_disable as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8895,9 +8363,7 @@ fn bindgen_test_layout_ble_gap_conn_event_trigger_t() {
         concat!("Alignment of ", stringify!(ble_gap_conn_event_trigger_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).ppi_ch_id as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).ppi_ch_id as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -8907,10 +8373,7 @@ fn bindgen_test_layout_ble_gap_conn_event_trigger_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).task_endpoint as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).task_endpoint as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -8921,8 +8384,7 @@ fn bindgen_test_layout_ble_gap_conn_event_trigger_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).conn_evt_counter_start
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).conn_evt_counter_start as *const _ as usize
         },
         8usize,
         concat!(
@@ -8933,10 +8395,7 @@ fn bindgen_test_layout_ble_gap_conn_event_trigger_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).period_in_events as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gap_conn_event_trigger_t>())).period_in_events as *const _ as usize },
         10usize,
         concat!(
             "Offset of field: ",
@@ -9351,10 +8810,7 @@ pub unsafe fn sd_ble_gap_adv_stop(adv_handle: u8) -> u32 {
 #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
-pub unsafe fn sd_ble_gap_conn_param_update(
-    conn_handle: u16,
-    p_conn_params: *const ble_gap_conn_params_t,
-) -> u32 {
+pub unsafe fn sd_ble_gap_conn_param_update(conn_handle: u16, p_conn_params: *const ble_gap_conn_params_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 117",
         inout("r0") to_asm(conn_handle) => ret,
@@ -9624,10 +9080,7 @@ pub unsafe fn sd_ble_gap_device_name_get(p_dev_name: *mut u8, p_len: *mut u16) -
 #[doc = "                                   See @ref ble_gap_cfg_car_incl_cfg_t and @ref ble_gap_cfg_role_count_t."]
 #[doc = " @retval ::NRF_ERROR_TIMEOUT A SMP timeout has occurred, and further SMP operations on this link is prohibited."]
 #[inline(always)]
-pub unsafe fn sd_ble_gap_authenticate(
-    conn_handle: u16,
-    p_sec_params: *const ble_gap_sec_params_t,
-) -> u32 {
+pub unsafe fn sd_ble_gap_authenticate(conn_handle: u16, p_sec_params: *const ble_gap_sec_params_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 126",
         inout("r0") to_asm(conn_handle) => ret,
@@ -9792,10 +9245,7 @@ pub unsafe fn sd_ble_gap_auth_key_reply(conn_handle: u16, key_type: u8, p_key: *
 #[doc = "                                   - The application has not pulled a @ref BLE_GAP_EVT_LESC_DHKEY_REQUEST event."]
 #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
-pub unsafe fn sd_ble_gap_lesc_dhkey_reply(
-    conn_handle: u16,
-    p_dhkey: *const ble_gap_lesc_dhkey_t,
-) -> u32 {
+pub unsafe fn sd_ble_gap_lesc_dhkey_reply(conn_handle: u16, p_dhkey: *const ble_gap_lesc_dhkey_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 129",
         inout("r0") to_asm(conn_handle) => ret,
@@ -10009,10 +9459,7 @@ pub unsafe fn sd_ble_gap_sec_info_reply(
 #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
 #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied."]
 #[inline(always)]
-pub unsafe fn sd_ble_gap_conn_sec_get(
-    conn_handle: u16,
-    p_conn_sec: *mut ble_gap_conn_sec_t,
-) -> u32 {
+pub unsafe fn sd_ble_gap_conn_sec_get(conn_handle: u16, p_conn_sec: *mut ble_gap_conn_sec_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 135",
         inout("r0") to_asm(conn_handle) => ret,
@@ -10655,9 +10102,7 @@ fn bindgen_test_layout_ble_l2cap_conn_cfg_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_conn_cfg_t>())).rx_queue_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_conn_cfg_t>())).rx_queue_size as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -10667,9 +10112,7 @@ fn bindgen_test_layout_ble_l2cap_conn_cfg_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_conn_cfg_t>())).tx_queue_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_conn_cfg_t>())).tx_queue_size as *const _ as usize },
         5usize,
         concat!(
             "Offset of field: ",
@@ -10722,9 +10165,7 @@ fn bindgen_test_layout_ble_l2cap_ch_rx_params_t() {
         concat!("Alignment of ", stringify!(ble_l2cap_ch_rx_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).rx_mtu as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).rx_mtu as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -10734,9 +10175,7 @@ fn bindgen_test_layout_ble_l2cap_ch_rx_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).rx_mps as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).rx_mps as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -10746,9 +10185,7 @@ fn bindgen_test_layout_ble_l2cap_ch_rx_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).sdu_buf as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_rx_params_t>())).sdu_buf as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -10785,9 +10222,7 @@ fn bindgen_test_layout_ble_l2cap_ch_setup_params_t() {
         concat!("Alignment of ", stringify!(ble_l2cap_ch_setup_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).rx_params as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).rx_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -10797,9 +10232,7 @@ fn bindgen_test_layout_ble_l2cap_ch_setup_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).le_psm as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).le_psm as *const _ as usize },
         12usize,
         concat!(
             "Offset of field: ",
@@ -10809,9 +10242,7 @@ fn bindgen_test_layout_ble_l2cap_ch_setup_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).status as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_setup_params_t>())).status as *const _ as usize },
         14usize,
         concat!(
             "Offset of field: ",
@@ -10852,9 +10283,7 @@ fn bindgen_test_layout_ble_l2cap_ch_tx_params_t() {
         concat!("Alignment of ", stringify!(ble_l2cap_ch_tx_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).tx_mtu as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).tx_mtu as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -10864,9 +10293,7 @@ fn bindgen_test_layout_ble_l2cap_ch_tx_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).peer_mps as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).peer_mps as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -10876,9 +10303,7 @@ fn bindgen_test_layout_ble_l2cap_ch_tx_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).tx_mps as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).tx_mps as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -10888,9 +10313,7 @@ fn bindgen_test_layout_ble_l2cap_ch_tx_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).credits as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_ch_tx_params_t>())).credits as *const _ as usize },
         6usize,
         concat!(
             "Offset of field: ",
@@ -10919,16 +10342,10 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_setup_request_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_l2cap_evt_ch_setup_request_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_l2cap_evt_ch_setup_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_l2cap_evt_ch_setup_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_request_t>())).tx_params as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_request_t>())).tx_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -10938,10 +10355,7 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_setup_request_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_request_t>())).le_psm as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_request_t>())).le_psm as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -10970,16 +10384,10 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_setup_refused_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_l2cap_evt_ch_setup_refused_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_l2cap_evt_ch_setup_refused_t)
-        )
+        concat!("Alignment of ", stringify!(ble_l2cap_evt_ch_setup_refused_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_refused_t>())).source as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_refused_t>())).source as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -10989,10 +10397,7 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_setup_refused_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_refused_t>())).status as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_refused_t>())).status as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -11022,9 +10427,7 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_setup_t() {
         concat!("Alignment of ", stringify!(ble_l2cap_evt_ch_setup_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_t>())).tx_params as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_setup_t>())).tx_params as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11054,16 +10457,10 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_sdu_buf_released_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_l2cap_evt_ch_sdu_buf_released_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_l2cap_evt_ch_sdu_buf_released_t)
-        )
+        concat!("Alignment of ", stringify!(ble_l2cap_evt_ch_sdu_buf_released_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_sdu_buf_released_t>())).sdu_buf as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_sdu_buf_released_t>())).sdu_buf as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11093,9 +10490,7 @@ fn bindgen_test_layout_ble_l2cap_evt_ch_credit_t() {
         concat!("Alignment of ", stringify!(ble_l2cap_evt_ch_credit_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_ch_credit_t>())).credits as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_ch_credit_t>())).credits as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11224,10 +10619,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_l2cap_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11237,10 +10629,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup_refused as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup_refused as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11250,9 +10639,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_setup as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11262,10 +10649,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_sdu_buf_released
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).ch_sdu_buf_released as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11275,9 +10659,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).credit as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).credit as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11287,9 +10669,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).rx as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).rx as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11299,9 +10679,7 @@ fn bindgen_test_layout_ble_l2cap_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).tx as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_l2cap_evt_t__bindgen_ty_1>())).tx as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11476,11 +10854,7 @@ pub unsafe fn sd_ble_l2cap_ch_release(conn_handle: u16, local_cid: u16) -> u32 {
 #[doc = " @retval ::NRF_ERROR_RESOURCES            Too many SDU data buffers supplied. Wait for a"]
 #[doc = "                                          @ref BLE_L2CAP_EVT_CH_RX event and retry."]
 #[inline(always)]
-pub unsafe fn sd_ble_l2cap_ch_rx(
-    conn_handle: u16,
-    local_cid: u16,
-    p_sdu_buf: *const ble_data_t,
-) -> u32 {
+pub unsafe fn sd_ble_l2cap_ch_rx(conn_handle: u16, local_cid: u16, p_sdu_buf: *const ble_data_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 186",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11535,11 +10909,7 @@ pub unsafe fn sd_ble_l2cap_ch_rx(
 #[doc = " @retval ::NRF_ERROR_RESOURCES            Too many SDUs queued for transmission. Wait for a"]
 #[doc = "                                          @ref BLE_L2CAP_EVT_CH_TX event and retry."]
 #[inline(always)]
-pub unsafe fn sd_ble_l2cap_ch_tx(
-    conn_handle: u16,
-    local_cid: u16,
-    p_sdu_buf: *const ble_data_t,
-) -> u32 {
+pub unsafe fn sd_ble_l2cap_ch_tx(conn_handle: u16, local_cid: u16, p_sdu_buf: *const ble_data_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 187",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11593,12 +10963,7 @@ pub unsafe fn sd_ble_l2cap_ch_tx(
 #[doc = "                                          in progress for an L2CAP channel)."]
 #[doc = " @retval ::NRF_ERROR_NOT_FOUND            CID not found."]
 #[inline(always)]
-pub unsafe fn sd_ble_l2cap_ch_flow_control(
-    conn_handle: u16,
-    local_cid: u16,
-    credits: u16,
-    p_credits: *mut u16,
-) -> u32 {
+pub unsafe fn sd_ble_l2cap_ch_flow_control(conn_handle: u16, local_cid: u16, credits: u16, p_credits: *mut u16) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 188",
         inout("r0") to_asm(conn_handle) => ret,
@@ -11683,10 +11048,7 @@ fn bindgen_test_layout_ble_gattc_conn_cfg_t() {
         concat!("Alignment of ", stringify!(ble_gattc_conn_cfg_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_conn_cfg_t>())).write_cmd_tx_queue_size as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_conn_cfg_t>())).write_cmd_tx_queue_size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11718,9 +11080,7 @@ fn bindgen_test_layout_ble_gattc_handle_range_t() {
         concat!("Alignment of ", stringify!(ble_gattc_handle_range_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_handle_range_t>())).start_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_handle_range_t>())).start_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -11730,9 +11090,7 @@ fn bindgen_test_layout_ble_gattc_handle_range_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_handle_range_t>())).end_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_handle_range_t>())).end_handle as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -11774,9 +11132,7 @@ fn bindgen_test_layout_ble_gattc_service_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_service_t>())).handle_range as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_service_t>())).handle_range as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -11818,9 +11174,7 @@ fn bindgen_test_layout_ble_gattc_include_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_include_t>())).included_srvc as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_include_t>())).included_srvc as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -11911,8 +11265,7 @@ impl ble_gattc_char_t {
     }
     #[inline]
     pub fn new_bitfield_1(char_ext_props: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let char_ext_props: u8 = unsafe { ::core::mem::transmute(char_ext_props) };
             char_ext_props as u64
@@ -11992,9 +11345,7 @@ fn bindgen_test_layout_ble_gattc_write_params_t() {
         concat!("Alignment of ", stringify!(ble_gattc_write_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_write_params_t>())).write_op as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_write_params_t>())).write_op as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12014,9 +11365,7 @@ fn bindgen_test_layout_ble_gattc_write_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_write_params_t>())).handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_write_params_t>())).handle as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12026,9 +11375,7 @@ fn bindgen_test_layout_ble_gattc_write_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_write_params_t>())).offset as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_write_params_t>())).offset as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -12048,9 +11395,7 @@ fn bindgen_test_layout_ble_gattc_write_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_write_params_t>())).p_value as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_write_params_t>())).p_value as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -12124,9 +11469,7 @@ fn bindgen_test_layout_ble_gattc_attr_info128_t() {
         concat!("Alignment of ", stringify!(ble_gattc_attr_info128_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_attr_info128_t>())).handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_attr_info128_t>())).handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12166,16 +11509,10 @@ fn bindgen_test_layout_ble_gattc_evt_prim_srvc_disc_rsp_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_prim_srvc_disc_rsp_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_prim_srvc_disc_rsp_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_prim_srvc_disc_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_prim_srvc_disc_rsp_t>())).count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_prim_srvc_disc_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12185,10 +11522,7 @@ fn bindgen_test_layout_ble_gattc_evt_prim_srvc_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_prim_srvc_disc_rsp_t>())).services as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_prim_srvc_disc_rsp_t>())).services as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12221,9 +11555,7 @@ fn bindgen_test_layout_ble_gattc_evt_rel_disc_rsp_t() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_rel_disc_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_rel_disc_rsp_t>())).count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_rel_disc_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12233,9 +11565,7 @@ fn bindgen_test_layout_ble_gattc_evt_rel_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_rel_disc_rsp_t>())).includes as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_rel_disc_rsp_t>())).includes as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12268,9 +11598,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_disc_rsp_t() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_char_disc_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_disc_rsp_t>())).count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_char_disc_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12280,9 +11608,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_disc_rsp_t>())).chars as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_char_disc_rsp_t>())).chars as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12315,9 +11641,7 @@ fn bindgen_test_layout_ble_gattc_evt_desc_disc_rsp_t() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_desc_disc_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_desc_disc_rsp_t>())).count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_desc_disc_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12327,9 +11651,7 @@ fn bindgen_test_layout_ble_gattc_evt_desc_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_desc_disc_rsp_t>())).descs as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_desc_disc_rsp_t>())).descs as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12381,8 +11703,8 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1>()))
-                .attr_info16 as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1>())).attr_info16 as *const _
+                as usize
         },
         0usize,
         concat!(
@@ -12394,8 +11716,8 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1>()))
-                .attr_info128 as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t__bindgen_ty_1>())).attr_info128 as *const _
+                as usize
         },
         0usize,
         concat!(
@@ -12416,16 +11738,10 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_attr_info_disc_rsp_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_attr_info_disc_rsp_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_attr_info_disc_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12435,10 +11751,7 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).format as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).format as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12448,10 +11761,7 @@ fn bindgen_test_layout_ble_gattc_evt_attr_info_disc_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).info as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_attr_info_disc_rsp_t>())).info as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -12483,9 +11793,7 @@ fn bindgen_test_layout_ble_gattc_handle_value_t() {
         concat!("Alignment of ", stringify!(ble_gattc_handle_value_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_handle_value_t>())).handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_handle_value_t>())).handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12495,9 +11803,7 @@ fn bindgen_test_layout_ble_gattc_handle_value_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_handle_value_t>())).p_value as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_handle_value_t>())).p_value as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -12525,24 +11831,15 @@ fn bindgen_test_layout_ble_gattc_evt_char_val_by_uuid_read_rsp_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>(),
         4usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gattc_evt_char_val_by_uuid_read_rsp_t)
-        )
+        concat!("Size of: ", stringify!(ble_gattc_evt_char_val_by_uuid_read_rsp_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_char_val_by_uuid_read_rsp_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_char_val_by_uuid_read_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12553,8 +11850,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_val_by_uuid_read_rsp_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).value_len
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).value_len as *const _ as usize
         },
         2usize,
         concat!(
@@ -12566,8 +11862,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_val_by_uuid_read_rsp_t() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).handle_value
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_char_val_by_uuid_read_rsp_t>())).handle_value as *const _ as usize
         },
         4usize,
         concat!(
@@ -12605,9 +11900,7 @@ fn bindgen_test_layout_ble_gattc_evt_read_rsp_t() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_read_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_read_rsp_t>())).handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_read_rsp_t>())).handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12617,9 +11910,7 @@ fn bindgen_test_layout_ble_gattc_evt_read_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_read_rsp_t>())).offset as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_read_rsp_t>())).offset as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12669,15 +11960,10 @@ fn bindgen_test_layout_ble_gattc_evt_char_vals_read_rsp_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_char_vals_read_rsp_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_char_vals_read_rsp_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_char_vals_read_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_vals_read_rsp_t>())).len as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_char_vals_read_rsp_t>())).len as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12687,10 +11973,7 @@ fn bindgen_test_layout_ble_gattc_evt_char_vals_read_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_char_vals_read_rsp_t>())).values as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_char_vals_read_rsp_t>())).values as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12729,9 +12012,7 @@ fn bindgen_test_layout_ble_gattc_evt_write_rsp_t() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_write_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12741,9 +12022,7 @@ fn bindgen_test_layout_ble_gattc_evt_write_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).write_op as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).write_op as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -12753,9 +12032,7 @@ fn bindgen_test_layout_ble_gattc_evt_write_rsp_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).offset as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_write_rsp_t>())).offset as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -12869,16 +12146,10 @@ fn bindgen_test_layout_ble_gattc_evt_exchange_mtu_rsp_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_exchange_mtu_rsp_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_exchange_mtu_rsp_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_exchange_mtu_rsp_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_exchange_mtu_rsp_t>())).server_rx_mtu as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_exchange_mtu_rsp_t>())).server_rx_mtu as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -12930,24 +12201,15 @@ fn bindgen_test_layout_ble_gattc_evt_write_cmd_tx_complete_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gattc_evt_write_cmd_tx_complete_t>(),
         1usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gattc_evt_write_cmd_tx_complete_t)
-        )
+        concat!("Size of: ", stringify!(ble_gattc_evt_write_cmd_tx_complete_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gattc_evt_write_cmd_tx_complete_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gattc_evt_write_cmd_tx_complete_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gattc_evt_write_cmd_tx_complete_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_write_cmd_tx_complete_t>())).count as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_write_cmd_tx_complete_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13012,10 +12274,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_gattc_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).prim_srvc_disc_rsp
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).prim_srvc_disc_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13025,10 +12284,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).rel_disc_rsp as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).rel_disc_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13038,10 +12294,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_disc_rsp as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_disc_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13051,10 +12304,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).desc_disc_rsp as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).desc_disc_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13065,8 +12315,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_val_by_uuid_read_rsp
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_val_by_uuid_read_rsp as *const _ as usize
         },
         0usize,
         concat!(
@@ -13077,9 +12326,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).read_rsp as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).read_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13089,10 +12336,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_vals_read_rsp
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).char_vals_read_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13102,10 +12346,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).write_rsp as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).write_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13115,9 +12356,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).hvx as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).hvx as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13127,10 +12366,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).exchange_mtu_rsp as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).exchange_mtu_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13140,9 +12376,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).timeout as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).timeout as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13152,10 +12386,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).attr_info_disc_rsp
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).attr_info_disc_rsp as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13166,8 +12397,7 @@ fn bindgen_test_layout_ble_gattc_evt_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).write_cmd_tx_complete
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gattc_evt_t__bindgen_ty_1>())).write_cmd_tx_complete as *const _ as usize
         },
         0usize,
         concat!(
@@ -13492,11 +12722,7 @@ pub unsafe fn sd_ble_gattc_read(conn_handle: u16, handle: u16, offset: u16) -> u
 #[doc = " @retval ::NRF_ERROR_BUSY Client procedure already in progress."]
 #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
-pub unsafe fn sd_ble_gattc_char_values_read(
-    conn_handle: u16,
-    p_handles: *const u16,
-    handle_count: u16,
-) -> u32 {
+pub unsafe fn sd_ble_gattc_char_values_read(conn_handle: u16, p_handles: *const u16, handle_count: u16) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 162",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13552,10 +12778,7 @@ pub unsafe fn sd_ble_gattc_char_values_read(
 #[doc = "                               Wait for a @ref BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE event and retry."]
 #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
-pub unsafe fn sd_ble_gattc_write(
-    conn_handle: u16,
-    p_write_params: *const ble_gattc_write_params_t,
-) -> u32 {
+pub unsafe fn sd_ble_gattc_write(conn_handle: u16, p_write_params: *const ble_gattc_write_params_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 163",
         inout("r0") to_asm(conn_handle) => ret,
@@ -13745,9 +12968,7 @@ fn bindgen_test_layout_ble_gatts_conn_cfg_t() {
         concat!("Alignment of ", stringify!(ble_gatts_conn_cfg_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_conn_cfg_t>())).hvn_tx_queue_size as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_conn_cfg_t>())).hvn_tx_queue_size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -13846,14 +13067,8 @@ impl ble_gatts_attr_md_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        vlen: u8,
-        vloc: u8,
-        rd_auth: u8,
-        wr_auth: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(vlen: u8, vloc: u8, rd_auth: u8, wr_auth: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let vlen: u8 = unsafe { ::core::mem::transmute(vlen) };
             vlen as u64
@@ -14145,9 +13360,7 @@ fn bindgen_test_layout_ble_gatts_char_md_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_ext_props as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_ext_props as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -14157,9 +13370,7 @@ fn bindgen_test_layout_ble_gatts_char_md_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_md_t>())).p_char_user_desc as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_md_t>())).p_char_user_desc as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -14169,10 +13380,7 @@ fn bindgen_test_layout_ble_gatts_char_md_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_user_desc_max_size as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_user_desc_max_size as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -14182,10 +13390,7 @@ fn bindgen_test_layout_ble_gatts_char_md_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_user_desc_size as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_md_t>())).char_user_desc_size as *const _ as usize },
         10usize,
         concat!(
             "Offset of field: ",
@@ -14205,9 +13410,7 @@ fn bindgen_test_layout_ble_gatts_char_md_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_md_t>())).p_user_desc_md as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_md_t>())).p_user_desc_md as *const _ as usize },
         16usize,
         concat!(
             "Offset of field: ",
@@ -14263,9 +13466,7 @@ fn bindgen_test_layout_ble_gatts_char_handles_t() {
         concat!("Alignment of ", stringify!(ble_gatts_char_handles_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).value_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).value_handle as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14275,10 +13476,7 @@ fn bindgen_test_layout_ble_gatts_char_handles_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).user_desc_handle as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).user_desc_handle as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -14288,9 +13486,7 @@ fn bindgen_test_layout_ble_gatts_char_handles_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).cccd_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).cccd_handle as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -14300,9 +13496,7 @@ fn bindgen_test_layout_ble_gatts_char_handles_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).sccd_handle as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_char_handles_t>())).sccd_handle as *const _ as usize },
         6usize,
         concat!(
             "Offset of field: ",
@@ -14417,10 +13611,7 @@ fn bindgen_test_layout_ble_gatts_authorize_params_t() {
         concat!("Alignment of ", stringify!(ble_gatts_authorize_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).gatt_status as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).gatt_status as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14430,9 +13621,7 @@ fn bindgen_test_layout_ble_gatts_authorize_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).offset as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).offset as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -14442,9 +13631,7 @@ fn bindgen_test_layout_ble_gatts_authorize_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).len as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).len as *const _ as usize },
         6usize,
         concat!(
             "Offset of field: ",
@@ -14454,9 +13641,7 @@ fn bindgen_test_layout_ble_gatts_authorize_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).p_data as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_authorize_params_t>())).p_data as *const _ as usize },
         8usize,
         concat!(
             "Offset of field: ",
@@ -14480,8 +13665,7 @@ impl ble_gatts_authorize_params_t {
     }
     #[inline]
     pub fn new_bitfield_1(update: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let update: u8 = unsafe { ::core::mem::transmute(update) };
             update as u64
@@ -14527,8 +13711,7 @@ fn bindgen_test_layout_ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1>())).read
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1>())).read as *const _ as usize
         },
         0usize,
         concat!(
@@ -14540,8 +13723,7 @@ fn bindgen_test_layout_ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1>())).write
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t__bindgen_ty_1>())).write as *const _ as usize
         },
         0usize,
         concat!(
@@ -14557,24 +13739,15 @@ fn bindgen_test_layout_ble_gatts_rw_authorize_reply_params_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_rw_authorize_reply_params_t>(),
         16usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gatts_rw_authorize_reply_params_t)
-        )
+        concat!("Size of: ", stringify!(ble_gatts_rw_authorize_reply_params_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gatts_rw_authorize_reply_params_t>(),
         4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gatts_rw_authorize_reply_params_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gatts_rw_authorize_reply_params_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t>())).type_ as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t>())).type_ as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14584,10 +13757,7 @@ fn bindgen_test_layout_ble_gatts_rw_authorize_reply_params_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t>())).params as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_rw_authorize_reply_params_t>())).params as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -14630,8 +13800,7 @@ impl ble_gatts_cfg_service_changed_t {
     }
     #[inline]
     pub fn new_bitfield_1(service_changed: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let service_changed: u8 = unsafe { ::core::mem::transmute(service_changed) };
             service_changed as u64
@@ -14664,10 +13833,7 @@ fn bindgen_test_layout_ble_gatts_cfg_attr_tab_size_t() {
         concat!("Alignment of ", stringify!(ble_gatts_cfg_attr_tab_size_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_cfg_attr_tab_size_t>())).attr_tab_size as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_cfg_attr_tab_size_t>())).attr_tab_size as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14700,9 +13866,7 @@ fn bindgen_test_layout_ble_gatts_cfg_t() {
         concat!("Alignment of ", stringify!(ble_gatts_cfg_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_cfg_t>())).service_changed as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_cfg_t>())).service_changed as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14785,9 +13949,7 @@ fn bindgen_test_layout_ble_gatts_evt_write_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_write_t>())).auth_required as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_write_t>())).auth_required as *const _ as usize },
         7usize,
         concat!(
             "Offset of field: ",
@@ -14917,8 +14079,7 @@ fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1>())).read
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1>())).read as *const _ as usize
         },
         0usize,
         concat!(
@@ -14930,8 +14091,7 @@ fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1() {
     );
     assert_eq!(
         unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1>())).write
-                as *const _ as usize
+            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t__bindgen_ty_1>())).write as *const _ as usize
         },
         0usize,
         concat!(
@@ -14947,24 +14107,15 @@ fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_rw_authorize_request_t>(),
         14usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gatts_evt_rw_authorize_request_t)
-        )
+        concat!("Size of: ", stringify!(ble_gatts_evt_rw_authorize_request_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gatts_evt_rw_authorize_request_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gatts_evt_rw_authorize_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gatts_evt_rw_authorize_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t>())).type_ as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t>())).type_ as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -14974,10 +14125,7 @@ fn bindgen_test_layout_ble_gatts_evt_rw_authorize_request_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t>())).request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_rw_authorize_request_t>())).request as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -15004,15 +14152,10 @@ fn bindgen_test_layout_ble_gatts_evt_sys_attr_missing_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_gatts_evt_sys_attr_missing_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gatts_evt_sys_attr_missing_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gatts_evt_sys_attr_missing_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_sys_attr_missing_t>())).hint as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_sys_attr_missing_t>())).hint as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15064,24 +14207,15 @@ fn bindgen_test_layout_ble_gatts_evt_exchange_mtu_request_t() {
     assert_eq!(
         ::core::mem::size_of::<ble_gatts_evt_exchange_mtu_request_t>(),
         2usize,
-        concat!(
-            "Size of: ",
-            stringify!(ble_gatts_evt_exchange_mtu_request_t)
-        )
+        concat!("Size of: ", stringify!(ble_gatts_evt_exchange_mtu_request_t))
     );
     assert_eq!(
         ::core::mem::align_of::<ble_gatts_evt_exchange_mtu_request_t>(),
         2usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_gatts_evt_exchange_mtu_request_t)
-        )
+        concat!("Alignment of ", stringify!(ble_gatts_evt_exchange_mtu_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_exchange_mtu_request_t>())).client_rx_mtu
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_exchange_mtu_request_t>())).client_rx_mtu as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15141,9 +14275,7 @@ fn bindgen_test_layout_ble_gatts_evt_hvn_tx_complete_t() {
         concat!("Alignment of ", stringify!(ble_gatts_evt_hvn_tx_complete_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_hvn_tx_complete_t>())).count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_hvn_tx_complete_t>())).count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15192,9 +14324,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_gatts_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).write as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).write as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15204,10 +14334,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).authorize_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).authorize_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15217,10 +14344,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).sys_attr_missing as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).sys_attr_missing as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15230,9 +14354,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).hvc as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).hvc as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15242,10 +14364,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).exchange_mtu_request
-                as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).exchange_mtu_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15255,9 +14374,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).timeout as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).timeout as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15267,10 +14384,7 @@ fn bindgen_test_layout_ble_gatts_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).hvn_tx_complete as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_gatts_evt_t__bindgen_ty_1>())).hvn_tx_complete as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -15333,11 +14447,7 @@ fn bindgen_test_layout_ble_gatts_evt_t() {
 #[doc = " @retval ::NRF_ERROR_FORBIDDEN Forbidden value supplied, certain UUIDs are reserved for the stack."]
 #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_service_add(
-    type_: u8,
-    p_uuid: *const ble_uuid_t,
-    p_handle: *mut u16,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_service_add(type_: u8, p_uuid: *const ble_uuid_t, p_handle: *mut u16) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 168",
         inout("r0") to_asm(type_) => ret,
@@ -15372,11 +14482,7 @@ pub unsafe fn sd_ble_gatts_service_add(
 #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute not found."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_include_add(
-    service_handle: u16,
-    inc_srvc_handle: u16,
-    p_include_handle: *mut u16,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_include_add(service_handle: u16, inc_srvc_handle: u16, p_include_handle: *mut u16) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 169",
         inout("r0") to_asm(service_handle) => ret,
@@ -15488,11 +14594,7 @@ pub unsafe fn sd_ble_gatts_descriptor_add(
 #[doc = " @retval ::NRF_ERROR_DATA_SIZE Invalid data size(s) supplied, attribute lengths are restricted by @ref BLE_GATTS_ATTR_LENS_MAX."]
 #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_value_set(
-    conn_handle: u16,
-    handle: u16,
-    p_value: *mut ble_gatts_value_t,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_value_set(conn_handle: u16, handle: u16, p_value: *mut ble_gatts_value_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 172",
         inout("r0") to_asm(conn_handle) => ret,
@@ -15526,11 +14628,7 @@ pub unsafe fn sd_ble_gatts_value_set(
 #[doc = " @retval ::BLE_ERROR_INVALID_CONN_HANDLE Invalid connection handle supplied on a system attribute."]
 #[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_value_get(
-    conn_handle: u16,
-    handle: u16,
-    p_value: *mut ble_gatts_value_t,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_value_get(conn_handle: u16, handle: u16, p_value: *mut ble_gatts_value_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 173",
         inout("r0") to_asm(conn_handle) => ret,
@@ -15605,10 +14703,7 @@ pub unsafe fn sd_ble_gatts_value_get(
 #[doc = "                               Wait for a @ref BLE_GATTS_EVT_HVN_TX_COMPLETE event and retry."]
 #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_hvx(
-    conn_handle: u16,
-    p_hvx_params: *const ble_gatts_hvx_params_t,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_hvx(conn_handle: u16, p_hvx_params: *const ble_gatts_hvx_params_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 174",
         inout("r0") to_asm(conn_handle) => ret,
@@ -15654,11 +14749,7 @@ pub unsafe fn sd_ble_gatts_hvx(
 #[doc = " @retval ::BLE_ERROR_GATTS_SYS_ATTR_MISSING System attributes missing, use @ref sd_ble_gatts_sys_attr_set to set them to a known value."]
 #[doc = " @retval ::NRF_ERROR_TIMEOUT There has been a GATT procedure timeout. No new GATT procedure can be performed without reestablishing the connection."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_service_changed(
-    conn_handle: u16,
-    start_handle: u16,
-    end_handle: u16,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_service_changed(conn_handle: u16, start_handle: u16, end_handle: u16) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 175",
         inout("r0") to_asm(conn_handle) => ret,
@@ -15757,12 +14848,7 @@ pub unsafe fn sd_ble_gatts_rw_authorize_reply(
 #[doc = " @retval ::NRF_ERROR_INVALID_DATA Invalid data supplied, the data should be exactly the same as retrieved with @ref sd_ble_gatts_sys_attr_get."]
 #[doc = " @retval ::NRF_ERROR_NO_MEM Not enough memory to complete operation."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_sys_attr_set(
-    conn_handle: u16,
-    p_sys_attr_data: *const u8,
-    len: u16,
-    flags: u32,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_sys_attr_set(conn_handle: u16, p_sys_attr_data: *const u8, len: u16, flags: u32) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 177",
         inout("r0") to_asm(conn_handle) => ret,
@@ -15851,11 +14937,7 @@ pub unsafe fn sd_ble_gatts_initial_user_handle_get(p_handle: *mut u16) -> u32 {
 #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid parameters supplied. Returned when both @c p_uuid and @c p_md are NULL."]
 #[doc = " @retval ::NRF_ERROR_NOT_FOUND Attribute was not found."]
 #[inline(always)]
-pub unsafe fn sd_ble_gatts_attr_get(
-    handle: u16,
-    p_uuid: *mut ble_uuid_t,
-    p_md: *mut ble_gatts_attr_md_t,
-) -> u32 {
+pub unsafe fn sd_ble_gatts_attr_get(handle: u16, p_uuid: *mut ble_uuid_t, p_md: *mut ble_gatts_attr_md_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 180",
         inout("r0") to_asm(handle) => ret,
@@ -16028,9 +15110,7 @@ fn bindgen_test_layout_ble_evt_user_mem_request_t() {
         concat!("Alignment of ", stringify!(ble_evt_user_mem_request_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_user_mem_request_t>())).type_ as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_user_mem_request_t>())).type_ as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16062,9 +15142,7 @@ fn bindgen_test_layout_ble_evt_user_mem_release_t() {
         concat!("Alignment of ", stringify!(ble_evt_user_mem_release_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_user_mem_release_t>())).type_ as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_user_mem_release_t>())).type_ as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16074,9 +15152,7 @@ fn bindgen_test_layout_ble_evt_user_mem_release_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_user_mem_release_t>())).mem_block as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_user_mem_release_t>())).mem_block as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -16117,10 +15193,7 @@ fn bindgen_test_layout_ble_common_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_common_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_evt_t__bindgen_ty_1>())).user_mem_request as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_evt_t__bindgen_ty_1>())).user_mem_request as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16130,10 +15203,7 @@ fn bindgen_test_layout_ble_common_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_evt_t__bindgen_ty_1>())).user_mem_release as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_evt_t__bindgen_ty_1>())).user_mem_release as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16200,12 +15270,7 @@ fn bindgen_test_layout_ble_evt_hdr_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_evt_hdr_t>())).evt_id as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_evt_hdr_t),
-            "::",
-            stringify!(evt_id)
-        )
+        concat!("Offset of field: ", stringify!(ble_evt_hdr_t), "::", stringify!(evt_id))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_evt_hdr_t>())).evt_len as *const _ as usize },
@@ -16253,9 +15318,7 @@ fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_evt_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).common_evt as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).common_evt as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16265,9 +15328,7 @@ fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gap_evt as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gap_evt as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16277,9 +15338,7 @@ fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gattc_evt as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gattc_evt as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16289,9 +15348,7 @@ fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gatts_evt as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).gatts_evt as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16301,9 +15358,7 @@ fn bindgen_test_layout_ble_evt_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).l2cap_evt as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_evt_t__bindgen_ty_1>())).l2cap_evt as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16328,22 +15383,12 @@ fn bindgen_test_layout_ble_evt_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_evt_t>())).header as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_evt_t),
-            "::",
-            stringify!(header)
-        )
+        concat!("Offset of field: ", stringify!(ble_evt_t), "::", stringify!(header))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_evt_t>())).evt as *const _ as usize },
         4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_evt_t),
-            "::",
-            stringify!(evt)
-        )
+        concat!("Offset of field: ", stringify!(ble_evt_t), "::", stringify!(evt))
     );
 }
 #[doc = " @brief Version Information."]
@@ -16390,9 +15435,7 @@ fn bindgen_test_layout_ble_version_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_version_t>())).subversion_number as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_version_t>())).subversion_number as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -16456,13 +15499,8 @@ impl ble_pa_lna_cfg_t {
         }
     }
     #[inline]
-    pub fn new_bitfield_1(
-        enable: u8,
-        active_high: u8,
-        gpio_pin: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+    pub fn new_bitfield_1(enable: u8, active_high: u8, gpio_pin: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enable: u8 = unsafe { ::core::mem::transmute(enable) };
             enable as u64
@@ -16526,9 +15564,7 @@ fn bindgen_test_layout_ble_common_opt_pa_lna_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).lna_cfg as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).lna_cfg as *const _ as usize },
         1usize,
         concat!(
             "Offset of field: ",
@@ -16538,9 +15574,7 @@ fn bindgen_test_layout_ble_common_opt_pa_lna_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).ppi_ch_id_set as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).ppi_ch_id_set as *const _ as usize },
         2usize,
         concat!(
             "Offset of field: ",
@@ -16550,9 +15584,7 @@ fn bindgen_test_layout_ble_common_opt_pa_lna_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).ppi_ch_id_clr as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).ppi_ch_id_clr as *const _ as usize },
         3usize,
         concat!(
             "Offset of field: ",
@@ -16562,9 +15594,7 @@ fn bindgen_test_layout_ble_common_opt_pa_lna_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).gpiote_ch_id as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_opt_pa_lna_t>())).gpiote_ch_id as *const _ as usize },
         4usize,
         concat!(
             "Offset of field: ",
@@ -16615,8 +15645,7 @@ impl ble_common_opt_conn_evt_ext_t {
     }
     #[inline]
     pub fn new_bitfield_1(enable: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enable: u8 = unsafe { ::core::mem::transmute(enable) };
             enable as u64
@@ -16652,10 +15681,7 @@ fn bindgen_test_layout_ble_common_opt_extended_rc_cal_t() {
     assert_eq!(
         ::core::mem::align_of::<ble_common_opt_extended_rc_cal_t>(),
         1usize,
-        concat!(
-            "Alignment of ",
-            stringify!(ble_common_opt_extended_rc_cal_t)
-        )
+        concat!("Alignment of ", stringify!(ble_common_opt_extended_rc_cal_t))
     );
 }
 impl ble_common_opt_extended_rc_cal_t {
@@ -16672,8 +15698,7 @@ impl ble_common_opt_extended_rc_cal_t {
     }
     #[inline]
     pub fn new_bitfield_1(enable: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> =
-            Default::default();
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
             let enable: u8 = unsafe { ::core::mem::transmute(enable) };
             enable as u64
@@ -16726,9 +15751,7 @@ fn bindgen_test_layout_ble_common_opt_t() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_opt_t>())).extended_rc_cal as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_opt_t>())).extended_rc_cal as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16763,22 +15786,12 @@ fn bindgen_test_layout_ble_opt_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_opt_t>())).common_opt as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_opt_t),
-            "::",
-            stringify!(common_opt)
-        )
+        concat!("Offset of field: ", stringify!(ble_opt_t), "::", stringify!(common_opt))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_opt_t>())).gap_opt as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_opt_t),
-            "::",
-            stringify!(gap_opt)
-        )
+        concat!("Offset of field: ", stringify!(ble_opt_t), "::", stringify!(gap_opt))
     );
 }
 #[doc = "@brief BLE connection configuration type, wrapping the module specific configurations, set with"]
@@ -16836,10 +15849,7 @@ fn bindgen_test_layout_ble_conn_cfg_t__bindgen_ty_1() {
         concat!("Alignment of ", stringify!(ble_conn_cfg_t__bindgen_ty_1))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gap_conn_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gap_conn_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16849,10 +15859,7 @@ fn bindgen_test_layout_ble_conn_cfg_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gattc_conn_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gattc_conn_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16862,10 +15869,7 @@ fn bindgen_test_layout_ble_conn_cfg_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gatts_conn_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gatts_conn_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16875,10 +15879,7 @@ fn bindgen_test_layout_ble_conn_cfg_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gatt_conn_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).gatt_conn_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16888,10 +15889,7 @@ fn bindgen_test_layout_ble_conn_cfg_t__bindgen_ty_1() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).l2cap_conn_cfg as *const _
-                as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_conn_cfg_t__bindgen_ty_1>())).l2cap_conn_cfg as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -16958,9 +15956,7 @@ fn bindgen_test_layout_ble_common_cfg_vs_uuid_t() {
         concat!("Alignment of ", stringify!(ble_common_cfg_vs_uuid_t))
     );
     assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<ble_common_cfg_vs_uuid_t>())).vs_uuid_count as *const _ as usize
-        },
+        unsafe { &(*(::core::ptr::null::<ble_common_cfg_vs_uuid_t>())).vs_uuid_count as *const _ as usize },
         0usize,
         concat!(
             "Offset of field: ",
@@ -17030,42 +16026,22 @@ fn bindgen_test_layout_ble_cfg_t() {
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_cfg_t>())).conn_cfg as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_cfg_t),
-            "::",
-            stringify!(conn_cfg)
-        )
+        concat!("Offset of field: ", stringify!(ble_cfg_t), "::", stringify!(conn_cfg))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_cfg_t>())).common_cfg as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_cfg_t),
-            "::",
-            stringify!(common_cfg)
-        )
+        concat!("Offset of field: ", stringify!(ble_cfg_t), "::", stringify!(common_cfg))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_cfg_t>())).gap_cfg as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_cfg_t),
-            "::",
-            stringify!(gap_cfg)
-        )
+        concat!("Offset of field: ", stringify!(ble_cfg_t), "::", stringify!(gap_cfg))
     );
     assert_eq!(
         unsafe { &(*(::core::ptr::null::<ble_cfg_t>())).gatts_cfg as *const _ as usize },
         0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_cfg_t),
-            "::",
-            stringify!(gatts_cfg)
-        )
+        concat!("Offset of field: ", stringify!(ble_cfg_t), "::", stringify!(gatts_cfg))
     );
 }
 
@@ -17293,11 +16269,7 @@ pub unsafe fn sd_ble_uuid_vs_remove(p_uuid_type: *mut u8) -> u32 {
 #[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Invalid UUID length."]
 #[doc = " @retval ::NRF_ERROR_NOT_FOUND For a 128-bit UUID, no match in the populated table of UUIDs."]
 #[inline(always)]
-pub unsafe fn sd_ble_uuid_decode(
-    uuid_le_len: u8,
-    p_uuid_le: *const u8,
-    p_uuid: *mut ble_uuid_t,
-) -> u32 {
+pub unsafe fn sd_ble_uuid_decode(uuid_le_len: u8, p_uuid_le: *const u8, p_uuid: *mut ble_uuid_t) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 99",
         inout("r0") to_asm(uuid_le_len) => ret,
@@ -17321,11 +16293,7 @@ pub unsafe fn sd_ble_uuid_decode(
 #[doc = " @retval ::NRF_ERROR_INVALID_ADDR Invalid pointer supplied."]
 #[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid UUID type."]
 #[inline(always)]
-pub unsafe fn sd_ble_uuid_encode(
-    p_uuid: *const ble_uuid_t,
-    p_uuid_le_len: *mut u8,
-    p_uuid_le: *mut u8,
-) -> u32 {
+pub unsafe fn sd_ble_uuid_encode(p_uuid: *const ble_uuid_t, p_uuid_le_len: *mut u8, p_uuid_le: *mut u8) -> u32 {
     let ret: u32;
     core::arch::asm!("svc 100",
         inout("r0") to_asm(p_uuid) => ret,

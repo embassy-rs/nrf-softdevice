@@ -1,17 +1,12 @@
-use regex::{Captures, Regex};
 use std::collections::HashMap;
-use std::env;
 use std::fmt::Write;
-use std::fs;
 use std::path::PathBuf;
+use std::{env, fs};
+
+use regex::{Captures, Regex};
 use walkdir::WalkDir;
 
-pub fn gen_bindings(
-    tmp_dir: &PathBuf,
-    src_dir: &PathBuf,
-    dst: &PathBuf,
-    mut f: impl FnMut(String) -> String,
-) {
+pub fn gen_bindings(tmp_dir: &PathBuf, src_dir: &PathBuf, dst: &PathBuf, mut f: impl FnMut(String) -> String) {
     let mut wrapper = String::new();
 
     for entry in WalkDir::new(src_dir)
@@ -29,12 +24,7 @@ pub fn gen_bindings(
             let data = f(data);
             fs::write(tmp_dir.join(entry.file_name()), data.as_bytes()).unwrap();
 
-            writeln!(
-                &mut wrapper,
-                "#include \"{}\"",
-                entry.file_name().to_string_lossy()
-            )
-            .unwrap();
+            writeln!(&mut wrapper, "#include \"{}\"", entry.file_name().to_string_lossy()).unwrap();
         }
     }
     fs::write(tmp_dir.join("nrf.h"), &[]).unwrap();
@@ -70,7 +60,10 @@ fn main() {
     fs::create_dir_all(&tmp_dir).unwrap();
 
     gen_bindings(&tmp_dir, &src_dir, &tmp_bindings_path, |data| {
-        let re = Regex::new(r"SVCALL\((?P<svc>[A-Za-z0-9_]+),\s*(?P<ret>[A-Za-z0-9_]+),\s*(?P<name>[A-Za-z0-9_]+)\((?P<args>.*)\)\);").unwrap();
+        let re = Regex::new(
+            r"SVCALL\((?P<svc>[A-Za-z0-9_]+),\s*(?P<ret>[A-Za-z0-9_]+),\s*(?P<name>[A-Za-z0-9_]+)\((?P<args>.*)\)\);",
+        )
+        .unwrap();
         re.replace_all(&data, "uint32_t __svc_$name = $svc;").into()
     });
 
@@ -92,7 +85,10 @@ fn main() {
         // they're used inside enums :(
         let data = data.replace("[1];", "[0];");
 
-        let re = Regex::new(r"SVCALL\((?P<svc>[A-Za-z0-9_]+),\s*(?P<ret>[A-Za-z0-9_]+),\s*(?P<name>[A-Za-z0-9_]+)\((?P<args>.*)\)\);").unwrap();
+        let re = Regex::new(
+            r"SVCALL\((?P<svc>[A-Za-z0-9_]+),\s*(?P<ret>[A-Za-z0-9_]+),\s*(?P<name>[A-Za-z0-9_]+)\((?P<args>.*)\)\);",
+        )
+        .unwrap();
         re.replace_all(&data, "$ret $name($args);").into()
     });
 
@@ -143,12 +139,7 @@ fn main() {
             } else {
                 let arg = arg_names[r];
                 let out = if r == 0 { "ret" } else { "_" };
-                writeln!(
-                    &mut res,
-                    "        inout(\"r{}\") to_asm({}) => {},",
-                    r, arg, out
-                )
-                .unwrap();
+                writeln!(&mut res, "        inout(\"r{}\") to_asm({}) => {},", r, arg, out).unwrap();
             }
         }
         writeln!(&mut res, "        lateout(\"r12\") _,").unwrap();

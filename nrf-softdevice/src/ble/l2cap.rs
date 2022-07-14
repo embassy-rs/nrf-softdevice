@@ -1,15 +1,13 @@
 //! Link-Layer Control and Adaptation Protocol
 
 use core::marker::PhantomData;
-use core::ptr;
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicBool, Ordering};
-use core::u16;
+use core::{ptr, u16};
 
 use crate::ble::*;
-use crate::raw;
 use crate::util::{get_union_field, Portal};
-use crate::{RawError, Softdevice};
+use crate::{raw, RawError, Softdevice};
 
 #[cfg(feature = "ble-l2cap-credit-wrokaround")]
 fn credit_hack_refill(conn: u16, cid: u16) {
@@ -33,10 +31,7 @@ fn credit_hack_refill(conn: u16, cid: u16) {
 
     let ret = unsafe { raw::sd_ble_l2cap_ch_flow_control(conn, cid, CREDITS_MAX, ptr::null_mut()) };
     if let Err(err) = RawError::convert(ret) {
-        warn!(
-            "sd_ble_l2cap_ch_flow_control credits=CREDITS_MAX err {:?}",
-            err
-        );
+        warn!("sd_ble_l2cap_ch_flow_control credits=CREDITS_MAX err {:?}", err);
         return;
     }
 
@@ -162,17 +157,10 @@ impl<P: Packet> L2cap<P> {
             })
         }
 
-        Self {
-            _private: PhantomData,
-        }
+        Self { _private: PhantomData }
     }
 
-    pub async fn setup(
-        &self,
-        conn: &Connection,
-        config: &Config,
-        psm: u16,
-    ) -> Result<Channel<P>, SetupError> {
+    pub async fn setup(&self, conn: &Connection, config: &Config, psm: u16) -> Result<Channel<P>, SetupError> {
         let sd = unsafe { Softdevice::steal() };
 
         let conn_handle = conn.with_state(|state| state.check_connected())?;
@@ -199,9 +187,7 @@ impl<P: Packet> L2cap<P> {
         portal(conn_handle)
             .wait_once(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
-                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                        return Err(SetupError::Disconnected)
-                    }
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(SetupError::Disconnected),
                     raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => {
                         // It is possible to get L2CAP_EVT_CH_RELEASED for the
                         // "half-setup" channel if the conn gets disconnected while
@@ -216,12 +202,8 @@ impl<P: Packet> L2cap<P> {
                         let _ = config.credits;
                         #[cfg(not(feature = "ble-l2cap-credit-wrokaround"))]
                         if config.credits != 1 {
-                            let ret = raw::sd_ble_l2cap_ch_flow_control(
-                                conn_handle,
-                                cid,
-                                config.credits,
-                                ptr::null_mut(),
-                            );
+                            let ret =
+                                raw::sd_ble_l2cap_ch_flow_control(conn_handle, cid, config.credits, ptr::null_mut());
                             if let Err(err) = RawError::convert(ret) {
                                 warn!("sd_ble_l2cap_ch_flow_control err {:?}", err);
                                 return Err(err.into());
@@ -245,12 +227,7 @@ impl<P: Packet> L2cap<P> {
             .await
     }
 
-    pub async fn listen(
-        &self,
-        conn: &Connection,
-        config: &Config,
-        psm: u16,
-    ) -> Result<Channel<P>, SetupError> {
+    pub async fn listen(&self, conn: &Connection, config: &Config, psm: u16) -> Result<Channel<P>, SetupError> {
         self.listen_with(conn, config, move |got_psm| got_psm == psm)
             .await
             .map(|(_, ch)| ch)
@@ -268,9 +245,7 @@ impl<P: Packet> L2cap<P> {
         portal(conn_handle)
             .wait_many(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
-                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                        return Some(Err(SetupError::Disconnected))
-                    }
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(SetupError::Disconnected)),
                     raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_SETUP_REQUEST => {
                         let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
                         let evt = &l2cap_evt.params.ch_setup_request;
@@ -379,9 +354,7 @@ impl<P: Packet> Channel<P> {
 
         let ret = unsafe { raw::sd_ble_l2cap_ch_tx(conn_handle, self.cid, &data) };
         match RawError::convert(ret) {
-            Err(RawError::Resources) => {
-                Err(TxError::TxQueueFull(unsafe { P::from_raw_parts(ptr, len) }))
-            }
+            Err(RawError::Resources) => Err(TxError::TxQueueFull(unsafe { P::from_raw_parts(ptr, len) })),
             Err(err) => {
                 warn!("sd_ble_l2cap_ch_tx err {:?}", err);
                 // The SD didn't take ownership of the buffer, so it's on us to free it.
@@ -446,9 +419,7 @@ impl<P: Packet> Channel<P> {
             .wait_many(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
                     raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => Some(Err(RxError::Disconnected)),
-                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => {
-                        Some(Err(RxError::Disconnected))
-                    }
+                    raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => Some(Err(RxError::Disconnected)),
                     raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RX => {
                         let l2cap_evt = get_union_field(ble_evt, &(*ble_evt).evt.l2cap_evt);
                         let evt = &l2cap_evt.params.rx;

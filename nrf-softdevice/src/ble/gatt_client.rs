@@ -4,9 +4,8 @@ use heapless::Vec;
 use num_enum::{FromPrimitive, IntoPrimitive};
 
 use crate::ble::*;
-use crate::raw;
 use crate::util::{get_flexarray, get_union_field, Portal};
-use crate::RawError;
+use crate::{raw, RawError};
 
 /// Discovered characteristic
 pub struct Characteristic {
@@ -35,11 +34,7 @@ pub trait Client {
     /// Called by [`discover`] for every discovered characteristic. Implementations must
     /// check if they're interested in the UUID of the characteristic, and save their
     /// handles if needed.
-    fn discovered_characteristic(
-        &mut self,
-        characteristic: &Characteristic,
-        descriptors: &[Descriptor],
-    );
+    fn discovered_characteristic(&mut self, characteristic: &Characteristic, descriptors: &[Descriptor]);
 
     /// Called by [`discover`] at the end of the discovery procedure. Implementations must check
     /// that all required characteristics have been discovered, and return [`DiscoverError::ServiceIncomplete`]
@@ -122,13 +117,9 @@ impl From<RawError> for DiscoverError {
 const DISC_CHARS_MAX: usize = 6;
 const DISC_DESCS_MAX: usize = 6;
 
-pub(crate) async fn discover_service(
-    conn: &Connection,
-    uuid: Uuid,
-) -> Result<raw::ble_gattc_service_t, DiscoverError> {
+pub(crate) async fn discover_service(conn: &Connection, uuid: Uuid) -> Result<raw::ble_gattc_service_t, DiscoverError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
-    let ret =
-        unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
+    let ret = unsafe { raw::sd_ble_gattc_primary_services_discover(conn_handle, 1, uuid.as_raw_ptr()) };
     RawError::convert(ret).map_err(|err| {
         warn!("sd_ble_gattc_primary_services_discover err {:?}", err);
         err
@@ -137,9 +128,7 @@ pub(crate) async fn discover_service(
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Err(DiscoverError::Disconnected)
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
@@ -189,16 +178,13 @@ async fn discover_characteristics(
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Err(DiscoverError::Disconnected)
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
                     let v = get_flexarray(ble_evt, &params.chars, params.count as usize);
-                    let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                        panic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len())
-                    });
+                    let v = Vec::from_slice(v)
+                        .unwrap_or_else(|_| panic!("too many gatt chars, increase DiscCharsMax: {:?}", v.len()));
                     Ok(v)
                 }
                 e => panic!("unexpected event {}", e),
@@ -233,16 +219,13 @@ async fn discover_descriptors(
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Err(DiscoverError::Disconnected)
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_DESC_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
                     let v = get_flexarray(ble_evt, &params.descs, params.count as usize);
-                    let v = Vec::from_slice(v).unwrap_or_else(|_| {
-                        panic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len())
-                    });
+                    let v = Vec::from_slice(v)
+                        .unwrap_or_else(|_| panic!("too many gatt descs, increase DiscDescsMax: {:?}", v.len()));
                     Ok(v)
                 }
                 e => panic!("unexpected event {}", e),
@@ -262,9 +245,7 @@ async fn discover_inner<T: Client>(
 ) -> Result<(), DiscoverError> {
     // Calcuate range of possible descriptors
     let start_handle = curr.handle_value + 1;
-    let end_handle = next
-        .map(|c| c.handle_decl - 1)
-        .unwrap_or(svc.handle_range.end_handle);
+    let end_handle = next.map(|c| c.handle_decl - 1).unwrap_or(svc.handle_range.end_handle);
 
     let characteristic = Characteristic {
         uuid: Uuid::from_raw(curr.uuid),
@@ -306,9 +287,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
     let svc = match discover_service(conn, T::uuid()).await {
-        Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => {
-            Err(DiscoverError::ServiceNotFound)
-        }
+        Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => Err(DiscoverError::ServiceNotFound),
         x => x,
     }?;
 
@@ -380,9 +359,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Some(Err(ReadError::Disconnected))
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(ReadError::Disconnected)),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_READ_RSP => {
                     let gattc_evt = match check_status(ble_evt) {
                         Ok(evt) => evt,
@@ -453,9 +430,7 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Some(Err(WriteError::Disconnected))
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(WriteError::Disconnected)),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_RSP => {
                     match check_status(ble_evt) {
                         Ok(_) => {}
@@ -472,11 +447,7 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
         .await
 }
 
-pub async fn write_without_response(
-    conn: &Connection,
-    handle: u16,
-    buf: &[u8],
-) -> Result<(), WriteError> {
+pub async fn write_without_response(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), WriteError> {
     loop {
         let conn_handle = conn.with_state(|state| state.check_connected())?;
 
@@ -500,9 +471,7 @@ pub async fn write_without_response(
         portal(conn_handle)
             .wait_many(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
-                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                        return Some(Err(WriteError::Disconnected))
-                    }
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(WriteError::Disconnected)),
                     raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => Some(Ok(())),
                     _ => None,
                 }
@@ -538,11 +507,7 @@ impl From<RawError> for TryWriteError {
     }
 }
 
-pub fn try_write_without_response(
-    conn: &Connection,
-    handle: u16,
-    buf: &[u8],
-) -> Result<(), TryWriteError> {
+pub fn try_write_without_response(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), TryWriteError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
     assert!(buf.len() <= u16::MAX as usize);
@@ -563,9 +528,7 @@ pub fn try_write_without_response(
     }
 }
 
-unsafe fn check_status(
-    ble_evt: *const raw::ble_evt_t,
-) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
+unsafe fn check_status(ble_evt: *const raw::ble_evt_t) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
     let gattc_evt = get_union_field(ble_evt, &(*ble_evt).evt.gattc_evt);
     match gattc_evt.gatt_status as u32 {
         raw::BLE_GATT_STATUS_SUCCESS => Ok(gattc_evt),
@@ -633,9 +596,7 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
-                    return Err(MtuExchangeError::Disconnected)
-                }
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(MtuExchangeError::Disconnected),
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => {
                     let gattc_evt = match check_status(ble_evt) {
                         Ok(evt) => evt,

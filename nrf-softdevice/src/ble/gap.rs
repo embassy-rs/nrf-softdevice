@@ -1,7 +1,6 @@
 use crate::ble::*;
-use crate::raw;
 use crate::util::get_union_field;
-use crate::RawError;
+use crate::{raw, RawError};
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
@@ -24,17 +23,12 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 Role::Peripheral => peripheral::ADV_PORTAL.call(ble_evt),
             };
             if !handled {
-                raw::sd_ble_gap_disconnect(
-                    gap_evt.conn_handle,
-                    raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
-                );
+                raw::sd_ble_gap_disconnect(gap_evt.conn_handle, raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _);
             }
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
             trace!("on_disconnected conn_handle={:?}", gap_evt.conn_handle);
-            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                state.on_disconnected(ble_evt)
-            });
+            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| state.on_disconnected(ble_evt));
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_PARAM_UPDATE => {
             let conn_params = gap_evt.params.conn_param_update.conn_params;
@@ -174,18 +168,13 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 }
 
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-pub(crate) unsafe fn do_data_length_update(
-    conn_handle: u16,
-    params: *const raw::ble_gap_data_length_params_t,
-) {
+pub(crate) unsafe fn do_data_length_update(conn_handle: u16, params: *const raw::ble_gap_data_length_params_t) {
     let mut dl_limitation = core::mem::zeroed();
     let ret = raw::sd_ble_gap_data_length_update(conn_handle, params, &mut dl_limitation);
     if let Err(_err) = RawError::convert(ret) {
         warn!("sd_ble_gap_data_length_update err {:?}", _err);
 
-        if dl_limitation.tx_payload_limited_octets != 0
-            || dl_limitation.rx_payload_limited_octets != 0
-        {
+        if dl_limitation.tx_payload_limited_octets != 0 || dl_limitation.rx_payload_limited_octets != 0 {
             warn!(
                 "The requested TX/RX packet length is too long by {:?}/{:?} octets.",
                 dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets

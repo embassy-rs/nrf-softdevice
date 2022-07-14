@@ -6,9 +6,9 @@
 mod example_common;
 
 use core::mem;
+
 use cortex_m_rt::entry;
-use defmt::info;
-use defmt::*;
+use defmt::{info, *};
 use embassy::executor::Executor;
 use embassy::util::Forever;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
@@ -65,11 +65,7 @@ pub struct DeviceInformation {
 pub struct DeviceInformationService {}
 
 impl DeviceInformationService {
-    pub fn new(
-        sd: &mut Softdevice,
-        pnp_id: &PnPID,
-        info: DeviceInformation,
-    ) -> Result<Self, RegisterError> {
+    pub fn new(sd: &mut Softdevice, pnp_id: &PnPID, info: DeviceInformation) -> Result<Self, RegisterError> {
         let mut sb = ServiceBuilder::new(sd, DEVICE_INFORMATION)?;
 
         Self::add_pnp_characteristic(&mut sb, pnp_id)?;
@@ -99,17 +95,10 @@ impl DeviceInformationService {
         }
     }
 
-    fn add_pnp_characteristic(
-        sb: &mut ServiceBuilder,
-        pnp_id: &PnPID,
-    ) -> Result<CharacteristicHandles, RegisterError> {
+    fn add_pnp_characteristic(sb: &mut ServiceBuilder, pnp_id: &PnPID) -> Result<CharacteristicHandles, RegisterError> {
         // SAFETY: `PnPID` is `repr(C, packed)` so viewing it as an immutable slice of bytes is safe.
-        let val = unsafe {
-            core::slice::from_raw_parts(
-                pnp_id as *const _ as *const u8,
-                core::mem::size_of::<PnPID>(),
-            )
-        };
+        let val =
+            unsafe { core::slice::from_raw_parts(pnp_id as *const _ as *const u8, core::mem::size_of::<PnPID>()) };
 
         let attr = Attribute::new(val);
         let md = Metadata::new(Properties::new().read());
@@ -128,8 +117,7 @@ impl BatteryService {
 
         let attr = Attribute::new(&[0u8]);
         let metadata = Metadata::new(Properties::new().read().notify());
-        let characteristic_builder =
-            service_builder.add_characteristic(BATTERY_LEVEL, attr, metadata)?;
+        let characteristic_builder = service_builder.add_characteristic(BATTERY_LEVEL, attr, metadata)?;
         let characteristic_handles = characteristic_builder.build();
 
         let _service_handle = service_builder.build();
@@ -146,18 +134,10 @@ impl BatteryService {
         Ok(buf[0])
     }
 
-    pub fn battery_level_set(
-        &self,
-        sd: &Softdevice,
-        val: u8,
-    ) -> Result<(), gatt_server::SetValueError> {
+    pub fn battery_level_set(&self, sd: &Softdevice, val: u8) -> Result<(), gatt_server::SetValueError> {
         gatt_server::set_value(sd, self.value_handle, &[val])
     }
-    pub fn battery_level_notify(
-        &self,
-        conn: &Connection,
-        val: u8,
-    ) -> Result<(), gatt_server::NotifyValueError> {
+    pub fn battery_level_notify(&self, conn: &Connection, val: u8) -> Result<(), gatt_server::NotifyValueError> {
         gatt_server::notify_value(conn, self.value_handle, &[val])
     }
 
@@ -221,10 +201,7 @@ async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data,
-            scan_data,
-        };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
@@ -254,9 +231,7 @@ fn main() -> ! {
             event_length: 24,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
-            attr_tab_size: 32768,
-        }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -269,9 +244,7 @@ fn main() -> ! {
             current_len: 9,
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
+            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
         }),
         ..Default::default()
     };

@@ -7,14 +7,13 @@ mod example_common;
 
 use core::mem;
 use core::ptr::NonNull;
+
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy::executor::Executor;
 use embassy::util::Forever;
-
 use nrf_softdevice::ble::{l2cap, peripheral};
-use nrf_softdevice::{ble, RawError};
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{ble, raw, RawError, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
@@ -42,10 +41,7 @@ async fn bluetooth_task(sd: &'static Softdevice) {
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data,
-            scan_data,
-        };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
@@ -123,12 +119,8 @@ fn main() -> ! {
         conn_gattc: Some(raw::ble_gattc_conn_cfg_t {
             write_cmd_tx_queue_size: 0,
         }),
-        conn_gatts: Some(raw::ble_gatts_conn_cfg_t {
-            hvn_tx_queue_size: 0,
-        }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
-            attr_tab_size: 1024,
-        }),
+        conn_gatts: Some(raw::ble_gatts_conn_cfg_t { hvn_tx_queue_size: 0 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 1024 }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 5,
@@ -141,9 +133,7 @@ fn main() -> ! {
             current_len: 9,
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
-            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(
-                raw::BLE_GATTS_VLOC_STACK as u8,
-            ),
+            _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
         }),
         conn_l2cap: Some(raw::ble_l2cap_conn_cfg_t {
             ch_count: 1,

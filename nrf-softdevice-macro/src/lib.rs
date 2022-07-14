@@ -2,11 +2,12 @@
 
 extern crate proc_macro;
 
+use std::iter::FromIterator;
+
 use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
-use std::iter::FromIterator;
 use syn::spanned::Spanned;
 
 mod uuid;
@@ -58,11 +59,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
             return TokenStream::new();
         }
     };
-    let fields = struct_fields
-        .named
-        .iter()
-        .cloned()
-        .collect::<Vec<syn::Field>>();
+    let fields = struct_fields.named.iter().cloned().collect::<Vec<syn::Field>>();
 
     let struct_name = struc.ident.clone();
     let event_enum_name = format_ident!("{}Event", struct_name);
@@ -82,10 +79,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
         ));
 
         if let syn::Type::Path(p) = &field.ty {
-            let name_pascal = format_ident!(
-                "{}",
-                inflector::cases::pascalcase::to_pascal_case(&name.to_string())
-            );
+            let name_pascal = format_ident!("{}", inflector::cases::pascalcase::to_pascal_case(&name.to_string()));
             let event_enum_ty = p.path.get_ident().unwrap();
             let event_enum_variant = format_ident!("{}Event", event_enum_ty);
             code_event_enum.extend(quote_spanned!(span=>
@@ -160,17 +154,14 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             return TokenStream::new();
         }
     };
-    let mut fields = struct_fields
-        .named
-        .iter()
-        .cloned()
-        .collect::<Vec<syn::Field>>();
+    let mut fields = struct_fields.named.iter().cloned().collect::<Vec<syn::Field>>();
     let mut err = None;
     fields.retain(|field| {
-        if let Some(attr) = field.attrs.iter().find(|attr| {
-            attr.path.segments.len() == 1
-                && attr.path.segments.first().unwrap().ident == "characteristic"
-        }) {
+        if let Some(attr) = field
+            .attrs
+            .iter()
+            .find(|attr| attr.path.segments.len() == 1 && attr.path.segments.first().unwrap().ident == "characteristic")
+        {
             let args = attr.parse_meta().unwrap();
 
             let args = match CharacteristicArgs::from_meta(&args) {
@@ -450,17 +441,14 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             return TokenStream::new();
         }
     };
-    let mut fields = struct_fields
-        .named
-        .iter()
-        .cloned()
-        .collect::<Vec<syn::Field>>();
+    let mut fields = struct_fields.named.iter().cloned().collect::<Vec<syn::Field>>();
     let mut err = None;
     fields.retain(|field| {
-        if let Some(attr) = field.attrs.iter().find(|attr| {
-            attr.path.segments.len() == 1
-                && attr.path.segments.first().unwrap().ident == "characteristic"
-        }) {
+        if let Some(attr) = field
+            .attrs
+            .iter()
+            .find(|attr| attr.path.segments.len() == 1 && attr.path.segments.first().unwrap().ident == "characteristic")
+        {
             let args = attr.parse_meta().unwrap();
 
             let args = match CharacteristicArgs::from_meta(&args) {

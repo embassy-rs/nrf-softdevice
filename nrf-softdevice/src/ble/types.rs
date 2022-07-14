@@ -1,7 +1,6 @@
 use core::mem;
 
-use crate::raw;
-use crate::RawError;
+use crate::{raw, RawError};
 
 #[repr(transparent)]
 #[derive(Copy, Clone)]

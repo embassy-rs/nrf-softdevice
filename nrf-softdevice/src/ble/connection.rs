@@ -1,12 +1,10 @@
-use core::cell::Cell;
-use core::cell::UnsafeCell;
+use core::cell::{Cell, UnsafeCell};
 use core::iter::FusedIterator;
 
 use raw::ble_gap_conn_params_t;
 
 use crate::ble::types::{Address, AddressType, Role};
-use crate::raw;
-use crate::RawError;
+use crate::{raw, RawError};
 
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 const BLE_GAP_DATA_LENGTH_DEFAULT: u8 = 27; //  The stack's default data length. <27-251>
@@ -136,12 +134,8 @@ impl ConnectionState {
             return Ok(());
         }
 
-        let ret = unsafe {
-            raw::sd_ble_gap_disconnect(
-                conn_handle,
-                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8,
-            )
-        };
+        let ret =
+            unsafe { raw::sd_ble_gap_disconnect(conn_handle, raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as u8) };
         unwrap!(RawError::convert(ret), "sd_ble_gap_disconnect");
 
         self.disconnecting = true;
@@ -149,10 +143,7 @@ impl ConnectionState {
     }
 
     pub(crate) fn on_disconnected(&mut self, _ble_evt: *const raw::ble_evt_t) {
-        let conn_handle = unwrap!(
-            self.conn_handle,
-            "bug: on_disconnected when already disconnected"
-        );
+        let conn_handle = unwrap!(self.conn_handle, "bug: on_disconnected when already disconnected");
 
         let ibh = index_by_handle(conn_handle);
         let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
@@ -201,10 +192,7 @@ impl Drop for Connection {
 impl Clone for Connection {
     fn clone(&self) -> Self {
         self.with_state(|state| {
-            state.refcount = unwrap!(
-                state.refcount.checked_add(1),
-                "Too many references to same connection"
-            );
+            state.refcount = unwrap!(state.refcount.checked_add(1), "Too many references to same connection");
         });
 
         Self { index: self.index }
@@ -306,10 +294,7 @@ impl Connection {
     /// For central connections, this will initiate a Link Layer connection parameter update procedure.
     /// For peripheral connections, this will send the corresponding L2CAP request to the central. It is then
     /// up to the central to accept or deny the request.
-    pub fn set_conn_params(
-        &self,
-        conn_params: ble_gap_conn_params_t,
-    ) -> Result<(), SetConnParamsError> {
+    pub fn set_conn_params(&self, conn_params: ble_gap_conn_params_t) -> Result<(), SetConnParamsError> {
         let conn_handle = self.with_state(|state| state.check_connected())?;
         let ret = unsafe { raw::sd_ble_gap_conn_param_update(conn_handle, &conn_params) };
         if let Err(err) = RawError::convert(ret) {
@@ -383,10 +368,8 @@ impl Iterator for ConnectionIter {
                     let state = &mut *s.get();
                     if state.conn_handle.is_some() {
                         let index = (n + i) as u8;
-                        state.refcount = unwrap!(
-                            state.refcount.checked_add(1),
-                            "Too many references to same connection"
-                        );
+                        state.refcount =
+                            unwrap!(state.refcount.checked_add(1), "Too many references to same connection");
                         self.0 = index + 1;
                         return Some(Connection { index });
                     }
@@ -408,10 +391,7 @@ impl FusedIterator for ConnectionIter {}
 const DUMMY_STATE: UnsafeCell<ConnectionState> = UnsafeCell::new(ConnectionState::dummy());
 static mut STATES: [UnsafeCell<ConnectionState>; CONNS_MAX] = [DUMMY_STATE; CONNS_MAX];
 
-pub(crate) fn with_state_by_conn_handle<T>(
-    conn_handle: u16,
-    f: impl FnOnce(&mut ConnectionState) -> T,
-) -> T {
+pub(crate) fn with_state_by_conn_handle<T>(conn_handle: u16, f: impl FnOnce(&mut ConnectionState) -> T) -> T {
     let index = unwrap!(
         index_by_handle(conn_handle).get(),
         "bug: with_state_by_conn_handle on conn_handle that has no state"
