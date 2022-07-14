@@ -196,6 +196,13 @@ static HEADER: &str = r#"
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#![allow(
+    clippy::fn_to_numeric_cast,
+    clippy::missing_safety_doc,
+    clippy::redundant_static_lifetimes,
+    clippy::useless_transmute
+)]
+
 pub type c_schar = i8;
 pub type c_uchar = u8;
 pub type c_char = u8;

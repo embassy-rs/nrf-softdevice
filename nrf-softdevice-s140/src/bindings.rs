@@ -36,6 +36,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#![allow(
+    clippy::fn_to_numeric_cast,
+    clippy::missing_safety_doc,
+    clippy::redundant_static_lifetimes,
+    clippy::useless_transmute
+)]
+
 pub type c_schar = i8;
 pub type c_uchar = u8;
 pub type c_char = u8;
@@ -305,9 +312,6 @@ pub const NRF_ERROR_INVALID_ADDR: u32 = 16;
 pub const NRF_ERROR_BUSY: u32 = 17;
 pub const NRF_ERROR_CONN_COUNT: u32 = 18;
 pub const NRF_ERROR_RESOURCES: u32 = 19;
-pub const NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN: u32 = 4096;
-pub const NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION: u32 = 4097;
-pub const NRF_ERROR_SDM_INCORRECT_CLENR0: u32 = 4098;
 pub const BLE_ERROR_NOT_ENABLED: u32 = 12289;
 pub const BLE_ERROR_INVALID_CONN_HANDLE: u32 = 12290;
 pub const BLE_ERROR_INVALID_ATTR_HANDLE: u32 = 12291;
@@ -318,65 +322,6 @@ pub const NRF_L2CAP_ERR_BASE: u32 = 12544;
 pub const NRF_GAP_ERR_BASE: u32 = 12800;
 pub const NRF_GATTC_ERR_BASE: u32 = 13056;
 pub const NRF_GATTS_ERR_BASE: u32 = 13312;
-pub const NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN: u32 = 8192;
-pub const NRF_ERROR_SOC_NVIC_INTERRUPT_NOT_AVAILABLE: u32 = 8193;
-pub const NRF_ERROR_SOC_NVIC_INTERRUPT_PRIORITY_NOT_ALLOWED: u32 = 8194;
-pub const NRF_ERROR_SOC_NVIC_SHOULD_NOT_RETURN: u32 = 8195;
-pub const NRF_ERROR_SOC_POWER_MODE_UNKNOWN: u32 = 8196;
-pub const NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN: u32 = 8197;
-pub const NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN: u32 = 8198;
-pub const NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES: u32 = 8199;
-pub const NRF_ERROR_SOC_PPI_INVALID_CHANNEL: u32 = 8200;
-pub const NRF_ERROR_SOC_PPI_INVALID_GROUP: u32 = 8201;
-pub const SOC_SVC_BASE: u32 = 32;
-pub const SOC_SVC_BASE_NOT_AVAILABLE: u32 = 44;
-pub const NRF_RADIO_NOTIFICATION_INACTIVE_GUARANTEED_TIME_US: u32 = 62;
-pub const NRF_RADIO_MINIMUM_TIMESLOT_LENGTH_EXTENSION_TIME_US: u32 = 200;
-pub const NRF_RADIO_MAX_EXTENSION_PROCESSING_TIME_US: u32 = 20;
-pub const NRF_RADIO_MIN_EXTENSION_MARGIN_US: u32 = 82;
-pub const SOC_ECB_KEY_LENGTH: u32 = 16;
-pub const SOC_ECB_CLEARTEXT_LENGTH: u32 = 16;
-pub const SOC_ECB_CIPHERTEXT_LENGTH: u32 = 16;
-pub const NRF_RADIO_LENGTH_MIN_US: u32 = 100;
-pub const NRF_RADIO_LENGTH_MAX_US: u32 = 100000;
-pub const NRF_RADIO_DISTANCE_MAX_US: u32 = 127999999;
-pub const NRF_RADIO_EARLIEST_TIMEOUT_MAX_US: u32 = 127999999;
-pub const NRF_RADIO_START_JITTER_US: u32 = 2;
-pub const SD_MAJOR_VERSION: u32 = 7;
-pub const SD_MINOR_VERSION: u32 = 0;
-pub const SD_BUGFIX_VERSION: u32 = 1;
-pub const SD_VARIANT_ID: u32 = 140;
-pub const SD_VERSION: u32 = 7000001;
-pub const SDM_SVC_BASE: u32 = 16;
-pub const SD_UNIQUE_STR_SIZE: u32 = 20;
-pub const SDM_INFO_FIELD_INVALID: u32 = 0;
-pub const SOFTDEVICE_INFO_STRUCT_OFFSET: u32 = 8192;
-pub const SD_INFO_STRUCT_SIZE_OFFSET: u32 = 8192;
-pub const SD_SIZE_OFFSET: u32 = 8200;
-pub const SD_FWID_OFFSET: u32 = 8204;
-pub const SD_ID_OFFSET: u32 = 8208;
-pub const SD_VERSION_OFFSET: u32 = 8212;
-pub const SD_UNIQUE_STR_OFFSET: u32 = 8216;
-pub const SD_FLASH_SIZE: u32 = 155648;
-pub const NRF_FAULT_ID_SD_RANGE_START: u32 = 0;
-pub const NRF_FAULT_ID_APP_RANGE_START: u32 = 4096;
-pub const NRF_FAULT_ID_SD_ASSERT: u32 = 1;
-pub const NRF_FAULT_ID_APP_MEMACC: u32 = 4097;
-pub const NRF_CLOCK_LF_ACCURACY_250_PPM: u32 = 0;
-pub const NRF_CLOCK_LF_ACCURACY_500_PPM: u32 = 1;
-pub const NRF_CLOCK_LF_ACCURACY_150_PPM: u32 = 2;
-pub const NRF_CLOCK_LF_ACCURACY_100_PPM: u32 = 3;
-pub const NRF_CLOCK_LF_ACCURACY_75_PPM: u32 = 4;
-pub const NRF_CLOCK_LF_ACCURACY_50_PPM: u32 = 5;
-pub const NRF_CLOCK_LF_ACCURACY_30_PPM: u32 = 6;
-pub const NRF_CLOCK_LF_ACCURACY_20_PPM: u32 = 7;
-pub const NRF_CLOCK_LF_ACCURACY_10_PPM: u32 = 8;
-pub const NRF_CLOCK_LF_ACCURACY_5_PPM: u32 = 9;
-pub const NRF_CLOCK_LF_ACCURACY_2_PPM: u32 = 10;
-pub const NRF_CLOCK_LF_ACCURACY_1_PPM: u32 = 11;
-pub const NRF_CLOCK_LF_SRC_RC: u32 = 0;
-pub const NRF_CLOCK_LF_SRC_XTAL: u32 = 1;
-pub const NRF_CLOCK_LF_SRC_SYNTH: u32 = 2;
 pub const BLE_HCI_STATUS_CODE_SUCCESS: u32 = 0;
 pub const BLE_HCI_STATUS_CODE_UNKNOWN_BTLE_COMMAND: u32 = 1;
 pub const BLE_HCI_STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER: u32 = 2;
@@ -528,89 +473,6 @@ pub const BLE_APPEARANCE_OUTDOOR_SPORTS_ACT_LOC_DISP: u32 = 5185;
 pub const BLE_APPEARANCE_OUTDOOR_SPORTS_ACT_LOC_AND_NAV_DISP: u32 = 5186;
 pub const BLE_APPEARANCE_OUTDOOR_SPORTS_ACT_LOC_POD: u32 = 5187;
 pub const BLE_APPEARANCE_OUTDOOR_SPORTS_ACT_LOC_AND_NAV_POD: u32 = 5188;
-pub const BLE_GATT_ATT_MTU_DEFAULT: u32 = 23;
-pub const BLE_GATT_HANDLE_INVALID: u32 = 0;
-pub const BLE_GATT_HANDLE_START: u32 = 1;
-pub const BLE_GATT_HANDLE_END: u32 = 65535;
-pub const BLE_GATT_TIMEOUT_SRC_PROTOCOL: u32 = 0;
-pub const BLE_GATT_OP_INVALID: u32 = 0;
-pub const BLE_GATT_OP_WRITE_REQ: u32 = 1;
-pub const BLE_GATT_OP_WRITE_CMD: u32 = 2;
-pub const BLE_GATT_OP_SIGN_WRITE_CMD: u32 = 3;
-pub const BLE_GATT_OP_PREP_WRITE_REQ: u32 = 4;
-pub const BLE_GATT_OP_EXEC_WRITE_REQ: u32 = 5;
-pub const BLE_GATT_EXEC_WRITE_FLAG_PREPARED_CANCEL: u32 = 0;
-pub const BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE: u32 = 1;
-pub const BLE_GATT_HVX_INVALID: u32 = 0;
-pub const BLE_GATT_HVX_NOTIFICATION: u32 = 1;
-pub const BLE_GATT_HVX_INDICATION: u32 = 2;
-pub const BLE_GATT_STATUS_SUCCESS: u32 = 0;
-pub const BLE_GATT_STATUS_UNKNOWN: u32 = 1;
-pub const BLE_GATT_STATUS_ATTERR_INVALID: u32 = 256;
-pub const BLE_GATT_STATUS_ATTERR_INVALID_HANDLE: u32 = 257;
-pub const BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED: u32 = 258;
-pub const BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED: u32 = 259;
-pub const BLE_GATT_STATUS_ATTERR_INVALID_PDU: u32 = 260;
-pub const BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION: u32 = 261;
-pub const BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED: u32 = 262;
-pub const BLE_GATT_STATUS_ATTERR_INVALID_OFFSET: u32 = 263;
-pub const BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION: u32 = 264;
-pub const BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL: u32 = 265;
-pub const BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND: u32 = 266;
-pub const BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG: u32 = 267;
-pub const BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE: u32 = 268;
-pub const BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH: u32 = 269;
-pub const BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR: u32 = 270;
-pub const BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION: u32 = 271;
-pub const BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE: u32 = 272;
-pub const BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES: u32 = 273;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE1_BEGIN: u32 = 274;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE1_END: u32 = 383;
-pub const BLE_GATT_STATUS_ATTERR_APP_BEGIN: u32 = 384;
-pub const BLE_GATT_STATUS_ATTERR_APP_END: u32 = 415;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE2_BEGIN: u32 = 416;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE2_END: u32 = 479;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE3_BEGIN: u32 = 480;
-pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE3_END: u32 = 508;
-pub const BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED: u32 = 508;
-pub const BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR: u32 = 509;
-pub const BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG: u32 = 510;
-pub const BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE: u32 = 511;
-pub const BLE_GATT_CPF_FORMAT_RFU: u32 = 0;
-pub const BLE_GATT_CPF_FORMAT_BOOLEAN: u32 = 1;
-pub const BLE_GATT_CPF_FORMAT_2BIT: u32 = 2;
-pub const BLE_GATT_CPF_FORMAT_NIBBLE: u32 = 3;
-pub const BLE_GATT_CPF_FORMAT_UINT8: u32 = 4;
-pub const BLE_GATT_CPF_FORMAT_UINT12: u32 = 5;
-pub const BLE_GATT_CPF_FORMAT_UINT16: u32 = 6;
-pub const BLE_GATT_CPF_FORMAT_UINT24: u32 = 7;
-pub const BLE_GATT_CPF_FORMAT_UINT32: u32 = 8;
-pub const BLE_GATT_CPF_FORMAT_UINT48: u32 = 9;
-pub const BLE_GATT_CPF_FORMAT_UINT64: u32 = 10;
-pub const BLE_GATT_CPF_FORMAT_UINT128: u32 = 11;
-pub const BLE_GATT_CPF_FORMAT_SINT8: u32 = 12;
-pub const BLE_GATT_CPF_FORMAT_SINT12: u32 = 13;
-pub const BLE_GATT_CPF_FORMAT_SINT16: u32 = 14;
-pub const BLE_GATT_CPF_FORMAT_SINT24: u32 = 15;
-pub const BLE_GATT_CPF_FORMAT_SINT32: u32 = 16;
-pub const BLE_GATT_CPF_FORMAT_SINT48: u32 = 17;
-pub const BLE_GATT_CPF_FORMAT_SINT64: u32 = 18;
-pub const BLE_GATT_CPF_FORMAT_SINT128: u32 = 19;
-pub const BLE_GATT_CPF_FORMAT_FLOAT32: u32 = 20;
-pub const BLE_GATT_CPF_FORMAT_FLOAT64: u32 = 21;
-pub const BLE_GATT_CPF_FORMAT_SFLOAT: u32 = 22;
-pub const BLE_GATT_CPF_FORMAT_FLOAT: u32 = 23;
-pub const BLE_GATT_CPF_FORMAT_DUINT16: u32 = 24;
-pub const BLE_GATT_CPF_FORMAT_UTF8S: u32 = 25;
-pub const BLE_GATT_CPF_FORMAT_UTF16S: u32 = 26;
-pub const BLE_GATT_CPF_FORMAT_STRUCT: u32 = 27;
-pub const BLE_GATT_CPF_NAMESPACE_BTSIG: u32 = 1;
-pub const BLE_GATT_CPF_NAMESPACE_DESCRIPTION_UNKNOWN: u32 = 0;
-pub const MBR_SVC_BASE: u32 = 24;
-pub const MBR_PAGE_SIZE_IN_WORDS: u32 = 1024;
-pub const MBR_SIZE: u32 = 4096;
-pub const MBR_BOOTLOADER_ADDR: u32 = 4088;
-pub const MBR_PARAM_PAGE_ADDR: u32 = 4092;
 pub const BLE_ERROR_GAP_UUID_LIST_MISMATCH: u32 = 12800;
 pub const BLE_ERROR_GAP_DISCOVERABLE_WITH_WHITELIST: u32 = 12801;
 pub const BLE_ERROR_GAP_INVALID_BLE_ADDR: u32 = 12802;
@@ -830,6 +692,84 @@ pub const BLE_L2CAP_CH_STATUS_CODE_SCID_ALLOCATED: u32 = 10;
 pub const BLE_L2CAP_CH_STATUS_CODE_UNACCEPTABLE_PARAMS: u32 = 11;
 pub const BLE_L2CAP_CH_STATUS_CODE_NOT_UNDERSTOOD: u32 = 32768;
 pub const BLE_L2CAP_CH_STATUS_CODE_TIMEOUT: u32 = 49152;
+pub const BLE_GATT_ATT_MTU_DEFAULT: u32 = 23;
+pub const BLE_GATT_HANDLE_INVALID: u32 = 0;
+pub const BLE_GATT_HANDLE_START: u32 = 1;
+pub const BLE_GATT_HANDLE_END: u32 = 65535;
+pub const BLE_GATT_TIMEOUT_SRC_PROTOCOL: u32 = 0;
+pub const BLE_GATT_OP_INVALID: u32 = 0;
+pub const BLE_GATT_OP_WRITE_REQ: u32 = 1;
+pub const BLE_GATT_OP_WRITE_CMD: u32 = 2;
+pub const BLE_GATT_OP_SIGN_WRITE_CMD: u32 = 3;
+pub const BLE_GATT_OP_PREP_WRITE_REQ: u32 = 4;
+pub const BLE_GATT_OP_EXEC_WRITE_REQ: u32 = 5;
+pub const BLE_GATT_EXEC_WRITE_FLAG_PREPARED_CANCEL: u32 = 0;
+pub const BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE: u32 = 1;
+pub const BLE_GATT_HVX_INVALID: u32 = 0;
+pub const BLE_GATT_HVX_NOTIFICATION: u32 = 1;
+pub const BLE_GATT_HVX_INDICATION: u32 = 2;
+pub const BLE_GATT_STATUS_SUCCESS: u32 = 0;
+pub const BLE_GATT_STATUS_UNKNOWN: u32 = 1;
+pub const BLE_GATT_STATUS_ATTERR_INVALID: u32 = 256;
+pub const BLE_GATT_STATUS_ATTERR_INVALID_HANDLE: u32 = 257;
+pub const BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED: u32 = 258;
+pub const BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED: u32 = 259;
+pub const BLE_GATT_STATUS_ATTERR_INVALID_PDU: u32 = 260;
+pub const BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION: u32 = 261;
+pub const BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED: u32 = 262;
+pub const BLE_GATT_STATUS_ATTERR_INVALID_OFFSET: u32 = 263;
+pub const BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION: u32 = 264;
+pub const BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL: u32 = 265;
+pub const BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND: u32 = 266;
+pub const BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG: u32 = 267;
+pub const BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE: u32 = 268;
+pub const BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH: u32 = 269;
+pub const BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR: u32 = 270;
+pub const BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION: u32 = 271;
+pub const BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE: u32 = 272;
+pub const BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES: u32 = 273;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE1_BEGIN: u32 = 274;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE1_END: u32 = 383;
+pub const BLE_GATT_STATUS_ATTERR_APP_BEGIN: u32 = 384;
+pub const BLE_GATT_STATUS_ATTERR_APP_END: u32 = 415;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE2_BEGIN: u32 = 416;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE2_END: u32 = 479;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE3_BEGIN: u32 = 480;
+pub const BLE_GATT_STATUS_ATTERR_RFU_RANGE3_END: u32 = 508;
+pub const BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED: u32 = 508;
+pub const BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR: u32 = 509;
+pub const BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG: u32 = 510;
+pub const BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE: u32 = 511;
+pub const BLE_GATT_CPF_FORMAT_RFU: u32 = 0;
+pub const BLE_GATT_CPF_FORMAT_BOOLEAN: u32 = 1;
+pub const BLE_GATT_CPF_FORMAT_2BIT: u32 = 2;
+pub const BLE_GATT_CPF_FORMAT_NIBBLE: u32 = 3;
+pub const BLE_GATT_CPF_FORMAT_UINT8: u32 = 4;
+pub const BLE_GATT_CPF_FORMAT_UINT12: u32 = 5;
+pub const BLE_GATT_CPF_FORMAT_UINT16: u32 = 6;
+pub const BLE_GATT_CPF_FORMAT_UINT24: u32 = 7;
+pub const BLE_GATT_CPF_FORMAT_UINT32: u32 = 8;
+pub const BLE_GATT_CPF_FORMAT_UINT48: u32 = 9;
+pub const BLE_GATT_CPF_FORMAT_UINT64: u32 = 10;
+pub const BLE_GATT_CPF_FORMAT_UINT128: u32 = 11;
+pub const BLE_GATT_CPF_FORMAT_SINT8: u32 = 12;
+pub const BLE_GATT_CPF_FORMAT_SINT12: u32 = 13;
+pub const BLE_GATT_CPF_FORMAT_SINT16: u32 = 14;
+pub const BLE_GATT_CPF_FORMAT_SINT24: u32 = 15;
+pub const BLE_GATT_CPF_FORMAT_SINT32: u32 = 16;
+pub const BLE_GATT_CPF_FORMAT_SINT48: u32 = 17;
+pub const BLE_GATT_CPF_FORMAT_SINT64: u32 = 18;
+pub const BLE_GATT_CPF_FORMAT_SINT128: u32 = 19;
+pub const BLE_GATT_CPF_FORMAT_FLOAT32: u32 = 20;
+pub const BLE_GATT_CPF_FORMAT_FLOAT64: u32 = 21;
+pub const BLE_GATT_CPF_FORMAT_SFLOAT: u32 = 22;
+pub const BLE_GATT_CPF_FORMAT_FLOAT: u32 = 23;
+pub const BLE_GATT_CPF_FORMAT_DUINT16: u32 = 24;
+pub const BLE_GATT_CPF_FORMAT_UTF8S: u32 = 25;
+pub const BLE_GATT_CPF_FORMAT_UTF16S: u32 = 26;
+pub const BLE_GATT_CPF_FORMAT_STRUCT: u32 = 27;
+pub const BLE_GATT_CPF_NAMESPACE_BTSIG: u32 = 1;
+pub const BLE_GATT_CPF_NAMESPACE_DESCRIPTION_UNKNOWN: u32 = 0;
 pub const BLE_ERROR_GATTC_PROC_NOT_PERMITTED: u32 = 13056;
 pub const BLE_GATTC_ATTR_INFO_FORMAT_16BIT: u32 = 1;
 pub const BLE_GATTC_ATTR_INFO_FORMAT_128BIT: u32 = 2;
@@ -874,8 +814,76 @@ pub const BLE_USER_MEM_TYPE_GATTS_QUEUED_WRITES: u32 = 1;
 pub const BLE_UUID_VS_COUNT_DEFAULT: u32 = 10;
 pub const BLE_UUID_VS_COUNT_MAX: u32 = 254;
 pub const BLE_CONN_CFG_TAG_DEFAULT: u32 = 0;
+pub const NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN: u32 = 8192;
+pub const NRF_ERROR_SOC_NVIC_INTERRUPT_NOT_AVAILABLE: u32 = 8193;
+pub const NRF_ERROR_SOC_NVIC_INTERRUPT_PRIORITY_NOT_ALLOWED: u32 = 8194;
+pub const NRF_ERROR_SOC_NVIC_SHOULD_NOT_RETURN: u32 = 8195;
+pub const NRF_ERROR_SOC_POWER_MODE_UNKNOWN: u32 = 8196;
+pub const NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN: u32 = 8197;
+pub const NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN: u32 = 8198;
+pub const NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES: u32 = 8199;
+pub const NRF_ERROR_SOC_PPI_INVALID_CHANNEL: u32 = 8200;
+pub const NRF_ERROR_SOC_PPI_INVALID_GROUP: u32 = 8201;
+pub const SOC_SVC_BASE: u32 = 32;
+pub const SOC_SVC_BASE_NOT_AVAILABLE: u32 = 44;
+pub const NRF_RADIO_NOTIFICATION_INACTIVE_GUARANTEED_TIME_US: u32 = 62;
+pub const NRF_RADIO_MINIMUM_TIMESLOT_LENGTH_EXTENSION_TIME_US: u32 = 200;
+pub const NRF_RADIO_MAX_EXTENSION_PROCESSING_TIME_US: u32 = 20;
+pub const NRF_RADIO_MIN_EXTENSION_MARGIN_US: u32 = 82;
+pub const SOC_ECB_KEY_LENGTH: u32 = 16;
+pub const SOC_ECB_CLEARTEXT_LENGTH: u32 = 16;
+pub const SOC_ECB_CIPHERTEXT_LENGTH: u32 = 16;
+pub const NRF_RADIO_LENGTH_MIN_US: u32 = 100;
+pub const NRF_RADIO_LENGTH_MAX_US: u32 = 100000;
+pub const NRF_RADIO_DISTANCE_MAX_US: u32 = 127999999;
+pub const NRF_RADIO_EARLIEST_TIMEOUT_MAX_US: u32 = 127999999;
+pub const NRF_RADIO_START_JITTER_US: u32 = 2;
 pub const SD_TIMERS_USED: u32 = 1;
 pub const SD_SWI_USED: u32 = 54;
+pub const MBR_SVC_BASE: u32 = 24;
+pub const MBR_PAGE_SIZE_IN_WORDS: u32 = 1024;
+pub const MBR_SIZE: u32 = 4096;
+pub const MBR_BOOTLOADER_ADDR: u32 = 4088;
+pub const MBR_PARAM_PAGE_ADDR: u32 = 4092;
+pub const NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN: u32 = 4096;
+pub const NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION: u32 = 4097;
+pub const NRF_ERROR_SDM_INCORRECT_CLENR0: u32 = 4098;
+pub const SD_MAJOR_VERSION: u32 = 7;
+pub const SD_MINOR_VERSION: u32 = 0;
+pub const SD_BUGFIX_VERSION: u32 = 1;
+pub const SD_VARIANT_ID: u32 = 140;
+pub const SD_VERSION: u32 = 7000001;
+pub const SDM_SVC_BASE: u32 = 16;
+pub const SD_UNIQUE_STR_SIZE: u32 = 20;
+pub const SDM_INFO_FIELD_INVALID: u32 = 0;
+pub const SOFTDEVICE_INFO_STRUCT_OFFSET: u32 = 8192;
+pub const SOFTDEVICE_INFO_STRUCT_ADDRESS: u32 = 12288;
+pub const SD_INFO_STRUCT_SIZE_OFFSET: u32 = 8192;
+pub const SD_SIZE_OFFSET: u32 = 8200;
+pub const SD_FWID_OFFSET: u32 = 8204;
+pub const SD_ID_OFFSET: u32 = 8208;
+pub const SD_VERSION_OFFSET: u32 = 8212;
+pub const SD_UNIQUE_STR_OFFSET: u32 = 8216;
+pub const SD_FLASH_SIZE: u32 = 155648;
+pub const NRF_FAULT_ID_SD_RANGE_START: u32 = 0;
+pub const NRF_FAULT_ID_APP_RANGE_START: u32 = 4096;
+pub const NRF_FAULT_ID_SD_ASSERT: u32 = 1;
+pub const NRF_FAULT_ID_APP_MEMACC: u32 = 4097;
+pub const NRF_CLOCK_LF_ACCURACY_250_PPM: u32 = 0;
+pub const NRF_CLOCK_LF_ACCURACY_500_PPM: u32 = 1;
+pub const NRF_CLOCK_LF_ACCURACY_150_PPM: u32 = 2;
+pub const NRF_CLOCK_LF_ACCURACY_100_PPM: u32 = 3;
+pub const NRF_CLOCK_LF_ACCURACY_75_PPM: u32 = 4;
+pub const NRF_CLOCK_LF_ACCURACY_50_PPM: u32 = 5;
+pub const NRF_CLOCK_LF_ACCURACY_30_PPM: u32 = 6;
+pub const NRF_CLOCK_LF_ACCURACY_20_PPM: u32 = 7;
+pub const NRF_CLOCK_LF_ACCURACY_10_PPM: u32 = 8;
+pub const NRF_CLOCK_LF_ACCURACY_5_PPM: u32 = 9;
+pub const NRF_CLOCK_LF_ACCURACY_2_PPM: u32 = 10;
+pub const NRF_CLOCK_LF_ACCURACY_1_PPM: u32 = 11;
+pub const NRF_CLOCK_LF_SRC_RC: u32 = 0;
+pub const NRF_CLOCK_LF_SRC_XTAL: u32 = 1;
+pub const NRF_CLOCK_LF_SRC_SYNTH: u32 = 2;
 pub type int_least64_t = i64;
 pub type uint_least64_t = u64;
 pub type int_fast64_t = i64;
@@ -894,2106 +902,6 @@ pub type int_fast8_t = i8;
 pub type uint_fast8_t = u8;
 pub type intmax_t = self::c_longlong;
 pub type uintmax_t = self::c_ulonglong;
-pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_GET: NRF_SOC_SVCS = 32;
-pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_SET: NRF_SOC_SVCS = 33;
-pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_CLR: NRF_SOC_SVCS = 34;
-pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ASSIGN: NRF_SOC_SVCS = 35;
-pub const NRF_SOC_SVCS_SD_PPI_GROUP_TASK_ENABLE: NRF_SOC_SVCS = 36;
-pub const NRF_SOC_SVCS_SD_PPI_GROUP_TASK_DISABLE: NRF_SOC_SVCS = 37;
-pub const NRF_SOC_SVCS_SD_PPI_GROUP_ASSIGN: NRF_SOC_SVCS = 38;
-pub const NRF_SOC_SVCS_SD_PPI_GROUP_GET: NRF_SOC_SVCS = 39;
-pub const NRF_SOC_SVCS_SD_FLASH_PAGE_ERASE: NRF_SOC_SVCS = 40;
-pub const NRF_SOC_SVCS_SD_FLASH_WRITE: NRF_SOC_SVCS = 41;
-pub const NRF_SOC_SVCS_SD_PROTECTED_REGISTER_WRITE: NRF_SOC_SVCS = 43;
-pub const NRF_SOC_SVCS_SD_MUTEX_NEW: NRF_SOC_SVCS = 44;
-pub const NRF_SOC_SVCS_SD_MUTEX_ACQUIRE: NRF_SOC_SVCS = 45;
-pub const NRF_SOC_SVCS_SD_MUTEX_RELEASE: NRF_SOC_SVCS = 46;
-pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_POOL_CAPACITY_GET: NRF_SOC_SVCS = 47;
-pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_BYTES_AVAILABLE_GET: NRF_SOC_SVCS = 48;
-pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_VECTOR_GET: NRF_SOC_SVCS = 49;
-pub const NRF_SOC_SVCS_SD_POWER_MODE_SET: NRF_SOC_SVCS = 50;
-pub const NRF_SOC_SVCS_SD_POWER_SYSTEM_OFF: NRF_SOC_SVCS = 51;
-pub const NRF_SOC_SVCS_SD_POWER_RESET_REASON_GET: NRF_SOC_SVCS = 52;
-pub const NRF_SOC_SVCS_SD_POWER_RESET_REASON_CLR: NRF_SOC_SVCS = 53;
-pub const NRF_SOC_SVCS_SD_POWER_POF_ENABLE: NRF_SOC_SVCS = 54;
-pub const NRF_SOC_SVCS_SD_POWER_POF_THRESHOLD_SET: NRF_SOC_SVCS = 55;
-pub const NRF_SOC_SVCS_SD_POWER_POF_THRESHOLDVDDH_SET: NRF_SOC_SVCS = 56;
-pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_SET: NRF_SOC_SVCS = 57;
-pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_CLR: NRF_SOC_SVCS = 58;
-pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_GET: NRF_SOC_SVCS = 59;
-pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_SET: NRF_SOC_SVCS = 60;
-pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_CLR: NRF_SOC_SVCS = 61;
-pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_GET: NRF_SOC_SVCS = 62;
-pub const NRF_SOC_SVCS_SD_POWER_DCDC_MODE_SET: NRF_SOC_SVCS = 63;
-pub const NRF_SOC_SVCS_SD_POWER_DCDC0_MODE_SET: NRF_SOC_SVCS = 64;
-pub const NRF_SOC_SVCS_SD_APP_EVT_WAIT: NRF_SOC_SVCS = 65;
-pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_REQUEST: NRF_SOC_SVCS = 66;
-pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_RELEASE: NRF_SOC_SVCS = 67;
-pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_IS_RUNNING: NRF_SOC_SVCS = 68;
-pub const NRF_SOC_SVCS_SD_RADIO_NOTIFICATION_CFG_SET: NRF_SOC_SVCS = 69;
-pub const NRF_SOC_SVCS_SD_ECB_BLOCK_ENCRYPT: NRF_SOC_SVCS = 70;
-pub const NRF_SOC_SVCS_SD_ECB_BLOCKS_ENCRYPT: NRF_SOC_SVCS = 71;
-pub const NRF_SOC_SVCS_SD_RADIO_SESSION_OPEN: NRF_SOC_SVCS = 72;
-pub const NRF_SOC_SVCS_SD_RADIO_SESSION_CLOSE: NRF_SOC_SVCS = 73;
-pub const NRF_SOC_SVCS_SD_RADIO_REQUEST: NRF_SOC_SVCS = 74;
-pub const NRF_SOC_SVCS_SD_EVT_GET: NRF_SOC_SVCS = 75;
-pub const NRF_SOC_SVCS_SD_TEMP_GET: NRF_SOC_SVCS = 76;
-pub const NRF_SOC_SVCS_SD_POWER_USBPWRRDY_ENABLE: NRF_SOC_SVCS = 77;
-pub const NRF_SOC_SVCS_SD_POWER_USBDETECTED_ENABLE: NRF_SOC_SVCS = 78;
-pub const NRF_SOC_SVCS_SD_POWER_USBREMOVED_ENABLE: NRF_SOC_SVCS = 79;
-pub const NRF_SOC_SVCS_SD_POWER_USBREGSTATUS_GET: NRF_SOC_SVCS = 80;
-pub const NRF_SOC_SVCS_SVC_SOC_LAST: NRF_SOC_SVCS = 81;
-#[doc = "@brief The SVC numbers used by the SVC functions in the SoC library."]
-pub type NRF_SOC_SVCS = self::c_uint;
-pub const NRF_MUTEX_VALUES_NRF_MUTEX_FREE: NRF_MUTEX_VALUES = 0;
-pub const NRF_MUTEX_VALUES_NRF_MUTEX_TAKEN: NRF_MUTEX_VALUES = 1;
-#[doc = "@brief Possible values of a ::nrf_mutex_t."]
-pub type NRF_MUTEX_VALUES = self::c_uint;
-#[doc = "< Constant latency mode. See power management in the reference manual."]
-pub const NRF_POWER_MODES_NRF_POWER_MODE_CONSTLAT: NRF_POWER_MODES = 0;
-#[doc = "< Low power mode. See power management in the reference manual."]
-pub const NRF_POWER_MODES_NRF_POWER_MODE_LOWPWR: NRF_POWER_MODES = 1;
-#[doc = "@brief Power modes."]
-pub type NRF_POWER_MODES = self::c_uint;
-#[doc = "< 1.7 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V17: NRF_POWER_THRESHOLDS = 4;
-#[doc = "< 1.8 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V18: NRF_POWER_THRESHOLDS = 5;
-#[doc = "< 1.9 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V19: NRF_POWER_THRESHOLDS = 6;
-#[doc = "< 2.0 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V20: NRF_POWER_THRESHOLDS = 7;
-#[doc = "< 2.1 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V21: NRF_POWER_THRESHOLDS = 8;
-#[doc = "< 2.2 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V22: NRF_POWER_THRESHOLDS = 9;
-#[doc = "< 2.3 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V23: NRF_POWER_THRESHOLDS = 10;
-#[doc = "< 2.4 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V24: NRF_POWER_THRESHOLDS = 11;
-#[doc = "< 2.5 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V25: NRF_POWER_THRESHOLDS = 12;
-#[doc = "< 2.6 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V26: NRF_POWER_THRESHOLDS = 13;
-#[doc = "< 2.7 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V27: NRF_POWER_THRESHOLDS = 14;
-#[doc = "< 2.8 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V28: NRF_POWER_THRESHOLDS = 15;
-#[doc = "@brief Power failure thresholds"]
-pub type NRF_POWER_THRESHOLDS = self::c_uint;
-#[doc = "< 2.7 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V27: NRF_POWER_THRESHOLDVDDHS = 0;
-#[doc = "< 2.8 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V28: NRF_POWER_THRESHOLDVDDHS = 1;
-#[doc = "< 2.9 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V29: NRF_POWER_THRESHOLDVDDHS = 2;
-#[doc = "< 3.0 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V30: NRF_POWER_THRESHOLDVDDHS = 3;
-#[doc = "< 3.1 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V31: NRF_POWER_THRESHOLDVDDHS = 4;
-#[doc = "< 3.2 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V32: NRF_POWER_THRESHOLDVDDHS = 5;
-#[doc = "< 3.3 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V33: NRF_POWER_THRESHOLDVDDHS = 6;
-#[doc = "< 3.4 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V34: NRF_POWER_THRESHOLDVDDHS = 7;
-#[doc = "< 3.5 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V35: NRF_POWER_THRESHOLDVDDHS = 8;
-#[doc = "< 3.6 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V36: NRF_POWER_THRESHOLDVDDHS = 9;
-#[doc = "< 3.7 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V37: NRF_POWER_THRESHOLDVDDHS = 10;
-#[doc = "< 3.8 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V38: NRF_POWER_THRESHOLDVDDHS = 11;
-#[doc = "< 3.9 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V39: NRF_POWER_THRESHOLDVDDHS = 12;
-#[doc = "< 4.0 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V40: NRF_POWER_THRESHOLDVDDHS = 13;
-#[doc = "< 4.1 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V41: NRF_POWER_THRESHOLDVDDHS = 14;
-#[doc = "< 4.2 Volts power failure threshold."]
-pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V42: NRF_POWER_THRESHOLDVDDHS = 15;
-#[doc = "@brief Power failure thresholds for high voltage"]
-pub type NRF_POWER_THRESHOLDVDDHS = self::c_uint;
-#[doc = "< The DCDC is disabled."]
-pub const NRF_POWER_DCDC_MODES_NRF_POWER_DCDC_DISABLE: NRF_POWER_DCDC_MODES = 0;
-#[doc = "< The DCDC is enabled."]
-pub const NRF_POWER_DCDC_MODES_NRF_POWER_DCDC_ENABLE: NRF_POWER_DCDC_MODES = 1;
-#[doc = "@brief DC/DC converter modes."]
-pub type NRF_POWER_DCDC_MODES = self::c_uint;
-#[doc = "< The event does not have a notification."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_NONE: NRF_RADIO_NOTIFICATION_DISTANCES = 0;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_800US: NRF_RADIO_NOTIFICATION_DISTANCES = 1;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_1740US: NRF_RADIO_NOTIFICATION_DISTANCES = 2;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_2680US: NRF_RADIO_NOTIFICATION_DISTANCES = 3;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_3620US: NRF_RADIO_NOTIFICATION_DISTANCES = 4;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_4560US: NRF_RADIO_NOTIFICATION_DISTANCES = 5;
-#[doc = "< The distance from the active notification to start of radio activity."]
-pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_5500US: NRF_RADIO_NOTIFICATION_DISTANCES = 6;
-#[doc = "@brief Radio notification distances."]
-pub type NRF_RADIO_NOTIFICATION_DISTANCES = self::c_uint;
-#[doc = "< The event does not have a radio notification signal."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_NONE: NRF_RADIO_NOTIFICATION_TYPES = 0;
-#[doc = "< Using interrupt for notification when the radio will be enabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_ACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 1;
-#[doc = "< Using interrupt for notification when the radio has been disabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 2;
-#[doc = "< Using interrupt for notification both when the radio will be enabled and disabled."]
-pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_BOTH: NRF_RADIO_NOTIFICATION_TYPES = 3;
-#[doc = "@brief Radio notification types."]
-pub type NRF_RADIO_NOTIFICATION_TYPES = self::c_uint;
-#[doc = "< This signal indicates the start of the radio timeslot."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_START: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 0;
-#[doc = "< This signal indicates the NRF_TIMER0 interrupt."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 1;
-#[doc = "< This signal indicates the NRF_RADIO interrupt."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 2;
-#[doc = "< This signal indicates extend action failed."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_FAILED: NRF_RADIO_CALLBACK_SIGNAL_TYPE =
-    3;
-#[doc = "< This signal indicates extend action succeeded."]
-pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_SUCCEEDED:
-    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 4;
-#[doc = "@brief The Radio signal callback types."]
-pub type NRF_RADIO_CALLBACK_SIGNAL_TYPE = self::c_uint;
-#[doc = "< Return without action."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_NONE: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 0;
-#[doc = "< Request an extension of the current"]
-#[doc = "timeslot. Maximum execution time for this action:"]
-#[doc = "@ref NRF_RADIO_MAX_EXTENSION_PROCESSING_TIME_US."]
-#[doc = "This action must be started at least"]
-#[doc = "@ref NRF_RADIO_MIN_EXTENSION_MARGIN_US before"]
-#[doc = "the end of the timeslot."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND: NRF_RADIO_SIGNAL_CALLBACK_ACTION =
-    1;
-#[doc = "< End the current radio timeslot."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_END: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 2;
-#[doc = "< Request a new radio timeslot and end the current timeslot."]
-pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_REQUEST_AND_END:
-    NRF_RADIO_SIGNAL_CALLBACK_ACTION = 3;
-#[doc = "@brief The actions requested by the signal callback."]
-#[doc = ""]
-#[doc = "  This code gives the SOC instructions about what action to take when the signal callback has"]
-#[doc = "  returned."]
-pub type NRF_RADIO_SIGNAL_CALLBACK_ACTION = self::c_uint;
-#[doc = "< The SoftDevice will guarantee that the high frequency clock source is the"]
-#[doc = "external crystal for the whole duration of the timeslot. This should be the"]
-#[doc = "preferred option for events that use the radio or require high timing accuracy."]
-#[doc = "@note The SoftDevice will automatically turn on and off the external crystal,"]
-#[doc = "at the beginning and end of the timeslot, respectively. The crystal may also"]
-#[doc = "intentionally be left running after the timeslot, in cases where it is needed"]
-#[doc = "by the SoftDevice shortly after the end of the timeslot."]
-pub const NRF_RADIO_HFCLK_CFG_NRF_RADIO_HFCLK_CFG_XTAL_GUARANTEED: NRF_RADIO_HFCLK_CFG = 0;
-#[doc = "< This configuration allows for earlier and tighter scheduling of timeslots."]
-#[doc = "The RC oscillator may be the clock source in part or for the whole duration of the timeslot."]
-#[doc = "The RC oscillator's accuracy must therefore be taken into consideration."]
-#[doc = "@note If the application will use the radio peripheral in timeslots with this configuration,"]
-#[doc = "it must make sure that the crystal is running and stable before starting the radio."]
-pub const NRF_RADIO_HFCLK_CFG_NRF_RADIO_HFCLK_CFG_NO_GUARANTEE: NRF_RADIO_HFCLK_CFG = 1;
-#[doc = "@brief Radio timeslot high frequency clock source configuration."]
-pub type NRF_RADIO_HFCLK_CFG = self::c_uint;
-#[doc = "< High (equal priority as the normal connection priority of the SoftDevice stack(s))."]
-pub const NRF_RADIO_PRIORITY_NRF_RADIO_PRIORITY_HIGH: NRF_RADIO_PRIORITY = 0;
-#[doc = "< Normal (equal priority as the priority of secondary activities of the SoftDevice stack(s))."]
-pub const NRF_RADIO_PRIORITY_NRF_RADIO_PRIORITY_NORMAL: NRF_RADIO_PRIORITY = 1;
-#[doc = "@brief Radio timeslot priorities."]
-pub type NRF_RADIO_PRIORITY = self::c_uint;
-#[doc = "< Request radio timeslot as early as possible. This should always be used for the first request in a session."]
-pub const NRF_RADIO_REQUEST_TYPE_NRF_RADIO_REQ_TYPE_EARLIEST: NRF_RADIO_REQUEST_TYPE = 0;
-#[doc = "< Normal radio timeslot request."]
-pub const NRF_RADIO_REQUEST_TYPE_NRF_RADIO_REQ_TYPE_NORMAL: NRF_RADIO_REQUEST_TYPE = 1;
-#[doc = "@brief Radio timeslot request type."]
-pub type NRF_RADIO_REQUEST_TYPE = self::c_uint;
-#[doc = "< Event indicating that the HFCLK has started."]
-pub const NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED: NRF_SOC_EVTS = 0;
-#[doc = "< Event indicating that a power failure warning has occurred."]
-pub const NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING: NRF_SOC_EVTS = 1;
-#[doc = "< Event indicating that the ongoing flash operation has completed successfully."]
-pub const NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS: NRF_SOC_EVTS = 2;
-#[doc = "< Event indicating that the ongoing flash operation has timed out with an error."]
-pub const NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR: NRF_SOC_EVTS = 3;
-#[doc = "< Event indicating that a radio timeslot was blocked."]
-pub const NRF_SOC_EVTS_NRF_EVT_RADIO_BLOCKED: NRF_SOC_EVTS = 4;
-#[doc = "< Event indicating that a radio timeslot was canceled by SoftDevice."]
-pub const NRF_SOC_EVTS_NRF_EVT_RADIO_CANCELED: NRF_SOC_EVTS = 5;
-#[doc = "< Event indicating that a radio timeslot signal callback handler return was invalid."]
-pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN: NRF_SOC_EVTS = 6;
-#[doc = "< Event indicating that a radio timeslot session is idle."]
-pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_IDLE: NRF_SOC_EVTS = 7;
-#[doc = "< Event indicating that a radio timeslot session is closed."]
-pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_CLOSED: NRF_SOC_EVTS = 8;
-#[doc = "< Event indicating that a USB 3.3 V supply is ready."]
-pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_POWER_READY: NRF_SOC_EVTS = 9;
-#[doc = "< Event indicating that voltage supply is detected on VBUS."]
-pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_DETECTED: NRF_SOC_EVTS = 10;
-#[doc = "< Event indicating that voltage supply is removed from VBUS."]
-pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED: NRF_SOC_EVTS = 11;
-pub const NRF_SOC_EVTS_NRF_EVT_NUMBER_OF_EVTS: NRF_SOC_EVTS = 12;
-#[doc = "@brief SoC Events."]
-pub type NRF_SOC_EVTS = self::c_uint;
-#[doc = "@brief Represents a mutex for use with the nrf_mutex functions."]
-#[doc = " @note Accessing the value directly is not safe, use the mutex functions!"]
-pub type nrf_mutex_t = u8;
-#[doc = "@brief Parameters for a request for a timeslot as early as possible."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_radio_request_earliest_t {
-    #[doc = "< High frequency clock source, see @ref NRF_RADIO_HFCLK_CFG."]
-    pub hfclk: u8,
-    #[doc = "< The radio timeslot priority, see @ref NRF_RADIO_PRIORITY."]
-    pub priority: u8,
-    #[doc = "< The radio timeslot length (in the range 100 to 100,000] microseconds)."]
-    pub length_us: u32,
-    #[doc = "< Longest acceptable delay until the start of the requested timeslot (up to @ref NRF_RADIO_EARLIEST_TIMEOUT_MAX_US microseconds)."]
-    pub timeout_us: u32,
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_request_earliest_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_request_earliest_t>(),
-        12usize,
-        concat!("Size of: ", stringify!(nrf_radio_request_earliest_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_request_earliest_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_radio_request_earliest_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).hfclk as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_earliest_t),
-            "::",
-            stringify!(hfclk)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).priority as *const _ as usize },
-        1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_earliest_t),
-            "::",
-            stringify!(priority)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).length_us as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_earliest_t),
-            "::",
-            stringify!(length_us)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).timeout_us as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_earliest_t),
-            "::",
-            stringify!(timeout_us)
-        )
-    );
-}
-#[doc = "@brief Parameters for a normal radio timeslot request."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_radio_request_normal_t {
-    #[doc = "< High frequency clock source, see @ref NRF_RADIO_HFCLK_CFG."]
-    pub hfclk: u8,
-    #[doc = "< The radio timeslot priority, see @ref NRF_RADIO_PRIORITY."]
-    pub priority: u8,
-    #[doc = "< Distance from the start of the previous radio timeslot (up to @ref NRF_RADIO_DISTANCE_MAX_US microseconds)."]
-    pub distance_us: u32,
-    #[doc = "< The radio timeslot length (in the range [100..100,000] microseconds)."]
-    pub length_us: u32,
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_request_normal_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_request_normal_t>(),
-        12usize,
-        concat!("Size of: ", stringify!(nrf_radio_request_normal_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_request_normal_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_radio_request_normal_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).hfclk as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_normal_t),
-            "::",
-            stringify!(hfclk)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).priority as *const _ as usize },
-        1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_normal_t),
-            "::",
-            stringify!(priority)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).distance_us as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_normal_t),
-            "::",
-            stringify!(distance_us)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).length_us as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_normal_t),
-            "::",
-            stringify!(length_us)
-        )
-    );
-}
-#[doc = "@brief Radio timeslot request parameters."]
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct nrf_radio_request_t {
-    #[doc = "< Type of request, see @ref NRF_RADIO_REQUEST_TYPE."]
-    pub request_type: u8,
-    #[doc = "< Parameter union."]
-    pub params: nrf_radio_request_t__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union nrf_radio_request_t__bindgen_ty_1 {
-    #[doc = "< Parameters for requesting a radio timeslot as early as possible."]
-    pub earliest: nrf_radio_request_earliest_t,
-    #[doc = "< Parameters for requesting a normal radio timeslot."]
-    pub normal: nrf_radio_request_normal_t,
-    _bindgen_union_align: [u32; 3usize],
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_request_t__bindgen_ty_1() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_request_t__bindgen_ty_1>(),
-        12usize,
-        concat!("Size of: ", stringify!(nrf_radio_request_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_request_t__bindgen_ty_1>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_radio_request_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).earliest as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_t__bindgen_ty_1),
-            "::",
-            stringify!(earliest)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).normal as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_t__bindgen_ty_1),
-            "::",
-            stringify!(normal)
-        )
-    );
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_request_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_request_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(nrf_radio_request_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_request_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_radio_request_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t>())).request_type as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_t),
-            "::",
-            stringify!(request_type)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t>())).params as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_request_t),
-            "::",
-            stringify!(params)
-        )
-    );
-}
-#[doc = "@brief Return parameters of the radio timeslot signal callback."]
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct nrf_radio_signal_callback_return_param_t {
-    #[doc = "< The action requested by the application when returning from the signal callback, see @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION."]
-    pub callback_action: u8,
-    #[doc = "< Parameter union."]
-    pub params: nrf_radio_signal_callback_return_param_t__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union nrf_radio_signal_callback_return_param_t__bindgen_ty_1 {
-    #[doc = "< Additional parameters for return_code @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION_REQUEST_AND_END."]
-    pub request: nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1,
-    #[doc = "< Additional parameters for return_code @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND."]
-    pub extend: nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2,
-    _bindgen_union_align: u32,
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1 {
-    #[doc = "< The request parameters for the next radio timeslot."]
-    pub p_next: *mut nrf_radio_request_t,
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
-        4usize,
-        concat!(
-            "Size of: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
-        4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>())).p_next
-                as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1),
-            "::",
-            stringify!(p_next)
-        )
-    );
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2 {
-    #[doc = "< Requested extension of the radio timeslot duration (microseconds) (for minimum time see @ref NRF_RADIO_MINIMUM_TIMESLOT_LENGTH_EXTENSION_TIME_US)."]
-    pub length_us: u32,
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
-        4usize,
-        concat!(
-            "Size of: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2)
-        )
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
-        4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>())).length_us
-                as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2),
-            "::",
-            stringify!(length_us)
-        )
-    );
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>(),
-        4usize,
-        concat!(
-            "Size of: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>(),
-        4usize,
-        concat!(
-            "Alignment of ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).request as *const _
-                as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1),
-            "::",
-            stringify!(request)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).extend as *const _
-                as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1),
-            "::",
-            stringify!(extend)
-        )
-    );
-}
-#[test]
-fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(nrf_radio_signal_callback_return_param_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_radio_signal_callback_return_param_t))
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).callback_action as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t),
-            "::",
-            stringify!(callback_action)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).params as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_radio_signal_callback_return_param_t),
-            "::",
-            stringify!(params)
-        )
-    );
-}
-#[doc = "@brief The radio timeslot signal callback type."]
-#[doc = ""]
-#[doc = " @note In case of invalid return parameters, the radio timeslot will automatically end"]
-#[doc = "       immediately after returning from the signal callback and the"]
-#[doc = "       @ref NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN event will be sent."]
-#[doc = " @note The returned struct pointer must remain valid after the signal callback"]
-#[doc = "       function returns. For instance, this means that it must not point to a stack variable."]
-#[doc = ""]
-#[doc = " @param[in] signal_type Type of signal, see @ref NRF_RADIO_CALLBACK_SIGNAL_TYPE."]
-#[doc = ""]
-#[doc = " @return Pointer to structure containing action requested by the application."]
-pub type nrf_radio_signal_callback_t =
-    ::core::option::Option<unsafe extern "C" fn(signal_type: u8) -> *mut nrf_radio_signal_callback_return_param_t>;
-#[doc = "@brief AES ECB parameter typedefs"]
-pub type soc_ecb_key_t = [u8; 16usize];
-pub type soc_ecb_cleartext_t = [u8; 16usize];
-pub type soc_ecb_ciphertext_t = [u8; 16usize];
-#[doc = "@brief AES ECB data structure"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_ecb_hal_data_t {
-    #[doc = "< Encryption key."]
-    pub key: soc_ecb_key_t,
-    #[doc = "< Cleartext data."]
-    pub cleartext: soc_ecb_cleartext_t,
-    #[doc = "< Ciphertext data."]
-    pub ciphertext: soc_ecb_ciphertext_t,
-}
-#[test]
-fn bindgen_test_layout_nrf_ecb_hal_data_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_ecb_hal_data_t>(),
-        48usize,
-        concat!("Size of: ", stringify!(nrf_ecb_hal_data_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_ecb_hal_data_t>(),
-        1usize,
-        concat!("Alignment of ", stringify!(nrf_ecb_hal_data_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).key as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_t),
-            "::",
-            stringify!(key)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).cleartext as *const _ as usize },
-        16usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_t),
-            "::",
-            stringify!(cleartext)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).ciphertext as *const _ as usize },
-        32usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_t),
-            "::",
-            stringify!(ciphertext)
-        )
-    );
-}
-#[doc = "@brief AES ECB block. Used to provide multiple blocks in a single call"]
-#[doc = "to @ref sd_ecb_blocks_encrypt."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_ecb_hal_data_block_t {
-    #[doc = "< Pointer to the Encryption key."]
-    pub p_key: *const soc_ecb_key_t,
-    #[doc = "< Pointer to the Cleartext data."]
-    pub p_cleartext: *const soc_ecb_cleartext_t,
-    #[doc = "< Pointer to the Ciphertext data."]
-    pub p_ciphertext: *mut soc_ecb_ciphertext_t,
-}
-#[test]
-fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_ecb_hal_data_block_t>(),
-        12usize,
-        concat!("Size of: ", stringify!(nrf_ecb_hal_data_block_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_ecb_hal_data_block_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(nrf_ecb_hal_data_block_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_key as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_block_t),
-            "::",
-            stringify!(p_key)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_cleartext as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_block_t),
-            "::",
-            stringify!(p_cleartext)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_ciphertext as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_ecb_hal_data_block_t),
-            "::",
-            stringify!(p_ciphertext)
-        )
-    );
-}
-
-#[doc = "@brief Initialize a mutex."]
-#[doc = ""]
-#[doc = " @param[in] p_mutex Pointer to the mutex to initialize."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 44",
-        inout("r0") to_asm(p_mutex) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Attempt to acquire a mutex."]
-#[doc = ""]
-#[doc = " @param[in] p_mutex Pointer to the mutex to acquire."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS The mutex was successfully acquired."]
-#[doc = " @retval ::NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN The mutex could not be acquired."]
-#[inline(always)]
-pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 45",
-        inout("r0") to_asm(p_mutex) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Release a mutex."]
-#[doc = ""]
-#[doc = " @param[in] p_mutex Pointer to the mutex to release."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 46",
-        inout("r0") to_asm(p_mutex) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Query the capacity of the application random pool."]
-#[doc = ""]
-#[doc = " @param[out] p_pool_capacity The capacity of the pool."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 47",
-        inout("r0") to_asm(p_pool_capacity) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get number of random bytes available to the application."]
-#[doc = ""]
-#[doc = " @param[out] p_bytes_available The number of bytes currently available in the pool."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 48",
-        inout("r0") to_asm(p_bytes_available) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get random bytes from the application pool."]
-#[doc = ""]
-#[doc = " @param[out]  p_buff  Pointer to unit8_t buffer for storing the bytes."]
-#[doc = " @param[in]   length  Number of bytes to take from pool and place in p_buff."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS The requested bytes were written to p_buff."]
-#[doc = " @retval ::NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES No bytes were written to the buffer, because there were not enough bytes available."]
-#[inline(always)]
-pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 49",
-        inout("r0") to_asm(p_buff) => ret,
-        inout("r1") to_asm(length) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Gets the reset reason register."]
-#[doc = ""]
-#[doc = " @param[out]  p_reset_reason  Contents of the NRF_POWER->RESETREAS register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 52",
-        inout("r0") to_asm(p_reset_reason) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Clears the bits of the reset reason register."]
-#[doc = ""]
-#[doc = " @param[in] reset_reason_clr_msk Contains the bits to clear from the reset reason register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 53",
-        inout("r0") to_asm(reset_reason_clr_msk) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Sets the power mode when in CPU sleep."]
-#[doc = ""]
-#[doc = " @param[in] power_mode The power mode to use when in CPU sleep, see @ref NRF_POWER_MODES. @sa sd_app_evt_wait"]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS The power mode was set."]
-#[doc = " @retval ::NRF_ERROR_SOC_POWER_MODE_UNKNOWN The power mode was unknown."]
-#[inline(always)]
-pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 50",
-        inout("r0") to_asm(power_mode) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Puts the chip in System OFF mode."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN"]
-#[inline(always)]
-pub unsafe fn sd_power_system_off() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 51",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enables or disables the power-fail comparator."]
-#[doc = ""]
-#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_FAILURE_WARNING) when the power failure warning occurs."]
-#[doc = " The event can be retrieved with sd_evt_get();"]
-#[doc = ""]
-#[doc = " @param[in] pof_enable    True if the power-fail comparator should be enabled, false if it should be disabled."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 54",
-        inout("r0") to_asm(pof_enable) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enables or disables the USB power ready event."]
-#[doc = ""]
-#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_POWER_READY) when a USB 3.3 V supply is ready."]
-#[doc = " The event can be retrieved with sd_evt_get();"]
-#[doc = ""]
-#[doc = " @param[in] usbpwrrdy_enable    True if the power ready event should be enabled, false if it should be disabled."]
-#[doc = ""]
-#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_usbpwrrdy_enable(usbpwrrdy_enable: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 77",
-        inout("r0") to_asm(usbpwrrdy_enable) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enables or disables the power USB-detected event."]
-#[doc = ""]
-#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_DETECTED) when a voltage supply is detected on VBUS."]
-#[doc = " The event can be retrieved with sd_evt_get();"]
-#[doc = ""]
-#[doc = " @param[in] usbdetected_enable    True if the power ready event should be enabled, false if it should be disabled."]
-#[doc = ""]
-#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_usbdetected_enable(usbdetected_enable: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 78",
-        inout("r0") to_asm(usbdetected_enable) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enables or disables the power USB-removed event."]
-#[doc = ""]
-#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_REMOVED) when a voltage supply is removed from VBUS."]
-#[doc = " The event can be retrieved with sd_evt_get();"]
-#[doc = ""]
-#[doc = " @param[in] usbremoved_enable    True if the power ready event should be enabled, false if it should be disabled."]
-#[doc = ""]
-#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_usbremoved_enable(usbremoved_enable: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 79",
-        inout("r0") to_asm(usbremoved_enable) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get USB supply status register content."]
-#[doc = ""]
-#[doc = " @param[out] usbregstatus    The content of USBREGSTATUS register."]
-#[doc = ""]
-#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_usbregstatus_get(usbregstatus: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 80",
-        inout("r0") to_asm(usbregstatus) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Sets the power failure comparator threshold value."]
-#[doc = ""]
-#[doc = " @note: Power failure comparator threshold setting. This setting applies both for normal voltage"]
-#[doc = "        mode (supply connected to both VDD and VDDH) and high voltage mode (supply connected to"]
-#[doc = "        VDDH only)."]
-#[doc = ""]
-#[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDS."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
-#[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
-#[inline(always)]
-pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 55",
-        inout("r0") to_asm(threshold) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Sets the power failure comparator threshold value for high voltage."]
-#[doc = ""]
-#[doc = " @note: Power failure comparator threshold setting for high voltage mode (supply connected to"]
-#[doc = "        VDDH only). This setting does not apply for normal voltage mode (supply connected to both"]
-#[doc = "        VDD and VDDH)."]
-#[doc = ""]
-#[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDVDDHS."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
-#[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
-#[inline(always)]
-pub unsafe fn sd_power_pof_thresholdvddh_set(threshold: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 56",
-        inout("r0") to_asm(threshold) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERSET register."]
-#[doc = ""]
-#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERSET register to write to."]
-#[doc = " @param[in] ram_powerset Contains the word to write to the NRF_POWER->RAM[index].POWERSET register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 57",
-        inout("r0") to_asm(index) => ret,
-        inout("r1") to_asm(ram_powerset) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERCLR register."]
-#[doc = ""]
-#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERCLR register to write to."]
-#[doc = " @param[in] ram_powerclr Contains the word to write to the NRF_POWER->RAM[index].POWERCLR register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 58",
-        inout("r0") to_asm(index) => ret,
-        inout("r1") to_asm(ram_powerclr) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get contents of NRF_POWER->RAM[index].POWER register, indicates power status of RAM[index] blocks."]
-#[doc = ""]
-#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWER register to read from."]
-#[doc = " @param[out] p_ram_power Content of NRF_POWER->RAM[index].POWER register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 59",
-        inout("r0") to_asm(index) => ret,
-        inout("r1") to_asm(p_ram_power) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Set bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-#[doc = ""]
-#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-#[doc = " @param[in] gpregret_msk Bits to be set in the GPREGRET register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 60",
-        inout("r0") to_asm(gpregret_id) => ret,
-        inout("r1") to_asm(gpregret_msk) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Clear bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-#[doc = ""]
-#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-#[doc = " @param[in] gpregret_msk Bits to be clear in the GPREGRET register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 61",
-        inout("r0") to_asm(gpregret_id) => ret,
-        inout("r1") to_asm(gpregret_msk) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get contents of the general purpose retention registers (NRF_POWER->GPREGRET*)."]
-#[doc = ""]
-#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
-#[doc = " @param[out] p_gpregret Contents of the GPREGRET register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 62",
-        inout("r0") to_asm(gpregret_id) => ret,
-        inout("r1") to_asm(p_gpregret) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enable or disable the DC/DC regulator for the regulator stage 1 (REG1)."]
-#[doc = ""]
-#[doc = " @param[in] dcdc_mode The mode of the DCDC, see @ref NRF_POWER_DCDC_MODES."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The DCDC mode is invalid."]
-#[inline(always)]
-pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 63",
-        inout("r0") to_asm(dcdc_mode) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Enable or disable the DC/DC regulator for the regulator stage 0 (REG0)."]
-#[doc = ""]
-#[doc = " For more details on the REG0 stage, please see product specification."]
-#[doc = ""]
-#[doc = " @param[in] dcdc_mode The mode of the DCDC0, see @ref NRF_POWER_DCDC_MODES."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The dcdc_mode is invalid."]
-#[inline(always)]
-pub unsafe fn sd_power_dcdc0_mode_set(dcdc_mode: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 64",
-        inout("r0") to_asm(dcdc_mode) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Request the high frequency crystal oscillator."]
-#[doc = ""]
-#[doc = " Will start the high frequency crystal oscillator, the startup time of the crystal varies"]
-#[doc = " and the ::sd_clock_hfclk_is_running function can be polled to check if it has started."]
-#[doc = ""]
-#[doc = " @see sd_clock_hfclk_is_running"]
-#[doc = " @see sd_clock_hfclk_release"]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_clock_hfclk_request() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 66",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Releases the high frequency crystal oscillator."]
-#[doc = ""]
-#[doc = " Will stop the high frequency crystal oscillator, this happens immediately."]
-#[doc = ""]
-#[doc = " @see sd_clock_hfclk_is_running"]
-#[doc = " @see sd_clock_hfclk_request"]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_clock_hfclk_release() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 67",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Checks if the high frequency crystal oscillator is running."]
-#[doc = ""]
-#[doc = " @see sd_clock_hfclk_request"]
-#[doc = " @see sd_clock_hfclk_release"]
-#[doc = ""]
-#[doc = " @param[out] p_is_running 1 if the external crystal oscillator is running, 0 if not."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 68",
-        inout("r0") to_asm(p_is_running) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Waits for an application event."]
-#[doc = ""]
-#[doc = " An application event is either an application interrupt or a pended interrupt when the interrupt"]
-#[doc = " is disabled."]
-#[doc = ""]
-#[doc = " When the application waits for an application event by calling this function, an interrupt that"]
-#[doc = " is enabled will be taken immediately on pending since this function will wait in thread mode,"]
-#[doc = " then the execution will return in the application's main thread."]
-#[doc = ""]
-#[doc = " In order to wake up from disabled interrupts, the SEVONPEND flag has to be set in the Cortex-M"]
-#[doc = " MCU's System Control Register (SCR), CMSIS_SCB. In that case, when a disabled interrupt gets"]
-#[doc = " pended, this function will return to the application's main thread."]
-#[doc = ""]
-#[doc = " @note The application must ensure that the pended flag is cleared using ::sd_nvic_ClearPendingIRQ"]
-#[doc = "       in order to sleep using this function. This is only necessary for disabled interrupts, as"]
-#[doc = "       the interrupt handler will clear the pending flag automatically for enabled interrupts."]
-#[doc = ""]
-#[doc = " @note If an application interrupt has happened since the last time sd_app_evt_wait was"]
-#[doc = "       called this function will return immediately and not go to sleep. This is to avoid race"]
-#[doc = "       conditions that can occur when a flag is updated in the interrupt handler and processed"]
-#[doc = "       in the main loop."]
-#[doc = ""]
-#[doc = " @post An application interrupt has happened or a interrupt pending flag is set."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_app_evt_wait() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 65",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get PPI channel enable register contents."]
-#[doc = ""]
-#[doc = " @param[out] p_channel_enable The contents of the PPI CHEN register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 32",
-        inout("r0") to_asm(p_channel_enable) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Set PPI channel enable register."]
-#[doc = ""]
-#[doc = " @param[in] channel_enable_set_msk Mask containing the bits to set in the PPI CHEN register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 33",
-        inout("r0") to_asm(channel_enable_set_msk) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Clear PPI channel enable register."]
-#[doc = ""]
-#[doc = " @param[in] channel_enable_clr_msk Mask containing the bits to clear in the PPI CHEN register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_channel_enable_clr(channel_enable_clr_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 34",
-        inout("r0") to_asm(channel_enable_clr_msk) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Assign endpoints to a PPI channel."]
-#[doc = ""]
-#[doc = " @param[in] channel_num Number of the PPI channel to assign."]
-#[doc = " @param[in] evt_endpoint Event endpoint of the PPI channel."]
-#[doc = " @param[in] task_endpoint Task endpoint of the PPI channel."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_CHANNEL The channel number is invalid."]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_channel_assign(
-    channel_num: u8,
-    evt_endpoint: *const self::c_void,
-    task_endpoint: *const self::c_void,
-) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 35",
-        inout("r0") to_asm(channel_num) => ret,
-        inout("r1") to_asm(evt_endpoint) => _,
-        inout("r2") to_asm(task_endpoint) => _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Task to enable a channel group."]
-#[doc = ""]
-#[doc = " @param[in] group_num Number of the channel group."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid"]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 36",
-        inout("r0") to_asm(group_num) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Task to disable a channel group."]
-#[doc = ""]
-#[doc = " @param[in] group_num Number of the PPI group."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 37",
-        inout("r0") to_asm(group_num) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Assign PPI channels to a channel group."]
-#[doc = ""]
-#[doc = " @param[in] group_num Number of the channel group."]
-#[doc = " @param[in] channel_msk Mask of the channels to assign to the group."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 38",
-        inout("r0") to_asm(group_num) => ret,
-        inout("r1") to_asm(channel_msk) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Gets the PPI channels of a channel group."]
-#[doc = ""]
-#[doc = " @param[in]   group_num Number of the channel group."]
-#[doc = " @param[out]  p_channel_msk Mask of the channels assigned to the group."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 39",
-        inout("r0") to_asm(group_num) => ret,
-        inout("r1") to_asm(p_channel_msk) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Configures the Radio Notification signal."]
-#[doc = ""]
-#[doc = " @note"]
-#[doc = "      - The notification signal latency depends on the interrupt priority settings of SWI used"]
-#[doc = "        for notification signal."]
-#[doc = "      - To ensure that the radio notification signal behaves in a consistent way, the radio"]
-#[doc = "        notifications must be configured when there is no protocol stack or other SoftDevice"]
-#[doc = "        activity in progress. It is recommended that the radio notification signal is"]
-#[doc = "        configured directly after the SoftDevice has been enabled."]
-#[doc = "      - In the period between the ACTIVE signal and the start of the Radio Event, the SoftDevice"]
-#[doc = "        will interrupt the application to do Radio Event preparation."]
-#[doc = "      - Using the Radio Notification feature may limit the bandwidth, as the SoftDevice may have"]
-#[doc = "        to shorten the connection events to have time for the Radio Notification signals."]
-#[doc = ""]
-#[doc = " @param[in]  type      Type of notification signal, see @ref NRF_RADIO_NOTIFICATION_TYPES."]
-#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE shall be used to turn off radio"]
-#[doc = "                       notification. Using @ref NRF_RADIO_NOTIFICATION_DISTANCE_NONE is"]
-#[doc = "                       recommended (but not required) to be used with"]
-#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE."]
-#[doc = ""]
-#[doc = " @param[in]  distance  Distance between the notification signal and start of radio activity, see @ref NRF_RADIO_NOTIFICATION_DISTANCES."]
-#[doc = "                       This parameter is ignored when @ref NRF_RADIO_NOTIFICATION_TYPE_NONE or"]
-#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE is used."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The group number is invalid."]
-#[doc = " @retval ::NRF_ERROR_INVALID_STATE A protocol stack or other SoftDevice is running. Stop all"]
-#[doc = "                                   running activities and retry."]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 69",
-        inout("r0") to_asm(type_) => ret,
-        inout("r1") to_asm(distance) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Encrypts a block according to the specified parameters."]
-#[doc = ""]
-#[doc = " 128-bit AES encryption."]
-#[doc = ""]
-#[doc = " @note:"]
-#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
-#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
-#[doc = "      main or low interrupt level."]
-#[doc = ""]
-#[doc = " @param[in, out] p_ecb_data Pointer to the ECB parameters' struct (two input"]
-#[doc = "                            parameters and one output parameter)."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 70",
-        inout("r0") to_asm(p_ecb_data) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Encrypts multiple data blocks provided as an array of data block structures."]
-#[doc = ""]
-#[doc = " @details: Performs 128-bit AES encryption on multiple data blocks"]
-#[doc = ""]
-#[doc = " @note:"]
-#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
-#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
-#[doc = "      main or low interrupt level."]
-#[doc = ""]
-#[doc = " @param[in]     block_count     Count of blocks in the p_data_blocks array."]
-#[doc = " @param[in,out] p_data_blocks   Pointer to the first entry in a contiguous array of"]
-#[doc = "                                @ref nrf_ecb_hal_data_block_t structures."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_ecb_blocks_encrypt(block_count: u8, p_data_blocks: *mut nrf_ecb_hal_data_block_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 71",
-        inout("r0") to_asm(block_count) => ret,
-        inout("r1") to_asm(p_data_blocks) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Gets any pending events generated by the SoC API."]
-#[doc = ""]
-#[doc = " The application should keep calling this function to get events, until ::NRF_ERROR_NOT_FOUND is returned."]
-#[doc = ""]
-#[doc = " @param[out] p_evt_id Set to one of the values in @ref NRF_SOC_EVTS, if any events are pending."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS An event was pending. The event id is written in the p_evt_id parameter."]
-#[doc = " @retval ::NRF_ERROR_NOT_FOUND No pending events."]
-#[inline(always)]
-pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 75",
-        inout("r0") to_asm(p_evt_id) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Get the temperature measured on the chip"]
-#[doc = ""]
-#[doc = " This function will block until the temperature measurement is done."]
-#[doc = " It takes around 50 us from call to return."]
-#[doc = ""]
-#[doc = " @param[out] p_temp Result of temperature measurement. Die temperature in 0.25 degrees Celsius."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS A temperature measurement was done, and the temperature was written to temp"]
-#[inline(always)]
-pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 76",
-        inout("r0") to_asm(p_temp) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Flash Write"]
-#[doc = ""]
-#[doc = " Commands to write a buffer to flash"]
-#[doc = ""]
-#[doc = " If the SoftDevice is enabled:"]
-#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
-#[doc = "  application with exactly one of the following events:"]
-#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
-#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
-#[doc = ""]
-#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
-#[doc = " write has been completed"]
-#[doc = ""]
-#[doc = " @note"]
-#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
-#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
-#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
-#[doc = "        and the command parameters)."]
-#[doc = "      - The data in the p_src buffer should not be modified before the @ref NRF_EVT_FLASH_OPERATION_SUCCESS"]
-#[doc = "        or the @ref NRF_EVT_FLASH_OPERATION_ERROR have been received if the SoftDevice is enabled."]
-#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is written, if it is"]
-#[doc = "        protected."]
-#[doc = ""]
-#[doc = ""]
-#[doc = " @param[in]  p_dst Pointer to start of flash location to be written."]
-#[doc = " @param[in]  p_src Pointer to buffer with data to be written."]
-#[doc = " @param[in]  size  Number of 32-bit words to write. Maximum size is the number of words in one"]
-#[doc = "                   flash page. See the device's Product Specification for details."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Tried to write to a non existing flash address, or p_dst or p_src was unaligned."]
-#[doc = " @retval ::NRF_ERROR_BUSY           The previous command has not yet completed."]
-#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Size was 0, or higher than the maximum allowed size."]
-#[doc = " @retval ::NRF_ERROR_FORBIDDEN      Tried to write to an address outside the application flash area."]
-#[doc = " @retval ::NRF_SUCCESS              The command was accepted."]
-#[inline(always)]
-pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 41",
-        inout("r0") to_asm(p_dst) => ret,
-        inout("r1") to_asm(p_src) => _,
-        inout("r2") to_asm(size) => _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Flash Erase page"]
-#[doc = ""]
-#[doc = " Commands to erase a flash page"]
-#[doc = " If the SoftDevice is enabled:"]
-#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
-#[doc = "  application with exactly one of the following events:"]
-#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
-#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
-#[doc = ""]
-#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
-#[doc = " erase has been completed"]
-#[doc = ""]
-#[doc = " @note"]
-#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
-#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
-#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
-#[doc = "        and the command parameters)."]
-#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is erased, if it is"]
-#[doc = "        protected."]
-#[doc = ""]
-#[doc = ""]
-#[doc = " @param[in]  page_number           Page number of the page to erase"]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INTERNAL      If a new session could not be opened due to an internal error."]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Tried to erase to a non existing flash page."]
-#[doc = " @retval ::NRF_ERROR_BUSY          The previous command has not yet completed."]
-#[doc = " @retval ::NRF_ERROR_FORBIDDEN     Tried to erase a page outside the application flash area."]
-#[doc = " @retval ::NRF_SUCCESS             The command was accepted."]
-#[inline(always)]
-pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 40",
-        inout("r0") to_asm(page_number) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Opens a session for radio timeslot requests."]
-#[doc = ""]
-#[doc = " @note Only one session can be open at a time."]
-#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) will be called when the radio timeslot"]
-#[doc = "       starts. From this point the NRF_RADIO and NRF_TIMER0 peripherals can be freely accessed"]
-#[doc = "       by the application."]
-#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0) is called whenever the NRF_TIMER0"]
-#[doc = "       interrupt occurs."]
-#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO) is called whenever the NRF_RADIO"]
-#[doc = "       interrupt occurs."]
-#[doc = " @note p_radio_signal_callback() will be called at ARM interrupt priority level 0. This"]
-#[doc = "       implies that none of the sd_* API calls can be used from p_radio_signal_callback()."]
-#[doc = ""]
-#[doc = " @param[in] p_radio_signal_callback The signal callback."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR p_radio_signal_callback is an invalid function pointer."]
-#[doc = " @retval ::NRF_ERROR_BUSY If session cannot be opened."]
-#[doc = " @retval ::NRF_ERROR_INTERNAL If a new session could not be opened due to an internal error."]
-#[doc = " @retval ::NRF_SUCCESS Otherwise."]
-#[inline(always)]
-pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_callback_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 72",
-        inout("r0") to_asm(p_radio_signal_callback) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Closes a session for radio timeslot requests."]
-#[doc = ""]
-#[doc = " @note Any current radio timeslot will be finished before the session is closed."]
-#[doc = " @note If a radio timeslot is scheduled when the session is closed, it will be canceled."]
-#[doc = " @note The application cannot consider the session closed until the @ref NRF_EVT_RADIO_SESSION_CLOSED"]
-#[doc = "       event is received."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_FORBIDDEN If session not opened."]
-#[doc = " @retval ::NRF_ERROR_BUSY If session is currently being closed."]
-#[doc = " @retval ::NRF_SUCCESS Otherwise."]
-#[inline(always)]
-pub unsafe fn sd_radio_session_close() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 73",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Requests a radio timeslot."]
-#[doc = ""]
-#[doc = " @note The request type is determined by p_request->request_type, and can be one of @ref NRF_RADIO_REQ_TYPE_EARLIEST"]
-#[doc = "       and @ref NRF_RADIO_REQ_TYPE_NORMAL. The first request in a session must always be of type @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
-#[doc = " @note For a normal request (@ref NRF_RADIO_REQ_TYPE_NORMAL), the start time of a radio timeslot is specified by"]
-#[doc = "       p_request->distance_us and is given relative to the start of the previous timeslot."]
-#[doc = " @note A too small p_request->distance_us will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
-#[doc = " @note Timeslots scheduled too close will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
-#[doc = " @note See the SoftDevice Specification for more on radio timeslot scheduling, distances and lengths."]
-#[doc = " @note If an opportunity for the first radio timeslot is not found before 100 ms after the call to this"]
-#[doc = "       function, it is not scheduled, and instead a @ref NRF_EVT_RADIO_BLOCKED event is sent."]
-#[doc = "       The application may then try to schedule the first radio timeslot again."]
-#[doc = " @note Successful requests will result in nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START)."]
-#[doc = "       Unsuccessful requests will result in a @ref NRF_EVT_RADIO_BLOCKED event, see @ref NRF_SOC_EVTS."]
-#[doc = " @note The jitter in the start time of the radio timeslots is +/- @ref NRF_RADIO_START_JITTER_US us."]
-#[doc = " @note The nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) call has a latency relative to the"]
-#[doc = "       specified radio timeslot start, but this does not affect the actual start time of the timeslot."]
-#[doc = " @note NRF_TIMER0 is reset at the start of the radio timeslot, and is clocked at 1MHz from the high frequency"]
-#[doc = "       (16 MHz) clock source. If p_request->hfclk_force_xtal is true, the high frequency clock is"]
-#[doc = "       guaranteed to be clocked from the external crystal."]
-#[doc = " @note The SoftDevice will neither access the NRF_RADIO peripheral nor the NRF_TIMER0 peripheral"]
-#[doc = "       during the radio timeslot."]
-#[doc = ""]
-#[doc = " @param[in] p_request Pointer to the request parameters."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_FORBIDDEN Either:"]
-#[doc = "                                - The session is not open."]
-#[doc = "                                - The session is not IDLE."]
-#[doc = "                                - This is the first request and its type is not @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
-#[doc = "                                - The request type was set to @ref NRF_RADIO_REQ_TYPE_NORMAL after a"]
-#[doc = "                                  @ref NRF_RADIO_REQ_TYPE_EARLIEST request was blocked."]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR If the p_request pointer is invalid."]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM If the parameters of p_request are not valid."]
-#[doc = " @retval ::NRF_SUCCESS Otherwise."]
-#[inline(always)]
-pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 74",
-        inout("r0") to_asm(p_request) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Write register protected by the SoftDevice"]
-#[doc = ""]
-#[doc = " This function writes to a register that is write-protected by the SoftDevice. Please refer to your"]
-#[doc = " SoftDevice Specification for more details about which registers that are protected by SoftDevice."]
-#[doc = " This function can write to the following protected peripheral:"]
-#[doc = "  - ACL"]
-#[doc = ""]
-#[doc = " @note Protected registers may be read directly."]
-#[doc = " @note Register that are write-once will return @ref NRF_SUCCESS on second set, even the value in"]
-#[doc = "       the register has not changed. See the Product Specification for more details about register"]
-#[doc = "       properties."]
-#[doc = ""]
-#[doc = " @param[in]  p_register Pointer to register to be written."]
-#[doc = " @param[in]  value Value to be written to the register."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR This function can not write to the reguested register."]
-#[doc = " @retval ::NRF_SUCCESS Value successfully written to register."]
-#[doc = ""]
-#[inline(always)]
-pub unsafe fn sd_protected_register_write(p_register: *mut u32, value: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 43",
-        inout("r0") to_asm(p_register) => ret,
-        inout("r1") to_asm(value) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "< ::sd_softdevice_enable"]
-pub const NRF_SD_SVCS_SD_SOFTDEVICE_ENABLE: NRF_SD_SVCS = 16;
-#[doc = "< ::sd_softdevice_disable"]
-pub const NRF_SD_SVCS_SD_SOFTDEVICE_DISABLE: NRF_SD_SVCS = 17;
-#[doc = "< ::sd_softdevice_is_enabled"]
-pub const NRF_SD_SVCS_SD_SOFTDEVICE_IS_ENABLED: NRF_SD_SVCS = 18;
-#[doc = "< ::sd_softdevice_vector_table_base_set"]
-pub const NRF_SD_SVCS_SD_SOFTDEVICE_VECTOR_TABLE_BASE_SET: NRF_SD_SVCS = 19;
-#[doc = "< Placeholder for last SDM SVC"]
-pub const NRF_SD_SVCS_SVC_SDM_LAST: NRF_SD_SVCS = 20;
-#[doc = "@brief nRF SoftDevice Manager API SVC numbers."]
-pub type NRF_SD_SVCS = self::c_uint;
-#[doc = "@brief Type representing LFCLK oscillator source."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct nrf_clock_lf_cfg_t {
-    #[doc = "< LF oscillator clock source, see @ref NRF_CLOCK_LF_SRC."]
-    pub source: u8,
-    #[doc = "< Only for ::NRF_CLOCK_LF_SRC_RC: Calibration timer interval in 1/4 second"]
-    #[doc = "units (nRF52: 1-32)."]
-    #[doc = "@note To avoid excessive clock drift, 0.5 degrees Celsius is the"]
-    #[doc = "maximum temperature change allowed in one calibration timer"]
-    #[doc = "interval. The interval should be selected to ensure this."]
-    #[doc = ""]
-    #[doc = "@note Must be 0 if source is not ::NRF_CLOCK_LF_SRC_RC."]
-    pub rc_ctiv: u8,
-    #[doc = "<  Only for ::NRF_CLOCK_LF_SRC_RC: How often (in number of calibration"]
-    #[doc = "intervals) the RC oscillator shall be calibrated if the temperature"]
-    #[doc = "hasn't changed."]
-    #[doc = "0: Always calibrate even if the temperature hasn't changed."]
-    #[doc = "1: Only calibrate if the temperature has changed (legacy - nRF51 only)."]
-    #[doc = "2-33: Check the temperature and only calibrate if it has changed,"]
-    #[doc = "however calibration will take place every rc_temp_ctiv"]
-    #[doc = "intervals in any case."]
-    #[doc = ""]
-    #[doc = "@note Must be 0 if source is not ::NRF_CLOCK_LF_SRC_RC."]
-    #[doc = ""]
-    #[doc = "@note For nRF52, the application must ensure calibration at least once"]
-    #[doc = "every 8 seconds to ensure +/-500 ppm clock stability. The"]
-    #[doc = "recommended configuration for ::NRF_CLOCK_LF_SRC_RC on nRF52 is"]
-    #[doc = "rc_ctiv=16 and rc_temp_ctiv=2. This will ensure calibration at"]
-    #[doc = "least once every 8 seconds and for temperature changes of 0.5"]
-    #[doc = "degrees Celsius every 4 seconds. See the Product Specification"]
-    #[doc = "for the nRF52 device being used for more information."]
-    pub rc_temp_ctiv: u8,
-    #[doc = "< External clock accuracy used in the LL to compute timing"]
-    #[doc = "windows, see @ref NRF_CLOCK_LF_ACCURACY."]
-    pub accuracy: u8,
-}
-#[test]
-fn bindgen_test_layout_nrf_clock_lf_cfg_t() {
-    assert_eq!(
-        ::core::mem::size_of::<nrf_clock_lf_cfg_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(nrf_clock_lf_cfg_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<nrf_clock_lf_cfg_t>(),
-        1usize,
-        concat!("Alignment of ", stringify!(nrf_clock_lf_cfg_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).source as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_clock_lf_cfg_t),
-            "::",
-            stringify!(source)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_ctiv as *const _ as usize },
-        1usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_clock_lf_cfg_t),
-            "::",
-            stringify!(rc_ctiv)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_temp_ctiv as *const _ as usize },
-        2usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_clock_lf_cfg_t),
-            "::",
-            stringify!(rc_temp_ctiv)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).accuracy as *const _ as usize },
-        3usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(nrf_clock_lf_cfg_t),
-            "::",
-            stringify!(accuracy)
-        )
-    );
-}
-#[doc = "@brief Fault Handler type."]
-#[doc = ""]
-#[doc = " When certain unrecoverable errors occur within the application or SoftDevice the fault handler will be called back."]
-#[doc = " The protocol stack will be in an undefined state when this happens and the only way to recover will be to"]
-#[doc = " perform a reset, using e.g. CMSIS NVIC_SystemReset()."]
-#[doc = " If the application returns from the fault handler the SoftDevice will call NVIC_SystemReset()."]
-#[doc = ""]
-#[doc = " @note It is recommended to either perform a reset in the fault handler or to let the SoftDevice reset the device."]
-#[doc = "       Otherwise SoC peripherals may behave in an undefined way. For example, the RADIO peripherial may"]
-#[doc = "       continously transmit packets."]
-#[doc = ""]
-#[doc = " @note This callback is executed in HardFault context, thus SVC functions cannot be called from the fault callback."]
-#[doc = ""]
-#[doc = " @param[in] id Fault identifier. See @ref NRF_FAULT_IDS."]
-#[doc = " @param[in] pc The program counter of the instruction that triggered the fault."]
-#[doc = " @param[in] info Optional additional information regarding the fault. Refer to each Fault identifier for details."]
-#[doc = ""]
-#[doc = " @note When id is set to @ref NRF_FAULT_ID_APP_MEMACC, pc will contain the address of the instruction being executed at the time when"]
-#[doc = " the fault is detected by the CPU. The CPU program counter may have advanced up to 2 instructions (no branching) after the one that triggered the fault."]
-pub type nrf_fault_handler_t = ::core::option::Option<unsafe extern "C" fn(id: u32, pc: u32, info: u32)>;
-
-#[doc = "@brief Enables the SoftDevice and by extension the protocol stack."]
-#[doc = ""]
-#[doc = " @note Some care must be taken if a low frequency clock source is already running when calling this function:"]
-#[doc = "       If the LF clock has a different source then the one currently running, it will be stopped. Then, the new"]
-#[doc = "       clock source will be started."]
-#[doc = ""]
-#[doc = " @note This function has no effect when returning with an error."]
-#[doc = ""]
-#[doc = " @post If return code is ::NRF_SUCCESS"]
-#[doc = "       - SoC library and protocol stack APIs are made available."]
-#[doc = "       - A portion of RAM will be unavailable (see relevant SDS documentation)."]
-#[doc = "       - Some peripherals will be unavailable or available only through the SoC API (see relevant SDS documentation)."]
-#[doc = "       - Interrupts will not arrive from protected peripherals or interrupts."]
-#[doc = "       - nrf_nvic_ functions must be used instead of CMSIS NVIC_ functions for reliable usage of the SoftDevice."]
-#[doc = "       - Interrupt latency may be affected by the SoftDevice  (see relevant SDS documentation)."]
-#[doc = "       - Chosen low frequency clock source will be running."]
-#[doc = ""]
-#[doc = " @param p_clock_lf_cfg Low frequency clock source and accuracy."]
-#[doc = "If NULL the clock will be configured as an RC source with rc_ctiv = 16 and .rc_temp_ctiv = 2"]
-#[doc = "In the case of XTAL source, the PPM accuracy of the chosen clock source must be greater than or equal to the actual characteristics of your XTAL clock."]
-#[doc = " @param fault_handler Callback to be invoked in case of fault, cannot be NULL."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid or NULL pointer supplied."]
-#[doc = " @retval ::NRF_ERROR_INVALID_STATE SoftDevice is already enabled, and the clock source and fault handler cannot be updated."]
-#[doc = " @retval ::NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION SoftDevice interrupt is already enabled, or an enabled interrupt has an illegal priority level."]
-#[doc = " @retval ::NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN Unknown low frequency clock source selected."]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid clock source configuration supplied in p_clock_lf_cfg."]
-#[inline(always)]
-pub unsafe fn sd_softdevice_enable(
-    p_clock_lf_cfg: *const nrf_clock_lf_cfg_t,
-    fault_handler: nrf_fault_handler_t,
-) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 16",
-        inout("r0") to_asm(p_clock_lf_cfg) => ret,
-        inout("r1") to_asm(fault_handler) => _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Disables the SoftDevice and by extension the protocol stack."]
-#[doc = ""]
-#[doc = " Idempotent function to disable the SoftDevice."]
-#[doc = ""]
-#[doc = " @post SoC library and protocol stack APIs are made unavailable."]
-#[doc = " @post All interrupts that was protected by the SoftDevice will be disabled and initialized to priority 0 (highest)."]
-#[doc = " @post All peripherals used by the SoftDevice will be reset to default values."]
-#[doc = " @post All of RAM become available."]
-#[doc = " @post All interrupts are forwarded to the application."]
-#[doc = " @post LFCLK source chosen in ::sd_softdevice_enable will be left running."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_softdevice_disable() -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 17",
-        lateout("r0") ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Check if the SoftDevice is enabled."]
-#[doc = ""]
-#[doc = " @param[out]  p_softdevice_enabled If the SoftDevice is enabled: 1 else 0."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 18",
-        inout("r0") to_asm(p_softdevice_enabled) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
-#[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the SoftDevice"]
-#[doc = ""]
-#[doc = " This function is only intended to be called when a bootloader is enabled."]
-#[doc = ""]
-#[doc = " @param[in] address The base address of the interrupt vector table for forwarded interrupts."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[inline(always)]
-pub unsafe fn sd_softdevice_vector_table_base_set(address: u32) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 19",
-        inout("r0") to_asm(address) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
 #[doc = " @brief 128 bit UUID values."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -3088,686 +996,6 @@ fn bindgen_test_layout_ble_data_t() {
         concat!("Offset of field: ", stringify!(ble_data_t), "::", stringify!(len))
     );
 }
-#[doc = " @brief BLE GATT connection configuration parameters, set with @ref sd_ble_cfg_set."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM att_mtu is smaller than @ref BLE_GATT_ATT_MTU_DEFAULT."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct ble_gatt_conn_cfg_t {
-    #[doc = "< Maximum size of ATT packet the SoftDevice can send or receive."]
-    #[doc = "The default and minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
-    #[doc = "@mscs"]
-    #[doc = "@mmsc{@ref BLE_GATTC_MTU_EXCHANGE}"]
-    #[doc = "@mmsc{@ref BLE_GATTS_MTU_EXCHANGE}"]
-    #[doc = "@endmscs"]
-    pub att_mtu: u16,
-}
-#[test]
-fn bindgen_test_layout_ble_gatt_conn_cfg_t() {
-    assert_eq!(
-        ::core::mem::size_of::<ble_gatt_conn_cfg_t>(),
-        2usize,
-        concat!("Size of: ", stringify!(ble_gatt_conn_cfg_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<ble_gatt_conn_cfg_t>(),
-        2usize,
-        concat!("Alignment of ", stringify!(ble_gatt_conn_cfg_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<ble_gatt_conn_cfg_t>())).att_mtu as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(ble_gatt_conn_cfg_t),
-            "::",
-            stringify!(att_mtu)
-        )
-    );
-}
-#[doc = "@brief GATT Characteristic Properties."]
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
-pub struct ble_gatt_char_props_t {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-}
-#[test]
-fn bindgen_test_layout_ble_gatt_char_props_t() {
-    assert_eq!(
-        ::core::mem::size_of::<ble_gatt_char_props_t>(),
-        1usize,
-        concat!("Size of: ", stringify!(ble_gatt_char_props_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<ble_gatt_char_props_t>(),
-        1usize,
-        concat!("Alignment of ", stringify!(ble_gatt_char_props_t))
-    );
-}
-impl ble_gatt_char_props_t {
-    #[inline]
-    pub fn broadcast(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_broadcast(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn read(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_read(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn write_wo_resp(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_write_wo_resp(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(2usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn write(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_write(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(3usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn notify(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_notify(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(4usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn indicate(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_indicate(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(5usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn auth_signed_wr(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_auth_signed_wr(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(6usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(
-        broadcast: u8,
-        read: u8,
-        write_wo_resp: u8,
-        write: u8,
-        notify: u8,
-        indicate: u8,
-        auth_signed_wr: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let broadcast: u8 = unsafe { ::core::mem::transmute(broadcast) };
-            broadcast as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let read: u8 = unsafe { ::core::mem::transmute(read) };
-            read as u64
-        });
-        __bindgen_bitfield_unit.set(2usize, 1u8, {
-            let write_wo_resp: u8 = unsafe { ::core::mem::transmute(write_wo_resp) };
-            write_wo_resp as u64
-        });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
-            let write: u8 = unsafe { ::core::mem::transmute(write) };
-            write as u64
-        });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
-            let notify: u8 = unsafe { ::core::mem::transmute(notify) };
-            notify as u64
-        });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let indicate: u8 = unsafe { ::core::mem::transmute(indicate) };
-            indicate as u64
-        });
-        __bindgen_bitfield_unit.set(6usize, 1u8, {
-            let auth_signed_wr: u8 = unsafe { ::core::mem::transmute(auth_signed_wr) };
-            auth_signed_wr as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-#[doc = "@brief GATT Characteristic Extended Properties."]
-#[repr(C, packed)]
-#[derive(Debug, Copy, Clone)]
-pub struct ble_gatt_char_ext_props_t {
-    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
-}
-#[test]
-fn bindgen_test_layout_ble_gatt_char_ext_props_t() {
-    assert_eq!(
-        ::core::mem::size_of::<ble_gatt_char_ext_props_t>(),
-        1usize,
-        concat!("Size of: ", stringify!(ble_gatt_char_ext_props_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<ble_gatt_char_ext_props_t>(),
-        1usize,
-        concat!("Alignment of ", stringify!(ble_gatt_char_ext_props_t))
-    );
-}
-impl ble_gatt_char_ext_props_t {
-    #[inline]
-    pub fn reliable_wr(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_reliable_wr(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(0usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn wr_aux(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
-    }
-    #[inline]
-    pub fn set_wr_aux(&mut self, val: u8) {
-        unsafe {
-            let val: u8 = ::core::mem::transmute(val);
-            self._bitfield_1.set(1usize, 1u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn new_bitfield_1(reliable_wr: u8, wr_aux: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
-        __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let reliable_wr: u8 = unsafe { ::core::mem::transmute(reliable_wr) };
-            reliable_wr as u64
-        });
-        __bindgen_bitfield_unit.set(1usize, 1u8, {
-            let wr_aux: u8 = unsafe { ::core::mem::transmute(wr_aux) };
-            wr_aux as u64
-        });
-        __bindgen_bitfield_unit
-    }
-}
-#[doc = "< ::sd_mbr_command"]
-pub const NRF_MBR_SVCS_SD_MBR_COMMAND: NRF_MBR_SVCS = 24;
-#[doc = "@brief nRF Master Boot Record API SVC numbers."]
-pub type NRF_MBR_SVCS = self::c_uint;
-#[doc = "< Copy a new BootLoader. @see ::sd_mbr_command_copy_bl_t"]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COPY_BL: NRF_MBR_COMMANDS = 0;
-#[doc = "< Copy a new SoftDevice. @see ::sd_mbr_command_copy_sd_t"]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COPY_SD: NRF_MBR_COMMANDS = 1;
-#[doc = "< Initialize forwarding interrupts to SD, and run reset function in SD. Does not require any parameters in ::sd_mbr_command_t params."]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_INIT_SD: NRF_MBR_COMMANDS = 2;
-#[doc = "< This command works like memcmp. @see ::sd_mbr_command_compare_t"]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COMPARE: NRF_MBR_COMMANDS = 3;
-#[doc = "< Change the address the MBR starts after a reset. @see ::sd_mbr_command_vector_table_base_set_t"]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET: NRF_MBR_COMMANDS = 4;
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_RESERVED: NRF_MBR_COMMANDS = 5;
-#[doc = "< Start forwarding all interrupts to this address. @see ::sd_mbr_command_irq_forward_address_set_t"]
-pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_IRQ_FORWARD_ADDRESS_SET: NRF_MBR_COMMANDS = 6;
-#[doc = "@brief Possible values for ::sd_mbr_command_t.command"]
-pub type NRF_MBR_COMMANDS = self::c_uint;
-#[doc = "@brief This command copies part of a new SoftDevice"]
-#[doc = ""]
-#[doc = " The destination area is erased before copying."]
-#[doc = " If dst is in the middle of a flash page, that whole flash page will be erased."]
-#[doc = " If (dst+len) is in the middle of a flash page, that whole flash page will be erased."]
-#[doc = ""]
-#[doc = " The user of this function is responsible for setting the BPROT registers."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS indicates that the contents of the memory blocks where copied correctly."]
-#[doc = " @retval ::NRF_ERROR_INTERNAL indicates that the contents of the memory blocks where not verified correctly after copying."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sd_mbr_command_copy_sd_t {
-    #[doc = "< Pointer to the source of data to be copied."]
-    pub src: *mut u32,
-    #[doc = "< Pointer to the destination where the content is to be copied."]
-    pub dst: *mut u32,
-    #[doc = "< Number of 32 bit words to copy. Must be a multiple of @ref MBR_PAGE_SIZE_IN_WORDS words."]
-    pub len: u32,
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_copy_sd_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_copy_sd_t>(),
-        12usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_copy_sd_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_copy_sd_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_copy_sd_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).src as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_copy_sd_t),
-            "::",
-            stringify!(src)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).dst as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_copy_sd_t),
-            "::",
-            stringify!(dst)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).len as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_copy_sd_t),
-            "::",
-            stringify!(len)
-        )
-    );
-}
-#[doc = "@brief This command works like memcmp, but takes the length in words."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS indicates that the contents of both memory blocks are equal."]
-#[doc = " @retval ::NRF_ERROR_NULL indicates that the contents of the memory blocks are not equal."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sd_mbr_command_compare_t {
-    #[doc = "< Pointer to block of memory."]
-    pub ptr1: *mut u32,
-    #[doc = "< Pointer to block of memory."]
-    pub ptr2: *mut u32,
-    #[doc = "< Number of 32 bit words to compare."]
-    pub len: u32,
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_compare_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_compare_t>(),
-        12usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_compare_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_compare_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_compare_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).ptr1 as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_compare_t),
-            "::",
-            stringify!(ptr1)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).ptr2 as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_compare_t),
-            "::",
-            stringify!(ptr2)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).len as *const _ as usize },
-        8usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_compare_t),
-            "::",
-            stringify!(len)
-        )
-    );
-}
-#[doc = "@brief This command copies a new BootLoader."]
-#[doc = ""]
-#[doc = " The MBR assumes that either @ref MBR_BOOTLOADER_ADDR or @ref MBR_UICR_BOOTLOADER_ADDR is set to"]
-#[doc = " the address where the bootloader will be copied. If both addresses are set, the MBR will prioritize"]
-#[doc = " @ref MBR_BOOTLOADER_ADDR."]
-#[doc = ""]
-#[doc = " The bootloader destination is erased by this function."]
-#[doc = " If (destination+bl_len) is in the middle of a flash page, that whole flash page will be erased."]
-#[doc = ""]
-#[doc = " This command requires that @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR is set,"]
-#[doc = " see @ref sd_mbr_command."]
-#[doc = ""]
-#[doc = " This command will use the flash protect peripheral (BPROT or ACL) to protect the flash that is"]
-#[doc = " not intended to be written."]
-#[doc = ""]
-#[doc = " On success, this function will not return. It will start the new bootloader from reset-vector as normal."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INTERNAL indicates an internal error that should not happen."]
-#[doc = " @retval ::NRF_ERROR_FORBIDDEN if the bootloader address is not set."]
-#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH if parameters attempts to read or write outside flash area."]
-#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page is provided. See @ref sd_mbr_command."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sd_mbr_command_copy_bl_t {
-    #[doc = "< Pointer to the source of the bootloader to be be copied."]
-    pub bl_src: *mut u32,
-    #[doc = "< Number of 32 bit words to copy for BootLoader."]
-    pub bl_len: u32,
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_copy_bl_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_copy_bl_t>(),
-        8usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_copy_bl_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_copy_bl_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_copy_bl_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_src as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_copy_bl_t),
-            "::",
-            stringify!(bl_src)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_len as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_copy_bl_t),
-            "::",
-            stringify!(bl_len)
-        )
-    );
-}
-#[doc = "@brief Change the address the MBR starts after a reset"]
-#[doc = ""]
-#[doc = " Once this function has been called, this address is where the MBR will start to forward"]
-#[doc = " interrupts to after a reset."]
-#[doc = ""]
-#[doc = " To restore default forwarding, this function should be called with @ref address set to 0. If a"]
-#[doc = " bootloader is present, interrupts will be forwarded to the bootloader. If not, interrupts will"]
-#[doc = " be forwarded to the SoftDevice."]
-#[doc = ""]
-#[doc = " The location of a bootloader can be specified in @ref MBR_BOOTLOADER_ADDR or"]
-#[doc = " @ref MBR_UICR_BOOTLOADER_ADDR. If both addresses are set, the MBR will prioritize"]
-#[doc = " @ref MBR_BOOTLOADER_ADDR."]
-#[doc = ""]
-#[doc = " This command requires that @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR is set,"]
-#[doc = " see @ref sd_mbr_command."]
-#[doc = ""]
-#[doc = " On success, this function will not return. It will reset the device."]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_INTERNAL indicates an internal error that should not happen."]
-#[doc = " @retval ::NRF_ERROR_INVALID_ADDR if parameter address is outside of the flash size."]
-#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page is provided. See @ref sd_mbr_command."]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sd_mbr_command_vector_table_base_set_t {
-    #[doc = "< The base address of the interrupt vector table for forwarded interrupts."]
-    pub address: u32,
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_vector_table_base_set_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_vector_table_base_set_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_vector_table_base_set_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_vector_table_base_set_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_vector_table_base_set_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_vector_table_base_set_t>())).address as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_vector_table_base_set_t),
-            "::",
-            stringify!(address)
-        )
-    );
-}
-#[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the MBR"]
-#[doc = ""]
-#[doc = " Unlike sd_mbr_command_vector_table_base_set_t, this function does not reset, and it does not"]
-#[doc = " change where the MBR starts after reset."]
-#[doc = ""]
-#[doc = " @retval ::NRF_SUCCESS"]
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct sd_mbr_command_irq_forward_address_set_t {
-    #[doc = "< The base address of the interrupt vector table for forwarded interrupts."]
-    pub address: u32,
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_irq_forward_address_set_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_irq_forward_address_set_t>(),
-        4usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_irq_forward_address_set_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_irq_forward_address_set_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_irq_forward_address_set_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_irq_forward_address_set_t>())).address as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_irq_forward_address_set_t),
-            "::",
-            stringify!(address)
-        )
-    );
-}
-#[doc = "@brief Input structure containing data used when calling ::sd_mbr_command"]
-#[doc = ""]
-#[doc = " Depending on what command value that is set, the corresponding params value type must also be"]
-#[doc = " set. See @ref NRF_MBR_COMMANDS for command types and corresponding params value type. If command"]
-#[doc = " @ref SD_MBR_COMMAND_INIT_SD is set, it is not necessary to set any values under params."]
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sd_mbr_command_t {
-    #[doc = "< Type of command to be issued. See @ref NRF_MBR_COMMANDS."]
-    pub command: u32,
-    #[doc = "< Command parameters."]
-    pub params: sd_mbr_command_t__bindgen_ty_1,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub union sd_mbr_command_t__bindgen_ty_1 {
-    #[doc = "< Parameters for copy SoftDevice."]
-    pub copy_sd: sd_mbr_command_copy_sd_t,
-    #[doc = "< Parameters for verify."]
-    pub compare: sd_mbr_command_compare_t,
-    #[doc = "< Parameters for copy BootLoader. Requires parameter page."]
-    pub copy_bl: sd_mbr_command_copy_bl_t,
-    #[doc = "< Parameters for vector table base set. Requires parameter page."]
-    pub base_set: sd_mbr_command_vector_table_base_set_t,
-    #[doc = "< Parameters for irq forward address set"]
-    pub irq_forward_address_set: sd_mbr_command_irq_forward_address_set_t,
-    _bindgen_union_align: [u32; 3usize],
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_t__bindgen_ty_1>(),
-        12usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_t__bindgen_ty_1>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_t__bindgen_ty_1))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_sd as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t__bindgen_ty_1),
-            "::",
-            stringify!(copy_sd)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).compare as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t__bindgen_ty_1),
-            "::",
-            stringify!(compare)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_bl as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t__bindgen_ty_1),
-            "::",
-            stringify!(copy_bl)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).base_set as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t__bindgen_ty_1),
-            "::",
-            stringify!(base_set)
-        )
-    );
-    assert_eq!(
-        unsafe {
-            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).irq_forward_address_set as *const _ as usize
-        },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t__bindgen_ty_1),
-            "::",
-            stringify!(irq_forward_address_set)
-        )
-    );
-}
-#[test]
-fn bindgen_test_layout_sd_mbr_command_t() {
-    assert_eq!(
-        ::core::mem::size_of::<sd_mbr_command_t>(),
-        16usize,
-        concat!("Size of: ", stringify!(sd_mbr_command_t))
-    );
-    assert_eq!(
-        ::core::mem::align_of::<sd_mbr_command_t>(),
-        4usize,
-        concat!("Alignment of ", stringify!(sd_mbr_command_t))
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t>())).command as *const _ as usize },
-        0usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t),
-            "::",
-            stringify!(command)
-        )
-    );
-    assert_eq!(
-        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t>())).params as *const _ as usize },
-        4usize,
-        concat!(
-            "Offset of field: ",
-            stringify!(sd_mbr_command_t),
-            "::",
-            stringify!(params)
-        )
-    );
-}
-
-#[doc = "@brief Issue Master Boot Record commands"]
-#[doc = ""]
-#[doc = " Commands used when updating a SoftDevice and bootloader."]
-#[doc = ""]
-#[doc = " The @ref SD_MBR_COMMAND_COPY_BL and @ref SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET requires"]
-#[doc = " parameters to be retained by the MBR when resetting the IC. This is done in a separate flash"]
-#[doc = " page. The location of the flash page should be provided by the application in either"]
-#[doc = " @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR. If both addresses are set, the MBR"]
-#[doc = " will prioritize @ref MBR_PARAM_PAGE_ADDR. This page will be cleared by the MBR and is used to"]
-#[doc = " store the command before reset. When an address is specified, the page it refers to must not be"]
-#[doc = " used by the application. If no address is provided by the application, i.e. both"]
-#[doc = " @ref MBR_PARAM_PAGE_ADDR and @ref MBR_UICR_PARAM_PAGE_ADDR is 0xFFFFFFFF, MBR commands which use"]
-#[doc = " flash will be unavailable and return @ref NRF_ERROR_NO_MEM."]
-#[doc = ""]
-#[doc = " @param[in]  param Pointer to a struct describing the command."]
-#[doc = ""]
-#[doc = " @note For a complete set of return values, see ::sd_mbr_command_copy_sd_t,"]
-#[doc = "       ::sd_mbr_command_copy_bl_t, ::sd_mbr_command_compare_t,"]
-#[doc = "       ::sd_mbr_command_vector_table_base_set_t, ::sd_mbr_command_irq_forward_address_set_t"]
-#[doc = ""]
-#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided"]
-#[doc = " @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given."]
-#[inline(always)]
-pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
-    let ret: u32;
-    core::arch::asm!("svc 24",
-        inout("r0") to_asm(param) => ret,
-        lateout("r1") _,
-        lateout("r2") _,
-        lateout("r3") _,
-        lateout("r12") _,
-    );
-    ret
-}
-
 #[doc = "< Set own Bluetooth Address."]
 pub const BLE_GAP_SVCS_SD_BLE_GAP_ADDR_SET: BLE_GAP_SVCS = 108;
 #[doc = "< Get own Bluetooth Address."]
@@ -11141,6 +8369,238 @@ pub unsafe fn sd_ble_l2cap_ch_flow_control(conn_handle: u16, local_cid: u16, cre
     ret
 }
 
+#[doc = " @brief BLE GATT connection configuration parameters, set with @ref sd_ble_cfg_set."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM att_mtu is smaller than @ref BLE_GATT_ATT_MTU_DEFAULT."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct ble_gatt_conn_cfg_t {
+    #[doc = "< Maximum size of ATT packet the SoftDevice can send or receive."]
+    #[doc = "The default and minimum value is @ref BLE_GATT_ATT_MTU_DEFAULT."]
+    #[doc = "@mscs"]
+    #[doc = "@mmsc{@ref BLE_GATTC_MTU_EXCHANGE}"]
+    #[doc = "@mmsc{@ref BLE_GATTS_MTU_EXCHANGE}"]
+    #[doc = "@endmscs"]
+    pub att_mtu: u16,
+}
+#[test]
+fn bindgen_test_layout_ble_gatt_conn_cfg_t() {
+    assert_eq!(
+        ::core::mem::size_of::<ble_gatt_conn_cfg_t>(),
+        2usize,
+        concat!("Size of: ", stringify!(ble_gatt_conn_cfg_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<ble_gatt_conn_cfg_t>(),
+        2usize,
+        concat!("Alignment of ", stringify!(ble_gatt_conn_cfg_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<ble_gatt_conn_cfg_t>())).att_mtu as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ble_gatt_conn_cfg_t),
+            "::",
+            stringify!(att_mtu)
+        )
+    );
+}
+#[doc = "@brief GATT Characteristic Properties."]
+#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+pub struct ble_gatt_char_props_t {
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
+}
+#[test]
+fn bindgen_test_layout_ble_gatt_char_props_t() {
+    assert_eq!(
+        ::core::mem::size_of::<ble_gatt_char_props_t>(),
+        1usize,
+        concat!("Size of: ", stringify!(ble_gatt_char_props_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<ble_gatt_char_props_t>(),
+        1usize,
+        concat!("Alignment of ", stringify!(ble_gatt_char_props_t))
+    );
+}
+impl ble_gatt_char_props_t {
+    #[inline]
+    pub fn broadcast(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_broadcast(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn read(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_read(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn write_wo_resp(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_write_wo_resp(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn write(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_write(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(3usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn notify(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_notify(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(4usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn indicate(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_indicate(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn auth_signed_wr(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_auth_signed_wr(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(6usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        broadcast: u8,
+        read: u8,
+        write_wo_resp: u8,
+        write: u8,
+        notify: u8,
+        indicate: u8,
+        auth_signed_wr: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let broadcast: u8 = unsafe { ::core::mem::transmute(broadcast) };
+            broadcast as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let read: u8 = unsafe { ::core::mem::transmute(read) };
+            read as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let write_wo_resp: u8 = unsafe { ::core::mem::transmute(write_wo_resp) };
+            write_wo_resp as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 1u8, {
+            let write: u8 = unsafe { ::core::mem::transmute(write) };
+            write as u64
+        });
+        __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let notify: u8 = unsafe { ::core::mem::transmute(notify) };
+            notify as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let indicate: u8 = unsafe { ::core::mem::transmute(indicate) };
+            indicate as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
+            let auth_signed_wr: u8 = unsafe { ::core::mem::transmute(auth_signed_wr) };
+            auth_signed_wr as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = "@brief GATT Characteristic Extended Properties."]
+#[repr(C, packed)]
+#[derive(Debug, Copy, Clone)]
+pub struct ble_gatt_char_ext_props_t {
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize], u8>,
+}
+#[test]
+fn bindgen_test_layout_ble_gatt_char_ext_props_t() {
+    assert_eq!(
+        ::core::mem::size_of::<ble_gatt_char_ext_props_t>(),
+        1usize,
+        concat!("Size of: ", stringify!(ble_gatt_char_ext_props_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<ble_gatt_char_ext_props_t>(),
+        1usize,
+        concat!("Alignment of ", stringify!(ble_gatt_char_ext_props_t))
+    );
+}
+impl ble_gatt_char_ext_props_t {
+    #[inline]
+    pub fn reliable_wr(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_reliable_wr(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn wr_aux(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_wr_aux(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(reliable_wr: u8, wr_aux: u8) -> __BindgenBitfieldUnit<[u8; 1usize], u8> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize], u8> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let reliable_wr: u8 = unsafe { ::core::mem::transmute(reliable_wr) };
+            reliable_wr as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let wr_aux: u8 = unsafe { ::core::mem::transmute(wr_aux) };
+            wr_aux as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
 #[doc = "< Primary Service Discovery."]
 pub const BLE_GATTC_SVCS_SD_BLE_GATTC_PRIMARY_SERVICES_DISCOVER: BLE_GATTC_SVCS = 155;
 #[doc = "< Relationship Discovery."]
@@ -16575,6 +14035,2554 @@ pub unsafe fn sd_ble_opt_get(opt_id: u32, p_opt: *mut ble_opt_t) -> u32 {
     core::arch::asm!("svc 104",
         inout("r0") to_asm(opt_id) => ret,
         inout("r1") to_asm(p_opt) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_GET: NRF_SOC_SVCS = 32;
+pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_SET: NRF_SOC_SVCS = 33;
+pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ENABLE_CLR: NRF_SOC_SVCS = 34;
+pub const NRF_SOC_SVCS_SD_PPI_CHANNEL_ASSIGN: NRF_SOC_SVCS = 35;
+pub const NRF_SOC_SVCS_SD_PPI_GROUP_TASK_ENABLE: NRF_SOC_SVCS = 36;
+pub const NRF_SOC_SVCS_SD_PPI_GROUP_TASK_DISABLE: NRF_SOC_SVCS = 37;
+pub const NRF_SOC_SVCS_SD_PPI_GROUP_ASSIGN: NRF_SOC_SVCS = 38;
+pub const NRF_SOC_SVCS_SD_PPI_GROUP_GET: NRF_SOC_SVCS = 39;
+pub const NRF_SOC_SVCS_SD_FLASH_PAGE_ERASE: NRF_SOC_SVCS = 40;
+pub const NRF_SOC_SVCS_SD_FLASH_WRITE: NRF_SOC_SVCS = 41;
+pub const NRF_SOC_SVCS_SD_PROTECTED_REGISTER_WRITE: NRF_SOC_SVCS = 43;
+pub const NRF_SOC_SVCS_SD_MUTEX_NEW: NRF_SOC_SVCS = 44;
+pub const NRF_SOC_SVCS_SD_MUTEX_ACQUIRE: NRF_SOC_SVCS = 45;
+pub const NRF_SOC_SVCS_SD_MUTEX_RELEASE: NRF_SOC_SVCS = 46;
+pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_POOL_CAPACITY_GET: NRF_SOC_SVCS = 47;
+pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_BYTES_AVAILABLE_GET: NRF_SOC_SVCS = 48;
+pub const NRF_SOC_SVCS_SD_RAND_APPLICATION_VECTOR_GET: NRF_SOC_SVCS = 49;
+pub const NRF_SOC_SVCS_SD_POWER_MODE_SET: NRF_SOC_SVCS = 50;
+pub const NRF_SOC_SVCS_SD_POWER_SYSTEM_OFF: NRF_SOC_SVCS = 51;
+pub const NRF_SOC_SVCS_SD_POWER_RESET_REASON_GET: NRF_SOC_SVCS = 52;
+pub const NRF_SOC_SVCS_SD_POWER_RESET_REASON_CLR: NRF_SOC_SVCS = 53;
+pub const NRF_SOC_SVCS_SD_POWER_POF_ENABLE: NRF_SOC_SVCS = 54;
+pub const NRF_SOC_SVCS_SD_POWER_POF_THRESHOLD_SET: NRF_SOC_SVCS = 55;
+pub const NRF_SOC_SVCS_SD_POWER_POF_THRESHOLDVDDH_SET: NRF_SOC_SVCS = 56;
+pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_SET: NRF_SOC_SVCS = 57;
+pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_CLR: NRF_SOC_SVCS = 58;
+pub const NRF_SOC_SVCS_SD_POWER_RAM_POWER_GET: NRF_SOC_SVCS = 59;
+pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_SET: NRF_SOC_SVCS = 60;
+pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_CLR: NRF_SOC_SVCS = 61;
+pub const NRF_SOC_SVCS_SD_POWER_GPREGRET_GET: NRF_SOC_SVCS = 62;
+pub const NRF_SOC_SVCS_SD_POWER_DCDC_MODE_SET: NRF_SOC_SVCS = 63;
+pub const NRF_SOC_SVCS_SD_POWER_DCDC0_MODE_SET: NRF_SOC_SVCS = 64;
+pub const NRF_SOC_SVCS_SD_APP_EVT_WAIT: NRF_SOC_SVCS = 65;
+pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_REQUEST: NRF_SOC_SVCS = 66;
+pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_RELEASE: NRF_SOC_SVCS = 67;
+pub const NRF_SOC_SVCS_SD_CLOCK_HFCLK_IS_RUNNING: NRF_SOC_SVCS = 68;
+pub const NRF_SOC_SVCS_SD_RADIO_NOTIFICATION_CFG_SET: NRF_SOC_SVCS = 69;
+pub const NRF_SOC_SVCS_SD_ECB_BLOCK_ENCRYPT: NRF_SOC_SVCS = 70;
+pub const NRF_SOC_SVCS_SD_ECB_BLOCKS_ENCRYPT: NRF_SOC_SVCS = 71;
+pub const NRF_SOC_SVCS_SD_RADIO_SESSION_OPEN: NRF_SOC_SVCS = 72;
+pub const NRF_SOC_SVCS_SD_RADIO_SESSION_CLOSE: NRF_SOC_SVCS = 73;
+pub const NRF_SOC_SVCS_SD_RADIO_REQUEST: NRF_SOC_SVCS = 74;
+pub const NRF_SOC_SVCS_SD_EVT_GET: NRF_SOC_SVCS = 75;
+pub const NRF_SOC_SVCS_SD_TEMP_GET: NRF_SOC_SVCS = 76;
+pub const NRF_SOC_SVCS_SD_POWER_USBPWRRDY_ENABLE: NRF_SOC_SVCS = 77;
+pub const NRF_SOC_SVCS_SD_POWER_USBDETECTED_ENABLE: NRF_SOC_SVCS = 78;
+pub const NRF_SOC_SVCS_SD_POWER_USBREMOVED_ENABLE: NRF_SOC_SVCS = 79;
+pub const NRF_SOC_SVCS_SD_POWER_USBREGSTATUS_GET: NRF_SOC_SVCS = 80;
+pub const NRF_SOC_SVCS_SVC_SOC_LAST: NRF_SOC_SVCS = 81;
+#[doc = "@brief The SVC numbers used by the SVC functions in the SoC library."]
+pub type NRF_SOC_SVCS = self::c_uint;
+pub const NRF_MUTEX_VALUES_NRF_MUTEX_FREE: NRF_MUTEX_VALUES = 0;
+pub const NRF_MUTEX_VALUES_NRF_MUTEX_TAKEN: NRF_MUTEX_VALUES = 1;
+#[doc = "@brief Possible values of a ::nrf_mutex_t."]
+pub type NRF_MUTEX_VALUES = self::c_uint;
+#[doc = "< Constant latency mode. See power management in the reference manual."]
+pub const NRF_POWER_MODES_NRF_POWER_MODE_CONSTLAT: NRF_POWER_MODES = 0;
+#[doc = "< Low power mode. See power management in the reference manual."]
+pub const NRF_POWER_MODES_NRF_POWER_MODE_LOWPWR: NRF_POWER_MODES = 1;
+#[doc = "@brief Power modes."]
+pub type NRF_POWER_MODES = self::c_uint;
+#[doc = "< 1.7 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V17: NRF_POWER_THRESHOLDS = 4;
+#[doc = "< 1.8 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V18: NRF_POWER_THRESHOLDS = 5;
+#[doc = "< 1.9 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V19: NRF_POWER_THRESHOLDS = 6;
+#[doc = "< 2.0 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V20: NRF_POWER_THRESHOLDS = 7;
+#[doc = "< 2.1 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V21: NRF_POWER_THRESHOLDS = 8;
+#[doc = "< 2.2 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V22: NRF_POWER_THRESHOLDS = 9;
+#[doc = "< 2.3 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V23: NRF_POWER_THRESHOLDS = 10;
+#[doc = "< 2.4 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V24: NRF_POWER_THRESHOLDS = 11;
+#[doc = "< 2.5 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V25: NRF_POWER_THRESHOLDS = 12;
+#[doc = "< 2.6 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V26: NRF_POWER_THRESHOLDS = 13;
+#[doc = "< 2.7 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V27: NRF_POWER_THRESHOLDS = 14;
+#[doc = "< 2.8 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDS_NRF_POWER_THRESHOLD_V28: NRF_POWER_THRESHOLDS = 15;
+#[doc = "@brief Power failure thresholds"]
+pub type NRF_POWER_THRESHOLDS = self::c_uint;
+#[doc = "< 2.7 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V27: NRF_POWER_THRESHOLDVDDHS = 0;
+#[doc = "< 2.8 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V28: NRF_POWER_THRESHOLDVDDHS = 1;
+#[doc = "< 2.9 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V29: NRF_POWER_THRESHOLDVDDHS = 2;
+#[doc = "< 3.0 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V30: NRF_POWER_THRESHOLDVDDHS = 3;
+#[doc = "< 3.1 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V31: NRF_POWER_THRESHOLDVDDHS = 4;
+#[doc = "< 3.2 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V32: NRF_POWER_THRESHOLDVDDHS = 5;
+#[doc = "< 3.3 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V33: NRF_POWER_THRESHOLDVDDHS = 6;
+#[doc = "< 3.4 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V34: NRF_POWER_THRESHOLDVDDHS = 7;
+#[doc = "< 3.5 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V35: NRF_POWER_THRESHOLDVDDHS = 8;
+#[doc = "< 3.6 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V36: NRF_POWER_THRESHOLDVDDHS = 9;
+#[doc = "< 3.7 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V37: NRF_POWER_THRESHOLDVDDHS = 10;
+#[doc = "< 3.8 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V38: NRF_POWER_THRESHOLDVDDHS = 11;
+#[doc = "< 3.9 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V39: NRF_POWER_THRESHOLDVDDHS = 12;
+#[doc = "< 4.0 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V40: NRF_POWER_THRESHOLDVDDHS = 13;
+#[doc = "< 4.1 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V41: NRF_POWER_THRESHOLDVDDHS = 14;
+#[doc = "< 4.2 Volts power failure threshold."]
+pub const NRF_POWER_THRESHOLDVDDHS_NRF_POWER_THRESHOLDVDDH_V42: NRF_POWER_THRESHOLDVDDHS = 15;
+#[doc = "@brief Power failure thresholds for high voltage"]
+pub type NRF_POWER_THRESHOLDVDDHS = self::c_uint;
+#[doc = "< The DCDC is disabled."]
+pub const NRF_POWER_DCDC_MODES_NRF_POWER_DCDC_DISABLE: NRF_POWER_DCDC_MODES = 0;
+#[doc = "< The DCDC is enabled."]
+pub const NRF_POWER_DCDC_MODES_NRF_POWER_DCDC_ENABLE: NRF_POWER_DCDC_MODES = 1;
+#[doc = "@brief DC/DC converter modes."]
+pub type NRF_POWER_DCDC_MODES = self::c_uint;
+#[doc = "< The event does not have a notification."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_NONE: NRF_RADIO_NOTIFICATION_DISTANCES = 0;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_800US: NRF_RADIO_NOTIFICATION_DISTANCES = 1;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_1740US: NRF_RADIO_NOTIFICATION_DISTANCES = 2;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_2680US: NRF_RADIO_NOTIFICATION_DISTANCES = 3;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_3620US: NRF_RADIO_NOTIFICATION_DISTANCES = 4;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_4560US: NRF_RADIO_NOTIFICATION_DISTANCES = 5;
+#[doc = "< The distance from the active notification to start of radio activity."]
+pub const NRF_RADIO_NOTIFICATION_DISTANCES_NRF_RADIO_NOTIFICATION_DISTANCE_5500US: NRF_RADIO_NOTIFICATION_DISTANCES = 6;
+#[doc = "@brief Radio notification distances."]
+pub type NRF_RADIO_NOTIFICATION_DISTANCES = self::c_uint;
+#[doc = "< The event does not have a radio notification signal."]
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_NONE: NRF_RADIO_NOTIFICATION_TYPES = 0;
+#[doc = "< Using interrupt for notification when the radio will be enabled."]
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_ACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 1;
+#[doc = "< Using interrupt for notification when the radio has been disabled."]
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE: NRF_RADIO_NOTIFICATION_TYPES = 2;
+#[doc = "< Using interrupt for notification both when the radio will be enabled and disabled."]
+pub const NRF_RADIO_NOTIFICATION_TYPES_NRF_RADIO_NOTIFICATION_TYPE_INT_ON_BOTH: NRF_RADIO_NOTIFICATION_TYPES = 3;
+#[doc = "@brief Radio notification types."]
+pub type NRF_RADIO_NOTIFICATION_TYPES = self::c_uint;
+#[doc = "< This signal indicates the start of the radio timeslot."]
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_START: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 0;
+#[doc = "< This signal indicates the NRF_TIMER0 interrupt."]
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 1;
+#[doc = "< This signal indicates the NRF_RADIO interrupt."]
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO: NRF_RADIO_CALLBACK_SIGNAL_TYPE = 2;
+#[doc = "< This signal indicates extend action failed."]
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_FAILED: NRF_RADIO_CALLBACK_SIGNAL_TYPE =
+    3;
+#[doc = "< This signal indicates extend action succeeded."]
+pub const NRF_RADIO_CALLBACK_SIGNAL_TYPE_NRF_RADIO_CALLBACK_SIGNAL_TYPE_EXTEND_SUCCEEDED:
+    NRF_RADIO_CALLBACK_SIGNAL_TYPE = 4;
+#[doc = "@brief The Radio signal callback types."]
+pub type NRF_RADIO_CALLBACK_SIGNAL_TYPE = self::c_uint;
+#[doc = "< Return without action."]
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_NONE: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 0;
+#[doc = "< Request an extension of the current"]
+#[doc = "timeslot. Maximum execution time for this action:"]
+#[doc = "@ref NRF_RADIO_MAX_EXTENSION_PROCESSING_TIME_US."]
+#[doc = "This action must be started at least"]
+#[doc = "@ref NRF_RADIO_MIN_EXTENSION_MARGIN_US before"]
+#[doc = "the end of the timeslot."]
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND: NRF_RADIO_SIGNAL_CALLBACK_ACTION =
+    1;
+#[doc = "< End the current radio timeslot."]
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_END: NRF_RADIO_SIGNAL_CALLBACK_ACTION = 2;
+#[doc = "< Request a new radio timeslot and end the current timeslot."]
+pub const NRF_RADIO_SIGNAL_CALLBACK_ACTION_NRF_RADIO_SIGNAL_CALLBACK_ACTION_REQUEST_AND_END:
+    NRF_RADIO_SIGNAL_CALLBACK_ACTION = 3;
+#[doc = "@brief The actions requested by the signal callback."]
+#[doc = ""]
+#[doc = "  This code gives the SOC instructions about what action to take when the signal callback has"]
+#[doc = "  returned."]
+pub type NRF_RADIO_SIGNAL_CALLBACK_ACTION = self::c_uint;
+#[doc = "< The SoftDevice will guarantee that the high frequency clock source is the"]
+#[doc = "external crystal for the whole duration of the timeslot. This should be the"]
+#[doc = "preferred option for events that use the radio or require high timing accuracy."]
+#[doc = "@note The SoftDevice will automatically turn on and off the external crystal,"]
+#[doc = "at the beginning and end of the timeslot, respectively. The crystal may also"]
+#[doc = "intentionally be left running after the timeslot, in cases where it is needed"]
+#[doc = "by the SoftDevice shortly after the end of the timeslot."]
+pub const NRF_RADIO_HFCLK_CFG_NRF_RADIO_HFCLK_CFG_XTAL_GUARANTEED: NRF_RADIO_HFCLK_CFG = 0;
+#[doc = "< This configuration allows for earlier and tighter scheduling of timeslots."]
+#[doc = "The RC oscillator may be the clock source in part or for the whole duration of the timeslot."]
+#[doc = "The RC oscillator's accuracy must therefore be taken into consideration."]
+#[doc = "@note If the application will use the radio peripheral in timeslots with this configuration,"]
+#[doc = "it must make sure that the crystal is running and stable before starting the radio."]
+pub const NRF_RADIO_HFCLK_CFG_NRF_RADIO_HFCLK_CFG_NO_GUARANTEE: NRF_RADIO_HFCLK_CFG = 1;
+#[doc = "@brief Radio timeslot high frequency clock source configuration."]
+pub type NRF_RADIO_HFCLK_CFG = self::c_uint;
+#[doc = "< High (equal priority as the normal connection priority of the SoftDevice stack(s))."]
+pub const NRF_RADIO_PRIORITY_NRF_RADIO_PRIORITY_HIGH: NRF_RADIO_PRIORITY = 0;
+#[doc = "< Normal (equal priority as the priority of secondary activities of the SoftDevice stack(s))."]
+pub const NRF_RADIO_PRIORITY_NRF_RADIO_PRIORITY_NORMAL: NRF_RADIO_PRIORITY = 1;
+#[doc = "@brief Radio timeslot priorities."]
+pub type NRF_RADIO_PRIORITY = self::c_uint;
+#[doc = "< Request radio timeslot as early as possible. This should always be used for the first request in a session."]
+pub const NRF_RADIO_REQUEST_TYPE_NRF_RADIO_REQ_TYPE_EARLIEST: NRF_RADIO_REQUEST_TYPE = 0;
+#[doc = "< Normal radio timeslot request."]
+pub const NRF_RADIO_REQUEST_TYPE_NRF_RADIO_REQ_TYPE_NORMAL: NRF_RADIO_REQUEST_TYPE = 1;
+#[doc = "@brief Radio timeslot request type."]
+pub type NRF_RADIO_REQUEST_TYPE = self::c_uint;
+#[doc = "< Event indicating that the HFCLK has started."]
+pub const NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED: NRF_SOC_EVTS = 0;
+#[doc = "< Event indicating that a power failure warning has occurred."]
+pub const NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING: NRF_SOC_EVTS = 1;
+#[doc = "< Event indicating that the ongoing flash operation has completed successfully."]
+pub const NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_SUCCESS: NRF_SOC_EVTS = 2;
+#[doc = "< Event indicating that the ongoing flash operation has timed out with an error."]
+pub const NRF_SOC_EVTS_NRF_EVT_FLASH_OPERATION_ERROR: NRF_SOC_EVTS = 3;
+#[doc = "< Event indicating that a radio timeslot was blocked."]
+pub const NRF_SOC_EVTS_NRF_EVT_RADIO_BLOCKED: NRF_SOC_EVTS = 4;
+#[doc = "< Event indicating that a radio timeslot was canceled by SoftDevice."]
+pub const NRF_SOC_EVTS_NRF_EVT_RADIO_CANCELED: NRF_SOC_EVTS = 5;
+#[doc = "< Event indicating that a radio timeslot signal callback handler return was invalid."]
+pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN: NRF_SOC_EVTS = 6;
+#[doc = "< Event indicating that a radio timeslot session is idle."]
+pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_IDLE: NRF_SOC_EVTS = 7;
+#[doc = "< Event indicating that a radio timeslot session is closed."]
+pub const NRF_SOC_EVTS_NRF_EVT_RADIO_SESSION_CLOSED: NRF_SOC_EVTS = 8;
+#[doc = "< Event indicating that a USB 3.3 V supply is ready."]
+pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_POWER_READY: NRF_SOC_EVTS = 9;
+#[doc = "< Event indicating that voltage supply is detected on VBUS."]
+pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_DETECTED: NRF_SOC_EVTS = 10;
+#[doc = "< Event indicating that voltage supply is removed from VBUS."]
+pub const NRF_SOC_EVTS_NRF_EVT_POWER_USB_REMOVED: NRF_SOC_EVTS = 11;
+pub const NRF_SOC_EVTS_NRF_EVT_NUMBER_OF_EVTS: NRF_SOC_EVTS = 12;
+#[doc = "@brief SoC Events."]
+pub type NRF_SOC_EVTS = self::c_uint;
+#[doc = "@brief Represents a mutex for use with the nrf_mutex functions."]
+#[doc = " @note Accessing the value directly is not safe, use the mutex functions!"]
+pub type nrf_mutex_t = u8;
+#[doc = "@brief Parameters for a request for a timeslot as early as possible."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_radio_request_earliest_t {
+    #[doc = "< High frequency clock source, see @ref NRF_RADIO_HFCLK_CFG."]
+    pub hfclk: u8,
+    #[doc = "< The radio timeslot priority, see @ref NRF_RADIO_PRIORITY."]
+    pub priority: u8,
+    #[doc = "< The radio timeslot length (in the range 100 to 100,000] microseconds)."]
+    pub length_us: u32,
+    #[doc = "< Longest acceptable delay until the start of the requested timeslot (up to @ref NRF_RADIO_EARLIEST_TIMEOUT_MAX_US microseconds)."]
+    pub timeout_us: u32,
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_request_earliest_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_request_earliest_t>(),
+        12usize,
+        concat!("Size of: ", stringify!(nrf_radio_request_earliest_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_request_earliest_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_radio_request_earliest_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).hfclk as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_earliest_t),
+            "::",
+            stringify!(hfclk)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).priority as *const _ as usize },
+        1usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_earliest_t),
+            "::",
+            stringify!(priority)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).length_us as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_earliest_t),
+            "::",
+            stringify!(length_us)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_earliest_t>())).timeout_us as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_earliest_t),
+            "::",
+            stringify!(timeout_us)
+        )
+    );
+}
+#[doc = "@brief Parameters for a normal radio timeslot request."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_radio_request_normal_t {
+    #[doc = "< High frequency clock source, see @ref NRF_RADIO_HFCLK_CFG."]
+    pub hfclk: u8,
+    #[doc = "< The radio timeslot priority, see @ref NRF_RADIO_PRIORITY."]
+    pub priority: u8,
+    #[doc = "< Distance from the start of the previous radio timeslot (up to @ref NRF_RADIO_DISTANCE_MAX_US microseconds)."]
+    pub distance_us: u32,
+    #[doc = "< The radio timeslot length (in the range [100..100,000] microseconds)."]
+    pub length_us: u32,
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_request_normal_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_request_normal_t>(),
+        12usize,
+        concat!("Size of: ", stringify!(nrf_radio_request_normal_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_request_normal_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_radio_request_normal_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).hfclk as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_normal_t),
+            "::",
+            stringify!(hfclk)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).priority as *const _ as usize },
+        1usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_normal_t),
+            "::",
+            stringify!(priority)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).distance_us as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_normal_t),
+            "::",
+            stringify!(distance_us)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_normal_t>())).length_us as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_normal_t),
+            "::",
+            stringify!(length_us)
+        )
+    );
+}
+#[doc = "@brief Radio timeslot request parameters."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct nrf_radio_request_t {
+    #[doc = "< Type of request, see @ref NRF_RADIO_REQUEST_TYPE."]
+    pub request_type: u8,
+    #[doc = "< Parameter union."]
+    pub params: nrf_radio_request_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union nrf_radio_request_t__bindgen_ty_1 {
+    #[doc = "< Parameters for requesting a radio timeslot as early as possible."]
+    pub earliest: nrf_radio_request_earliest_t,
+    #[doc = "< Parameters for requesting a normal radio timeslot."]
+    pub normal: nrf_radio_request_normal_t,
+    _bindgen_union_align: [u32; 3usize],
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_request_t__bindgen_ty_1() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_request_t__bindgen_ty_1>(),
+        12usize,
+        concat!("Size of: ", stringify!(nrf_radio_request_t__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_request_t__bindgen_ty_1>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_radio_request_t__bindgen_ty_1))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).earliest as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_t__bindgen_ty_1),
+            "::",
+            stringify!(earliest)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t__bindgen_ty_1>())).normal as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_t__bindgen_ty_1),
+            "::",
+            stringify!(normal)
+        )
+    );
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_request_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_request_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(nrf_radio_request_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_request_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_radio_request_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t>())).request_type as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_t),
+            "::",
+            stringify!(request_type)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_request_t>())).params as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_request_t),
+            "::",
+            stringify!(params)
+        )
+    );
+}
+#[doc = "@brief Return parameters of the radio timeslot signal callback."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct nrf_radio_signal_callback_return_param_t {
+    #[doc = "< The action requested by the application when returning from the signal callback, see @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION."]
+    pub callback_action: u8,
+    #[doc = "< Parameter union."]
+    pub params: nrf_radio_signal_callback_return_param_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union nrf_radio_signal_callback_return_param_t__bindgen_ty_1 {
+    #[doc = "< Additional parameters for return_code @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION_REQUEST_AND_END."]
+    pub request: nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1,
+    #[doc = "< Additional parameters for return_code @ref NRF_RADIO_SIGNAL_CALLBACK_ACTION_EXTEND."]
+    pub extend: nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2,
+    _bindgen_union_align: u32,
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1 {
+    #[doc = "< The request parameters for the next radio timeslot."]
+    pub p_next: *mut nrf_radio_request_t,
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
+        4usize,
+        concat!(
+            "Size of: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>(),
+        4usize,
+        concat!(
+            "Alignment of ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1>())).p_next
+                as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_1),
+            "::",
+            stringify!(p_next)
+        )
+    );
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2 {
+    #[doc = "< Requested extension of the radio timeslot duration (microseconds) (for minimum time see @ref NRF_RADIO_MINIMUM_TIMESLOT_LENGTH_EXTENSION_TIME_US)."]
+    pub length_us: u32,
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
+        4usize,
+        concat!(
+            "Size of: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2)
+        )
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>(),
+        4usize,
+        concat!(
+            "Alignment of ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2>())).length_us
+                as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1__bindgen_ty_2),
+            "::",
+            stringify!(length_us)
+        )
+    );
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t__bindgen_ty_1() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>(),
+        4usize,
+        concat!(
+            "Size of: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>(),
+        4usize,
+        concat!(
+            "Alignment of ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).request as *const _
+                as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1),
+            "::",
+            stringify!(request)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t__bindgen_ty_1>())).extend as *const _
+                as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t__bindgen_ty_1),
+            "::",
+            stringify!(extend)
+        )
+    );
+}
+#[test]
+fn bindgen_test_layout_nrf_radio_signal_callback_return_param_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_radio_signal_callback_return_param_t>(),
+        8usize,
+        concat!("Size of: ", stringify!(nrf_radio_signal_callback_return_param_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_radio_signal_callback_return_param_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_radio_signal_callback_return_param_t))
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).callback_action as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t),
+            "::",
+            stringify!(callback_action)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_radio_signal_callback_return_param_t>())).params as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_radio_signal_callback_return_param_t),
+            "::",
+            stringify!(params)
+        )
+    );
+}
+#[doc = "@brief The radio timeslot signal callback type."]
+#[doc = ""]
+#[doc = " @note In case of invalid return parameters, the radio timeslot will automatically end"]
+#[doc = "       immediately after returning from the signal callback and the"]
+#[doc = "       @ref NRF_EVT_RADIO_SIGNAL_CALLBACK_INVALID_RETURN event will be sent."]
+#[doc = " @note The returned struct pointer must remain valid after the signal callback"]
+#[doc = "       function returns. For instance, this means that it must not point to a stack variable."]
+#[doc = ""]
+#[doc = " @param[in] signal_type Type of signal, see @ref NRF_RADIO_CALLBACK_SIGNAL_TYPE."]
+#[doc = ""]
+#[doc = " @return Pointer to structure containing action requested by the application."]
+pub type nrf_radio_signal_callback_t =
+    ::core::option::Option<unsafe extern "C" fn(signal_type: u8) -> *mut nrf_radio_signal_callback_return_param_t>;
+#[doc = "@brief AES ECB parameter typedefs"]
+pub type soc_ecb_key_t = [u8; 16usize];
+pub type soc_ecb_cleartext_t = [u8; 16usize];
+pub type soc_ecb_ciphertext_t = [u8; 16usize];
+#[doc = "@brief AES ECB data structure"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_ecb_hal_data_t {
+    #[doc = "< Encryption key."]
+    pub key: soc_ecb_key_t,
+    #[doc = "< Cleartext data."]
+    pub cleartext: soc_ecb_cleartext_t,
+    #[doc = "< Ciphertext data."]
+    pub ciphertext: soc_ecb_ciphertext_t,
+}
+#[test]
+fn bindgen_test_layout_nrf_ecb_hal_data_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_ecb_hal_data_t>(),
+        48usize,
+        concat!("Size of: ", stringify!(nrf_ecb_hal_data_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_ecb_hal_data_t>(),
+        1usize,
+        concat!("Alignment of ", stringify!(nrf_ecb_hal_data_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).key as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_t),
+            "::",
+            stringify!(key)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).cleartext as *const _ as usize },
+        16usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_t),
+            "::",
+            stringify!(cleartext)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_t>())).ciphertext as *const _ as usize },
+        32usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_t),
+            "::",
+            stringify!(ciphertext)
+        )
+    );
+}
+#[doc = "@brief AES ECB block. Used to provide multiple blocks in a single call"]
+#[doc = "to @ref sd_ecb_blocks_encrypt."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_ecb_hal_data_block_t {
+    #[doc = "< Pointer to the Encryption key."]
+    pub p_key: *const soc_ecb_key_t,
+    #[doc = "< Pointer to the Cleartext data."]
+    pub p_cleartext: *const soc_ecb_cleartext_t,
+    #[doc = "< Pointer to the Ciphertext data."]
+    pub p_ciphertext: *mut soc_ecb_ciphertext_t,
+}
+#[test]
+fn bindgen_test_layout_nrf_ecb_hal_data_block_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_ecb_hal_data_block_t>(),
+        12usize,
+        concat!("Size of: ", stringify!(nrf_ecb_hal_data_block_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_ecb_hal_data_block_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(nrf_ecb_hal_data_block_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_key as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_block_t),
+            "::",
+            stringify!(p_key)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_cleartext as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_block_t),
+            "::",
+            stringify!(p_cleartext)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_ecb_hal_data_block_t>())).p_ciphertext as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_ecb_hal_data_block_t),
+            "::",
+            stringify!(p_ciphertext)
+        )
+    );
+}
+
+#[doc = "@brief Initialize a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to initialize."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_mutex_new(p_mutex: *mut nrf_mutex_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 44",
+        inout("r0") to_asm(p_mutex) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Attempt to acquire a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to acquire."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The mutex was successfully acquired."]
+#[doc = " @retval ::NRF_ERROR_SOC_MUTEX_ALREADY_TAKEN The mutex could not be acquired."]
+#[inline(always)]
+pub unsafe fn sd_mutex_acquire(p_mutex: *mut nrf_mutex_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 45",
+        inout("r0") to_asm(p_mutex) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Release a mutex."]
+#[doc = ""]
+#[doc = " @param[in] p_mutex Pointer to the mutex to release."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_mutex_release(p_mutex: *mut nrf_mutex_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 46",
+        inout("r0") to_asm(p_mutex) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Query the capacity of the application random pool."]
+#[doc = ""]
+#[doc = " @param[out] p_pool_capacity The capacity of the pool."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_rand_application_pool_capacity_get(p_pool_capacity: *mut u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 47",
+        inout("r0") to_asm(p_pool_capacity) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get number of random bytes available to the application."]
+#[doc = ""]
+#[doc = " @param[out] p_bytes_available The number of bytes currently available in the pool."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_rand_application_bytes_available_get(p_bytes_available: *mut u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 48",
+        inout("r0") to_asm(p_bytes_available) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get random bytes from the application pool."]
+#[doc = ""]
+#[doc = " @param[out]  p_buff  Pointer to unit8_t buffer for storing the bytes."]
+#[doc = " @param[in]   length  Number of bytes to take from pool and place in p_buff."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The requested bytes were written to p_buff."]
+#[doc = " @retval ::NRF_ERROR_SOC_RAND_NOT_ENOUGH_VALUES No bytes were written to the buffer, because there were not enough bytes available."]
+#[inline(always)]
+pub unsafe fn sd_rand_application_vector_get(p_buff: *mut u8, length: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 49",
+        inout("r0") to_asm(p_buff) => ret,
+        inout("r1") to_asm(length) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Gets the reset reason register."]
+#[doc = ""]
+#[doc = " @param[out]  p_reset_reason  Contents of the NRF_POWER->RESETREAS register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_reset_reason_get(p_reset_reason: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 52",
+        inout("r0") to_asm(p_reset_reason) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Clears the bits of the reset reason register."]
+#[doc = ""]
+#[doc = " @param[in] reset_reason_clr_msk Contains the bits to clear from the reset reason register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_reset_reason_clr(reset_reason_clr_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 53",
+        inout("r0") to_asm(reset_reason_clr_msk) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Sets the power mode when in CPU sleep."]
+#[doc = ""]
+#[doc = " @param[in] power_mode The power mode to use when in CPU sleep, see @ref NRF_POWER_MODES. @sa sd_app_evt_wait"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The power mode was set."]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_MODE_UNKNOWN The power mode was unknown."]
+#[inline(always)]
+pub unsafe fn sd_power_mode_set(power_mode: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 50",
+        inout("r0") to_asm(power_mode) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Puts the chip in System OFF mode."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_OFF_SHOULD_NOT_RETURN"]
+#[inline(always)]
+pub unsafe fn sd_power_system_off() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 51",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enables or disables the power-fail comparator."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_FAILURE_WARNING) when the power failure warning occurs."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] pof_enable    True if the power-fail comparator should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_pof_enable(pof_enable: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 54",
+        inout("r0") to_asm(pof_enable) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enables or disables the USB power ready event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_POWER_READY) when a USB 3.3 V supply is ready."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbpwrrdy_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_usbpwrrdy_enable(usbpwrrdy_enable: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 77",
+        inout("r0") to_asm(usbpwrrdy_enable) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enables or disables the power USB-detected event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_DETECTED) when a voltage supply is detected on VBUS."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbdetected_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_usbdetected_enable(usbdetected_enable: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 78",
+        inout("r0") to_asm(usbdetected_enable) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enables or disables the power USB-removed event."]
+#[doc = ""]
+#[doc = " Enabling this will give a SoftDevice event (NRF_EVT_POWER_USB_REMOVED) when a voltage supply is removed from VBUS."]
+#[doc = " The event can be retrieved with sd_evt_get();"]
+#[doc = ""]
+#[doc = " @param[in] usbremoved_enable    True if the power ready event should be enabled, false if it should be disabled."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_usbremoved_enable(usbremoved_enable: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 79",
+        inout("r0") to_asm(usbremoved_enable) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get USB supply status register content."]
+#[doc = ""]
+#[doc = " @param[out] usbregstatus    The content of USBREGSTATUS register."]
+#[doc = ""]
+#[doc = " @note Calling this function on a chip without USBD peripheral will result in undefined behaviour."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_usbregstatus_get(usbregstatus: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 80",
+        inout("r0") to_asm(usbregstatus) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Sets the power failure comparator threshold value."]
+#[doc = ""]
+#[doc = " @note: Power failure comparator threshold setting. This setting applies both for normal voltage"]
+#[doc = "        mode (supply connected to both VDD and VDDH) and high voltage mode (supply connected to"]
+#[doc = "        VDDH only)."]
+#[doc = ""]
+#[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDS."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
+#[inline(always)]
+pub unsafe fn sd_power_pof_threshold_set(threshold: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 55",
+        inout("r0") to_asm(threshold) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Sets the power failure comparator threshold value for high voltage."]
+#[doc = ""]
+#[doc = " @note: Power failure comparator threshold setting for high voltage mode (supply connected to"]
+#[doc = "        VDDH only). This setting does not apply for normal voltage mode (supply connected to both"]
+#[doc = "        VDD and VDDH)."]
+#[doc = ""]
+#[doc = " @param[in] threshold The power-fail threshold value to use, see @ref NRF_POWER_THRESHOLDVDDHS."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS The power failure threshold was set."]
+#[doc = " @retval ::NRF_ERROR_SOC_POWER_POF_THRESHOLD_UNKNOWN The power failure threshold is unknown."]
+#[inline(always)]
+pub unsafe fn sd_power_pof_thresholdvddh_set(threshold: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 56",
+        inout("r0") to_asm(threshold) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERSET register."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERSET register to write to."]
+#[doc = " @param[in] ram_powerset Contains the word to write to the NRF_POWER->RAM[index].POWERSET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_ram_power_set(index: u8, ram_powerset: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 57",
+        inout("r0") to_asm(index) => ret,
+        inout("r1") to_asm(ram_powerset) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Writes the NRF_POWER->RAM[index].POWERCLR register."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWERCLR register to write to."]
+#[doc = " @param[in] ram_powerclr Contains the word to write to the NRF_POWER->RAM[index].POWERCLR register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_ram_power_clr(index: u8, ram_powerclr: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 58",
+        inout("r0") to_asm(index) => ret,
+        inout("r1") to_asm(ram_powerclr) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get contents of NRF_POWER->RAM[index].POWER register, indicates power status of RAM[index] blocks."]
+#[doc = ""]
+#[doc = " @param[in] index Contains the index in the NRF_POWER->RAM[index].POWER register to read from."]
+#[doc = " @param[out] p_ram_power Content of NRF_POWER->RAM[index].POWER register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_ram_power_get(index: u8, p_ram_power: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 59",
+        inout("r0") to_asm(index) => ret,
+        inout("r1") to_asm(p_ram_power) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Set bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[in] gpregret_msk Bits to be set in the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_gpregret_set(gpregret_id: u32, gpregret_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 60",
+        inout("r0") to_asm(gpregret_id) => ret,
+        inout("r1") to_asm(gpregret_msk) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Clear bits in the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[in] gpregret_msk Bits to be clear in the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_gpregret_clr(gpregret_id: u32, gpregret_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 61",
+        inout("r0") to_asm(gpregret_id) => ret,
+        inout("r1") to_asm(gpregret_msk) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get contents of the general purpose retention registers (NRF_POWER->GPREGRET*)."]
+#[doc = ""]
+#[doc = " @param[in] gpregret_id 0 for GPREGRET, 1 for GPREGRET2."]
+#[doc = " @param[out] p_gpregret Contents of the GPREGRET register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_power_gpregret_get(gpregret_id: u32, p_gpregret: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 62",
+        inout("r0") to_asm(gpregret_id) => ret,
+        inout("r1") to_asm(p_gpregret) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enable or disable the DC/DC regulator for the regulator stage 1 (REG1)."]
+#[doc = ""]
+#[doc = " @param[in] dcdc_mode The mode of the DCDC, see @ref NRF_POWER_DCDC_MODES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The DCDC mode is invalid."]
+#[inline(always)]
+pub unsafe fn sd_power_dcdc_mode_set(dcdc_mode: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 63",
+        inout("r0") to_asm(dcdc_mode) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Enable or disable the DC/DC regulator for the regulator stage 0 (REG0)."]
+#[doc = ""]
+#[doc = " For more details on the REG0 stage, please see product specification."]
+#[doc = ""]
+#[doc = " @param[in] dcdc_mode The mode of the DCDC0, see @ref NRF_POWER_DCDC_MODES."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The dcdc_mode is invalid."]
+#[inline(always)]
+pub unsafe fn sd_power_dcdc0_mode_set(dcdc_mode: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 64",
+        inout("r0") to_asm(dcdc_mode) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Request the high frequency crystal oscillator."]
+#[doc = ""]
+#[doc = " Will start the high frequency crystal oscillator, the startup time of the crystal varies"]
+#[doc = " and the ::sd_clock_hfclk_is_running function can be polled to check if it has started."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_is_running"]
+#[doc = " @see sd_clock_hfclk_release"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_clock_hfclk_request() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 66",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Releases the high frequency crystal oscillator."]
+#[doc = ""]
+#[doc = " Will stop the high frequency crystal oscillator, this happens immediately."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_is_running"]
+#[doc = " @see sd_clock_hfclk_request"]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_clock_hfclk_release() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 67",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Checks if the high frequency crystal oscillator is running."]
+#[doc = ""]
+#[doc = " @see sd_clock_hfclk_request"]
+#[doc = " @see sd_clock_hfclk_release"]
+#[doc = ""]
+#[doc = " @param[out] p_is_running 1 if the external crystal oscillator is running, 0 if not."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_clock_hfclk_is_running(p_is_running: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 68",
+        inout("r0") to_asm(p_is_running) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Waits for an application event."]
+#[doc = ""]
+#[doc = " An application event is either an application interrupt or a pended interrupt when the interrupt"]
+#[doc = " is disabled."]
+#[doc = ""]
+#[doc = " When the application waits for an application event by calling this function, an interrupt that"]
+#[doc = " is enabled will be taken immediately on pending since this function will wait in thread mode,"]
+#[doc = " then the execution will return in the application's main thread."]
+#[doc = ""]
+#[doc = " In order to wake up from disabled interrupts, the SEVONPEND flag has to be set in the Cortex-M"]
+#[doc = " MCU's System Control Register (SCR), CMSIS_SCB. In that case, when a disabled interrupt gets"]
+#[doc = " pended, this function will return to the application's main thread."]
+#[doc = ""]
+#[doc = " @note The application must ensure that the pended flag is cleared using ::sd_nvic_ClearPendingIRQ"]
+#[doc = "       in order to sleep using this function. This is only necessary for disabled interrupts, as"]
+#[doc = "       the interrupt handler will clear the pending flag automatically for enabled interrupts."]
+#[doc = ""]
+#[doc = " @note If an application interrupt has happened since the last time sd_app_evt_wait was"]
+#[doc = "       called this function will return immediately and not go to sleep. This is to avoid race"]
+#[doc = "       conditions that can occur when a flag is updated in the interrupt handler and processed"]
+#[doc = "       in the main loop."]
+#[doc = ""]
+#[doc = " @post An application interrupt has happened or a interrupt pending flag is set."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_app_evt_wait() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 65",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get PPI channel enable register contents."]
+#[doc = ""]
+#[doc = " @param[out] p_channel_enable The contents of the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_channel_enable_get(p_channel_enable: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 32",
+        inout("r0") to_asm(p_channel_enable) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Set PPI channel enable register."]
+#[doc = ""]
+#[doc = " @param[in] channel_enable_set_msk Mask containing the bits to set in the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_channel_enable_set(channel_enable_set_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 33",
+        inout("r0") to_asm(channel_enable_set_msk) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Clear PPI channel enable register."]
+#[doc = ""]
+#[doc = " @param[in] channel_enable_clr_msk Mask containing the bits to clear in the PPI CHEN register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_channel_enable_clr(channel_enable_clr_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 34",
+        inout("r0") to_asm(channel_enable_clr_msk) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Assign endpoints to a PPI channel."]
+#[doc = ""]
+#[doc = " @param[in] channel_num Number of the PPI channel to assign."]
+#[doc = " @param[in] evt_endpoint Event endpoint of the PPI channel."]
+#[doc = " @param[in] task_endpoint Task endpoint of the PPI channel."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_CHANNEL The channel number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_channel_assign(
+    channel_num: u8,
+    evt_endpoint: *const self::c_void,
+    task_endpoint: *const self::c_void,
+) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 35",
+        inout("r0") to_asm(channel_num) => ret,
+        inout("r1") to_asm(evt_endpoint) => _,
+        inout("r2") to_asm(task_endpoint) => _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Task to enable a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the channel group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid"]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_group_task_enable(group_num: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 36",
+        inout("r0") to_asm(group_num) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Task to disable a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the PPI group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_group_task_disable(group_num: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 37",
+        inout("r0") to_asm(group_num) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Assign PPI channels to a channel group."]
+#[doc = ""]
+#[doc = " @param[in] group_num Number of the channel group."]
+#[doc = " @param[in] channel_msk Mask of the channels to assign to the group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_group_assign(group_num: u8, channel_msk: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 38",
+        inout("r0") to_asm(group_num) => ret,
+        inout("r1") to_asm(channel_msk) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Gets the PPI channels of a channel group."]
+#[doc = ""]
+#[doc = " @param[in]   group_num Number of the channel group."]
+#[doc = " @param[out]  p_channel_msk Mask of the channels assigned to the group."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_SOC_PPI_INVALID_GROUP The group number is invalid."]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ppi_group_get(group_num: u8, p_channel_msk: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 39",
+        inout("r0") to_asm(group_num) => ret,
+        inout("r1") to_asm(p_channel_msk) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Configures the Radio Notification signal."]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - The notification signal latency depends on the interrupt priority settings of SWI used"]
+#[doc = "        for notification signal."]
+#[doc = "      - To ensure that the radio notification signal behaves in a consistent way, the radio"]
+#[doc = "        notifications must be configured when there is no protocol stack or other SoftDevice"]
+#[doc = "        activity in progress. It is recommended that the radio notification signal is"]
+#[doc = "        configured directly after the SoftDevice has been enabled."]
+#[doc = "      - In the period between the ACTIVE signal and the start of the Radio Event, the SoftDevice"]
+#[doc = "        will interrupt the application to do Radio Event preparation."]
+#[doc = "      - Using the Radio Notification feature may limit the bandwidth, as the SoftDevice may have"]
+#[doc = "        to shorten the connection events to have time for the Radio Notification signals."]
+#[doc = ""]
+#[doc = " @param[in]  type      Type of notification signal, see @ref NRF_RADIO_NOTIFICATION_TYPES."]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE shall be used to turn off radio"]
+#[doc = "                       notification. Using @ref NRF_RADIO_NOTIFICATION_DISTANCE_NONE is"]
+#[doc = "                       recommended (but not required) to be used with"]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_NONE."]
+#[doc = ""]
+#[doc = " @param[in]  distance  Distance between the notification signal and start of radio activity, see @ref NRF_RADIO_NOTIFICATION_DISTANCES."]
+#[doc = "                       This parameter is ignored when @ref NRF_RADIO_NOTIFICATION_TYPE_NONE or"]
+#[doc = "                       @ref NRF_RADIO_NOTIFICATION_TYPE_INT_ON_INACTIVE is used."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM The group number is invalid."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE A protocol stack or other SoftDevice is running. Stop all"]
+#[doc = "                                   running activities and retry."]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_radio_notification_cfg_set(type_: u8, distance: u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 69",
+        inout("r0") to_asm(type_) => ret,
+        inout("r1") to_asm(distance) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Encrypts a block according to the specified parameters."]
+#[doc = ""]
+#[doc = " 128-bit AES encryption."]
+#[doc = ""]
+#[doc = " @note:"]
+#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
+#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
+#[doc = "      main or low interrupt level."]
+#[doc = ""]
+#[doc = " @param[in, out] p_ecb_data Pointer to the ECB parameters' struct (two input"]
+#[doc = "                            parameters and one output parameter)."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ecb_block_encrypt(p_ecb_data: *mut nrf_ecb_hal_data_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 70",
+        inout("r0") to_asm(p_ecb_data) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Encrypts multiple data blocks provided as an array of data block structures."]
+#[doc = ""]
+#[doc = " @details: Performs 128-bit AES encryption on multiple data blocks"]
+#[doc = ""]
+#[doc = " @note:"]
+#[doc = "    - The application may set the SEVONPEND bit in the SCR to 1 to make the SoftDevice sleep while"]
+#[doc = "      the ECB is running. The SEVONPEND bit should only be cleared (set to 0) from application"]
+#[doc = "      main or low interrupt level."]
+#[doc = ""]
+#[doc = " @param[in]     block_count     Count of blocks in the p_data_blocks array."]
+#[doc = " @param[in,out] p_data_blocks   Pointer to the first entry in a contiguous array of"]
+#[doc = "                                @ref nrf_ecb_hal_data_block_t structures."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_ecb_blocks_encrypt(block_count: u8, p_data_blocks: *mut nrf_ecb_hal_data_block_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 71",
+        inout("r0") to_asm(block_count) => ret,
+        inout("r1") to_asm(p_data_blocks) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Gets any pending events generated by the SoC API."]
+#[doc = ""]
+#[doc = " The application should keep calling this function to get events, until ::NRF_ERROR_NOT_FOUND is returned."]
+#[doc = ""]
+#[doc = " @param[out] p_evt_id Set to one of the values in @ref NRF_SOC_EVTS, if any events are pending."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS An event was pending. The event id is written in the p_evt_id parameter."]
+#[doc = " @retval ::NRF_ERROR_NOT_FOUND No pending events."]
+#[inline(always)]
+pub unsafe fn sd_evt_get(p_evt_id: *mut u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 75",
+        inout("r0") to_asm(p_evt_id) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Get the temperature measured on the chip"]
+#[doc = ""]
+#[doc = " This function will block until the temperature measurement is done."]
+#[doc = " It takes around 50 us from call to return."]
+#[doc = ""]
+#[doc = " @param[out] p_temp Result of temperature measurement. Die temperature in 0.25 degrees Celsius."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS A temperature measurement was done, and the temperature was written to temp"]
+#[inline(always)]
+pub unsafe fn sd_temp_get(p_temp: *mut i32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 76",
+        inout("r0") to_asm(p_temp) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Flash Write"]
+#[doc = ""]
+#[doc = " Commands to write a buffer to flash"]
+#[doc = ""]
+#[doc = " If the SoftDevice is enabled:"]
+#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
+#[doc = "  application with exactly one of the following events:"]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
+#[doc = ""]
+#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
+#[doc = " write has been completed"]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
+#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
+#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
+#[doc = "        and the command parameters)."]
+#[doc = "      - The data in the p_src buffer should not be modified before the @ref NRF_EVT_FLASH_OPERATION_SUCCESS"]
+#[doc = "        or the @ref NRF_EVT_FLASH_OPERATION_ERROR have been received if the SoftDevice is enabled."]
+#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is written, if it is"]
+#[doc = "        protected."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in]  p_dst Pointer to start of flash location to be written."]
+#[doc = " @param[in]  p_src Pointer to buffer with data to be written."]
+#[doc = " @param[in]  size  Number of 32-bit words to write. Maximum size is the number of words in one"]
+#[doc = "                   flash page. See the device's Product Specification for details."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR   Tried to write to a non existing flash address, or p_dst or p_src was unaligned."]
+#[doc = " @retval ::NRF_ERROR_BUSY           The previous command has not yet completed."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH Size was 0, or higher than the maximum allowed size."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN      Tried to write to an address outside the application flash area."]
+#[doc = " @retval ::NRF_SUCCESS              The command was accepted."]
+#[inline(always)]
+pub unsafe fn sd_flash_write(p_dst: *mut u32, p_src: *const u32, size: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 41",
+        inout("r0") to_asm(p_dst) => ret,
+        inout("r1") to_asm(p_src) => _,
+        inout("r2") to_asm(size) => _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Flash Erase page"]
+#[doc = ""]
+#[doc = " Commands to erase a flash page"]
+#[doc = " If the SoftDevice is enabled:"]
+#[doc = "  This call initiates the flash access command, and its completion will be communicated to the"]
+#[doc = "  application with exactly one of the following events:"]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_SUCCESS - The command was successfully completed."]
+#[doc = "      - @ref NRF_EVT_FLASH_OPERATION_ERROR   - The command could not be started."]
+#[doc = ""]
+#[doc = " If the SoftDevice is not enabled no event will be generated, and this call will return @ref NRF_SUCCESS when the"]
+#[doc = " erase has been completed"]
+#[doc = ""]
+#[doc = " @note"]
+#[doc = "      - This call takes control over the radio and the CPU during flash erase and write to make sure that"]
+#[doc = "        they will not interfere with the flash access. This means that all interrupts will be blocked"]
+#[doc = "        for a predictable time (depending on the NVMC specification in the device's Product Specification"]
+#[doc = "        and the command parameters)."]
+#[doc = "      - This call will make the SoftDevice trigger a hardfault when the page is erased, if it is"]
+#[doc = "        protected."]
+#[doc = ""]
+#[doc = ""]
+#[doc = " @param[in]  page_number           Page number of the page to erase"]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INTERNAL      If a new session could not be opened due to an internal error."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Tried to erase to a non existing flash page."]
+#[doc = " @retval ::NRF_ERROR_BUSY          The previous command has not yet completed."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN     Tried to erase a page outside the application flash area."]
+#[doc = " @retval ::NRF_SUCCESS             The command was accepted."]
+#[inline(always)]
+pub unsafe fn sd_flash_page_erase(page_number: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 40",
+        inout("r0") to_asm(page_number) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Opens a session for radio timeslot requests."]
+#[doc = ""]
+#[doc = " @note Only one session can be open at a time."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) will be called when the radio timeslot"]
+#[doc = "       starts. From this point the NRF_RADIO and NRF_TIMER0 peripherals can be freely accessed"]
+#[doc = "       by the application."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_TIMER0) is called whenever the NRF_TIMER0"]
+#[doc = "       interrupt occurs."]
+#[doc = " @note p_radio_signal_callback(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_RADIO) is called whenever the NRF_RADIO"]
+#[doc = "       interrupt occurs."]
+#[doc = " @note p_radio_signal_callback() will be called at ARM interrupt priority level 0. This"]
+#[doc = "       implies that none of the sd_* API calls can be used from p_radio_signal_callback()."]
+#[doc = ""]
+#[doc = " @param[in] p_radio_signal_callback The signal callback."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR p_radio_signal_callback is an invalid function pointer."]
+#[doc = " @retval ::NRF_ERROR_BUSY If session cannot be opened."]
+#[doc = " @retval ::NRF_ERROR_INTERNAL If a new session could not be opened due to an internal error."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
+#[inline(always)]
+pub unsafe fn sd_radio_session_open(p_radio_signal_callback: nrf_radio_signal_callback_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 72",
+        inout("r0") to_asm(p_radio_signal_callback) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Closes a session for radio timeslot requests."]
+#[doc = ""]
+#[doc = " @note Any current radio timeslot will be finished before the session is closed."]
+#[doc = " @note If a radio timeslot is scheduled when the session is closed, it will be canceled."]
+#[doc = " @note The application cannot consider the session closed until the @ref NRF_EVT_RADIO_SESSION_CLOSED"]
+#[doc = "       event is received."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN If session not opened."]
+#[doc = " @retval ::NRF_ERROR_BUSY If session is currently being closed."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
+#[inline(always)]
+pub unsafe fn sd_radio_session_close() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 73",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Requests a radio timeslot."]
+#[doc = ""]
+#[doc = " @note The request type is determined by p_request->request_type, and can be one of @ref NRF_RADIO_REQ_TYPE_EARLIEST"]
+#[doc = "       and @ref NRF_RADIO_REQ_TYPE_NORMAL. The first request in a session must always be of type @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
+#[doc = " @note For a normal request (@ref NRF_RADIO_REQ_TYPE_NORMAL), the start time of a radio timeslot is specified by"]
+#[doc = "       p_request->distance_us and is given relative to the start of the previous timeslot."]
+#[doc = " @note A too small p_request->distance_us will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
+#[doc = " @note Timeslots scheduled too close will lead to a @ref NRF_EVT_RADIO_BLOCKED event."]
+#[doc = " @note See the SoftDevice Specification for more on radio timeslot scheduling, distances and lengths."]
+#[doc = " @note If an opportunity for the first radio timeslot is not found before 100 ms after the call to this"]
+#[doc = "       function, it is not scheduled, and instead a @ref NRF_EVT_RADIO_BLOCKED event is sent."]
+#[doc = "       The application may then try to schedule the first radio timeslot again."]
+#[doc = " @note Successful requests will result in nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START)."]
+#[doc = "       Unsuccessful requests will result in a @ref NRF_EVT_RADIO_BLOCKED event, see @ref NRF_SOC_EVTS."]
+#[doc = " @note The jitter in the start time of the radio timeslots is +/- @ref NRF_RADIO_START_JITTER_US us."]
+#[doc = " @note The nrf_radio_signal_callback_t(@ref NRF_RADIO_CALLBACK_SIGNAL_TYPE_START) call has a latency relative to the"]
+#[doc = "       specified radio timeslot start, but this does not affect the actual start time of the timeslot."]
+#[doc = " @note NRF_TIMER0 is reset at the start of the radio timeslot, and is clocked at 1MHz from the high frequency"]
+#[doc = "       (16 MHz) clock source. If p_request->hfclk_force_xtal is true, the high frequency clock is"]
+#[doc = "       guaranteed to be clocked from the external crystal."]
+#[doc = " @note The SoftDevice will neither access the NRF_RADIO peripheral nor the NRF_TIMER0 peripheral"]
+#[doc = "       during the radio timeslot."]
+#[doc = ""]
+#[doc = " @param[in] p_request Pointer to the request parameters."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN Either:"]
+#[doc = "                                - The session is not open."]
+#[doc = "                                - The session is not IDLE."]
+#[doc = "                                - This is the first request and its type is not @ref NRF_RADIO_REQ_TYPE_EARLIEST."]
+#[doc = "                                - The request type was set to @ref NRF_RADIO_REQ_TYPE_NORMAL after a"]
+#[doc = "                                  @ref NRF_RADIO_REQ_TYPE_EARLIEST request was blocked."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR If the p_request pointer is invalid."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM If the parameters of p_request are not valid."]
+#[doc = " @retval ::NRF_SUCCESS Otherwise."]
+#[inline(always)]
+pub unsafe fn sd_radio_request(p_request: *const nrf_radio_request_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 74",
+        inout("r0") to_asm(p_request) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Write register protected by the SoftDevice"]
+#[doc = ""]
+#[doc = " This function writes to a register that is write-protected by the SoftDevice. Please refer to your"]
+#[doc = " SoftDevice Specification for more details about which registers that are protected by SoftDevice."]
+#[doc = " This function can write to the following protected peripheral:"]
+#[doc = "  - ACL"]
+#[doc = ""]
+#[doc = " @note Protected registers may be read directly."]
+#[doc = " @note Register that are write-once will return @ref NRF_SUCCESS on second set, even the value in"]
+#[doc = "       the register has not changed. See the Product Specification for more details about register"]
+#[doc = "       properties."]
+#[doc = ""]
+#[doc = " @param[in]  p_register Pointer to register to be written."]
+#[doc = " @param[in]  value Value to be written to the register."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR This function can not write to the reguested register."]
+#[doc = " @retval ::NRF_SUCCESS Value successfully written to register."]
+#[doc = ""]
+#[inline(always)]
+pub unsafe fn sd_protected_register_write(p_register: *mut u32, value: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 43",
+        inout("r0") to_asm(p_register) => ret,
+        inout("r1") to_asm(value) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "< ::sd_mbr_command"]
+pub const NRF_MBR_SVCS_SD_MBR_COMMAND: NRF_MBR_SVCS = 24;
+#[doc = "@brief nRF Master Boot Record API SVC numbers."]
+pub type NRF_MBR_SVCS = self::c_uint;
+#[doc = "< Copy a new BootLoader. @see ::sd_mbr_command_copy_bl_t"]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COPY_BL: NRF_MBR_COMMANDS = 0;
+#[doc = "< Copy a new SoftDevice. @see ::sd_mbr_command_copy_sd_t"]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COPY_SD: NRF_MBR_COMMANDS = 1;
+#[doc = "< Initialize forwarding interrupts to SD, and run reset function in SD. Does not require any parameters in ::sd_mbr_command_t params."]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_INIT_SD: NRF_MBR_COMMANDS = 2;
+#[doc = "< This command works like memcmp. @see ::sd_mbr_command_compare_t"]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_COMPARE: NRF_MBR_COMMANDS = 3;
+#[doc = "< Change the address the MBR starts after a reset. @see ::sd_mbr_command_vector_table_base_set_t"]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET: NRF_MBR_COMMANDS = 4;
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_RESERVED: NRF_MBR_COMMANDS = 5;
+#[doc = "< Start forwarding all interrupts to this address. @see ::sd_mbr_command_irq_forward_address_set_t"]
+pub const NRF_MBR_COMMANDS_SD_MBR_COMMAND_IRQ_FORWARD_ADDRESS_SET: NRF_MBR_COMMANDS = 6;
+#[doc = "@brief Possible values for ::sd_mbr_command_t.command"]
+pub type NRF_MBR_COMMANDS = self::c_uint;
+#[doc = "@brief This command copies part of a new SoftDevice"]
+#[doc = ""]
+#[doc = " The destination area is erased before copying."]
+#[doc = " If dst is in the middle of a flash page, that whole flash page will be erased."]
+#[doc = " If (dst+len) is in the middle of a flash page, that whole flash page will be erased."]
+#[doc = ""]
+#[doc = " The user of this function is responsible for setting the BPROT registers."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS indicates that the contents of the memory blocks where copied correctly."]
+#[doc = " @retval ::NRF_ERROR_INTERNAL indicates that the contents of the memory blocks where not verified correctly after copying."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sd_mbr_command_copy_sd_t {
+    #[doc = "< Pointer to the source of data to be copied."]
+    pub src: *mut u32,
+    #[doc = "< Pointer to the destination where the content is to be copied."]
+    pub dst: *mut u32,
+    #[doc = "< Number of 32 bit words to copy. Must be a multiple of @ref MBR_PAGE_SIZE_IN_WORDS words."]
+    pub len: u32,
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_copy_sd_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_copy_sd_t>(),
+        12usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_copy_sd_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_copy_sd_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_copy_sd_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).src as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_copy_sd_t),
+            "::",
+            stringify!(src)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).dst as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_copy_sd_t),
+            "::",
+            stringify!(dst)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_sd_t>())).len as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_copy_sd_t),
+            "::",
+            stringify!(len)
+        )
+    );
+}
+#[doc = "@brief This command works like memcmp, but takes the length in words."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS indicates that the contents of both memory blocks are equal."]
+#[doc = " @retval ::NRF_ERROR_NULL indicates that the contents of the memory blocks are not equal."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sd_mbr_command_compare_t {
+    #[doc = "< Pointer to block of memory."]
+    pub ptr1: *mut u32,
+    #[doc = "< Pointer to block of memory."]
+    pub ptr2: *mut u32,
+    #[doc = "< Number of 32 bit words to compare."]
+    pub len: u32,
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_compare_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_compare_t>(),
+        12usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_compare_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_compare_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_compare_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).ptr1 as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_compare_t),
+            "::",
+            stringify!(ptr1)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).ptr2 as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_compare_t),
+            "::",
+            stringify!(ptr2)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_compare_t>())).len as *const _ as usize },
+        8usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_compare_t),
+            "::",
+            stringify!(len)
+        )
+    );
+}
+#[doc = "@brief This command copies a new BootLoader."]
+#[doc = ""]
+#[doc = " The MBR assumes that either @ref MBR_BOOTLOADER_ADDR or @ref MBR_UICR_BOOTLOADER_ADDR is set to"]
+#[doc = " the address where the bootloader will be copied. If both addresses are set, the MBR will prioritize"]
+#[doc = " @ref MBR_BOOTLOADER_ADDR."]
+#[doc = ""]
+#[doc = " The bootloader destination is erased by this function."]
+#[doc = " If (destination+bl_len) is in the middle of a flash page, that whole flash page will be erased."]
+#[doc = ""]
+#[doc = " This command requires that @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR is set,"]
+#[doc = " see @ref sd_mbr_command."]
+#[doc = ""]
+#[doc = " This command will use the flash protect peripheral (BPROT or ACL) to protect the flash that is"]
+#[doc = " not intended to be written."]
+#[doc = ""]
+#[doc = " On success, this function will not return. It will start the new bootloader from reset-vector as normal."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INTERNAL indicates an internal error that should not happen."]
+#[doc = " @retval ::NRF_ERROR_FORBIDDEN if the bootloader address is not set."]
+#[doc = " @retval ::NRF_ERROR_INVALID_LENGTH if parameters attempts to read or write outside flash area."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page is provided. See @ref sd_mbr_command."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sd_mbr_command_copy_bl_t {
+    #[doc = "< Pointer to the source of the bootloader to be be copied."]
+    pub bl_src: *mut u32,
+    #[doc = "< Number of 32 bit words to copy for BootLoader."]
+    pub bl_len: u32,
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_copy_bl_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_copy_bl_t>(),
+        8usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_copy_bl_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_copy_bl_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_copy_bl_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_src as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_copy_bl_t),
+            "::",
+            stringify!(bl_src)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_copy_bl_t>())).bl_len as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_copy_bl_t),
+            "::",
+            stringify!(bl_len)
+        )
+    );
+}
+#[doc = "@brief Change the address the MBR starts after a reset"]
+#[doc = ""]
+#[doc = " Once this function has been called, this address is where the MBR will start to forward"]
+#[doc = " interrupts to after a reset."]
+#[doc = ""]
+#[doc = " To restore default forwarding, this function should be called with @ref address set to 0. If a"]
+#[doc = " bootloader is present, interrupts will be forwarded to the bootloader. If not, interrupts will"]
+#[doc = " be forwarded to the SoftDevice."]
+#[doc = ""]
+#[doc = " The location of a bootloader can be specified in @ref MBR_BOOTLOADER_ADDR or"]
+#[doc = " @ref MBR_UICR_BOOTLOADER_ADDR. If both addresses are set, the MBR will prioritize"]
+#[doc = " @ref MBR_BOOTLOADER_ADDR."]
+#[doc = ""]
+#[doc = " This command requires that @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR is set,"]
+#[doc = " see @ref sd_mbr_command."]
+#[doc = ""]
+#[doc = " On success, this function will not return. It will reset the device."]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_INTERNAL indicates an internal error that should not happen."]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR if parameter address is outside of the flash size."]
+#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page is provided. See @ref sd_mbr_command."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sd_mbr_command_vector_table_base_set_t {
+    #[doc = "< The base address of the interrupt vector table for forwarded interrupts."]
+    pub address: u32,
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_vector_table_base_set_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_vector_table_base_set_t>(),
+        4usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_vector_table_base_set_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_vector_table_base_set_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_vector_table_base_set_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_vector_table_base_set_t>())).address as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_vector_table_base_set_t),
+            "::",
+            stringify!(address)
+        )
+    );
+}
+#[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the MBR"]
+#[doc = ""]
+#[doc = " Unlike sd_mbr_command_vector_table_base_set_t, this function does not reset, and it does not"]
+#[doc = " change where the MBR starts after reset."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct sd_mbr_command_irq_forward_address_set_t {
+    #[doc = "< The base address of the interrupt vector table for forwarded interrupts."]
+    pub address: u32,
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_irq_forward_address_set_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_irq_forward_address_set_t>(),
+        4usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_irq_forward_address_set_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_irq_forward_address_set_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_irq_forward_address_set_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_irq_forward_address_set_t>())).address as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_irq_forward_address_set_t),
+            "::",
+            stringify!(address)
+        )
+    );
+}
+#[doc = "@brief Input structure containing data used when calling ::sd_mbr_command"]
+#[doc = ""]
+#[doc = " Depending on what command value that is set, the corresponding params value type must also be"]
+#[doc = " set. See @ref NRF_MBR_COMMANDS for command types and corresponding params value type. If command"]
+#[doc = " @ref SD_MBR_COMMAND_INIT_SD is set, it is not necessary to set any values under params."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct sd_mbr_command_t {
+    #[doc = "< Type of command to be issued. See @ref NRF_MBR_COMMANDS."]
+    pub command: u32,
+    #[doc = "< Command parameters."]
+    pub params: sd_mbr_command_t__bindgen_ty_1,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub union sd_mbr_command_t__bindgen_ty_1 {
+    #[doc = "< Parameters for copy SoftDevice."]
+    pub copy_sd: sd_mbr_command_copy_sd_t,
+    #[doc = "< Parameters for verify."]
+    pub compare: sd_mbr_command_compare_t,
+    #[doc = "< Parameters for copy BootLoader. Requires parameter page."]
+    pub copy_bl: sd_mbr_command_copy_bl_t,
+    #[doc = "< Parameters for vector table base set. Requires parameter page."]
+    pub base_set: sd_mbr_command_vector_table_base_set_t,
+    #[doc = "< Parameters for irq forward address set"]
+    pub irq_forward_address_set: sd_mbr_command_irq_forward_address_set_t,
+    _bindgen_union_align: [u32; 3usize],
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_t__bindgen_ty_1() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_t__bindgen_ty_1>(),
+        12usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_t__bindgen_ty_1))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_t__bindgen_ty_1>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_t__bindgen_ty_1))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_sd as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t__bindgen_ty_1),
+            "::",
+            stringify!(copy_sd)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).compare as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t__bindgen_ty_1),
+            "::",
+            stringify!(compare)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).copy_bl as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t__bindgen_ty_1),
+            "::",
+            stringify!(copy_bl)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).base_set as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t__bindgen_ty_1),
+            "::",
+            stringify!(base_set)
+        )
+    );
+    assert_eq!(
+        unsafe {
+            &(*(::core::ptr::null::<sd_mbr_command_t__bindgen_ty_1>())).irq_forward_address_set as *const _ as usize
+        },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t__bindgen_ty_1),
+            "::",
+            stringify!(irq_forward_address_set)
+        )
+    );
+}
+#[test]
+fn bindgen_test_layout_sd_mbr_command_t() {
+    assert_eq!(
+        ::core::mem::size_of::<sd_mbr_command_t>(),
+        16usize,
+        concat!("Size of: ", stringify!(sd_mbr_command_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<sd_mbr_command_t>(),
+        4usize,
+        concat!("Alignment of ", stringify!(sd_mbr_command_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t>())).command as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t),
+            "::",
+            stringify!(command)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<sd_mbr_command_t>())).params as *const _ as usize },
+        4usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(sd_mbr_command_t),
+            "::",
+            stringify!(params)
+        )
+    );
+}
+
+#[doc = "@brief Issue Master Boot Record commands"]
+#[doc = ""]
+#[doc = " Commands used when updating a SoftDevice and bootloader."]
+#[doc = ""]
+#[doc = " The @ref SD_MBR_COMMAND_COPY_BL and @ref SD_MBR_COMMAND_VECTOR_TABLE_BASE_SET requires"]
+#[doc = " parameters to be retained by the MBR when resetting the IC. This is done in a separate flash"]
+#[doc = " page. The location of the flash page should be provided by the application in either"]
+#[doc = " @ref MBR_PARAM_PAGE_ADDR or @ref MBR_UICR_PARAM_PAGE_ADDR. If both addresses are set, the MBR"]
+#[doc = " will prioritize @ref MBR_PARAM_PAGE_ADDR. This page will be cleared by the MBR and is used to"]
+#[doc = " store the command before reset. When an address is specified, the page it refers to must not be"]
+#[doc = " used by the application. If no address is provided by the application, i.e. both"]
+#[doc = " @ref MBR_PARAM_PAGE_ADDR and @ref MBR_UICR_PARAM_PAGE_ADDR is 0xFFFFFFFF, MBR commands which use"]
+#[doc = " flash will be unavailable and return @ref NRF_ERROR_NO_MEM."]
+#[doc = ""]
+#[doc = " @param[in]  param Pointer to a struct describing the command."]
+#[doc = ""]
+#[doc = " @note For a complete set of return values, see ::sd_mbr_command_copy_sd_t,"]
+#[doc = "       ::sd_mbr_command_copy_bl_t, ::sd_mbr_command_compare_t,"]
+#[doc = "       ::sd_mbr_command_vector_table_base_set_t, ::sd_mbr_command_irq_forward_address_set_t"]
+#[doc = ""]
+#[doc = " @retval ::NRF_ERROR_NO_MEM No MBR parameter page provided"]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM if an invalid command is given."]
+#[inline(always)]
+pub unsafe fn sd_mbr_command(param: *mut sd_mbr_command_t) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 24",
+        inout("r0") to_asm(param) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "< ::sd_softdevice_enable"]
+pub const NRF_SD_SVCS_SD_SOFTDEVICE_ENABLE: NRF_SD_SVCS = 16;
+#[doc = "< ::sd_softdevice_disable"]
+pub const NRF_SD_SVCS_SD_SOFTDEVICE_DISABLE: NRF_SD_SVCS = 17;
+#[doc = "< ::sd_softdevice_is_enabled"]
+pub const NRF_SD_SVCS_SD_SOFTDEVICE_IS_ENABLED: NRF_SD_SVCS = 18;
+#[doc = "< ::sd_softdevice_vector_table_base_set"]
+pub const NRF_SD_SVCS_SD_SOFTDEVICE_VECTOR_TABLE_BASE_SET: NRF_SD_SVCS = 19;
+#[doc = "< Placeholder for last SDM SVC"]
+pub const NRF_SD_SVCS_SVC_SDM_LAST: NRF_SD_SVCS = 20;
+#[doc = "@brief nRF SoftDevice Manager API SVC numbers."]
+pub type NRF_SD_SVCS = self::c_uint;
+#[doc = "@brief Type representing LFCLK oscillator source."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct nrf_clock_lf_cfg_t {
+    #[doc = "< LF oscillator clock source, see @ref NRF_CLOCK_LF_SRC."]
+    pub source: u8,
+    #[doc = "< Only for ::NRF_CLOCK_LF_SRC_RC: Calibration timer interval in 1/4 second"]
+    #[doc = "units (nRF52: 1-32)."]
+    #[doc = "@note To avoid excessive clock drift, 0.5 degrees Celsius is the"]
+    #[doc = "maximum temperature change allowed in one calibration timer"]
+    #[doc = "interval. The interval should be selected to ensure this."]
+    #[doc = ""]
+    #[doc = "@note Must be 0 if source is not ::NRF_CLOCK_LF_SRC_RC."]
+    pub rc_ctiv: u8,
+    #[doc = "<  Only for ::NRF_CLOCK_LF_SRC_RC: How often (in number of calibration"]
+    #[doc = "intervals) the RC oscillator shall be calibrated if the temperature"]
+    #[doc = "hasn't changed."]
+    #[doc = "0: Always calibrate even if the temperature hasn't changed."]
+    #[doc = "1: Only calibrate if the temperature has changed (legacy - nRF51 only)."]
+    #[doc = "2-33: Check the temperature and only calibrate if it has changed,"]
+    #[doc = "however calibration will take place every rc_temp_ctiv"]
+    #[doc = "intervals in any case."]
+    #[doc = ""]
+    #[doc = "@note Must be 0 if source is not ::NRF_CLOCK_LF_SRC_RC."]
+    #[doc = ""]
+    #[doc = "@note For nRF52, the application must ensure calibration at least once"]
+    #[doc = "every 8 seconds to ensure +/-500 ppm clock stability. The"]
+    #[doc = "recommended configuration for ::NRF_CLOCK_LF_SRC_RC on nRF52 is"]
+    #[doc = "rc_ctiv=16 and rc_temp_ctiv=2. This will ensure calibration at"]
+    #[doc = "least once every 8 seconds and for temperature changes of 0.5"]
+    #[doc = "degrees Celsius every 4 seconds. See the Product Specification"]
+    #[doc = "for the nRF52 device being used for more information."]
+    pub rc_temp_ctiv: u8,
+    #[doc = "< External clock accuracy used in the LL to compute timing"]
+    #[doc = "windows, see @ref NRF_CLOCK_LF_ACCURACY."]
+    pub accuracy: u8,
+}
+#[test]
+fn bindgen_test_layout_nrf_clock_lf_cfg_t() {
+    assert_eq!(
+        ::core::mem::size_of::<nrf_clock_lf_cfg_t>(),
+        4usize,
+        concat!("Size of: ", stringify!(nrf_clock_lf_cfg_t))
+    );
+    assert_eq!(
+        ::core::mem::align_of::<nrf_clock_lf_cfg_t>(),
+        1usize,
+        concat!("Alignment of ", stringify!(nrf_clock_lf_cfg_t))
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).source as *const _ as usize },
+        0usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_clock_lf_cfg_t),
+            "::",
+            stringify!(source)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_ctiv as *const _ as usize },
+        1usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_clock_lf_cfg_t),
+            "::",
+            stringify!(rc_ctiv)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).rc_temp_ctiv as *const _ as usize },
+        2usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_clock_lf_cfg_t),
+            "::",
+            stringify!(rc_temp_ctiv)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::core::ptr::null::<nrf_clock_lf_cfg_t>())).accuracy as *const _ as usize },
+        3usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(nrf_clock_lf_cfg_t),
+            "::",
+            stringify!(accuracy)
+        )
+    );
+}
+#[doc = "@brief Fault Handler type."]
+#[doc = ""]
+#[doc = " When certain unrecoverable errors occur within the application or SoftDevice the fault handler will be called back."]
+#[doc = " The protocol stack will be in an undefined state when this happens and the only way to recover will be to"]
+#[doc = " perform a reset, using e.g. CMSIS NVIC_SystemReset()."]
+#[doc = " If the application returns from the fault handler the SoftDevice will call NVIC_SystemReset()."]
+#[doc = ""]
+#[doc = " @note It is recommended to either perform a reset in the fault handler or to let the SoftDevice reset the device."]
+#[doc = "       Otherwise SoC peripherals may behave in an undefined way. For example, the RADIO peripherial may"]
+#[doc = "       continously transmit packets."]
+#[doc = ""]
+#[doc = " @note This callback is executed in HardFault context, thus SVC functions cannot be called from the fault callback."]
+#[doc = ""]
+#[doc = " @param[in] id Fault identifier. See @ref NRF_FAULT_IDS."]
+#[doc = " @param[in] pc The program counter of the instruction that triggered the fault."]
+#[doc = " @param[in] info Optional additional information regarding the fault. Refer to each Fault identifier for details."]
+#[doc = ""]
+#[doc = " @note When id is set to @ref NRF_FAULT_ID_APP_MEMACC, pc will contain the address of the instruction being executed at the time when"]
+#[doc = " the fault is detected by the CPU. The CPU program counter may have advanced up to 2 instructions (no branching) after the one that triggered the fault."]
+pub type nrf_fault_handler_t = ::core::option::Option<unsafe extern "C" fn(id: u32, pc: u32, info: u32)>;
+
+#[doc = "@brief Enables the SoftDevice and by extension the protocol stack."]
+#[doc = ""]
+#[doc = " @note Some care must be taken if a low frequency clock source is already running when calling this function:"]
+#[doc = "       If the LF clock has a different source then the one currently running, it will be stopped. Then, the new"]
+#[doc = "       clock source will be started."]
+#[doc = ""]
+#[doc = " @note This function has no effect when returning with an error."]
+#[doc = ""]
+#[doc = " @post If return code is ::NRF_SUCCESS"]
+#[doc = "       - SoC library and protocol stack APIs are made available."]
+#[doc = "       - A portion of RAM will be unavailable (see relevant SDS documentation)."]
+#[doc = "       - Some peripherals will be unavailable or available only through the SoC API (see relevant SDS documentation)."]
+#[doc = "       - Interrupts will not arrive from protected peripherals or interrupts."]
+#[doc = "       - nrf_nvic_ functions must be used instead of CMSIS NVIC_ functions for reliable usage of the SoftDevice."]
+#[doc = "       - Interrupt latency may be affected by the SoftDevice  (see relevant SDS documentation)."]
+#[doc = "       - Chosen low frequency clock source will be running."]
+#[doc = ""]
+#[doc = " @param p_clock_lf_cfg Low frequency clock source and accuracy."]
+#[doc = "If NULL the clock will be configured as an RC source with rc_ctiv = 16 and .rc_temp_ctiv = 2"]
+#[doc = "In the case of XTAL source, the PPM accuracy of the chosen clock source must be greater than or equal to the actual characteristics of your XTAL clock."]
+#[doc = " @param fault_handler Callback to be invoked in case of fault, cannot be NULL."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[doc = " @retval ::NRF_ERROR_INVALID_ADDR  Invalid or NULL pointer supplied."]
+#[doc = " @retval ::NRF_ERROR_INVALID_STATE SoftDevice is already enabled, and the clock source and fault handler cannot be updated."]
+#[doc = " @retval ::NRF_ERROR_SDM_INCORRECT_INTERRUPT_CONFIGURATION SoftDevice interrupt is already enabled, or an enabled interrupt has an illegal priority level."]
+#[doc = " @retval ::NRF_ERROR_SDM_LFCLK_SOURCE_UNKNOWN Unknown low frequency clock source selected."]
+#[doc = " @retval ::NRF_ERROR_INVALID_PARAM Invalid clock source configuration supplied in p_clock_lf_cfg."]
+#[inline(always)]
+pub unsafe fn sd_softdevice_enable(
+    p_clock_lf_cfg: *const nrf_clock_lf_cfg_t,
+    fault_handler: nrf_fault_handler_t,
+) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 16",
+        inout("r0") to_asm(p_clock_lf_cfg) => ret,
+        inout("r1") to_asm(fault_handler) => _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Disables the SoftDevice and by extension the protocol stack."]
+#[doc = ""]
+#[doc = " Idempotent function to disable the SoftDevice."]
+#[doc = ""]
+#[doc = " @post SoC library and protocol stack APIs are made unavailable."]
+#[doc = " @post All interrupts that was protected by the SoftDevice will be disabled and initialized to priority 0 (highest)."]
+#[doc = " @post All peripherals used by the SoftDevice will be reset to default values."]
+#[doc = " @post All of RAM become available."]
+#[doc = " @post All interrupts are forwarded to the application."]
+#[doc = " @post LFCLK source chosen in ::sd_softdevice_enable will be left running."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_softdevice_disable() -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 17",
+        lateout("r0") ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Check if the SoftDevice is enabled."]
+#[doc = ""]
+#[doc = " @param[out]  p_softdevice_enabled If the SoftDevice is enabled: 1 else 0."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_softdevice_is_enabled(p_softdevice_enabled: *mut u8) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 18",
+        inout("r0") to_asm(p_softdevice_enabled) => ret,
+        lateout("r1") _,
+        lateout("r2") _,
+        lateout("r3") _,
+        lateout("r12") _,
+    );
+    ret
+}
+
+#[doc = "@brief Sets the base address of the interrupt vector table for interrupts forwarded from the SoftDevice"]
+#[doc = ""]
+#[doc = " This function is only intended to be called when a bootloader is enabled."]
+#[doc = ""]
+#[doc = " @param[in] address The base address of the interrupt vector table for forwarded interrupts."]
+#[doc = ""]
+#[doc = " @retval ::NRF_SUCCESS"]
+#[inline(always)]
+pub unsafe fn sd_softdevice_vector_table_base_set(address: u32) -> u32 {
+    let ret: u32;
+    core::arch::asm!("svc 19",
+        inout("r0") to_asm(address) => ret,
+        lateout("r1") _,
         lateout("r2") _,
         lateout("r3") _,
         lateout("r12") _,
