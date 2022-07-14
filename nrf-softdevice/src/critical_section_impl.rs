@@ -56,7 +56,7 @@ critical_section::custom_impl!(CriticalSection);
 
 unsafe impl critical_section::Impl for CriticalSection {
     unsafe fn acquire() -> u8 {
-        let nvic = &*NVIC::ptr();
+        let nvic = &*NVIC::PTR;
         let nested_cs = CS_FLAG.load(Ordering::SeqCst);
 
         if !nested_cs {
@@ -79,7 +79,7 @@ unsafe impl critical_section::Impl for CriticalSection {
     unsafe fn release(token: u8) {
         compiler_fence(Ordering::SeqCst);
 
-        let nvic = &*NVIC::ptr();
+        let nvic = &*NVIC::PTR;
         if token == 0 {
             raw_critical_section(|| {
                 CS_FLAG.store(false, Ordering::Relaxed);
