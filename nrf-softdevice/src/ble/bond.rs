@@ -1,4 +1,5 @@
 use crate::ble::replies::{OutOfBandReply, PasskeyReply};
+use crate::ble::types::SecurityMode;
 use crate::ble::Connection;
 use crate::raw;
 
@@ -49,6 +50,8 @@ pub trait BondHandler {
     #[cfg(feature = "ble-gatt-server")]
     /// Load the GATTS system attributes for the bond associated with `conn`
     fn load_sys_attrs(&self, setter: super::replies::SysAttrsReply);
+
+    fn on_security_update(&self, _conn: &Connection, _security_mode: SecurityMode) {}
 
     fn io_capabilities(&self) -> IoCapabilities {
         IoCapabilities::None

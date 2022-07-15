@@ -266,9 +266,14 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_CONN_SEC_UPDATE => {
             let params = &gap_evt.params.conn_sec_update;
             trace!("ble evt conn sec update");
-            connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default()
-            });
+            if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
+                conn.with_state(|state| {
+                    state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default();
+                    if let Some(bonder) = state.bonder {
+                        bonder.on_security_update(&conn, state.security_mode);
+                    }
+                });
+            }
         }
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_AUTH_STATUS => {
             let params = &gap_evt.params.auth_status;
