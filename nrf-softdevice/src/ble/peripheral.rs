@@ -2,7 +2,6 @@
 
 use core::{mem, ptr};
 
-use crate::ble::bond::BondHandler;
 use crate::ble::*;
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{raw, RawError, Softdevice};
@@ -254,24 +253,31 @@ pub async fn advertise_connectable(
     adv: ConnectableAdvertisement<'_>,
     config: &Config,
 ) -> Result<Connection, AdvertiseError> {
-    advertise_inner(sd, adv, config, None).await
+    advertise_inner(sd, adv, config, Connection::new).await
 }
 
+#[cfg(feature = "ble-bond")]
 pub async fn advertise_bondable<'a>(
     sd: &'a Softdevice,
     adv: ConnectableAdvertisement<'a>,
     config: &'a Config,
-    bonder: &'static dyn BondHandler,
+    bonder: &'static dyn crate::ble::bond::BondHandler,
 ) -> Result<Connection, AdvertiseError> {
-    advertise_inner(sd, adv, config, Some(bonder)).await
+    advertise_inner(sd, adv, config, |conn_handle, role, peer_address, conn_params| {
+        Connection::with_bonder(conn_handle, role, peer_address, conn_params, bonder)
+    })
+    .await
 }
 
-pub async fn advertise_inner<'a>(
+async fn advertise_inner<'a, F>(
     _sd: &'a Softdevice,
     adv: ConnectableAdvertisement<'a>,
     config: &'a Config,
-    bonder: Option<&'static dyn BondHandler>,
-) -> Result<Connection, AdvertiseError> {
+    mut f: F,
+) -> Result<Connection, AdvertiseError>
+where
+    F: FnMut(u16, Role, Address, raw::ble_gap_conn_params_t) -> Result<Connection, OutOfConnsError>,
+{
     let d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_adv_stop(ADV_HANDLE) };
         if let Err(_e) = RawError::convert(ret) {
@@ -294,7 +300,7 @@ pub async fn advertise_inner<'a>(
                     let conn_params = params.conn_params;
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
-                    match Connection::new(conn_handle, role, peer_address, conn_params, bonder) {
+                    match f(conn_handle, role, peer_address, conn_params) {
                         Ok(conn) => {
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                             gap::do_data_length_update(conn_handle, ptr::null());

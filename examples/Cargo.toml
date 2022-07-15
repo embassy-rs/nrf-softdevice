@@ -9,11 +9,13 @@ default = [
     "ble-l2cap",
     "ble-gatt-server",
     "ble-gatt-client",
+    "ble-bond",
 ]
 
 ble-l2cap = ["nrf-softdevice/ble-l2cap"]
 ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
 ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
+ble-bond = ["nrf-softdevice/ble-bond"]
 
 [dependencies]
 embassy-executor = { version = "0.1.0", features = ["nightly", "defmt"]}

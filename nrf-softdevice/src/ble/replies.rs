@@ -1,10 +1,12 @@
 use super::Connection;
 use crate::{raw, RawError};
 
+#[cfg(feature = "ble-bond")]
 pub struct PasskeyReply {
     conn: Option<Connection>,
 }
 
+#[cfg(feature = "ble-bond")]
 impl Drop for PasskeyReply {
     fn drop(&mut self) {
         if let Some(conn_handle) = self.conn.take().and_then(|x| x.handle()) {
@@ -19,6 +21,7 @@ impl Drop for PasskeyReply {
     }
 }
 
+#[cfg(feature = "ble-bond")]
 impl PasskeyReply {
     pub(crate) fn new(conn: Connection) -> Self {
         Self { conn: Some(conn) }
@@ -39,10 +42,12 @@ impl PasskeyReply {
     }
 }
 
+#[cfg(feature = "ble-bond")]
 pub struct OutOfBandReply {
     conn: Option<Connection>,
 }
 
+#[cfg(feature = "ble-bond")]
 impl Drop for OutOfBandReply {
     fn drop(&mut self) {
         if let Some(conn_handle) = self.conn.take().and_then(|x| x.handle()) {
@@ -57,6 +62,7 @@ impl Drop for OutOfBandReply {
     }
 }
 
+#[cfg(feature = "ble-bond")]
 impl OutOfBandReply {
     pub(crate) fn new(conn: Connection) -> Self {
         Self { conn: Some(conn) }

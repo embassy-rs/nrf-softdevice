@@ -132,9 +132,10 @@ where
                     trace!("gatts sys attr missing conn={:?}", gatts_evt.conn_handle);
 
                     if let Some(conn) = Connection::from_handle(gatts_evt.conn_handle) {
-                        let setter = SysAttrsReply::new(conn.clone());
+                        let _setter = SysAttrsReply::new(conn.clone());
+                        #[cfg(feature = "ble-bond")]
                         if let Some(bonder) = conn.bonder() {
-                            bonder.load_sys_attrs(setter);
+                            bonder.load_sys_attrs(_setter);
                         }
                     }
                 }

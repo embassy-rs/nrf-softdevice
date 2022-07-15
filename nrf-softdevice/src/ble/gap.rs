@@ -179,12 +179,12 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 sec_params.kdist_own.set_id(1);
                 sec_params.kdist_peer.set_enc(1);
                 sec_params.kdist_peer.set_id(1);
+                sec_params.set_io_caps(raw::BLE_GAP_IO_CAPS_NONE as u8);
 
-                if let Some(bonder) = state.bonder {
+                #[cfg(feature = "ble-bond")]
+                if let Some(bonder) = state.bond.handler {
                     sec_params.set_bond(1);
                     sec_params.set_io_caps(bonder.io_capabilities().to_io_caps());
-                } else {
-                    sec_params.set_io_caps(raw::BLE_GAP_IO_CAPS_NONE as u8);
                 }
 
                 (sec_params, state.keyset())
@@ -208,8 +208,9 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 "on_passkey_display passkey={}",
                 core::str::from_utf8_unchecked(&params.passkey)
             );
+            #[cfg(feature = "ble-bond")]
             connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                if let Some(bonder) = state.bonder {
+                if let Some(bonder) = state.bond.handler {
                     unwrap!(bonder.display_passkey(&params.passkey))
                 }
             });
@@ -218,8 +219,11 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             let params = &gap_evt.params.auth_key_request;
             trace!("on_auth_key_request key_type={}", params.key_type);
 
+            #[cfg(not(feature = "ble-bond"))]
+            let handled = false;
+            #[cfg(feature = "ble-bond")]
             let handled = connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                state.bonder.and_then(|bonder| match u32::from(params.key_type) {
+                state.bond.handler.and_then(|bonder| match u32::from(params.key_type) {
                     raw::BLE_GAP_AUTH_KEY_TYPE_PASSKEY => Connection::from_handle(gap_evt.conn_handle)
                         .map(|conn| bonder.enter_passkey(PasskeyReply::new(conn))),
                     raw::BLE_GAP_AUTH_KEY_TYPE_OOB => Connection::from_handle(gap_evt.conn_handle)
@@ -248,9 +252,11 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.enc_info(), params.id_info(), params.sign_info(), params.master_id.ediv, params.master_id.rand,
                 params.peer_addr.addr, params.peer_addr.addr_id_peer(), params.peer_addr.addr_type());
 
-            let key = Connection::from_handle(gap_evt.conn_handle).and_then(|conn| {
-                conn.with_state(|state| state.bonder.and_then(|x| x.get_key(&conn, params.master_id)))
-            });
+            #[cfg(not(feature = "ble-bond"))]
+            let key = None;
+            #[cfg(feature = "ble-bond")]
+            let key = Connection::from_handle(gap_evt.conn_handle)
+                .and_then(|conn| conn.bonder().and_then(|x| x.get_key(&conn, params.master_id)));
 
             let ret = raw::sd_ble_gap_sec_info_reply(
                 gap_evt.conn_handle,
@@ -269,7 +275,8 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                 conn.with_state(|state| {
                     state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default();
-                    if let Some(bonder) = state.bonder {
+                    #[cfg(feature = "ble-bond")]
+                    if let Some(bonder) = state.bond.handler {
                         bonder.on_security_update(&conn, state.security_mode);
                     }
                 });
@@ -285,16 +292,17 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.kdist_own._bitfield_1.get(0, 8),
                 params.kdist_peer._bitfield_1.get(0, 8)
             );
+            #[cfg(feature = "ble-bond")]
             if u32::from(params.auth_status) == raw::BLE_GAP_SEC_STATUS_SUCCESS {
                 if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                     conn.with_state(|state| {
                         if params.bonded() != 0 {
-                            if let Some(bonder) = state.bonder {
+                            if let Some(bonder) = state.bond.handler {
                                 bonder.on_bonded(
                                     &conn,
-                                    &state.own_enc_key,
-                                    (params.kdist_peer.id() != 0).then(|| &state.peer_id),
-                                    (params.kdist_peer.enc() != 0).then(|| &state.peer_enc_key),
+                                    &state.bond.own_enc_key,
+                                    (params.kdist_peer.id() != 0).then(|| &state.bond.peer_id),
+                                    (params.kdist_peer.enc() != 0).then(|| &state.bond.peer_enc_key),
                                 );
                             }
                         }
