@@ -22,15 +22,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aligned"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a785a543aea40f5e4e2e93bb2655d31bc21bb391fff65697150973e383f16bb"
-dependencies = [
- "as-slice 0.1.5",
-]
-
-[[package]]
 name = "as-slice"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -137,19 +128,6 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "cortex-m"
-version = "0.6.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9075300b07c6a56263b9b582c214d0ff037b00d45ec9fde1cc711490c56f1bb9"
-dependencies = [
- "aligned",
- "bare-metal 0.2.5",
- "bitfield",
- "cortex-m 0.7.5",
- "volatile-register",
-]
-
-[[package]]
-name = "cortex-m"
 version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd20d4ac4aa86f4f75f239d59e542ef67de87cce2c282818dc6e84155d3ea126"
@@ -188,7 +166,7 @@ checksum = "95da181745b56d4bd339530ec393508910c909c784e8962d15d722bacf0bcbcd"
 dependencies = [
  "bare-metal 1.0.0",
  "cfg-if",
- "cortex-m 0.7.5",
+ "cortex-m",
  "riscv",
 ]
 
@@ -308,7 +286,7 @@ source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359
 dependencies = [
  "atomic-polyfill",
  "cfg-if",
- "cortex-m 0.7.5",
+ "cortex-m",
  "critical-section",
  "defmt",
  "embassy-macros",
@@ -326,7 +304,7 @@ source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359
 dependencies = [
  "atomic-polyfill",
  "cfg-if",
- "cortex-m 0.7.5",
+ "cortex-m",
  "critical-section",
  "embassy",
  "embassy-hal-common",
@@ -352,7 +330,7 @@ name = "embassy-hal-common"
 version = "0.1.0"
 source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "embassy",
  "num-traits",
 ]
@@ -374,7 +352,7 @@ version = "0.1.0"
 source = "git+https://github.com/embassy-rs/embassy#5318fe404bed68a38a1d81eb7359ebc38e6fad15"
 dependencies = [
  "cfg-if",
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "critical-section",
  "defmt",
@@ -649,7 +627,7 @@ checksum = "546c37ac5d9e56f55e73b677106873d9d9f5190605e41a856503623648488cae"
 name = "nrf-softdevice"
 version = "0.1.0"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "critical-section",
  "defmt",
@@ -677,21 +655,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "nrf-softdevice-defmt-rtt"
-version = "0.1.0"
-dependencies = [
- "cortex-m 0.6.7",
- "critical-section",
- "defmt",
- "nrf-softdevice",
-]
-
-[[package]]
 name = "nrf-softdevice-examples"
 version = "0.1.0"
 dependencies = [
  "atomic-pool",
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "defmt",
  "defmt-rtt",
@@ -749,7 +717,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0cd69f02212c43d0abf0f29b2b38657efe06f60719606398427e307ef2141da"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -760,7 +728,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c781b61666a97f249989d25c2997cefcf72a29721a2628cf666a4195566933b9"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -771,7 +739,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be89f9a72ea52c1fc1712db6cb9adebf95fb16598d5919e7d3dbd6e13b7913ce"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -782,7 +750,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ccfc0d290dc3bf619206bd32d012778692c62401b14eda67091609feff1629e0"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -793,7 +761,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e649284d1cde4aef5c43ea32588553cfd31a9b7ce5fccdac98f012399382c33a"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -804,7 +772,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd2b96c950afd2887102113c5194cb5c985a13aff0eac5fb976a76cd6e62a21"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -815,7 +783,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9efa9d1e910e3b825fd7e28f369363a8e036b386b77e21035b9f0e510de199cf"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "cortex-m-rt",
  "vcell",
 ]
@@ -855,7 +823,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ab1f00eac22bd18f8e5cae9555f2820b3a0c166b5b556ee3e203746ea6dcf3a"
 dependencies = [
- "cortex-m 0.7.5",
+ "cortex-m",
  "defmt",
 ]
 
