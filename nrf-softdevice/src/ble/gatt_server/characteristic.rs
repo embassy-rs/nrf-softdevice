@@ -1,5 +1,3 @@
-use core::convert::TryInto;
-
 use crate::ble::SecurityMode;
 use crate::raw;
 

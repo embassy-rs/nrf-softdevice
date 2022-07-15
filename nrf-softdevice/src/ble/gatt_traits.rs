@@ -1,4 +1,3 @@
-use core::convert::TryInto;
 use core::{mem, slice};
 
 use heapless::{String, Vec};
