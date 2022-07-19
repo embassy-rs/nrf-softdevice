@@ -252,18 +252,22 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.enc_info(), params.id_info(), params.sign_info(), params.master_id.ediv, params.master_id.rand,
                 params.peer_addr.addr, params.peer_addr.addr_id_peer(), params.peer_addr.addr_type());
 
-            #[cfg(not(feature = "ble-bond"))]
-            let key = None;
             #[cfg(feature = "ble-bond")]
-            let key = Connection::from_handle(gap_evt.conn_handle)
-                .and_then(|conn| conn.bonder().and_then(|x| x.get_key(&conn, params.master_id)));
+            let key = Connection::from_handle(gap_evt.conn_handle).and_then(|conn| {
+                conn.bonder()
+                    .and_then(|x| x.get_key(&conn, MasterId::from_raw(params.master_id)))
+            });
 
-            let ret = raw::sd_ble_gap_sec_info_reply(
-                gap_evt.conn_handle,
-                key.as_ref().map(|x| x as *const _).unwrap_or(core::ptr::null()),
-                core::ptr::null(),
-                core::ptr::null(),
-            );
+            #[cfg(not(feature = "ble-bond"))]
+            let key_ptr = core::ptr::null();
+            #[cfg(feature = "ble-bond")]
+            let key_ptr = key
+                .as_ref()
+                .map(|x| x.as_raw() as *const _)
+                .unwrap_or(core::ptr::null());
+
+            let ret =
+                raw::sd_ble_gap_sec_info_reply(gap_evt.conn_handle, key_ptr, core::ptr::null(), core::ptr::null());
 
             if let Err(_err) = RawError::convert(ret) {
                 warn!("sd_ble_gap_sec_info_reply err {:?}", _err);
@@ -298,11 +302,18 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                     conn.with_state(|state| {
                         if params.bonded() != 0 {
                             if let Some(bonder) = state.bond.handler {
+                                let peer_id = if params.kdist_peer.id() != 0 {
+                                    IdentityKey::from_raw(state.bond.peer_id)
+                                } else {
+                                    warn!("Peer identity key not distributed; falling back to address");
+                                    IdentityKey::from_addr(conn.peer_address())
+                                };
+
                                 bonder.on_bonded(
                                     &conn,
-                                    &state.bond.own_enc_key,
-                                    (params.kdist_peer.id() != 0).then(|| &state.bond.peer_id),
-                                    (params.kdist_peer.enc() != 0).then(|| &state.bond.peer_enc_key),
+                                    MasterId::from_raw(state.bond.own_enc_key.master_id),
+                                    EncryptionInfo::from_raw(state.bond.own_enc_key.enc_info),
+                                    peer_id,
                                 );
                             }
                         }

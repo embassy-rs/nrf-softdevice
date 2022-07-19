@@ -17,7 +17,7 @@ use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::RegisterError;
 use nrf_softdevice::ble::{
-    gatt_server, peripheral, Address, AddressType, Connection, SecurityMode, SysAttrsReply, Uuid,
+    gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, SysAttrsReply, Uuid,
 };
 use nrf_softdevice::{raw, Softdevice};
 
@@ -31,9 +31,16 @@ async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
+#[derive(Debug, Clone, Copy)]
+struct Peer {
+    master_id: MasterId,
+    key: EncryptionInfo,
+    peer_id: IdentityKey,
+}
+
 pub struct Bonder {
-    peer: Cell<Option<raw::ble_gap_enc_key_t>>,
-    sys_attrs: RefCell<(Option<Address>, heapless::Vec<u8, 62>)>,
+    peer: Cell<Option<Peer>>,
+    sys_attrs: RefCell<heapless::Vec<u8, 62>>,
 }
 
 impl Default for Bonder {
@@ -46,67 +53,50 @@ impl Default for Bonder {
 }
 
 impl BondHandler for Bonder {
-    fn on_bonded(
-        &self,
-        _conn: &Connection,
-        key: &raw::ble_gap_enc_key_t,
-        _peer_id: Option<&raw::ble_gap_id_key_t>,
-        _peer_key: Option<&raw::ble_gap_enc_key_t>,
-    ) {
-        debug!(
-            "storing bond for: id: {{ ediv: {:x}, rand: {:x} }}, key: {{ ltk: {:x}, ltk_len: {}, auth: {}, lesc: {} }}",
-            key.master_id.ediv,
-            key.master_id.rand,
-            key.enc_info.ltk,
-            key.enc_info.ltk_len(),
-            key.enc_info.auth(),
-            key.enc_info.lesc()
-        );
+    fn on_bonded(&self, _conn: &Connection, master_id: MasterId, key: EncryptionInfo, peer_id: IdentityKey) {
+        debug!("storing bond for: id: {}, key: {}", master_id, key);
 
         // In a real application you would want to signal another task to permanently store the keys in non-volatile memory here.
-        self.peer.set(Some(*key));
+        self.sys_attrs.borrow_mut().clear();
+        self.peer.set(Some(Peer {
+            master_id,
+            key,
+            peer_id,
+        }));
     }
 
-    fn get_key(&self, _conn: &Connection, master_id: raw::ble_gap_master_id_t) -> Option<raw::ble_gap_enc_info_t> {
-        debug!(
-            "getting bond for: id: {{ ediv: {:x}, rand: {:x} }}",
-            master_id.ediv, master_id.rand
-        );
+    fn get_key(&self, _conn: &Connection, master_id: MasterId) -> Option<EncryptionInfo> {
+        debug!("getting bond for: id: {}", master_id);
 
-        self.peer.get().and_then(|peer| {
-            (master_id.ediv == peer.master_id.ediv && master_id.rand == peer.master_id.rand).then(|| peer.enc_info)
-        })
+        self.peer
+            .get()
+            .and_then(|peer| (master_id == peer.master_id).then(|| peer.key))
     }
 
     fn save_sys_attrs(&self, conn: &Connection) {
         debug!("saving system attributes for: {}", conn.peer_address());
 
-        let mut sys_attrs = self.sys_attrs.borrow_mut();
-        let capacity = sys_attrs.1.capacity();
-        unwrap!(sys_attrs.1.resize(capacity, 0));
-        let len = unwrap!(gatt_server::get_sys_attrs(conn, &mut sys_attrs.1)) as u16;
-        sys_attrs.1.truncate(usize::from(len));
-        sys_attrs.0 = Some(conn.peer_address());
-        // In a real application you would want to signal another task to permanently store sys_attrs for this connection's address
+        if let Some(peer) = self.peer.get() {
+            if peer.peer_id.is_match(conn.peer_address()) {
+                let mut sys_attrs = self.sys_attrs.borrow_mut();
+                let capacity = sys_attrs.capacity();
+                unwrap!(sys_attrs.resize(capacity, 0));
+                let len = unwrap!(gatt_server::get_sys_attrs(conn, &mut sys_attrs)) as u16;
+                sys_attrs.truncate(usize::from(len));
+                // In a real application you would want to signal another task to permanently store sys_attrs for this connection's peer
+            }
+        }
     }
 
     fn load_sys_attrs(&self, setter: SysAttrsReply) {
-        let sys_attrs = self.sys_attrs.borrow();
         let addr = setter.connection().peer_address();
         debug!("loading system attributes for: {}", addr);
 
-        match addr.address_type() {
-            AddressType::Public | AddressType::RandomStatic => {
-                if sys_attrs.0 == Some(addr) {
-                    unwrap!(setter.set_sys_attrs(&sys_attrs.1));
-                }
+        if let Some(peer) = self.peer.get() {
+            // In a real application you would loop through all stored peers to find a match
+            if peer.peer_id.is_match(addr) {
+                unwrap!(setter.set_sys_attrs(&self.sys_attrs.borrow()));
             }
-            AddressType::RandomPrivateResolvable => {
-                // Need to use the peer id associated with the bond to calculate a hash per Bluetooth core
-                // specification 4.2 section 3.H.2.2.2.
-                defmt::unimplemented!()
-            }
-            AddressType::RandomPrivateNonResolvable | AddressType::Anonymous => return,
         }
     }
 }

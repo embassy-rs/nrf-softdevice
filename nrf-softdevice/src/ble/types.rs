@@ -246,3 +246,97 @@ pub enum PhySet {
     #[cfg(feature = "s140")]
     M1M2Coded = 7,
 }
+
+// Note: this type MUST be layout-compatible with raw::ble_gap_master_id_t
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct MasterId {
+    /// Encrypted diversifier
+    pub ediv: u16,
+    /// Random number
+    pub rand: [u8; 8usize],
+}
+
+impl MasterId {
+    pub fn from_raw(raw: raw::ble_gap_master_id_t) -> Self {
+        // Safety: `raw::ble_gap_master_id_t` has the same layout as `Self` and all bit patterns are valid
+        unsafe { mem::transmute(raw) }
+    }
+}
+
+// Note: this type MUST be layout-compatible with raw::ble_gap_enc_info_t
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct EncryptionInfo {
+    /// Long term key
+    pub ltk: [u8; 16usize],
+    pub flags: u8,
+}
+
+impl EncryptionInfo {
+    pub fn as_raw(&self) -> &raw::ble_gap_enc_info_t {
+        // Safety: `Self` has the same layout as `raw::ble_gap_enc_info_t` and all bit patterns are valid
+        unsafe { mem::transmute(self) }
+    }
+
+    pub fn from_raw(raw: raw::ble_gap_enc_info_t) -> Self {
+        // Safety: `raw::ble_gap_enc_info_t` has the same layout as `Self` and all bit patterns are valid
+        unsafe { mem::transmute(raw) }
+    }
+}
+
+// Note: this type MUST be layout-compatible with raw::ble_gap_id_key_t
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct IdentityKey {
+    /// Identity resolution key
+    pub irk: [u8; 16usize],
+    /// Address
+    pub addr: Address,
+}
+
+impl IdentityKey {
+    pub fn is_match(&self, addr: Address) -> bool {
+        match addr.address_type() {
+            AddressType::Public | AddressType::RandomStatic => self.addr == addr,
+            AddressType::RandomPrivateResolvable => {
+                let local_hash = random_address_hash(self.irk, addr.bytes()[3..].try_into().unwrap());
+                addr.bytes()[..3] == local_hash
+            }
+            AddressType::RandomPrivateNonResolvable | AddressType::Anonymous => false,
+        }
+    }
+
+    pub fn from_raw(raw: raw::ble_gap_id_key_t) -> Self {
+        // Safety: `raw::ble_gap_id_key_t` has the same layout as `Self` and all bit patterns are valid
+        unsafe { mem::transmute(raw) }
+    }
+
+    pub fn from_addr(addr: Address) -> Self {
+        Self { irk: [0; 16], addr }
+    }
+}
+
+fn random_address_hash(key: [u8; 16], r: [u8; 3]) -> [u8; 3] {
+    let mut cleartext = [0; 16];
+    cleartext[13..].copy_from_slice(&r);
+    cleartext[13..].reverse(); // big-endian to little-endian
+
+    let mut ecb_hal_data: raw::nrf_ecb_hal_data_t = raw::nrf_ecb_hal_data_t {
+        key,
+        cleartext,
+        ciphertext: [0; 16],
+    };
+
+    ecb_hal_data.key.reverse(); // big-endian to little-endian
+
+    // Can only return NRF_SUCCESS
+    let _ = unsafe { raw::sd_ecb_block_encrypt(&mut ecb_hal_data) };
+
+    let mut res: [u8; 3] = ecb_hal_data.ciphertext[13..].try_into().unwrap();
+    res.reverse(); // little-endian to big-endian
+    res
+}
