@@ -46,7 +46,7 @@ impl Uuid {
         }
     }
 
-    pub unsafe fn as_raw_ptr(&self) -> *const raw::ble_uuid_t {
+    pub fn as_raw_ptr(&self) -> *const raw::ble_uuid_t {
         &self.inner as _
     }
 
@@ -148,6 +148,30 @@ pub enum AddressType {
     Anonymous = 0x7F,
 }
 
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct InvalidAddressType;
+
+impl TryFrom<u8> for AddressType {
+    type Error = InvalidAddressType;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        if value == 0x00 {
+            Ok(AddressType::Public)
+        } else if value == 0x01 {
+            Ok(AddressType::RandomStatic)
+        } else if value == 0x02 {
+            Ok(AddressType::RandomPrivateResolvable)
+        } else if value == 0x03 {
+            Ok(AddressType::RandomPrivateNonResolvable)
+        } else if value == 0x7F {
+            Ok(AddressType::Anonymous)
+        } else {
+            Err(InvalidAddressType)
+        }
+    }
+}
+
 // Note: this type MUST be layout-compatible with raw::ble_gap_addr_t
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -167,19 +191,21 @@ impl Address {
     }
 
     pub fn address_type(&self) -> AddressType {
-        unsafe { mem::transmute(self.flags >> 1) }
+        unwrap!((self.flags >> 1).try_into())
     }
 
     pub fn bytes(&self) -> [u8; 6] {
         self.bytes
     }
 
-    pub fn into_raw(&self) -> raw::ble_gap_addr_t {
-        unsafe { mem::transmute(*self) }
+    pub fn as_raw(&self) -> &raw::ble_gap_addr_t {
+        // Safety: `Self` has the same layout as `raw::ble_gap_addr_t` and all bit patterns are valid
+        unsafe { mem::transmute(self) }
     }
 
-    pub unsafe fn from_raw(raw: raw::ble_gap_addr_t) -> Self {
-        mem::transmute(raw)
+    pub fn from_raw(raw: raw::ble_gap_addr_t) -> Self {
+        // Safety: `Self` has the same layout as `raw::ble_gap_addr_t` and all bit patterns are valid
+        unsafe { mem::transmute(raw) }
     }
 }
 
@@ -247,7 +273,6 @@ pub enum PhySet {
     M1M2Coded = 7,
 }
 
-// Note: this type MUST be layout-compatible with raw::ble_gap_master_id_t
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -255,13 +280,15 @@ pub struct MasterId {
     /// Encrypted diversifier
     pub ediv: u16,
     /// Random number
-    pub rand: [u8; 8usize],
+    pub rand: [u8; 8],
 }
 
 impl MasterId {
     pub fn from_raw(raw: raw::ble_gap_master_id_t) -> Self {
-        // Safety: `raw::ble_gap_master_id_t` has the same layout as `Self` and all bit patterns are valid
-        unsafe { mem::transmute(raw) }
+        MasterId {
+            ediv: raw.ediv,
+            rand: raw.rand,
+        }
     }
 }
 
@@ -271,7 +298,7 @@ impl MasterId {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct EncryptionInfo {
     /// Long term key
-    pub ltk: [u8; 16usize],
+    pub ltk: [u8; 16],
     pub flags: u8,
 }
 
@@ -287,13 +314,12 @@ impl EncryptionInfo {
     }
 }
 
-// Note: this type MUST be layout-compatible with raw::ble_gap_id_key_t
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct IdentityKey {
     /// Identity resolution key
-    pub irk: [u8; 16usize],
+    pub irk: [u8; 16],
     /// Address
     pub addr: Address,
 }
@@ -311,8 +337,10 @@ impl IdentityKey {
     }
 
     pub fn from_raw(raw: raw::ble_gap_id_key_t) -> Self {
-        // Safety: `raw::ble_gap_id_key_t` has the same layout as `Self` and all bit patterns are valid
-        unsafe { mem::transmute(raw) }
+        Self {
+            irk: raw.id_info.irk,
+            addr: Address::from_raw(raw.id_addr_info),
+        }
     }
 
     pub fn from_addr(addr: Address) -> Self {
