@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
 
-use embassy::util::Forever;
+use embassy_util::Forever;
 
 use crate::{pac, raw, RawError, SocEvent};
 

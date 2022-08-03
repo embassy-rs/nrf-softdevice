@@ -10,8 +10,8 @@ use core::{mem, slice};
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::l2cap::Packet as _;
 use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
 use nrf_softdevice::{raw, Softdevice};
@@ -20,12 +20,12 @@ static EXECUTOR: Forever<Executor> = Forever::new();
 
 const PSM: u16 = 0x2349;
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn ble_central_task(sd: &'static Softdevice) {
     info!("Scanning for peer...");
 

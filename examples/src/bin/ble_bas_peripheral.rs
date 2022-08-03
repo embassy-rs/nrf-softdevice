@@ -9,14 +9,14 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -39,7 +39,7 @@ struct Server {
     foo: FooService,
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
     #[rustfmt::skip]
     let adv_data = &[

@@ -10,8 +10,8 @@ use core::ptr::NonNull;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::{l2cap, peripheral};
 use nrf_softdevice::{ble, raw, RawError, Softdevice};
 
@@ -19,12 +19,12 @@ static EXECUTOR: Forever<Executor> = Forever::new();
 
 const PSM: u16 = 0x2349;
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice) {
     info!("My address: {:?}", ble::get_address(sd));
 

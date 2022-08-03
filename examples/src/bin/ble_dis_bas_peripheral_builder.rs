@@ -9,8 +9,8 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError};
@@ -31,7 +31,7 @@ const PNP_ID: Uuid = Uuid::new_16(0x2a50);
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -186,7 +186,7 @@ impl gatt_server::Server for Server {
     }
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
     #[rustfmt::skip]
     let adv_data = &[

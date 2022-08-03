@@ -9,14 +9,14 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::{central, gatt_client, Address, AddressType};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -27,7 +27,7 @@ struct BatteryServiceClient {
     battery_level: u8,
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn ble_central_task(sd: &'static Softdevice) {
     let addrs = &[&Address::new(
         AddressType::RandomStatic,
