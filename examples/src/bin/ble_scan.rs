@@ -9,19 +9,19 @@ use core::{mem, slice};
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use nrf_softdevice::ble::central;
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn ble_task(sd: &'static Softdevice) {
     let config = central::ScanConfig::default();
     let res = central::scan(sd, &config, |params| unsafe {

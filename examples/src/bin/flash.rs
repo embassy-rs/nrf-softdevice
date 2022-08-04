@@ -7,20 +7,20 @@ mod example_common;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
+use embassy_util::Forever;
 use embedded_storage_async::nor_flash::*;
 use futures::pin_mut;
 use nrf_softdevice::{Flash, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn flash_task(sd: &'static Softdevice) {
     let f = Flash::take(sd);
     pin_mut!(f);

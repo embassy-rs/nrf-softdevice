@@ -9,17 +9,17 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::executor::Executor;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
+use embassy_util::Forever;
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
 static EXECUTOR: Forever<Executor> = Forever::new();
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -73,7 +73,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
     }
 }
 
-#[embassy::task]
+#[embassy_executor::task]
 async fn bluetooth_task(sd: &'static Softdevice, server: Server, button1: AnyPin, button2: AnyPin) {
     info!("Bluetooth is OFF");
     info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
