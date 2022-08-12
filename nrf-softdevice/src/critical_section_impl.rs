@@ -53,10 +53,11 @@ unsafe fn raw_critical_section<R>(f: impl FnOnce() -> R) -> R {
 }
 
 struct CriticalSection;
-critical_section::custom_impl!(CriticalSection);
+critical_section_1::set_impl!(CriticalSection);
+critical_section_02::custom_impl!(CriticalSection);
 
-unsafe impl critical_section::Impl for CriticalSection {
-    unsafe fn acquire() -> u8 {
+unsafe impl critical_section_1::Impl for CriticalSection {
+    unsafe fn acquire() -> bool {
         let nvic = &*NVIC::PTR;
         let nested_cs = CS_FLAG.load(Ordering::SeqCst);
 
@@ -74,19 +75,29 @@ unsafe impl critical_section::Impl for CriticalSection {
 
         compiler_fence(Ordering::SeqCst);
 
-        return nested_cs as u8;
+        nested_cs
     }
 
-    unsafe fn release(token: u8) {
+    unsafe fn release(nested_cs: bool) {
         compiler_fence(Ordering::SeqCst);
 
         let nvic = &*NVIC::PTR;
-        if token == 0 {
+        if !nested_cs {
             raw_critical_section(|| {
                 CS_FLAG.store(false, Ordering::Relaxed);
                 // restore only non-reserved irqs.
                 nvic.iser[0].write(CS_MASK & !RESERVED_IRQS);
             });
         }
+    }
+}
+
+unsafe impl critical_section_02::Impl for CriticalSection {
+    unsafe fn acquire() -> u8 {
+        <Self as critical_section_1::Impl>::acquire() as _
+    }
+
+    unsafe fn release(token: u8) {
+        <Self as critical_section_1::Impl>::release(token != 0)
     }
 }
