@@ -67,5 +67,17 @@ nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", opti
 nrf-softdevice-macro = { version = "0.1.0", path = "../nrf-softdevice-macro" }
 
 [package.metadata.docs.rs]
-targets = ["thumbv7em-none-eabihf"]
-features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client"]
+targets = ["thumbv7em-none-eabi"]
+features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi"]
+
+[package.metadata.embassy_docs]
+src_base = "https://github.com/embassy-rs/nrf-softdevice/blob/nrf-softdevice-mbr-v$VERSION/nrf-softdevice-mbr/src/"
+src_base_git = "https://github.com/embassy-rs/nrf-softdevice/blob/$COMMIT/nrf-softdevice-mbr/src/"
+target = "thumbv7em-none-eabi"
+flavors = [
+    { name = "s112", features = ["nrf52832", "s112", "ble-peripheral", "ble-gatt-server", "ble-gatt-client", "ble-rssi"] },
+    { name = "s113", features = ["nrf52840", "s113", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi"] },
+    { name = "s122", features = ["nrf52833", "s122", "ble-central", "ble-gatt-server", "ble-gatt-client", "ble-rssi"] },
+    { name = "s132", features = ["nrf52832", "s132", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi"] },
+    { name = "s140", features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi"] },
+]

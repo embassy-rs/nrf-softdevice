@@ -10,4 +10,9 @@ license-file = "LICENSE-NORDIC"
 edition = "2021"
 
 [package.metadata.docs.rs]
-targets = ["thumbv7em-none-eabihf"]
+targets = ["thumbv7em-none-eabi"]
+
+[package.metadata.embassy_docs]
+src_base = "https://github.com/embassy-rs/nrf-softdevice/blob/nrf-softdevice-s132-v$VERSION/nrf-softdevice-s132/src/"
+src_base_git = "https://github.com/embassy-rs/nrf-softdevice/blob/$COMMIT/nrf-softdevice-s132/src/"
+target = "thumbv7em-none-eabi"
