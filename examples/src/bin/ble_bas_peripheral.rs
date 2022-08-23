@@ -9,12 +9,12 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Executor;
+use static_cell::StaticCell;
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
-static EXECUTOR: Forever<Executor> = Forever::new();
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -125,7 +125,7 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&config);
 
-    let executor = EXECUTOR.put(Executor::new());
+    let executor = EXECUTOR.init(Executor::new());
     executor.run(move |spawner| {
         let server = unwrap!(Server::new(sd));
         unwrap!(spawner.spawn(softdevice_task(sd)));

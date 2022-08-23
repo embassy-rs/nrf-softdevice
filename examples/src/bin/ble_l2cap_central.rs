@@ -10,13 +10,13 @@ use core::{mem, slice};
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Executor;
+use static_cell::StaticCell;
 use nrf_softdevice::ble::l2cap::Packet as _;
 use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
 use nrf_softdevice::{raw, Softdevice};
 
-static EXECUTOR: Forever<Executor> = Forever::new();
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 const PSM: u16 = 0x2349;
 
@@ -180,7 +180,7 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&config);
 
-    let executor = EXECUTOR.put(Executor::new());
+    let executor = EXECUTOR.init(Executor::new());
     executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(ble_central_task(sd)));

@@ -9,8 +9,8 @@ use core::mem;
 
 use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Executor;
+use static_cell::StaticCell;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError};
@@ -29,7 +29,7 @@ const SOFTWARE_REVISION: Uuid = Uuid::new_16(0x2a28);
 const MANUFACTURER_NAME: Uuid = Uuid::new_16(0x2a29);
 const PNP_ID: Uuid = Uuid::new_16(0x2a50);
 
-static EXECUTOR: Forever<Executor> = Forever::new();
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -253,7 +253,7 @@ fn main() -> ! {
 
     let server = unwrap!(Server::new(sd, "12345678"));
 
-    let executor = EXECUTOR.put(Executor::new());
+    let executor = EXECUTOR.init(Executor::new());
     executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(bluetooth_task(sd, server)));

@@ -10,12 +10,12 @@ use core::ptr::NonNull;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Executor;
+use static_cell::StaticCell;
 use nrf_softdevice::ble::{l2cap, peripheral};
 use nrf_softdevice::{ble, raw, RawError, Softdevice};
 
-static EXECUTOR: Forever<Executor> = Forever::new();
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 const PSM: u16 = 0x2349;
 
@@ -149,7 +149,7 @@ fn main() -> ! {
 
     unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
 
-    let executor = EXECUTOR.put(Executor::new());
+    let executor = EXECUTOR.init(Executor::new());
     executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(bluetooth_task(sd)));

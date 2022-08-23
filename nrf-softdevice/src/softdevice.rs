@@ -1,8 +1,8 @@
+use core::cell::UnsafeCell;
 use core::marker::PhantomData;
+use core::mem::MaybeUninit;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
-
-use embassy_util::Forever;
 
 use crate::{pac, raw, RawError, SocEvent};
 
@@ -84,8 +84,14 @@ fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
     }
 }
 
+// embassy_util::Forever was replaced with static_cell::StaticCell, but the latter doesn't have a steal() method so we have to use UnsafeCell and MaybeUninit directly.
+struct SoftdeviceHolder (UnsafeCell<MaybeUninit<Softdevice>>);
+
+unsafe impl Send for SoftdeviceHolder {}
+unsafe impl Sync for SoftdeviceHolder {}
+
 static ENABLED: AtomicBool = AtomicBool::new(false);
-static SOFTDEVICE: Forever<Softdevice> = Forever::new();
+static SOFTDEVICE: SoftdeviceHolder = SoftdeviceHolder(UnsafeCell::new(MaybeUninit::uninit()));
 
 impl Softdevice {
     /// Enable the softdevice.
@@ -280,7 +286,8 @@ impl Softdevice {
             .map(|x| x.rx_mps)
             .unwrap_or(raw::BLE_L2CAP_MPS_MIN as u16);
 
-        SOFTDEVICE.put(Softdevice {
+        let p: &mut MaybeUninit<Softdevice> = unsafe { &mut *SOFTDEVICE.0.get() };
+        p.write(Softdevice {
             _private: PhantomData,
 
             #[cfg(feature = "ble-gatt")]
@@ -296,7 +303,8 @@ impl Softdevice {
     /// (a call to [`enable`] has returned without error) and no `&mut` references
     /// to the softdevice are active
     pub unsafe fn steal() -> &'static Softdevice {
-        SOFTDEVICE.steal()
+        let p: &mut MaybeUninit<Softdevice> = unsafe { &mut *SOFTDEVICE.0.get() };
+        p.assume_init_mut()
     }
 
     /// Runs the softdevice event handling loop.

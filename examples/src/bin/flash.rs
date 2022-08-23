@@ -7,13 +7,13 @@ mod example_common;
 
 use cortex_m_rt::entry;
 use defmt::*;
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Executor;
+use static_cell::StaticCell;
 use embedded_storage_async::nor_flash::*;
 use futures::pin_mut;
 use nrf_softdevice::{Flash, Softdevice};
 
-static EXECUTOR: Forever<Executor> = Forever::new();
+static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -40,7 +40,7 @@ fn main() -> ! {
 
     let sd = Softdevice::enable(&Default::default());
 
-    let executor = EXECUTOR.put(Executor::new());
+    let executor = EXECUTOR.init(Executor::new());
     executor.run(move |spawner| {
         unwrap!(spawner.spawn(softdevice_task(sd)));
         unwrap!(spawner.spawn(flash_task(sd)));
