@@ -85,7 +85,7 @@ fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
 }
 
 // embassy_util::Forever was replaced with static_cell::StaticCell, but the latter doesn't have a steal() method so we have to use UnsafeCell and MaybeUninit directly.
-struct SoftdeviceHolder (UnsafeCell<MaybeUninit<Softdevice>>);
+struct SoftdeviceHolder(UnsafeCell<MaybeUninit<Softdevice>>);
 
 unsafe impl Send for SoftdeviceHolder {}
 unsafe impl Sync for SoftdeviceHolder {}

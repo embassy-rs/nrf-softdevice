@@ -8,10 +8,10 @@ mod example_common;
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy_executor::Executor;
-use static_cell::StaticCell;
 use embedded_storage_async::nor_flash::*;
 use futures::pin_mut;
 use nrf_softdevice::{Flash, Softdevice};
+use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 

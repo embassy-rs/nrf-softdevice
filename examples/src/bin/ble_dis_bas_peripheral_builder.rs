@@ -10,12 +10,12 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::{info, *};
 use embassy_executor::Executor;
-use static_cell::StaticCell;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
+use static_cell::StaticCell;
 
 const DEVICE_INFORMATION: Uuid = Uuid::new_16(0x180a);
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);

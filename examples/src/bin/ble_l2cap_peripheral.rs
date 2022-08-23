@@ -11,9 +11,9 @@ use core::ptr::NonNull;
 use cortex_m_rt::entry;
 use defmt::*;
 use embassy_executor::Executor;
-use static_cell::StaticCell;
 use nrf_softdevice::ble::{l2cap, peripheral};
 use nrf_softdevice::{ble, raw, RawError, Softdevice};
+use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 

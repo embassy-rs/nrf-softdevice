@@ -10,9 +10,9 @@ use core::mem;
 use cortex_m_rt::entry;
 use defmt::{info, *};
 use embassy_executor::Executor;
-use static_cell::StaticCell;
 use nrf_softdevice::ble::{central, gatt_client, Address, AddressType};
 use nrf_softdevice::{raw, Softdevice};
+use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 

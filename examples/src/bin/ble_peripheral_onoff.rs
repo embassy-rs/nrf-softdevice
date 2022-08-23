@@ -12,10 +12,10 @@ use defmt::*;
 use embassy_executor::Executor;
 use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
-use static_cell::StaticCell;
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
+use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 

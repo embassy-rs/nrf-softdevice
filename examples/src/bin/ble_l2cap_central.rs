@@ -11,10 +11,10 @@ use core::{mem, slice};
 use cortex_m_rt::entry;
 use defmt::{info, *};
 use embassy_executor::Executor;
-use static_cell::StaticCell;
 use nrf_softdevice::ble::l2cap::Packet as _;
 use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
 use nrf_softdevice::{raw, Softdevice};
+use static_cell::StaticCell;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
