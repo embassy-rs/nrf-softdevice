@@ -7,21 +7,17 @@ mod example_common;
 
 use core::mem;
 
-use cortex_m_rt::entry;
 use defmt::*;
-use embassy_executor::executor::Executor;
-use embassy_nrf::gpio::{AnyPin, Input, Pin as _, Pull};
+use embassy_executor::Spawner;
+use embassy_nrf::gpio::{Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
-use embassy_util::Forever;
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
-static EXECUTOR: Forever<Executor> = Forever::new();
-
 #[embassy_executor::task]
-async fn softdevice_task(sd: &'static Softdevice) {
-    sd.run().await;
+async fn softdevice_task(sd: &'static Softdevice) -> ! {
+    sd.run().await
 }
 
 #[nrf_softdevice::gatt_service(uuid = "9e7312e0-2354-11eb-9f10-fbc30a62cf38")]
@@ -73,52 +69,8 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
     }
 }
 
-#[embassy_executor::task]
-async fn bluetooth_task(sd: &'static Softdevice, server: Server, button1: AnyPin, button2: AnyPin) {
-    info!("Bluetooth is OFF");
-    info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
-
-    let button1 = Input::new(button1, Pull::Up);
-    let button2 = Input::new(button2, Pull::Up);
-    pin_mut!(button1);
-    pin_mut!(button2);
-    loop {
-        button1.as_mut().wait_for_low().await;
-        info!("Bluetooth ON!");
-
-        // Create a future that will run the bluetooth loop.
-        // Note the lack of `.await`! This creates the future but doesn't poll it yet.
-        let bluetooth_fut = run_bluetooth(sd, &server);
-
-        // Create a future that will resolve when the OFF button is pressed.
-        let off_fut = async {
-            button2.as_mut().wait_for_low().await;
-            info!("Bluetooth OFF!");
-        };
-
-        pin_mut!(bluetooth_fut);
-        pin_mut!(off_fut);
-
-        // Select the two futures.
-        //
-        // select() returns when one of the two futures returns. The other future is dropped before completing.
-        //
-        // Since the bluetooth future never finishes, this can only happen when the Off button is pressed.
-        // This will cause the bluetooth future to be dropped.
-        //
-        // If it was advertising, the nested `peripheral::advertise_connectable` future will be dropped, which will cause
-        // the softdevice to stop advertising.
-        // If it was connected, it will drop everything including the `Connection` instance, which
-        // will tell the softdevice to disconnect it.
-        //
-        // This demonstrates the awesome power of Rust's async-await combined with nrf-softdevice's async wrappers.
-        // It's super easy to cancel a complex tree of operations: just drop its future!
-        futures::future::select(bluetooth_fut, off_fut).await;
-    }
-}
-
-#[entry]
-fn main() -> ! {
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
     info!("Hello World!");
 
     let mut config = embassy_nrf::config::Config::default();
@@ -157,11 +109,47 @@ fn main() -> ! {
     };
 
     let sd = Softdevice::enable(&config);
+    let server = unwrap!(Server::new(sd));
+    unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let executor = EXECUTOR.put(Executor::new());
-    executor.run(move |spawner| {
-        let server = unwrap!(Server::new(sd));
-        unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, server, p.P0_11.degrade(), p.P0_12.degrade())));
-    });
+    info!("Bluetooth is OFF");
+    info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
+
+    let button1 = Input::new(p.P0_11.degrade(), Pull::Up);
+    let button2 = Input::new(p.P0_12.degrade(), Pull::Up);
+    pin_mut!(button1);
+    pin_mut!(button2);
+    loop {
+        button1.as_mut().wait_for_low().await;
+        info!("Bluetooth ON!");
+
+        // Create a future that will run the bluetooth loop.
+        // Note the lack of `.await`! This creates the future but doesn't poll it yet.
+        let bluetooth_fut = run_bluetooth(sd, &server);
+
+        // Create a future that will resolve when the OFF button is pressed.
+        let off_fut = async {
+            button2.as_mut().wait_for_low().await;
+            info!("Bluetooth OFF!");
+        };
+
+        pin_mut!(bluetooth_fut);
+        pin_mut!(off_fut);
+
+        // Select the two futures.
+        //
+        // select() returns when one of the two futures returns. The other future is dropped before completing.
+        //
+        // Since the bluetooth future never finishes, this can only happen when the Off button is pressed.
+        // This will cause the bluetooth future to be dropped.
+        //
+        // If it was advertising, the nested `peripheral::advertise_connectable` future will be dropped, which will cause
+        // the softdevice to stop advertising.
+        // If it was connected, it will drop everything including the `Connection` instance, which
+        // will tell the softdevice to disconnect it.
+        //
+        // This demonstrates the awesome power of Rust's async-await combined with nrf-softdevice's async wrappers.
+        // It's super easy to cancel a complex tree of operations: just drop its future!
+        futures::future::select(bluetooth_fut, off_fut).await;
+    }
 }

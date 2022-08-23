@@ -8,53 +8,16 @@ mod example_common;
 use core::mem;
 use core::ptr::NonNull;
 
-use cortex_m_rt::entry;
 use defmt::*;
-use embassy_executor::executor::Executor;
-use embassy_util::Forever;
+use embassy_executor::Spawner;
 use nrf_softdevice::ble::{l2cap, peripheral};
 use nrf_softdevice::{ble, raw, RawError, Softdevice};
-
-static EXECUTOR: Forever<Executor> = Forever::new();
 
 const PSM: u16 = 0x2349;
 
 #[embassy_executor::task]
-async fn softdevice_task(sd: &'static Softdevice) {
-    sd.run().await;
-}
-
-#[embassy_executor::task]
-async fn bluetooth_task(sd: &'static Softdevice) {
-    info!("My address: {:?}", ble::get_address(sd));
-
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x11, 0x06, 0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
-        0x02, 0x09, b'H',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[ ];
-
-    let l = l2cap::L2cap::<Packet>::init(sd);
-
-    loop {
-        let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
-        let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
-
-        info!("advertising done!");
-
-        let config = l2cap::Config { credits: 8 };
-        let ch = unwrap!(l.listen(&conn, &config, PSM).await);
-        info!("l2cap connected");
-
-        loop {
-            let pkt = unwrap!(ch.rx().await);
-            info!("rx: {:x}", pkt.as_bytes());
-        }
-    }
+async fn softdevice_task(sd: &'static Softdevice) -> ! {
+    sd.run().await
 }
 
 use atomic_pool::{pool, Box};
@@ -100,8 +63,8 @@ impl l2cap::Packet for Packet {
     }
 }
 
-#[entry]
-fn main() -> ! {
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
     info!("Hello World!");
 
     let config = nrf_softdevice::Config {
@@ -146,12 +109,36 @@ fn main() -> ! {
     };
 
     let sd = Softdevice::enable(&config);
-
     unwrap!(RawError::convert(unsafe { raw::sd_clock_hfclk_request() }));
+    unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let executor = EXECUTOR.put(Executor::new());
-    executor.run(move |spawner| {
-        unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd)));
-    });
+    info!("My address: {:?}", ble::get_address(sd));
+
+    #[rustfmt::skip]
+    let adv_data = &[
+        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
+        0x11, 0x06, 0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
+        0x02, 0x09, b'H',
+    ];
+    #[rustfmt::skip]
+    let scan_data = &[ ];
+
+    let l = l2cap::L2cap::<Packet>::init(sd);
+
+    loop {
+        let config = peripheral::Config::default();
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
+
+        info!("advertising done!");
+
+        let config = l2cap::Config { credits: 8 };
+        let ch = unwrap!(l.listen(&conn, &config, PSM).await);
+        info!("l2cap connected");
+
+        loop {
+            let pkt = unwrap!(ch.rx().await);
+            info!("rx: {:x}", pkt.as_bytes());
+        }
+    }
 }

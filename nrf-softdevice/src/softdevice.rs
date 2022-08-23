@@ -1,8 +1,7 @@
 use core::marker::PhantomData;
+use core::mem::MaybeUninit;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
-
-use embassy_util::Forever;
 
 use crate::{pac, raw, RawError, SocEvent};
 
@@ -85,12 +84,10 @@ fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
 }
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
-static SOFTDEVICE: Forever<Softdevice> = Forever::new();
+static mut SOFTDEVICE: MaybeUninit<Softdevice> = MaybeUninit::uninit();
 
 impl Softdevice {
     /// Enable the softdevice.
-    ///
-    /// This function takes ownership of the softdevice-reserved peripherals to ensure application code doesn't attempt to use them after enabling.
     ///
     /// # Panics
     /// - Panics if the requested configuration requires more memory than reserved for the softdevice. In that case, you can give more memory to the softdevice by editing the RAM start address in `memory.x`. The required start address is logged prior to panic.
@@ -280,7 +277,7 @@ impl Softdevice {
             .map(|x| x.rx_mps)
             .unwrap_or(raw::BLE_L2CAP_MPS_MIN as u16);
 
-        SOFTDEVICE.put(Softdevice {
+        let sd = Softdevice {
             _private: PhantomData,
 
             #[cfg(feature = "ble-gatt")]
@@ -288,7 +285,13 @@ impl Softdevice {
 
             #[cfg(feature = "ble-l2cap")]
             l2cap_rx_mps,
-        })
+        };
+
+        unsafe {
+            let p = SOFTDEVICE.as_mut_ptr();
+            p.write(sd);
+            &mut *p
+        }
     }
 
     /// Return an instance to the softdevice without checking whether
@@ -296,7 +299,7 @@ impl Softdevice {
     /// (a call to [`enable`] has returned without error) and no `&mut` references
     /// to the softdevice are active
     pub unsafe fn steal() -> &'static Softdevice {
-        SOFTDEVICE.steal()
+        &*SOFTDEVICE.as_ptr()
     }
 
     /// Runs the softdevice event handling loop.
