@@ -1,7 +1,7 @@
 use core::mem::MaybeUninit;
 use core::task::Poll;
 
-use embassy_sync::waitqueue::AtomicWaker;
+use embassy_util::waitqueue::AtomicWaker;
 use futures::future::poll_fn;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 

@@ -7,18 +7,14 @@ mod example_common;
 
 use core::mem;
 
-use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy_executor::Executor;
+use embassy_executor::Spawner;
 use nrf_softdevice::ble::{central, gatt_client, Address, AddressType};
 use nrf_softdevice::{raw, Softdevice};
-use static_cell::StaticCell;
-
-static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[embassy_executor::task]
-async fn softdevice_task(sd: &'static Softdevice) {
-    sd.run().await;
+async fn softdevice_task(sd: &'static Softdevice) -> ! {
+    sd.run().await
 }
 
 #[nrf_softdevice::gatt_client(uuid = "180f")]
@@ -27,34 +23,8 @@ struct BatteryServiceClient {
     battery_level: u8,
 }
 
-#[embassy_executor::task]
-async fn ble_central_task(sd: &'static Softdevice) {
-    let addrs = &[&Address::new(
-        AddressType::RandomStatic,
-        [0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0],
-    )];
-    let mut config = central::ConnectConfig::default();
-    config.scan_config.whitelist = Some(addrs);
-    let conn = unwrap!(central::connect(sd, &config).await);
-    info!("connected");
-
-    let client: BatteryServiceClient = unwrap!(gatt_client::discover(&conn).await);
-
-    // Read
-    let val = unwrap!(client.battery_level_read().await);
-    info!("read battery level: {}", val);
-
-    // Write, set it to 42
-    unwrap!(client.battery_level_write(42).await);
-    info!("Wrote battery level!");
-
-    // Read to check it's changed
-    let val = unwrap!(client.battery_level_read().await);
-    info!("read battery level: {}", val);
-}
-
-#[entry]
-fn main() -> ! {
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
     info!("Hello World!");
 
     let config = nrf_softdevice::Config {
@@ -88,10 +58,28 @@ fn main() -> ! {
     };
 
     let sd = Softdevice::enable(&config);
+    unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let executor = EXECUTOR.init(Executor::new());
-    executor.run(move |spawner| {
-        unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(ble_central_task(sd)));
-    });
+    let addrs = &[&Address::new(
+        AddressType::RandomStatic,
+        [0x06, 0x6b, 0x71, 0x2c, 0xf5, 0xc0],
+    )];
+    let mut config = central::ConnectConfig::default();
+    config.scan_config.whitelist = Some(addrs);
+    let conn = unwrap!(central::connect(sd, &config).await);
+    info!("connected");
+
+    let client: BatteryServiceClient = unwrap!(gatt_client::discover(&conn).await);
+
+    // Read
+    let val = unwrap!(client.battery_level_read().await);
+    info!("read battery level: {}", val);
+
+    // Write, set it to 42
+    unwrap!(client.battery_level_write(42).await);
+    info!("Wrote battery level!");
+
+    // Read to check it's changed
+    let val = unwrap!(client.battery_level_read().await);
+    info!("read battery level: {}", val);
 }

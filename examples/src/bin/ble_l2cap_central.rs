@@ -8,78 +8,17 @@ mod example_common;
 use core::ptr::NonNull;
 use core::{mem, slice};
 
-use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy_executor::Executor;
+use embassy_executor::Spawner;
 use nrf_softdevice::ble::l2cap::Packet as _;
 use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
 use nrf_softdevice::{raw, Softdevice};
-use static_cell::StaticCell;
-
-static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 const PSM: u16 = 0x2349;
 
 #[embassy_executor::task]
-async fn softdevice_task(sd: &'static Softdevice) {
-    sd.run().await;
-}
-
-#[embassy_executor::task]
-async fn ble_central_task(sd: &'static Softdevice) {
-    info!("Scanning for peer...");
-
-    let config = central::ScanConfig {
-        whitelist: None,
-        tx_power: TxPower::ZerodBm,
-        ..Default::default()
-    };
-    let res = central::scan(sd, &config, |params| unsafe {
-        let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
-        while data.len() != 0 {
-            let len = data[0] as usize;
-            if data.len() < len + 1 {
-                break;
-            }
-            if len < 1 {
-                break;
-            }
-            let key = data[1];
-            let value = &data[2..len + 1];
-
-            if key == 0x06
-                && value
-                    == &[
-                        0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
-                    ]
-            {
-                return Some(Address::from_raw(params.peer_addr));
-            }
-            data = &data[len + 1..];
-        }
-        None
-    })
-    .await;
-    let address = unwrap!(res);
-    info!("Scan found address {:?}", address);
-
-    let addrs = &[&address];
-
-    let mut config = central::ConnectConfig::default();
-    config.scan_config.whitelist = Some(addrs);
-    let conn = unwrap!(central::connect(sd, &config).await);
-    info!("connected");
-
-    let l = l2cap::L2cap::<Packet>::init(sd);
-    let config = l2cap::Config { credits: 8 };
-    let ch = unwrap!(l.setup(&conn, &config, PSM).await);
-    info!("l2cap connected");
-
-    for i in 0..10 {
-        unwrap!(ch.tx(Packet::new(&[i; Packet::MTU])).await);
-        info!("l2cap tx done");
-    }
-    futures::future::pending::<()>().await;
+async fn softdevice_task(sd: &'static Softdevice) -> ! {
+    sd.run().await
 }
 
 use atomic_pool::{pool, Box};
@@ -133,8 +72,8 @@ impl l2cap::Packet for Packet {
     }
 }
 
-#[entry]
-fn main() -> ! {
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
     info!("Hello World!");
 
     let config = nrf_softdevice::Config {
@@ -179,10 +118,59 @@ fn main() -> ! {
     };
 
     let sd = Softdevice::enable(&config);
+    unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let executor = EXECUTOR.init(Executor::new());
-    executor.run(move |spawner| {
-        unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(ble_central_task(sd)));
-    });
+    info!("Scanning for peer...");
+
+    let config = central::ScanConfig {
+        whitelist: None,
+        tx_power: TxPower::ZerodBm,
+        ..Default::default()
+    };
+    let res = central::scan(sd, &config, |params| unsafe {
+        let mut data = slice::from_raw_parts(params.data.p_data, params.data.len as usize);
+        while data.len() != 0 {
+            let len = data[0] as usize;
+            if data.len() < len + 1 {
+                break;
+            }
+            if len < 1 {
+                break;
+            }
+            let key = data[1];
+            let value = &data[2..len + 1];
+
+            if key == 0x06
+                && value
+                    == &[
+                        0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
+                    ]
+            {
+                return Some(Address::from_raw(params.peer_addr));
+            }
+            data = &data[len + 1..];
+        }
+        None
+    })
+    .await;
+    let address = unwrap!(res);
+    info!("Scan found address {:?}", address);
+
+    let addrs = &[&address];
+
+    let mut config = central::ConnectConfig::default();
+    config.scan_config.whitelist = Some(addrs);
+    let conn = unwrap!(central::connect(sd, &config).await);
+    info!("connected");
+
+    let l = l2cap::L2cap::<Packet>::init(sd);
+    let config = l2cap::Config { credits: 8 };
+    let ch = unwrap!(l.setup(&conn, &config, PSM).await);
+    info!("l2cap connected");
+
+    for i in 0..10 {
+        unwrap!(ch.tx(Packet::new(&[i; Packet::MTU])).await);
+        info!("l2cap tx done");
+    }
+    futures::future::pending::<()>().await;
 }

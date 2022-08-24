@@ -137,7 +137,7 @@ DO NOT disable the softdevice's interrupts. You MUST NOT use the widely-used `co
 
 - Make sure the `critical-section-impl` Cargo feature is enabled for `nrf-softdevice`. This makes `nrf-softdevice` emit a custom critical section implementation that disables only non-softdevice interrupts.
 - Use `critical_section::with` instead of `cortex_m::interrupt::free`. This uses the custom critical-section impl.
-- Use `embassy_sync::blocking_mutex::CriticalSectionMutex` instead of `cortex_m::interrupt::Mutex`.
+- Use `embassy_util::blocking_mutex::CriticalSectionMutex` instead of `cortex_m::interrupt::Mutex`.
 
 Make sure you're not using any library that internally uses `cortex_m::interrupt::free` as well.
 
