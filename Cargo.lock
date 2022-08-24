@@ -423,6 +423,7 @@ dependencies = [
  "defmt",
  "embassy-macros",
  "embedded-hal 0.2.7",
+ "embedded-hal-async",
  "futures-util",
 ]
 
@@ -490,9 +491,9 @@ dependencies = [
 
 [[package]]
 name = "fixed"
-version = "1.17.0"
+version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ff8fc11090cf4e92c9f9052e778d3dc869d0fb943cdc5568df3d3b559a58787"
+checksum = "ec8c4fbf8cd36f2a96740c31320902abbf0acbd733049b758707d842490c98c4"
 dependencies = [
  "az",
  "bytemuck",
