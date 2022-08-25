@@ -18,7 +18,7 @@ ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
 [dependencies]
 embassy-executor = { version = "0.1.0", features = ["nightly", "defmt"]}
 embassy-time = { version = "0.1.0", features = ["nightly", "defmt", "defmt-timestamp-uptime"]}
-embassy-util = { version = "0.1.0" }
+embassy-sync = { version = "0.1.0" }
 embassy-nrf = { version = "0.1.0", features = [ "nightly", "defmt", "nrf52840", "gpiote", "time-driver-rtc1" ]}
 cortex-m = "0.7.2"
 cortex-m-rt = "0.7.0"
