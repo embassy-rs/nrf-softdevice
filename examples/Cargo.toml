@@ -35,6 +35,7 @@ futures = { version = "0.3.5", default-features = false }
 fixed = "1.2.0"
 heapless = "0.7.1"
 atomic-pool = "0.2.1"
+static_cell = "1.0.0"
 
 [[bin]]
 name = "ble_bas_peripheral"

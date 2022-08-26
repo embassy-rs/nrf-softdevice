@@ -8,10 +8,8 @@ mod example_common;
 use core::cell::{Cell, RefCell};
 use core::mem;
 
-use cortex_m_rt::entry;
 use defmt::{info, *};
-use embassy::executor::Executor;
-use embassy::util::Forever;
+use embassy_executor::Spawner;
 use nrf_softdevice::ble::bond::BondHandler;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
@@ -20,13 +18,12 @@ use nrf_softdevice::ble::{
     gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, SysAttrsReply, Uuid,
 };
 use nrf_softdevice::{raw, Softdevice};
+use static_cell::StaticCell;
 
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
 const BATTERY_LEVEL: Uuid = Uuid::new_16(0x2a19);
 
-static EXECUTOR: Forever<Executor> = Forever::new();
-
-#[embassy::task]
+#[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
 }
@@ -164,40 +161,8 @@ impl gatt_server::Server for Server {
     }
 }
 
-#[embassy::task]
-async fn bluetooth_task(sd: &'static Softdevice, server: Server) {
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
-
-    static BONDER: Forever<Bonder> = Forever::new();
-    let bonder = BONDER.put(Bonder::default());
-
-    loop {
-        let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
-        let conn = unwrap!(peripheral::advertise_bondable(sd, adv, &config, bonder).await);
-
-        info!("advertising done!");
-
-        // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, &server, |_| {}).await;
-
-        if let Err(e) = res {
-            info!("gatt_server run exited with error: {:?}", e);
-        }
-    }
-}
-
-#[entry]
-fn main() -> ! {
+#[embassy_executor::main]
+async fn main(spawner: Spawner) -> ! {
     info!("Hello World!");
 
     let config = nrf_softdevice::Config {
@@ -231,12 +196,35 @@ fn main() -> ! {
     };
 
     let sd = Softdevice::enable(&config);
-
     let server = unwrap!(Server::new(sd));
+    unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let executor = EXECUTOR.put(Executor::new());
-    executor.run(move |spawner| {
-        unwrap!(spawner.spawn(softdevice_task(sd)));
-        unwrap!(spawner.spawn(bluetooth_task(sd, server)));
-    });
+    #[rustfmt::skip]
+    let adv_data = &[
+        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
+        0x03, 0x03, 0x09, 0x18,
+        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
+    ];
+    #[rustfmt::skip]
+    let scan_data = &[
+        0x03, 0x03, 0x09, 0x18,
+    ];
+
+    static BONDER: StaticCell<Bonder> = StaticCell::new();
+    let bonder = BONDER.init(Bonder::default());
+
+    loop {
+        let config = peripheral::Config::default();
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let conn = unwrap!(peripheral::advertise_bondable(sd, adv, &config, bonder).await);
+
+        info!("advertising done!");
+
+        // Run the GATT server on the connection. This returns when the connection gets disconnected.
+        let res = gatt_server::run(&conn, &server, |_| {}).await;
+
+        if let Err(e) = res {
+            info!("gatt_server run exited with error: {:?}", e);
+        }
+    }
 }
