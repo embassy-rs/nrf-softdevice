@@ -13,6 +13,8 @@ struct RawAdvertisement<'a> {
 }
 
 /// Connectable advertisement types, which can accept connections from interested Central devices.
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConnectableAdvertisement<'a> {
     ScannableUndirected {
         adv_data: &'a [u8],
@@ -70,6 +72,8 @@ impl<'a> From<ConnectableAdvertisement<'a>> for RawAdvertisement<'a> {
 
 /// Non-Connectable advertisement types. They cannot accept connections, they can be
 /// only used to broadcast information in the air.
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum NonconnectableAdvertisement<'a> {
     ScannableUndirected {
         adv_data: &'a [u8],
