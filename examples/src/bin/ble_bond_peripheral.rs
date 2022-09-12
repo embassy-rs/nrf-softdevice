@@ -92,7 +92,8 @@ impl BondHandler for Bonder {
         if let Some(peer) = self.peer.get() {
             // In a real application you would loop through all stored peers to find a match
             if peer.peer_id.is_match(addr) {
-                unwrap!(setter.set_sys_attrs(&self.sys_attrs.borrow()));
+                let attrs = self.sys_attrs.borrow();
+                unwrap!(setter.set_sys_attrs((!attrs.is_empty()).then(|| attrs.as_slice())));
             }
         }
     }
