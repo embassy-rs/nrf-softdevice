@@ -2,14 +2,19 @@
 
 mod connection;
 mod gatt_traits;
+mod replies;
 mod types;
 
 pub use connection::*;
 pub use gatt_traits::*;
+pub use replies::*;
 pub use types::*;
 
 mod common;
 mod gap;
+
+#[cfg(feature = "ble-sec")]
+pub mod security;
 
 #[cfg(feature = "ble-central")]
 pub mod central;
@@ -56,8 +61,7 @@ pub fn get_address(_sd: &Softdevice) -> Address {
 
 pub fn set_address(_sd: &Softdevice, addr: &Address) {
     unsafe {
-        let addr = addr.into_raw();
-        let ret = raw::sd_ble_gap_addr_set(&addr);
+        let ret = raw::sd_ble_gap_addr_set(addr.as_raw());
         unwrap!(RawError::convert(ret), "sd_ble_gap_addr_set");
     }
 }

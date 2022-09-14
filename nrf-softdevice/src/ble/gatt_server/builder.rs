@@ -99,7 +99,7 @@ impl<'a> ServiceBuilder<'a> {
         };
 
         let mut attr = raw::ble_gatts_attr_t {
-            p_uuid: unsafe { uuid.as_raw_ptr() },
+            p_uuid: uuid.as_raw_ptr(),
             p_attr_md: attr_md as _,
             init_len: unwrap!(value.len().try_into()),
             init_offs: 0,
@@ -170,7 +170,7 @@ impl<'a> CharacteristicBuilder<'a> {
         attr_md: &raw::ble_gatts_attr_md_t,
     ) -> Result<DescriptorHandle, RegisterError> {
         let attr = raw::ble_gatts_attr_t {
-            p_uuid: unsafe { uuid.as_raw_ptr() },
+            p_uuid: uuid.as_raw_ptr(),
             p_attr_md: attr_md as _,
             init_len: unwrap!(value.len().try_into()),
             init_offs: 0,

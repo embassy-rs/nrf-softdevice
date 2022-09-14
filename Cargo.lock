@@ -731,6 +731,7 @@ dependencies = [
  "nrf-softdevice",
  "nrf-softdevice-s140",
  "panic-probe",
+ "static_cell",
 ]
 
 [[package]]

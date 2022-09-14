@@ -3,7 +3,9 @@ use core::iter::FusedIterator;
 
 use raw::ble_gap_conn_params_t;
 
-use crate::ble::types::{Address, AddressType, Role};
+#[cfg(feature = "ble-sec")]
+use crate::ble::security::SecurityHandler;
+use crate::ble::types::{Address, AddressType, Role, SecurityMode};
 use crate::{raw, RawError};
 
 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
@@ -61,6 +63,42 @@ impl From<RawError> for IgnoreSlaveLatencyError {
 // Highest ever the softdevice can support.
 pub(crate) const CONNS_MAX: usize = 20;
 
+#[cfg(feature = "ble-sec")]
+#[derive(Clone, Copy)]
+pub(crate) struct EncryptionState {
+    pub handler: Option<&'static dyn SecurityHandler>,
+
+    pub own_enc_key: raw::ble_gap_enc_key_t,
+    pub peer_enc_key: raw::ble_gap_enc_key_t,
+    pub peer_id: raw::ble_gap_id_key_t,
+}
+
+#[cfg(feature = "ble-sec")]
+const NEW_GAP_ENC_KEY: raw::ble_gap_enc_key_t = raw::ble_gap_enc_key_t {
+    enc_info: raw::ble_gap_enc_info_t {
+        ltk: [0; 16],
+        _bitfield_1: raw::__BindgenBitfieldUnit::new([0; 1]),
+    },
+    master_id: raw::ble_gap_master_id_t { ediv: 0, rand: [0; 8] },
+};
+
+#[cfg(feature = "ble-sec")]
+const NEW_GAP_ID_KEY: raw::ble_gap_id_key_t = raw::ble_gap_id_key_t {
+    id_info: raw::ble_gap_irk_t { irk: [0; 16] },
+    id_addr_info: raw::ble_gap_addr_t {
+        _bitfield_1: raw::__BindgenBitfieldUnit::new([0; 1]),
+        addr: [0; 6],
+    },
+};
+
+#[cfg(feature = "ble-sec")]
+const NEW_ENCRYPTION_STATE: EncryptionState = EncryptionState {
+    handler: None,
+    own_enc_key: NEW_GAP_ENC_KEY,
+    peer_enc_key: NEW_GAP_ENC_KEY,
+    peer_id: NEW_GAP_ID_KEY,
+};
+
 // We could make the public Connection type simply hold the softdevice's conn_handle.
 // However, that would allow for bugs like:
 // - Connection is established with conn_handle=5
@@ -84,6 +122,7 @@ pub(crate) struct ConnectionState {
     pub disconnecting: bool,
     pub role: Role,
     pub peer_address: Address,
+    pub security_mode: SecurityMode,
 
     pub conn_params: ble_gap_conn_params_t,
 
@@ -94,6 +133,9 @@ pub(crate) struct ConnectionState {
     pub att_mtu: u16, // Effective ATT_MTU size (in bytes).
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
     pub data_length_effective: u8, // Effective data length (in bytes).
+
+    #[cfg(feature = "ble-sec")]
+    pub security: EncryptionState,
 }
 
 impl ConnectionState {
@@ -108,6 +150,7 @@ impl ConnectionState {
             #[cfg(not(feature = "ble-central"))]
             role: Role::Peripheral,
             peer_address: Address::new(AddressType::Public, [0; 6]),
+            security_mode: SecurityMode::NoAccess,
             disconnecting: false,
             conn_params: ble_gap_conn_params_t {
                 conn_sup_timeout: 0,
@@ -121,6 +164,8 @@ impl ConnectionState {
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
+            #[cfg(feature = "ble-sec")]
+            security: NEW_ENCRYPTION_STATE,
         }
     }
     pub(crate) fn check_connected(&mut self) -> Result<u16, DisconnectedError> {
@@ -147,6 +192,13 @@ impl ConnectionState {
 
         let ibh = index_by_handle(conn_handle);
         let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
+
+        #[cfg(all(feature = "ble-gatt-server", feature = "ble-sec"))]
+        if let Some(handler) = self.security.handler {
+            let conn = unwrap!(Connection::from_handle(conn_handle), "bug: conn_handle has no index");
+            handler.save_sys_attrs(&conn);
+        }
+
         ibh.set(None);
 
         self.conn_handle = None;
@@ -160,6 +212,39 @@ impl ConnectionState {
         crate::ble::l2cap::portal(conn_handle).call(_ble_evt);
 
         trace!("conn {:?}: disconnected", _index);
+    }
+
+    pub(crate) fn keyset(&mut self) -> raw::ble_gap_sec_keyset_t {
+        #[cfg(feature = "ble-sec")]
+        return raw::ble_gap_sec_keyset_t {
+            keys_own: raw::ble_gap_sec_keys_t {
+                p_enc_key: &mut self.security.own_enc_key,
+                p_id_key: core::ptr::null_mut(),
+                p_sign_key: core::ptr::null_mut(),
+                p_pk: core::ptr::null_mut(),
+            },
+            keys_peer: raw::ble_gap_sec_keys_t {
+                p_enc_key: &mut self.security.peer_enc_key,
+                p_id_key: &mut self.security.peer_id,
+                p_sign_key: core::ptr::null_mut(),
+                p_pk: core::ptr::null_mut(),
+            },
+        };
+        #[cfg(not(feature = "ble-sec"))]
+        return raw::ble_gap_sec_keyset_t {
+            keys_own: raw::ble_gap_sec_keys_t {
+                p_enc_key: core::ptr::null_mut(),
+                p_id_key: core::ptr::null_mut(),
+                p_sign_key: core::ptr::null_mut(),
+                p_pk: core::ptr::null_mut(),
+            },
+            keys_peer: raw::ble_gap_sec_keys_t {
+                p_enc_key: core::ptr::null_mut(),
+                p_id_key: core::ptr::null_mut(),
+                p_sign_key: core::ptr::null_mut(),
+                p_pk: core::ptr::null_mut(),
+            },
+        };
     }
 }
 
@@ -216,6 +301,15 @@ impl Connection {
         self.with_state(|state| state.conn_handle)
     }
 
+    pub fn from_handle(conn_handle: u16) -> Option<Connection> {
+        index_by_handle(conn_handle).get().map(|index| {
+            with_state(index, |state| {
+                state.refcount = unwrap!(state.refcount.checked_add(1), "Too many references to same connection");
+                Connection { index }
+            })
+        })
+    }
+
     pub(crate) fn new(
         conn_handle: u16,
         role: Role,
@@ -229,6 +323,7 @@ impl Connection {
                 conn_handle: Some(conn_handle),
                 role,
                 peer_address,
+                security_mode: SecurityMode::Open,
 
                 disconnecting: false,
 
@@ -242,6 +337,9 @@ impl Connection {
 
                 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                 data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
+
+                #[cfg(feature = "ble-sec")]
+                security: NEW_ENCRYPTION_STATE,
             };
 
             // Update index_by_handle
@@ -252,6 +350,19 @@ impl Connection {
             trace!("conn {:?}: connected", index);
             Self { index }
         })
+    }
+
+    #[cfg(feature = "ble-sec")]
+    pub(crate) fn with_security_handler(
+        conn_handle: u16,
+        role: Role,
+        peer_address: Address,
+        conn_params: ble_gap_conn_params_t,
+        handler: &'static dyn SecurityHandler,
+    ) -> Result<Self, OutOfConnsError> {
+        let conn = Self::new(conn_handle, role, peer_address, conn_params)?;
+        conn.with_state(|state| state.security.handler = Some(handler));
+        Ok(conn)
     }
 
     /// Start measuring RSSI on this connection.
@@ -283,6 +394,15 @@ impl Connection {
     #[cfg(feature = "ble-gatt")]
     pub fn att_mtu(&self) -> u16 {
         with_state(self.index, |s| s.att_mtu)
+    }
+
+    pub fn security_mode(&self) -> SecurityMode {
+        with_state(self.index, |s| s.security_mode)
+    }
+
+    #[cfg(feature = "ble-sec")]
+    pub fn security_handler(&self) -> Option<&dyn SecurityHandler> {
+        with_state(self.index, |s| s.security.handler)
     }
 
     /// Set the connection params.

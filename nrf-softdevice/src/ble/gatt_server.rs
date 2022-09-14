@@ -126,9 +126,18 @@ where
                     server.on_write(params.handle, &v).map(|e| f(e));
                 }
                 raw::BLE_GATTS_EVTS_BLE_GATTS_EVT_SYS_ATTR_MISSING => {
-                    debug!("initializing gatt sys att");
-                    let ret = raw::sd_ble_gatts_sys_attr_set(conn_handle, ::core::ptr::null(), 0, 0);
-                    RawError::convert(ret).err();
+                    let evt = &*ble_evt;
+                    let gatts_evt = get_union_field(ble_evt, &evt.evt.gatts_evt);
+                    let _params = get_union_field(ble_evt, &gatts_evt.params.sys_attr_missing);
+                    trace!("gatts sys attr missing conn={:?}", gatts_evt.conn_handle);
+
+                    if let Some(conn) = Connection::from_handle(gatts_evt.conn_handle) {
+                        let _setter = SysAttrsReply::new(conn.clone());
+                        #[cfg(feature = "ble-sec")]
+                        if let Some(handler) = conn.security_handler() {
+                            handler.load_sys_attrs(_setter);
+                        }
+                    }
                 }
                 _ => {}
             }
@@ -263,6 +272,32 @@ pub fn indicate_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), 
     RawError::convert(ret)?;
 
     Ok(())
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum GetSysAttrsError {
+    DataSize(usize),
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for GetSysAttrsError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+pub fn get_sys_attrs(conn: &Connection, buf: &mut [u8]) -> Result<usize, GetSysAttrsError> {
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
+
+    let mut len = u16::try_from(buf.len()).unwrap();
+    let ret = unsafe { raw::sd_ble_gatts_sys_attr_get(conn_handle, buf.as_mut_ptr(), &mut len, 0) };
+    match RawError::convert(ret) {
+        Ok(_) => Ok(usize::from(len)),
+        Err(RawError::DataSize) => Err(GetSysAttrsError::DataSize(usize::from(len))),
+        Err(err) => Err(GetSysAttrsError::Raw(err)),
+    }
 }
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {

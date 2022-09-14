@@ -9,11 +9,13 @@ default = [
     "ble-l2cap",
     "ble-gatt-server",
     "ble-gatt-client",
+    "ble-sec",
 ]
 
 ble-l2cap = ["nrf-softdevice/ble-l2cap"]
 ble-gatt-server = ["nrf-softdevice/ble-gatt-server"]
 ble-gatt-client = ["nrf-softdevice/ble-gatt-client"]
+ble-sec = ["nrf-softdevice/ble-sec"]
 
 [dependencies]
 embassy-executor = { version = "0.1.0", features = ["nightly", "defmt"]}
@@ -33,6 +35,7 @@ futures = { version = "0.3.5", default-features = false }
 fixed = "1.2.0"
 heapless = "0.7.1"
 atomic-pool = "0.2.1"
+static_cell = "1.0.0"
 
 [[bin]]
 name = "ble_bas_peripheral"
