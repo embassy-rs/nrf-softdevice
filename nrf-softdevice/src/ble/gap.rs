@@ -182,9 +182,9 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 sec_params.set_io_caps(raw::BLE_GAP_IO_CAPS_NONE as u8);
 
                 #[cfg(feature = "ble-sec")]
-                if let Some(bonder) = state.bond.handler {
+                if let Some(handler) = state.security.handler {
                     sec_params.set_bond(1);
-                    sec_params.set_io_caps(bonder.io_capabilities().to_io_caps());
+                    sec_params.set_io_caps(handler.io_capabilities().to_io_caps());
                 }
 
                 (sec_params, state.keyset())
@@ -210,8 +210,8 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             );
             #[cfg(feature = "ble-sec")]
             connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                if let Some(bonder) = state.bond.handler {
-                    unwrap!(bonder.display_passkey(&params.passkey))
+                if let Some(handler) = state.security.handler {
+                    unwrap!(handler.display_passkey(&params.passkey))
                 }
             });
         }
@@ -223,13 +223,16 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             let handled = false;
             #[cfg(feature = "ble-sec")]
             let handled = connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
-                state.bond.handler.and_then(|bonder| match u32::from(params.key_type) {
-                    raw::BLE_GAP_AUTH_KEY_TYPE_PASSKEY => Connection::from_handle(gap_evt.conn_handle)
-                        .map(|conn| bonder.enter_passkey(PasskeyReply::new(conn))),
-                    raw::BLE_GAP_AUTH_KEY_TYPE_OOB => Connection::from_handle(gap_evt.conn_handle)
-                        .map(|conn| bonder.recv_out_of_band(OutOfBandReply::new(conn))),
-                    _ => None,
-                })
+                state
+                    .security
+                    .handler
+                    .and_then(|handler| match u32::from(params.key_type) {
+                        raw::BLE_GAP_AUTH_KEY_TYPE_PASSKEY => Connection::from_handle(gap_evt.conn_handle)
+                            .map(|conn| handler.enter_passkey(PasskeyReply::new(conn))),
+                        raw::BLE_GAP_AUTH_KEY_TYPE_OOB => Connection::from_handle(gap_evt.conn_handle)
+                            .map(|conn| handler.recv_out_of_band(OutOfBandReply::new(conn))),
+                        _ => None,
+                    })
             })
             .is_some();
 
@@ -254,7 +257,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 
             #[cfg(feature = "ble-sec")]
             let key = Connection::from_handle(gap_evt.conn_handle).and_then(|conn| {
-                conn.bonder()
+                conn.security_handler()
                     .and_then(|x| x.get_key(&conn, MasterId::from_raw(params.master_id)))
             });
 
@@ -280,8 +283,8 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 conn.with_state(|state| {
                     state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default();
                     #[cfg(feature = "ble-sec")]
-                    if let Some(bonder) = state.bond.handler {
-                        bonder.on_security_update(&conn, state.security_mode);
+                    if let Some(handler) = state.security.handler {
+                        handler.on_security_update(&conn, state.security_mode);
                     }
                 });
             }
@@ -301,18 +304,18 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                     conn.with_state(|state| {
                         if params.bonded() != 0 {
-                            if let Some(bonder) = state.bond.handler {
+                            if let Some(handler) = state.security.handler {
                                 let peer_id = if params.kdist_peer.id() != 0 {
-                                    IdentityKey::from_raw(state.bond.peer_id)
+                                    IdentityKey::from_raw(state.security.peer_id)
                                 } else {
-                                    warn!("Peer identity key not distributed; falling back to address");
+                                    debug!("Peer identity key not distributed; falling back to address");
                                     IdentityKey::from_addr(conn.peer_address())
                                 };
 
-                                bonder.on_bonded(
+                                handler.on_bonded(
                                     &conn,
-                                    MasterId::from_raw(state.bond.own_enc_key.master_id),
-                                    EncryptionInfo::from_raw(state.bond.own_enc_key.enc_info),
+                                    MasterId::from_raw(state.security.own_enc_key.master_id),
+                                    EncryptionInfo::from_raw(state.security.own_enc_key.enc_info),
                                     peer_id,
                                 );
                             }
@@ -321,7 +324,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 }
             }
         }
-        // BLE_GAP_EVTS_BLE_GAP_EVT_KEY_PRESSED (LESC central bonding)
+        // BLE_GAP_EVTS_BLE_GAP_EVT_KEY_PRESSED (LESC central pairing)
         // BLE_GAP_EVTS_BLE_GAP_EVT_LESC_DHKEY_REQUEST (LESC key calculation)
         // BLE_GAP_EVTS_BLE_GAP_EVT_SEC_REQUEST (Peripheral-initiated security request)
         // BLE_GAP_EVTS_BLE_GAP_EVT_RSSI_CHANGED

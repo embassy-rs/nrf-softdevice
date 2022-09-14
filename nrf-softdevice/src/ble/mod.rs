@@ -14,7 +14,7 @@ mod common;
 mod gap;
 
 #[cfg(feature = "ble-sec")]
-pub mod bond;
+pub mod security;
 
 #[cfg(feature = "ble-central")]
 pub mod central;

@@ -10,10 +10,10 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
-use nrf_softdevice::ble::bond::BondHandler;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::RegisterError;
+use nrf_softdevice::ble::security::SecurityHandler;
 use nrf_softdevice::ble::{
     gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, SysAttrsReply, Uuid,
 };
@@ -49,7 +49,7 @@ impl Default for Bonder {
     }
 }
 
-impl BondHandler for Bonder {
+impl SecurityHandler for Bonder {
     fn on_bonded(&self, _conn: &Connection, master_id: MasterId, key: EncryptionInfo, peer_id: IdentityKey) {
         debug!("storing bond for: id: {}, key: {}", master_id, key);
 
@@ -217,7 +217,7 @@ async fn main(spawner: Spawner) -> ! {
     loop {
         let config = peripheral::Config::default();
         let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
-        let conn = unwrap!(peripheral::advertise_bondable(sd, adv, &config, bonder).await);
+        let conn = unwrap!(peripheral::advertise_pairable(sd, adv, &config, bonder).await);
 
         info!("advertising done!");
 

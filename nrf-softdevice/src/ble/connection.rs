@@ -4,7 +4,7 @@ use core::iter::FusedIterator;
 use raw::ble_gap_conn_params_t;
 
 #[cfg(feature = "ble-sec")]
-use crate::ble::bond::BondHandler;
+use crate::ble::security::SecurityHandler;
 use crate::ble::types::{Address, AddressType, Role, SecurityMode};
 use crate::{raw, RawError};
 
@@ -65,8 +65,8 @@ pub(crate) const CONNS_MAX: usize = 20;
 
 #[cfg(feature = "ble-sec")]
 #[derive(Clone, Copy)]
-pub(crate) struct BondState {
-    pub handler: Option<&'static dyn BondHandler>,
+pub(crate) struct EncryptionState {
+    pub handler: Option<&'static dyn SecurityHandler>,
 
     pub own_enc_key: raw::ble_gap_enc_key_t,
     pub peer_enc_key: raw::ble_gap_enc_key_t,
@@ -92,7 +92,7 @@ const NEW_GAP_ID_KEY: raw::ble_gap_id_key_t = raw::ble_gap_id_key_t {
 };
 
 #[cfg(feature = "ble-sec")]
-const NEW_BOND_STATE: BondState = BondState {
+const NEW_ENCRYPTION_STATE: EncryptionState = EncryptionState {
     handler: None,
     own_enc_key: NEW_GAP_ENC_KEY,
     peer_enc_key: NEW_GAP_ENC_KEY,
@@ -135,7 +135,7 @@ pub(crate) struct ConnectionState {
     pub data_length_effective: u8, // Effective data length (in bytes).
 
     #[cfg(feature = "ble-sec")]
-    pub bond: BondState,
+    pub security: EncryptionState,
 }
 
 impl ConnectionState {
@@ -165,7 +165,7 @@ impl ConnectionState {
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
             #[cfg(feature = "ble-sec")]
-            bond: NEW_BOND_STATE,
+            security: NEW_ENCRYPTION_STATE,
         }
     }
     pub(crate) fn check_connected(&mut self) -> Result<u16, DisconnectedError> {
@@ -194,9 +194,9 @@ impl ConnectionState {
         let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
 
         #[cfg(all(feature = "ble-gatt-server", feature = "ble-sec"))]
-        if let Some(bonder) = self.bond.handler {
+        if let Some(handler) = self.security.handler {
             let conn = unwrap!(Connection::from_handle(conn_handle), "bug: conn_handle has no index");
-            bonder.save_sys_attrs(&conn);
+            handler.save_sys_attrs(&conn);
         }
 
         ibh.set(None);
@@ -218,14 +218,14 @@ impl ConnectionState {
         #[cfg(feature = "ble-sec")]
         return raw::ble_gap_sec_keyset_t {
             keys_own: raw::ble_gap_sec_keys_t {
-                p_enc_key: &mut self.bond.own_enc_key,
+                p_enc_key: &mut self.security.own_enc_key,
                 p_id_key: core::ptr::null_mut(),
                 p_sign_key: core::ptr::null_mut(),
                 p_pk: core::ptr::null_mut(),
             },
             keys_peer: raw::ble_gap_sec_keys_t {
-                p_enc_key: &mut self.bond.peer_enc_key,
-                p_id_key: &mut self.bond.peer_id,
+                p_enc_key: &mut self.security.peer_enc_key,
+                p_id_key: &mut self.security.peer_id,
                 p_sign_key: core::ptr::null_mut(),
                 p_pk: core::ptr::null_mut(),
             },
@@ -339,7 +339,7 @@ impl Connection {
                 data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
 
                 #[cfg(feature = "ble-sec")]
-                bond: NEW_BOND_STATE,
+                security: NEW_ENCRYPTION_STATE,
             };
 
             // Update index_by_handle
@@ -353,15 +353,15 @@ impl Connection {
     }
 
     #[cfg(feature = "ble-sec")]
-    pub(crate) fn with_bonder(
+    pub(crate) fn with_security_handler(
         conn_handle: u16,
         role: Role,
         peer_address: Address,
         conn_params: ble_gap_conn_params_t,
-        bonder: &'static dyn BondHandler,
+        handler: &'static dyn SecurityHandler,
     ) -> Result<Self, OutOfConnsError> {
         let conn = Self::new(conn_handle, role, peer_address, conn_params)?;
-        conn.with_state(|state| state.bond.handler = Some(bonder));
+        conn.with_state(|state| state.security.handler = Some(handler));
         Ok(conn)
     }
 
@@ -401,8 +401,8 @@ impl Connection {
     }
 
     #[cfg(feature = "ble-sec")]
-    pub fn bonder(&self) -> Option<&dyn BondHandler> {
-        with_state(self.index, |s| s.bond.handler)
+    pub fn security_handler(&self) -> Option<&dyn SecurityHandler> {
+        with_state(self.index, |s| s.security.handler)
     }
 
     /// Set the connection params.

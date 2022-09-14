@@ -257,14 +257,14 @@ pub async fn advertise_connectable(
 }
 
 #[cfg(feature = "ble-sec")]
-pub async fn advertise_bondable<'a>(
+pub async fn advertise_pairable<'a>(
     sd: &'a Softdevice,
     adv: ConnectableAdvertisement<'a>,
     config: &'a Config,
-    bonder: &'static dyn crate::ble::bond::BondHandler,
+    security_handler: &'static dyn crate::ble::security::SecurityHandler,
 ) -> Result<Connection, AdvertiseError> {
     advertise_inner(sd, adv, config, |conn_handle, role, peer_address, conn_params| {
-        Connection::with_bonder(conn_handle, role, peer_address, conn_params, bonder)
+        Connection::with_security_handler(conn_handle, role, peer_address, conn_params, security_handler)
     })
     .await
 }

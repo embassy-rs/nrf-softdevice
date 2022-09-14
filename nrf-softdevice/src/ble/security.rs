@@ -30,7 +30,7 @@ impl IoCapabilities {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct NotSupported {}
 
-pub trait BondHandler {
+pub trait SecurityHandler {
     /// The connection has been bonded and its encryption keys should now be stored.
     fn on_bonded(&self, conn: &Connection, master_id: MasterId, key: EncryptionInfo, peer_id: IdentityKey);
 
