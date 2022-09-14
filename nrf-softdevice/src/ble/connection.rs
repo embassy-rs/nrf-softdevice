@@ -3,7 +3,7 @@ use core::iter::FusedIterator;
 
 use raw::ble_gap_conn_params_t;
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 use crate::ble::bond::BondHandler;
 use crate::ble::types::{Address, AddressType, Role, SecurityMode};
 use crate::{raw, RawError};
@@ -63,7 +63,7 @@ impl From<RawError> for IgnoreSlaveLatencyError {
 // Highest ever the softdevice can support.
 pub(crate) const CONNS_MAX: usize = 20;
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 #[derive(Clone, Copy)]
 pub(crate) struct BondState {
     pub handler: Option<&'static dyn BondHandler>,
@@ -73,7 +73,7 @@ pub(crate) struct BondState {
     pub peer_id: raw::ble_gap_id_key_t,
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 const NEW_GAP_ENC_KEY: raw::ble_gap_enc_key_t = raw::ble_gap_enc_key_t {
     enc_info: raw::ble_gap_enc_info_t {
         ltk: [0; 16],
@@ -82,7 +82,7 @@ const NEW_GAP_ENC_KEY: raw::ble_gap_enc_key_t = raw::ble_gap_enc_key_t {
     master_id: raw::ble_gap_master_id_t { ediv: 0, rand: [0; 8] },
 };
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 const NEW_GAP_ID_KEY: raw::ble_gap_id_key_t = raw::ble_gap_id_key_t {
     id_info: raw::ble_gap_irk_t { irk: [0; 16] },
     id_addr_info: raw::ble_gap_addr_t {
@@ -91,7 +91,7 @@ const NEW_GAP_ID_KEY: raw::ble_gap_id_key_t = raw::ble_gap_id_key_t {
     },
 };
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 const NEW_BOND_STATE: BondState = BondState {
     handler: None,
     own_enc_key: NEW_GAP_ENC_KEY,
@@ -134,7 +134,7 @@ pub(crate) struct ConnectionState {
     #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
     pub data_length_effective: u8, // Effective data length (in bytes).
 
-    #[cfg(feature = "ble-bond")]
+    #[cfg(feature = "ble-sec")]
     pub bond: BondState,
 }
 
@@ -164,7 +164,7 @@ impl ConnectionState {
             att_mtu: 0,
             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
             data_length_effective: 0,
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             bond: NEW_BOND_STATE,
         }
     }
@@ -193,7 +193,7 @@ impl ConnectionState {
         let ibh = index_by_handle(conn_handle);
         let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
 
-        #[cfg(all(feature = "ble-gatt-server", feature = "ble-bond"))]
+        #[cfg(all(feature = "ble-gatt-server", feature = "ble-sec"))]
         if let Some(bonder) = self.bond.handler {
             let conn = unwrap!(Connection::from_handle(conn_handle), "bug: conn_handle has no index");
             bonder.save_sys_attrs(&conn);
@@ -215,7 +215,7 @@ impl ConnectionState {
     }
 
     pub(crate) fn keyset(&mut self) -> raw::ble_gap_sec_keyset_t {
-        #[cfg(feature = "ble-bond")]
+        #[cfg(feature = "ble-sec")]
         return raw::ble_gap_sec_keyset_t {
             keys_own: raw::ble_gap_sec_keys_t {
                 p_enc_key: &mut self.bond.own_enc_key,
@@ -230,7 +230,7 @@ impl ConnectionState {
                 p_pk: core::ptr::null_mut(),
             },
         };
-        #[cfg(not(feature = "ble-bond"))]
+        #[cfg(not(feature = "ble-sec"))]
         return raw::ble_gap_sec_keyset_t {
             keys_own: raw::ble_gap_sec_keys_t {
                 p_enc_key: core::ptr::null_mut(),
@@ -338,7 +338,7 @@ impl Connection {
                 #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                 data_length_effective: BLE_GAP_DATA_LENGTH_DEFAULT,
 
-                #[cfg(feature = "ble-bond")]
+                #[cfg(feature = "ble-sec")]
                 bond: NEW_BOND_STATE,
             };
 
@@ -352,7 +352,7 @@ impl Connection {
         })
     }
 
-    #[cfg(feature = "ble-bond")]
+    #[cfg(feature = "ble-sec")]
     pub(crate) fn with_bonder(
         conn_handle: u16,
         role: Role,
@@ -400,7 +400,7 @@ impl Connection {
         with_state(self.index, |s| s.security_mode)
     }
 
-    #[cfg(feature = "ble-bond")]
+    #[cfg(feature = "ble-sec")]
     pub fn bonder(&self) -> Option<&dyn BondHandler> {
         with_state(self.index, |s| s.bond.handler)
     }

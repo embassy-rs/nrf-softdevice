@@ -3,12 +3,12 @@ use core::mem::ManuallyDrop;
 use super::Connection;
 use crate::{raw, RawError};
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 pub struct PasskeyReply {
     conn: ManuallyDrop<Connection>,
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 impl Drop for PasskeyReply {
     fn drop(&mut self) {
         if let Some(conn_handle) = self.conn.handle() {
@@ -26,7 +26,7 @@ impl Drop for PasskeyReply {
     }
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 impl PasskeyReply {
     pub(crate) fn new(conn: Connection) -> Self {
         Self {
@@ -52,12 +52,12 @@ impl PasskeyReply {
     }
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 pub struct OutOfBandReply {
     conn: ManuallyDrop<Connection>,
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 impl Drop for OutOfBandReply {
     fn drop(&mut self) {
         if let Some(conn_handle) = self.conn.handle() {
@@ -75,7 +75,7 @@ impl Drop for OutOfBandReply {
     }
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 impl OutOfBandReply {
     pub(crate) fn new(conn: Connection) -> Self {
         Self {

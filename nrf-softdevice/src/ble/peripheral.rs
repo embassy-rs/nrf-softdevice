@@ -256,7 +256,7 @@ pub async fn advertise_connectable(
     advertise_inner(sd, adv, config, Connection::new).await
 }
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 pub async fn advertise_bondable<'a>(
     sd: &'a Softdevice,
     adv: ConnectableAdvertisement<'a>,

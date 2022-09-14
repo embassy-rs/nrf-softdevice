@@ -181,7 +181,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 sec_params.kdist_peer.set_id(1);
                 sec_params.set_io_caps(raw::BLE_GAP_IO_CAPS_NONE as u8);
 
-                #[cfg(feature = "ble-bond")]
+                #[cfg(feature = "ble-sec")]
                 if let Some(bonder) = state.bond.handler {
                     sec_params.set_bond(1);
                     sec_params.set_io_caps(bonder.io_capabilities().to_io_caps());
@@ -208,7 +208,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 "on_passkey_display passkey={}",
                 core::str::from_utf8_unchecked(&params.passkey)
             );
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
                 if let Some(bonder) = state.bond.handler {
                     unwrap!(bonder.display_passkey(&params.passkey))
@@ -219,9 +219,9 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             let params = &gap_evt.params.auth_key_request;
             trace!("on_auth_key_request key_type={}", params.key_type);
 
-            #[cfg(not(feature = "ble-bond"))]
+            #[cfg(not(feature = "ble-sec"))]
             let handled = false;
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             let handled = connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
                 state.bond.handler.and_then(|bonder| match u32::from(params.key_type) {
                     raw::BLE_GAP_AUTH_KEY_TYPE_PASSKEY => Connection::from_handle(gap_evt.conn_handle)
@@ -252,15 +252,15 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.enc_info(), params.id_info(), params.sign_info(), params.master_id.ediv, params.master_id.rand,
                 params.peer_addr.addr, params.peer_addr.addr_id_peer(), params.peer_addr.addr_type());
 
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             let key = Connection::from_handle(gap_evt.conn_handle).and_then(|conn| {
                 conn.bonder()
                     .and_then(|x| x.get_key(&conn, MasterId::from_raw(params.master_id)))
             });
 
-            #[cfg(not(feature = "ble-bond"))]
+            #[cfg(not(feature = "ble-sec"))]
             let key_ptr = core::ptr::null();
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             let key_ptr = key
                 .as_ref()
                 .map(|x| x.as_raw() as *const _)
@@ -279,7 +279,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                 conn.with_state(|state| {
                     state.security_mode = SecurityMode::try_from_raw(params.conn_sec.sec_mode).unwrap_or_default();
-                    #[cfg(feature = "ble-bond")]
+                    #[cfg(feature = "ble-sec")]
                     if let Some(bonder) = state.bond.handler {
                         bonder.on_security_update(&conn, state.security_mode);
                     }
@@ -296,7 +296,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.kdist_own._bitfield_1.get(0, 8),
                 params.kdist_peer._bitfield_1.get(0, 8)
             );
-            #[cfg(feature = "ble-bond")]
+            #[cfg(feature = "ble-sec")]
             if u32::from(params.auth_status) == raw::BLE_GAP_SEC_STATUS_SUCCESS {
                 if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                     conn.with_state(|state| {

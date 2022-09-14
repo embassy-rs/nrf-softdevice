@@ -13,7 +13,7 @@ pub use types::*;
 mod common;
 mod gap;
 
-#[cfg(feature = "ble-bond")]
+#[cfg(feature = "ble-sec")]
 pub mod bond;
 
 #[cfg(feature = "ble-central")]

@@ -133,7 +133,7 @@ where
 
                     if let Some(conn) = Connection::from_handle(gatts_evt.conn_handle) {
                         let _setter = SysAttrsReply::new(conn.clone());
-                        #[cfg(feature = "ble-bond")]
+                        #[cfg(feature = "ble-sec")]
                         if let Some(bonder) = conn.bonder() {
                             bonder.load_sys_attrs(_setter);
                         }
