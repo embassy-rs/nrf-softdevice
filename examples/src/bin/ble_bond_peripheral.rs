@@ -50,6 +50,10 @@ impl Default for Bonder {
 }
 
 impl SecurityHandler for Bonder {
+    fn can_bond(&self, _conn: &Connection) -> bool {
+        true
+    }
+
     fn on_bonded(&self, _conn: &Connection, master_id: MasterId, key: EncryptionInfo, peer_id: IdentityKey) {
         debug!("storing bond for: id: {}, key: {}", master_id, key);
 

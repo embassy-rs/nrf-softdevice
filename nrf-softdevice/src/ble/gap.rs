@@ -183,8 +183,10 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 
                 #[cfg(feature = "ble-sec")]
                 if let Some(handler) = state.security.handler {
-                    sec_params.set_bond(1);
                     sec_params.set_io_caps(handler.io_capabilities().to_io_caps());
+                    if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
+                        sec_params.set_bond(handler.can_bond(&conn) as u8);
+                    }
                 }
 
                 (sec_params, state.keyset())
@@ -211,7 +213,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             #[cfg(feature = "ble-sec")]
             connection::with_state_by_conn_handle(gap_evt.conn_handle, |state| {
                 if let Some(handler) = state.security.handler {
-                    unwrap!(handler.display_passkey(&params.passkey))
+                    handler.display_passkey(&params.passkey)
                 }
             });
         }
@@ -300,25 +302,23 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                 params.kdist_peer._bitfield_1.get(0, 8)
             );
             #[cfg(feature = "ble-sec")]
-            if u32::from(params.auth_status) == raw::BLE_GAP_SEC_STATUS_SUCCESS {
+            if u32::from(params.auth_status) == raw::BLE_GAP_SEC_STATUS_SUCCESS && params.bonded() != 0 {
                 if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                     conn.with_state(|state| {
-                        if params.bonded() != 0 {
-                            if let Some(handler) = state.security.handler {
-                                let peer_id = if params.kdist_peer.id() != 0 {
-                                    IdentityKey::from_raw(state.security.peer_id)
-                                } else {
-                                    debug!("Peer identity key not distributed; falling back to address");
-                                    IdentityKey::from_addr(conn.peer_address())
-                                };
+                        if let Some(handler) = state.security.handler {
+                            let peer_id = if params.kdist_peer.id() != 0 {
+                                IdentityKey::from_raw(state.security.peer_id)
+                            } else {
+                                debug!("Peer identity key not distributed; falling back to address");
+                                IdentityKey::from_addr(conn.peer_address())
+                            };
 
-                                handler.on_bonded(
-                                    &conn,
-                                    MasterId::from_raw(state.security.own_enc_key.master_id),
-                                    EncryptionInfo::from_raw(state.security.own_enc_key.enc_info),
-                                    peer_id,
-                                );
-                            }
+                            handler.on_bonded(
+                                &conn,
+                                MasterId::from_raw(state.security.own_enc_key.master_id),
+                                EncryptionInfo::from_raw(state.security.own_enc_key.enc_info),
+                                peer_id,
+                            );
                         }
                     });
                 }
