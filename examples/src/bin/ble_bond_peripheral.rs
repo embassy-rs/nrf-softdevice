@@ -13,7 +13,7 @@ use embassy_executor::Spawner;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::RegisterError;
-use nrf_softdevice::ble::security::SecurityHandler;
+use nrf_softdevice::ble::security::{IoCapabilities, SecurityHandler};
 use nrf_softdevice::ble::{
     gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, SysAttrsReply, Uuid,
 };
@@ -50,8 +50,16 @@ impl Default for Bonder {
 }
 
 impl SecurityHandler for Bonder {
+    fn io_capabilities(&self) -> IoCapabilities {
+        IoCapabilities::DisplayOnly
+    }
+
     fn can_bond(&self, _conn: &Connection) -> bool {
         true
+    }
+
+    fn display_passkey(&self, passkey: &[u8; 6]) {
+        info!("The passkey is \"{:a}\"", passkey)
     }
 
     fn on_bonded(&self, _conn: &Connection, master_id: MasterId, key: EncryptionInfo, peer_id: IdentityKey) {
@@ -71,7 +79,7 @@ impl SecurityHandler for Bonder {
 
         self.peer
             .get()
-            .and_then(|peer| (master_id == peer.master_id).then(|| peer.key))
+            .and_then(|peer| (master_id == peer.master_id).then_some(peer.key))
     }
 
     fn save_sys_attrs(&self, conn: &Connection) {
