@@ -31,6 +31,11 @@ pub trait SecurityHandler {
         IoCapabilities::None
     }
 
+    /// Returns `true` if the device can receive out-of-band authentication data.
+    fn can_recv_out_of_band(&self, _conn: &Connection) -> bool {
+        false
+    }
+
     /// Returns `true` if the device can save bonding keys for `_conn`
     fn can_bond(&self, _conn: &Connection) -> bool {
         false
@@ -38,20 +43,24 @@ pub trait SecurityHandler {
 
     /// Display `passkey` to the user for confirmation on the remote device.
     ///
-    /// Must be implemented if [`io_capabilities()`] is one of `DisplayOnly`, `DisplayYesNo`, or `KeyboardDisplay`.
+    /// Must be implemented if [`io_capabilities()`][Self::io_capabilities] is one of `DisplayOnly`, `DisplayYesNo`, or `KeyboardDisplay`.
     fn display_passkey(&self, _passkey: &[u8; 6]) {
         panic!("SecurityHandler::display_passkey is not implemented");
     }
 
     /// Allow the user to enter a passkey displayed on the remote device.
     ///
-    /// Must be implemented if [`io_capabilities()`] is one of `KeyboardOnly` or `KeyboardDisplay`.
+    /// Must be implemented if [`io_capabilities()`][Self::io_capabilities] is one of `KeyboardOnly` or `KeyboardDisplay`.
     fn enter_passkey(&self, _reply: PasskeyReply) {
         panic!("SecurityHandler::enter_passkey is not implemented");
     }
 
     /// Receive out-of-band authentication data.
-    fn recv_out_of_band(&self, _reply: OutOfBandReply) {}
+    ///
+    /// Must be implemented if [`can_recv_out_of_band()`][Self::can_recv_out_of_band] ever returns `true`.
+    fn recv_out_of_band(&self, _reply: OutOfBandReply) {
+        panic!("SecurityHandler::recv_out_of_band is not implemented");
+    }
 
     /// Called when the [`SecurityMode`] of a [`Connection`] has changed.
     fn on_security_update(&self, _conn: &Connection, _security_mode: SecurityMode) {}

@@ -186,6 +186,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                     sec_params.set_io_caps(handler.io_capabilities().to_io_caps());
                     if let Some(conn) = Connection::from_handle(gap_evt.conn_handle) {
                         sec_params.set_bond(handler.can_bond(&conn) as u8);
+                        sec_params.set_oob(handler.can_recv_out_of_band(&conn) as u8);
                     }
                 }
 
