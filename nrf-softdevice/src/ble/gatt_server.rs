@@ -94,22 +94,7 @@ impl TryFrom<u8> for WriteOp {
 pub trait Server: Sized {
     type Event;
 
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event>;
-
-    fn on_write_ext(
-        &self,
-        conn: &Connection,
-        handle: u16,
-        op: WriteOp,
-        offset: usize,
-        data: &[u8],
-    ) -> Option<Self::Event> {
-        let _ = conn;
-        match (op, offset) {
-            (WriteOp::Request | WriteOp::Command, 0) => self.on_write(handle, data),
-            _ => panic!("gatt_server writes with nonzero offset are not implemented"),
-        }
-    }
+    fn on_write(&self, conn: &Connection, handle: u16, op: WriteOp, offset: usize, data: &[u8]) -> Option<Self::Event>;
 
     /// Handle reads of characteristics built with the
     /// [`deferred_read`][characteristic::AttributeMetadata::deferred_read] flag set.
@@ -235,7 +220,7 @@ where
                     trace!("gatts write handle={:?} data={:?}", params.handle, v);
 
                     match params.op.try_into() {
-                        Ok(op) => server.on_write_ext(&conn, params.handle, op, offset, v),
+                        Ok(op) => server.on_write(&conn, params.handle, op, offset, v),
                         Err(_) => {
                             error!("gatt_server invalid write op: {}", params.op);
                             None

@@ -11,7 +11,7 @@ use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
-use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError};
+use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
 
@@ -176,7 +176,14 @@ impl Server {
 impl gatt_server::Server for Server {
     type Event = ();
 
-    fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+    fn on_write(
+        &self,
+        _conn: &Connection,
+        handle: u16,
+        _op: WriteOp,
+        _offset: usize,
+        data: &[u8],
+    ) -> Option<Self::Event> {
         self.bas.on_write(handle, data);
         None
     }
