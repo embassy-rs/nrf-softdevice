@@ -227,12 +227,17 @@ pub enum TxPower {
     Minus8dBm = -8,
     Minus4dBm = -4,
     ZerodBm = 0,
+    #[cfg(feature = "s140")]
     Plus2dBm = 2,
     Plus3dBm = 3,
     Plus4dBm = 4,
+    #[cfg(feature = "s140")]
     Plus5dBm = 5,
+    #[cfg(feature = "s140")]
     Plus6dBm = 6,
+    #[cfg(feature = "s140")]
     Plus7dBm = 7,
+    #[cfg(feature = "s140")]
     Plus8dBm = 8,
 }
 
