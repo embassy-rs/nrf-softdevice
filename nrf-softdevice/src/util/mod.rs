@@ -1,7 +1,5 @@
 #![macro_use]
 
-mod signal;
-pub use signal::*;
 mod portal;
 pub use portal::*;
 mod drop_bomb;
