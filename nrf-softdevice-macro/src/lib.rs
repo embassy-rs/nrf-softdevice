@@ -287,10 +287,10 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             ));
             code_on_write.extend(quote_spanned!(ch.span=>
                 if handle == self.#value_handle {
-                    if data.len() >= #ty_as_val::MIN_SIZE && data.len() <= #ty_as_val::MAX_SIZE {
-                        return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(data)));
+                    if data.len() < #ty_as_val::MIN_SIZE {
+                        return self.#get_fn().ok().map(#event_enum_name::#case_write);
                     } else {
-                        return None;
+                        return Some(#event_enum_name::#case_write(#ty_as_val::from_gatt(data)));
                     }
                 }
             ));
