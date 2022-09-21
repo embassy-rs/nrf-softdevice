@@ -3,7 +3,9 @@ use core::future::Future;
 use core::mem;
 use core::mem::MaybeUninit;
 
-use crate::util::{OnDrop, Signal};
+use embassy_sync::signal::Signal;
+
+use crate::util::OnDrop;
 
 /// Utility to call a closure across tasks.
 pub struct Portal<T> {

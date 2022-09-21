@@ -2,10 +2,11 @@ use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use embassy_sync::signal::Signal;
 use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
 use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
-use crate::util::{DropBomb, Signal};
+use crate::util::DropBomb;
 use crate::{raw, RawError, Softdevice};
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
