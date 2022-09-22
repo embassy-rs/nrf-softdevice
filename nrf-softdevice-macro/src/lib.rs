@@ -114,7 +114,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
         impl #ble::gatt_server::Server for #struct_name {
             type Event = #event_enum_name;
 
-            fn on_write(&self, handle: u16, data: &[u8]) -> Option<Self::Event> {
+            fn on_write(&self, _conn: &::nrf_softdevice::ble::Connection, handle: u16, op: ::nrf_softdevice::ble::gatt_server::WriteOp, offset: usize, data: &[u8]) -> Option<Self::Event> {
                 use #ble::gatt_server::Service;
 
                 #code_on_write
