@@ -103,6 +103,9 @@ async fn main(spawner: Spawner) {
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: raw::BLE_GAP_ADV_SET_COUNT_DEFAULT as u8,
             periph_role_count: raw::BLE_GAP_ROLE_COUNT_PERIPH_DEFAULT as u8,
+            central_role_count: 0,
+            central_sec_count: 0,
+            _bitfield_1: raw::ble_gap_cfg_role_count_t::new_bitfield_1(0),
         }),
         gap_device_name: Some(raw::ble_gap_cfg_device_name_t {
             p_value: b"HelloRust" as *const u8 as _,
