@@ -3,8 +3,8 @@ use core::future::Future;
 use core::mem;
 use core::mem::MaybeUninit;
 
-use embassy_sync::signal::Signal;
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
+use embassy_sync::signal::Signal;
 
 use crate::util::OnDrop;
 
