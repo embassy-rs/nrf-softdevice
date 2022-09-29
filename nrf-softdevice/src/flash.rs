@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 use embassy_sync::signal::Signal;
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
 use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
 
@@ -56,7 +57,7 @@ impl Flash {
     }
 }
 
-static SIGNAL: Signal<Result<(), FlashError>> = Signal::new();
+static SIGNAL: Signal<CriticalSectionRawMutex, Result<(), FlashError>> = Signal::new();
 
 pub(crate) fn on_flash_success() {
     SIGNAL.signal(Ok(()))

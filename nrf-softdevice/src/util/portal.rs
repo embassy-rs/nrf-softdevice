@@ -4,6 +4,7 @@ use core::mem;
 use core::mem::MaybeUninit;
 
 use embassy_sync::signal::Signal;
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 
 use crate::util::OnDrop;
 
@@ -60,7 +61,7 @@ impl<T> Portal<T> {
         assert_thread_mode();
 
         async move {
-            let signal = Signal::new();
+            let signal = Signal::<CriticalSectionRawMutex, _>::new();
             let mut result: MaybeUninit<R> = MaybeUninit::uninit();
             let mut call_func = |val: T| unsafe {
                 let state = &mut *self.state.get();
@@ -106,7 +107,7 @@ impl<T> Portal<T> {
         assert_thread_mode();
 
         async move {
-            let signal = Signal::new();
+            let signal = Signal::<CriticalSectionRawMutex, _>::new();
             let mut result: MaybeUninit<R> = MaybeUninit::uninit();
             let mut call_func = |val: T| {
                 unsafe {
