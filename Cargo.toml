@@ -18,11 +18,11 @@ exclude = [
 ]
 
 [patch.crates-io]
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
-embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
-embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "eeb1515e9fd093e4a9797abac25ca657e1e35dc3" }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "1d6f5493e7764767eb592e0b90d6b07d46b100ca" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "1d6f5493e7764767eb592e0b90d6b07d46b100ca" }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "1d6f5493e7764767eb592e0b90d6b07d46b100ca" }
+embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "1d6f5493e7764767eb592e0b90d6b07d46b100ca" }
+embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "1d6f5493e7764767eb592e0b90d6b07d46b100ca" }
 
 [profile.release]
 codegen-units = 1
