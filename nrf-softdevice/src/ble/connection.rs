@@ -248,6 +248,7 @@ impl ConnectionState {
     }
 }
 
+#[derive(PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Connection {
     index: u8,
 }

@@ -12,10 +12,10 @@ use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
-use nrf_softdevice::ble::gatt_server::{RegisterError, WriteOp};
+use nrf_softdevice::ble::gatt_server::{set_sys_attrs, RegisterError, WriteOp};
 use nrf_softdevice::ble::security::{IoCapabilities, SecurityHandler};
 use nrf_softdevice::ble::{
-    gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, SysAttrsReply, Uuid,
+    gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, Uuid,
 };
 use nrf_softdevice::{raw, Softdevice};
 use static_cell::StaticCell;
@@ -97,17 +97,19 @@ impl SecurityHandler for Bonder {
         }
     }
 
-    fn load_sys_attrs(&self, setter: SysAttrsReply) {
-        let addr = setter.connection().peer_address();
+    fn load_sys_attrs(&self, conn: &Connection) {
+        let addr = conn.peer_address();
         debug!("loading system attributes for: {}", addr);
 
-        if let Some(peer) = self.peer.get() {
-            // In a real application you would loop through all stored peers to find a match
-            if peer.peer_id.is_match(addr) {
-                let attrs = self.sys_attrs.borrow();
-                unwrap!(setter.set_sys_attrs((!attrs.is_empty()).then(|| attrs.as_slice())));
-            }
-        }
+        let attrs = self.sys_attrs.borrow();
+        // In a real application you would search all stored peers to find a match
+        let attrs = if self.peer.get().map(|peer| peer.peer_id.is_match(addr)).unwrap_or(false) {
+            (!attrs.is_empty()).then_some(attrs.as_slice())
+        } else {
+            None
+        };
+
+        unwrap!(set_sys_attrs(conn, attrs));
     }
 }
 
