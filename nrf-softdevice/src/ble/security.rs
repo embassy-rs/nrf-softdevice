@@ -83,5 +83,12 @@ pub trait SecurityHandler {
 
     #[cfg(feature = "ble-gatt-server")]
     /// Load the GATTS system attributes for the bond associated with `conn`
-    fn load_sys_attrs(&self, _setter: super::replies::SysAttrsReply) {}
+    ///
+    /// If no system attributes have been stored for this peer, you should call
+    /// [set_sys_attrs][super::gatt_server::set_sys_attrs] with a `sys_attrs` parameter of `None`.
+    fn load_sys_attrs(&self, conn: &super::Connection) {
+        if let Err(err) = super::gatt_server::set_sys_attrs(conn, None) {
+            warn!("SecurityHandler failed to set sys attrs: {:?}", err);
+        }
+    }
 }

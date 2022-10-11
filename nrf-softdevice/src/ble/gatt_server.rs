@@ -204,10 +204,16 @@ where
                     trace!("gatts sys attr missing conn={:?}", gatts_evt.conn_handle);
 
                     if let Some(conn) = Connection::from_handle(gatts_evt.conn_handle) {
-                        let _setter = SysAttrsReply::new(conn.clone());
                         #[cfg(feature = "ble-sec")]
                         if let Some(handler) = conn.security_handler() {
-                            handler.load_sys_attrs(_setter);
+                            handler.load_sys_attrs(&conn);
+                        } else if let Err(err) = set_sys_attrs(&conn, None) {
+                            warn!("gatt_server failed to set sys attrs: {:?}", err);
+                        }
+
+                        #[cfg(not(feature = "ble-sec"))]
+                        if let Err(err) = set_sys_attrs(&conn, None) {
+                            warn!("gatt_server failed to set sys attrs: {:?}", err);
                         }
                     }
 
@@ -421,13 +427,34 @@ impl From<DisconnectedError> for GetSysAttrsError {
 pub fn get_sys_attrs(conn: &Connection, buf: &mut [u8]) -> Result<usize, GetSysAttrsError> {
     let conn_handle = conn.with_state(|state| state.check_connected())?;
 
-    let mut len = u16::try_from(buf.len()).unwrap();
+    let mut len = unwrap!(u16::try_from(buf.len()));
     let ret = unsafe { raw::sd_ble_gatts_sys_attr_get(conn_handle, buf.as_mut_ptr(), &mut len, 0) };
     match RawError::convert(ret) {
-        Ok(_) => Ok(usize::from(len)),
+        Ok(()) => Ok(usize::from(len)),
         Err(RawError::DataSize) => Err(GetSysAttrsError::DataSize(usize::from(len))),
         Err(err) => Err(GetSysAttrsError::Raw(err)),
     }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum SetSysAttrsError {
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for SetSysAttrsError {
+    fn from(_: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+pub fn set_sys_attrs(conn: &Connection, sys_attrs: Option<&[u8]>) -> Result<(), SetSysAttrsError> {
+    let conn_handle = conn.with_state(|state| state.check_connected())?;
+    let ptr = sys_attrs.map(|x| x.as_ptr()).unwrap_or(core::ptr::null());
+    let len = sys_attrs.map(|x| x.len()).unwrap_or_default();
+    let ret = unsafe { raw::sd_ble_gatts_sys_attr_set(conn_handle, ptr, unwrap!(len.try_into()), 0) };
+    RawError::convert(ret).map_err(SetSysAttrsError::Raw)
 }
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
