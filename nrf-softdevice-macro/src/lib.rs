@@ -6,6 +6,7 @@ use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
+use syn::parse::Parser;
 use syn::spanned::Spanned;
 
 mod uuid;
@@ -377,7 +378,14 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     let uuid = args.uuid;
-    struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
+    struct_fields.named = syn::punctuated::Punctuated::from_iter(
+        std::iter::once(
+            syn::Field::parse_named
+                .parse2(quote! { handle: #ble::gatt_server::ServiceHandle })
+                .unwrap(),
+        )
+        .chain(fields.into_iter()),
+    );
     let struc_vis = struc.vis.clone();
 
     let result = quote! {
@@ -391,11 +399,16 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
                 #code_build_chars
 
-                let _ = service_builder.build();
+                let handle = service_builder.build();
 
                 Ok(Self {
+                    handle,
                     #code_struct_init
                 })
+            }
+
+            #struct_vis fn handle(&self) -> #ble::gatt_server::ServiceHandle {
+                self.handle
             }
 
             #code_impl
