@@ -1,17 +1,18 @@
 //! Bluetooth Low Energy
 
 mod connection;
+mod gap;
 mod gatt_traits;
 mod replies;
 mod types;
 
 pub use connection::*;
+pub use gap::*;
 pub use gatt_traits::*;
 pub use replies::*;
 pub use types::*;
 
 mod common;
-mod gap;
 
 #[cfg(feature = "ble-sec")]
 pub mod security;

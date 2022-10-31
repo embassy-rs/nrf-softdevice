@@ -311,7 +311,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                                 IdentityKey::from_raw(state.security.peer_id)
                             } else {
                                 debug!("Peer identity key not distributed; falling back to address");
-                                IdentityKey::from_addr(conn.peer_address())
+                                IdentityKey::from_addr(state.peer_address)
                             };
 
                             handler.on_bonded(
@@ -356,4 +356,65 @@ pub(crate) unsafe fn do_data_length_update(conn_handle: u16, params: *const raw:
             );
         }
     }
+}
+
+pub fn set_device_identities_list(
+    id_keys: &[IdentityKey],
+    local_irks: Option<&[IdentityResolutionKey]>,
+) -> Result<(), RawError> {
+    const MAX_LEN: usize = raw::BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT as usize;
+    assert!(id_keys.len() <= MAX_LEN);
+    assert!(local_irks.map(|x| x.len() == id_keys.len()).unwrap_or(true));
+
+    let mut p_id_keys: [*const raw::ble_gap_id_key_t; MAX_LEN] = [core::ptr::null(); MAX_LEN];
+    let pp_id_keys = if !id_keys.is_empty() {
+        for (a, b) in id_keys.iter().zip(p_id_keys.iter_mut()) {
+            *b = a.as_raw() as *const _;
+        }
+        Some(&p_id_keys[..id_keys.len()])
+    } else {
+        None
+    };
+
+    let mut p_local_irks: [*const raw::ble_gap_irk_t; MAX_LEN] = [core::ptr::null(); MAX_LEN];
+    let pp_local_irks = if let Some(local_irks) = local_irks {
+        for (a, b) in local_irks.iter().zip(p_local_irks.iter_mut()) {
+            *b = a.as_raw() as *const _;
+        }
+        Some(&p_local_irks[..local_irks.len()])
+    } else {
+        None
+    };
+
+    let ret = unsafe {
+        raw::sd_ble_gap_device_identities_set(
+            pp_id_keys.map(|x| x.as_ptr()).unwrap_or(core::ptr::null()),
+            pp_local_irks.map(|x| x.as_ptr()).unwrap_or(core::ptr::null()),
+            id_keys.len() as u8,
+        )
+    };
+    RawError::convert(ret)
+}
+
+pub fn set_whitelist(addrs: &[Address]) -> Result<(), RawError> {
+    const MAX_LEN: usize = raw::BLE_GAP_WHITELIST_ADDR_MAX_COUNT as usize;
+    assert!(addrs.len() <= MAX_LEN);
+
+    let mut p_addrs: [*const raw::ble_gap_addr_t; MAX_LEN] = [core::ptr::null(); MAX_LEN];
+    let pp_addrs = if !addrs.is_empty() {
+        for (a, b) in addrs.iter().zip(p_addrs.iter_mut()) {
+            *b = a.as_raw() as *const _;
+        }
+        Some(&p_addrs[..addrs.len()])
+    } else {
+        None
+    };
+
+    let ret = unsafe {
+        raw::sd_ble_gap_whitelist_set(
+            pp_addrs.map(|x| x.as_ptr()).unwrap_or(core::ptr::null()),
+            addrs.len() as u8,
+        )
+    };
+    RawError::convert(ret)
 }

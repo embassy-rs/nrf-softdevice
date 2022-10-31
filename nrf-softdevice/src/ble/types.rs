@@ -176,13 +176,23 @@ impl TryFrom<u8> for AddressType {
 
 // Note: this type MUST be layout-compatible with raw::ble_gap_addr_t
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 pub struct Address {
     // bit 0: is resolved private address
     // bits 7-1: type
     pub flags: u8,
     pub bytes: [u8; 6],
 }
+
+impl PartialEq for Address {
+    fn eq(&self, other: &Self) -> bool {
+        // bit 0 of flags indicates a peer identity address resolved from a resolvable private address by the
+        // Softdevice. It is irrelevant for comparing addresses.
+        (self.flags & 0xfe) == (other.flags & 0xfe) && self.bytes == other.bytes
+    }
+}
+
+impl Eq for Address {}
 
 impl Address {
     pub const fn new(address_type: AddressType, bytes: [u8; 6]) -> Self {
@@ -194,6 +204,10 @@ impl Address {
 
     pub fn address_type(&self) -> AddressType {
         unwrap!((self.flags >> 1).try_into())
+    }
+
+    pub fn is_resolved_peer_id(&self) -> bool {
+        (self.flags & 1) != 0
     }
 
     pub fn bytes(&self) -> [u8; 6] {
@@ -214,7 +228,11 @@ impl Address {
 #[cfg(feature = "defmt")]
 impl defmt::Format for Address {
     fn format(&self, fmt: defmt::Formatter) {
-        defmt::write!(fmt, "{:?}:{=[u8]:x}", self.address_type(), self.bytes())
+        if self.is_resolved_peer_id() {
+            defmt::write!(fmt, "{:?}(resolved):{=[u8]:x}", self.address_type(), self.bytes())
+        } else {
+            defmt::write!(fmt, "{:?}:{=[u8]:x}", self.address_type(), self.bytes())
+        }
     }
 }
 
@@ -321,12 +339,32 @@ impl EncryptionInfo {
     }
 }
 
+// Note: this type MUST be layout-compatible with raw::ble_gap_irk_t
+#[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct IdentityResolutionKey {
+    irk: [u8; 16],
+}
+
+impl IdentityResolutionKey {
+    pub fn from_raw(raw: raw::ble_gap_irk_t) -> Self {
+        Self { irk: raw.irk }
+    }
+
+    pub fn as_raw(&self) -> &raw::ble_gap_irk_t {
+        // Safety: `Self` has the same layout as `raw::ble_gap_irk_t` and all bit patterns are valid
+        unsafe { core::mem::transmute(self) }
+    }
+}
+
+// Note: this type MUST be layout-compatible with raw::ble_gap_id_key_t
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct IdentityKey {
     /// Identity resolution key
-    pub irk: [u8; 16],
+    pub irk: IdentityResolutionKey,
     /// Address
     pub addr: Address,
 }
@@ -345,23 +383,31 @@ impl IdentityKey {
 
     pub fn from_raw(raw: raw::ble_gap_id_key_t) -> Self {
         Self {
-            irk: raw.id_info.irk,
+            irk: IdentityResolutionKey::from_raw(raw.id_info),
             addr: Address::from_raw(raw.id_addr_info),
         }
     }
 
     pub fn from_addr(addr: Address) -> Self {
-        Self { irk: [0; 16], addr }
+        Self {
+            irk: Default::default(),
+            addr,
+        }
+    }
+
+    pub fn as_raw(&self) -> &raw::ble_gap_id_key_t {
+        // Safety: `Self` has the same layout as `raw::ble_gap_id_key_t` and all bit patterns are valid
+        unsafe { core::mem::transmute(self) }
     }
 }
 
-fn random_address_hash(key: [u8; 16], r: [u8; 3]) -> [u8; 3] {
+fn random_address_hash(key: IdentityResolutionKey, r: [u8; 3]) -> [u8; 3] {
     let mut cleartext = [0; 16];
     cleartext[13..].copy_from_slice(&r);
     cleartext[13..].reverse(); // big-endian to little-endian
 
     let mut ecb_hal_data: raw::nrf_ecb_hal_data_t = raw::nrf_ecb_hal_data_t {
-        key,
+        key: key.irk,
         cleartext,
         ciphertext: [0; 16],
     };

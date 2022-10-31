@@ -10,7 +10,7 @@ struct RawAdvertisement<'a> {
     kind: u8,
     adv_data: Option<&'a [u8]>,
     scan_data: Option<&'a [u8]>,
-    peer: Option<&'a Address>,
+    peer: Option<Address>,
     anonymous: bool,
     set_id: u8,
 }
@@ -24,10 +24,10 @@ pub enum ConnectableAdvertisement<'a> {
         scan_data: &'a [u8],
     },
     NonscannableDirected {
-        peer: &'a Address,
+        peer: Address,
     },
     NonscannableDirectedHighDuty {
-        peer: &'a Address,
+        peer: Address,
     },
     #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableUndirected {
@@ -37,7 +37,7 @@ pub enum ConnectableAdvertisement<'a> {
     #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedNonscannableDirected {
         set_id: u8,
-        peer: &'a Address,
+        peer: Address,
         adv_data: &'a [u8],
     },
 }
@@ -111,7 +111,7 @@ pub enum NonconnectableAdvertisement<'a> {
     #[cfg(any(feature = "s132", feature = "s140"))]
     ExtendedScannableDirected {
         set_id: u8,
-        peer: &'a Address,
+        peer: Address,
         scan_data: &'a [u8],
     },
     #[cfg(any(feature = "s132", feature = "s140"))]
@@ -124,7 +124,7 @@ pub enum NonconnectableAdvertisement<'a> {
     ExtendedNonscannableDirected {
         set_id: u8,
         anonymous: bool,
-        peer: &'a Address,
+        peer: Address,
         adv_data: &'a [u8],
     },
 }
@@ -223,12 +223,13 @@ fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), Advertise
     let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
 
     adv_params.properties.type_ = adv.kind;
-    adv_params
-        .properties
-        .set_include_tx_power(u8::from(config.include_tx_power));
     adv_params.properties.set_anonymous(u8::from(adv.anonymous));
 
-    adv_params.p_peer_addr = adv.peer.map(|x| x.as_raw() as *const _).unwrap_or(core::ptr::null());
+    adv_params.p_peer_addr = adv
+        .peer
+        .as_ref()
+        .map(|x| x.as_raw() as *const _)
+        .unwrap_or(core::ptr::null());
     adv_params.primary_phy = config.primary_phy as u8;
     adv_params.secondary_phy = config.secondary_phy as u8;
     adv_params.duration = config.timeout.map(|t| t.max(1)).unwrap_or(0);
@@ -411,7 +412,6 @@ pub struct Config {
     pub primary_phy: Phy,
     pub secondary_phy: Phy,
     pub tx_power: TxPower,
-    pub include_tx_power: bool,
 
     /// Timeout duration, in 10ms units
     pub timeout: Option<u16>,
@@ -429,7 +429,6 @@ impl Default for Config {
             primary_phy: Phy::M1,
             secondary_phy: Phy::M1,
             tx_power: TxPower::ZerodBm,
-            include_tx_power: false,
             timeout: None,
             max_events: None,
             interval: 400, // 250ms
