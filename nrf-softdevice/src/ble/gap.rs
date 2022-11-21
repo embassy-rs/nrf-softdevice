@@ -359,9 +359,11 @@ pub(crate) unsafe fn do_data_length_update(conn_handle: u16, params: *const raw:
 }
 
 pub fn set_device_identities_list(
+    sd: &Softdevice,
     id_keys: &[IdentityKey],
     local_irks: Option<&[IdentityResolutionKey]>,
 ) -> Result<(), RawError> {
+    let _ = sd;
     const MAX_LEN: usize = raw::BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT as usize;
     assert!(id_keys.len() <= MAX_LEN);
     assert!(local_irks.map(|x| x.len() == id_keys.len()).unwrap_or(true));
@@ -396,7 +398,8 @@ pub fn set_device_identities_list(
     RawError::convert(ret)
 }
 
-pub fn set_whitelist(addrs: &[Address]) -> Result<(), RawError> {
+pub fn set_whitelist(sd: &Softdevice, addrs: &[Address]) -> Result<(), RawError> {
+    let _ = sd;
     const MAX_LEN: usize = raw::BLE_GAP_WHITELIST_ADDR_MAX_COUNT as usize;
     assert!(addrs.len() <= MAX_LEN);
 
