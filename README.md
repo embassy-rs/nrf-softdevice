@@ -153,20 +153,15 @@ irq.set_priority(interrupt::Priority::P3);
 let mut spim = spim::Spim::new( p.SPI3, irq, p.P0_13, p.P0_16, p.P0_15, config);
 ```
 
-If you're using Embassy with the `gpiote` or `time-driver-rtc1` features enabled, you'll need to edit your embassy_config to move those priorities:
+If you're using `embassy-nrf` with the `gpiote` or `time-driver-rtc1` features enabled, you'll need to edit your embassy_config to move those priorities:
 
 ```rust
 // 0 is Highest. Lower prio number can preempt higher prio number
 // Softdevice has reserved priorities 0, 1 and 4
-pub fn embassy_config() -> embassy_nrf::config::Config {
-    let mut config = embassy_nrf::config::Config::default();
-    config.hfclk_source = embassy_nrf::config::HfclkSource::Internal;
-    config.lfclk_source = embassy_nrf::config::LfclkSource::InternalRC;
-    config.time_interrupt_priority = interrupt::Priority::P2;
-    // if we see button misses lower this
-    config.gpiote_interrupt_priority = interrupt::Priority::P7;
-    config
-}
+let mut config = embassy_nrf::config::Config::default();
+config.gpiote_interrupt_priority = Priority::P2;
+config.time_interrupt_priority = Priority::P2;
+let peripherals = embassy_nrf::init(config);
 ```
 
 ## Troubleshooting
