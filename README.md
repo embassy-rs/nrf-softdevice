@@ -148,6 +148,8 @@ Interrupt priority levels 0, 1, and 4 are [reserved for the SoftDevice](https://
 The default priority level for interrupts is 0, so for *every single interrupt* you enable, make sure to set the priority level explicitly. For example:
 
 ```rust
+use embassy_nrf::interrupt::{self, InterruptExt};
+
 let mut irq = interrupt::take!(SPIM3);
 irq.set_priority(interrupt::Priority::P3);
 let mut spim = spim::Spim::new( p.SPI3, irq, p.P0_13, p.P0_16, p.P0_15, config);
