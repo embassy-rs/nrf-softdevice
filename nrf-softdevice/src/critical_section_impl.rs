@@ -53,10 +53,9 @@ unsafe fn raw_critical_section<R>(f: impl FnOnce() -> R) -> R {
 }
 
 struct CriticalSection;
-critical_section_1::set_impl!(CriticalSection);
-critical_section_02::custom_impl!(CriticalSection);
+critical_section::set_impl!(CriticalSection);
 
-unsafe impl critical_section_1::Impl for CriticalSection {
+unsafe impl critical_section::Impl for CriticalSection {
     unsafe fn acquire() -> bool {
         let nvic = &*NVIC::PTR;
         let nested_cs = CS_FLAG.load(Ordering::SeqCst);
@@ -89,15 +88,5 @@ unsafe impl critical_section_1::Impl for CriticalSection {
                 nvic.iser[0].write(CS_MASK & !RESERVED_IRQS);
             });
         }
-    }
-}
-
-unsafe impl critical_section_02::Impl for CriticalSection {
-    unsafe fn acquire() -> u8 {
-        <Self as critical_section_1::Impl>::acquire() as _
-    }
-
-    unsafe fn release(token: u8) {
-        <Self as critical_section_1::Impl>::release(token != 0)
     }
 }
