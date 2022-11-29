@@ -286,7 +286,7 @@ fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), Advertise
     Ok(())
 }
 
-/// Perform connectable advertising, returning the connection that's established as a result.
+/// Perform non-connectable advertising.
 pub async fn advertise(
     _sd: &Softdevice,
     adv: NonconnectableAdvertisement<'_>,
