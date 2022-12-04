@@ -3,6 +3,7 @@ name = "nrf-softdevice"
 version = "0.1.0"
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 edition = "2021"
+license = "MIT OR Apache-2.0"
 
 [features]
 
