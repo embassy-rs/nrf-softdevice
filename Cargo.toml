@@ -18,8 +18,13 @@ exclude = [
 ]
 
 [patch.crates-io]
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", tag = "embassy-time-v0.1.0" }
-embassy-nrf = { git = "https://github.com/embassy-rs/embassy", tag = "embassy-time-v0.1.0" }
+embassy-nrf = { git = "https://github.com/embassy-rs/embassy", tag = "embassy-executor-v0.1.1" }
+
+[patch."https://github.com/embassy-rs/embassy"]
+embassy-executor = "0.1.1"
+embassy-macros = "0.1.0"
+embassy-sync = "0.1.0"
+embassy-time = "0.1.0"
 
 [profile.release]
 codegen-units = 1
