@@ -48,7 +48,14 @@ fn on_soc_evt<F: FnMut(SocEvent)>(evt: u32, evt_handler: &mut F) {
     }
 }
 
-// TODO actually derive this from the headers + the ATT_MTU
+// Doing this without features would require Softdevice to have its configuration available as
+// consts (through associated constants), then we'd have a const generic run function that
+// allocates a precalculated size.
+#[cfg(feature = "evt-max-size-512")]
+const BLE_EVT_MAX_SIZE: u16 = 512;
+#[cfg(all(feature = "evt-max-size-256", not(feature = "evt-max-size-512")))]
+const BLE_EVT_MAX_SIZE: u16 = 256;
+#[cfg(not(any(feature = "evt-max-size-256", feature = "evt-max-size-512")))]
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
 pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
@@ -74,7 +81,7 @@ pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
                 Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
                 Err(RawError::NotFound) => break,
                 Err(RawError::BleNotEnabled) => break,
-                Err(RawError::DataSize) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                Err(RawError::DataSize) => panic!("BLE_EVT_MAX_SIZE is too low, use larger evt-max-size feature"),
                 Err(err) => panic!("sd_ble_evt_get err {:?}", err),
             }
         }

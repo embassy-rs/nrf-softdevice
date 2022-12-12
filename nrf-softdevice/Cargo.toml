@@ -36,6 +36,9 @@ critical-section-impl = ["critical-section-1/restore-state-bool", "critical-sect
 # https://devzone.nordicsemi.com/f/nordic-q-a/81894/s140-7-3-0-softdevice-assertion-failed-at-pc-0xa806-using-l2cap
 ble-l2cap-credit-wrokaround = []
 
+evt-max-size-256 = []
+evt-max-size-512 = []
+
 [dependencies]
 defmt = { version = "0.3", optional = true }
 log = { version = "0.4.11", optional = true }
