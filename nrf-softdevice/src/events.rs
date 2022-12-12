@@ -74,7 +74,7 @@ pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
                 Ok(()) => crate::ble::on_evt(evt.as_ptr() as *const raw::ble_evt_t),
                 Err(RawError::NotFound) => break,
                 Err(RawError::BleNotEnabled) => break,
-                Err(RawError::NoMem) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
+                Err(RawError::DataSize) => panic!("BUG: BLE_EVT_MAX_SIZE is too low"),
                 Err(err) => panic!("sd_ble_evt_get err {:?}", err),
             }
         }
