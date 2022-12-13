@@ -55,9 +55,9 @@ async fn notify_adc_value<'a>(saadc: &'a mut Saadc<'_, 1>, server: &'a Server, c
         let adc_raw_value: i16 = buf[0];
 
         // Try and notify the connected client of the new ADC value.
-        match server.bas.battery_level_notify(connection, adc_raw_value) {
+        match server.bas.battery_level_notify(connection, &adc_raw_value) {
             Ok(_) => info!("Battery adc_raw_value: {=i16}", &adc_raw_value),
-            Err(_) => unwrap!(server.bas.battery_level_set(adc_raw_value)),
+            Err(_) => unwrap!(server.bas.battery_level_set(&adc_raw_value)),
         };
 
         // Sleep for one second.

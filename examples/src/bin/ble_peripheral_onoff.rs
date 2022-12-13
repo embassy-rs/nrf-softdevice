@@ -55,7 +55,7 @@ async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
         let res = gatt_server::run(&conn, server, |e| match e {
             ServerEvent::Foo(FooServiceEvent::FooWrite(val)) => {
                 info!("wrote foo level: {}", val);
-                if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
+                if let Err(e) = server.foo.foo_notify(&conn, &(val + 1)) {
                     info!("send notification error: {:?}", e);
                 }
             }

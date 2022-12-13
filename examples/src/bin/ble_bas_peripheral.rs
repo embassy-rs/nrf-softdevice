@@ -104,7 +104,7 @@ async fn main(spawner: Spawner) {
             ServerEvent::Foo(e) => match e {
                 FooServiceEvent::FooWrite(val) => {
                     info!("wrote foo: {}", val);
-                    if let Err(e) = server.foo.foo_notify(&conn, val + 1) {
+                    if let Err(e) = server.foo.foo_notify(&conn, &(val + 1)) {
                         info!("send notification error: {:?}", e);
                     }
                 }
