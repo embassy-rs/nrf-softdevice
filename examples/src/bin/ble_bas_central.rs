@@ -76,7 +76,7 @@ async fn main(spawner: Spawner) {
     info!("read battery level: {}", val);
 
     // Write, set it to 42
-    unwrap!(client.battery_level_write(42).await);
+    unwrap!(client.battery_level_write(&42).await);
     info!("Wrote battery level!");
 
     // Read to check it's changed

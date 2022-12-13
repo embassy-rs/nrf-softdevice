@@ -262,7 +262,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
             #fn_vis fn #set_fn(&self, val: &#ty) -> Result<(), #ble::gatt_server::SetValueError> {
                 let sd = unsafe { ::nrf_softdevice::Softdevice::steal() };
-                let buf = #ty_as_val::to_gatt(&val);
+                let buf = #ty_as_val::to_gatt(val);
                 #ble::gatt_server::set_value(sd, self.#value_handle, buf)
             }
         ));
@@ -303,7 +303,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     conn: &#ble::Connection,
                     val: &#ty,
                 ) -> Result<(), #ble::gatt_server::NotifyValueError> {
-                    let buf = #ty_as_val::to_gatt(&val);
+                    let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_server::notify_value(conn, self.#value_handle, buf)
                 }
             ));
@@ -333,7 +333,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     conn: &#ble::Connection,
                     val: &#ty,
                 ) -> Result<(), #ble::gatt_server::IndicateValueError> {
-                    let buf = #ty_as_val::to_gatt(&val);
+                    let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_server::indicate_value(conn, self.#value_handle, buf)
                 }
             ));
@@ -581,15 +581,15 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         if write {
             code_impl.extend(quote_spanned!(ch.span=>
                 async fn #write_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
-                    let buf = #ty_as_val::to_gatt(&val);
+                    let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write(&self.conn, self.#value_handle, buf).await
                 }
                 async fn #write_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
-                    let buf = #ty_as_val::to_gatt(&val);
+                    let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write_without_response(&self.conn, self.#value_handle, buf).await
                 }
                 fn #write_try_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::TryWriteError> {
-                    let buf = #ty_as_val::to_gatt(&val);
+                    let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::try_write_without_response(&self.conn, self.#value_handle, buf)
                 }
             ));
