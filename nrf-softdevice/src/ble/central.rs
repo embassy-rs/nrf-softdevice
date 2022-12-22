@@ -172,8 +172,10 @@ where
 
     let _d = OnDrop::new(|| {
         let ret = unsafe { raw::sd_ble_gap_scan_stop() };
-        if let Err(_e) = RawError::convert(ret) {
-            warn!("sd_ble_gap_scan_stop: {:?}", _e);
+        match RawError::convert(ret) {
+            Ok(_) => {}
+            Err(RawError::InvalidState) => {} // scan stopped itself due to timeout, erroring is normal.
+            Err(_e) => warn!("sd_ble_gap_scan_stop: {:?}", _e),
         }
     });
 
@@ -193,8 +195,12 @@ where
                     let ret = raw::sd_ble_gap_scan_start(ptr::null(), &BUF_DATA);
                     match RawError::convert(ret) {
                         Ok(()) => {}
+
+                        // "The scanner has timed out when this function is called to continue scanning"
+                        Err(RawError::InvalidState) => return Some(Err(ScanError::Timeout)),
+
                         Err(err) => {
-                            warn!("sd_ble_gap_scan_start err {:?}", err);
+                            warn!("sd_ble_gap_scan_start resume err {:?}", err);
                             return Some(Err(ScanError::Raw(err)));
                         }
                     };
