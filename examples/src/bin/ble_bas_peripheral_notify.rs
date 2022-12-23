@@ -27,6 +27,7 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
+use embassy_nrf::interrupt::InterruptExt;
 use embassy_nrf::peripherals::SAADC;
 use embassy_nrf::saadc::{AnyInput, Input, Saadc};
 use embassy_nrf::{interrupt, saadc};
@@ -41,7 +42,9 @@ fn init_adc(adc_pin: AnyInput, adc: SAADC) -> Saadc<'static, 1> {
     // Then we initialize the ADC. We are only using one channel in this example.
     let config = saadc::Config::default();
     let channel_cfg = saadc::ChannelConfig::single_ended(adc_pin.degrade_saadc());
-    let saadc = saadc::Saadc::new(adc, interrupt::take!(SAADC), config, [channel_cfg]);
+    let irq = interrupt::take!(SAADC);
+    irq.set_priority(interrupt::Priority::P3);
+    let saadc = saadc::Saadc::new(adc, irq, config, [channel_cfg]);
     saadc
 }
 
@@ -84,6 +87,18 @@ struct Server {
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
     info!("Hello World!");
+
+    // First we get the peripherals access crate.
+    let mut config = embassy_nrf::config::Config::default();
+    config.gpiote_interrupt_priority = interrupt::Priority::P2;
+    config.time_interrupt_priority = interrupt::Priority::P2;
+    let p = embassy_nrf::init(config);
+
+    // Then we initialize the ADC. We are only using one channel in this example.
+    let adc_pin = p.P0_29.degrade_saadc();
+    let mut saadc = init_adc(adc_pin, p.SAADC);
+    // Indicated: wait for ADC calibration.
+    saadc.calibrate().await;
 
     let config = nrf_softdevice::Config {
         clock: Some(raw::nrf_clock_lf_cfg_t {
@@ -132,14 +147,6 @@ async fn main(spawner: Spawner) {
     let scan_data = &[
         0x03, 0x03, 0x09, 0x18,
     ];
-
-    // First we get the peripherals access crate.
-    let p = embassy_nrf::init(Default::default());
-    // Then we initialize the ADC. We are only using one channel in this example.
-    let adc_pin = p.P0_29.degrade_saadc();
-    let mut saadc = init_adc(adc_pin, p.SAADC);
-    // Indicated: wait for ADC calibration.
-    saadc.calibrate().await;
 
     loop {
         let config = peripheral::Config::default();
