@@ -11,7 +11,7 @@ quote = "1.0.7"
 darling = "0.13.4"
 proc-macro2 = "1.0.18"
 Inflector = "0.11.4"
-uuid = "1.2.2"
+uuid = { version = "1.2.2", default-features = false }
 
 [lib]
 proc-macro = true
