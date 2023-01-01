@@ -260,3 +260,22 @@ impl Metadata {
         }
     }
 }
+
+#[derive(Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[repr(C, packed)]
+pub struct ReportDescriptor {
+    pub id: u8,
+    pub desc_type: u8,
+}
+
+impl AsRef<[u8]> for ReportDescriptor {
+    fn as_ref(&self) -> &[u8] {
+        unsafe {
+            ::core::slice::from_raw_parts(
+                &self as *const _ as *const u8,
+                ::core::mem::size_of::<ReportDescriptor>(),
+            )
+        }
+    }
+}

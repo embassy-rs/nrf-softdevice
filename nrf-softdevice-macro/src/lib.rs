@@ -29,6 +29,8 @@ struct CharacteristicArgs {
     notify: bool,
     #[darling(default)]
     indicate: bool,
+    #[darling(default)]
+    report: Option<u8>,
 }
 
 #[derive(Debug)]
@@ -194,6 +196,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut code_impl = TokenStream2::new();
     let mut code_build_chars = TokenStream2::new();
+    let mut code_build_desc = TokenStream2::new();
     let mut code_struct_init = TokenStream2::new();
     let mut code_on_write = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
@@ -217,6 +220,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let write_without_response = ch.args.write_without_response;
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
+        let report = ch.args.report;
         let ty = &ch.ty;
         let ty_as_val = quote!(<#ty as #ble::GattValue>);
 
@@ -227,6 +231,14 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             colon_token: Default::default(),
             vis: syn::Visibility::Inherited,
         });
+
+        if let Some(report) = report {
+            code_build_desc.extend(quote_spanned!(ch.span=>
+                let desc = #ble::gatt_server::characteristic::ReportDescriptor {id: #report, desc_type: 0x1};
+                let desc_attr = #ble::gatt_server::characteristic::Attribute::new(&desc);
+                let _ = char.add_descriptor(::nrf_softdevice::ble::Uuid::new_16(0x2908), desc_attr);
+            ));
+        }
 
         code_build_chars.extend(quote_spanned!(ch.span=>
             let #char_name = {
@@ -244,7 +256,11 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     ..Default::default()
                 };
                 let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
-                service_builder.add_characteristic(#uuid, attr, metadata)?.build()
+                let mut char = service_builder.add_characteristic(#uuid, attr, metadata)?;
+
+                #code_build_desc
+
+                char.build()
             };
         ));
 
