@@ -26,7 +26,7 @@ const RESERVED_IRQS: u32 = (1 << (Interrupt::POWER_CLOCK as u8))
     | (1 << (Interrupt::SWI5_EGU5 as u8));
 
 static CS_FLAG: AtomicBool = AtomicBool::new(false);
-static mut CS_MASK: u32 = 0;
+static mut CS_MASK: [u32; 2] = [0; 2];
 
 #[inline]
 unsafe fn raw_critical_section<R>(f: impl FnOnce() -> R) -> R {
@@ -65,10 +65,12 @@ unsafe impl critical_section::Impl for CriticalSection {
                 CS_FLAG.store(true, Ordering::Relaxed);
 
                 // Store the state of irqs.
-                CS_MASK = nvic.icer[0].read();
+                CS_MASK[0] = nvic.icer[0].read();
+                CS_MASK[1] = nvic.icer[1].read();
 
                 // Disable only not-reserved irqs.
                 nvic.icer[0].write(!RESERVED_IRQS);
+                nvic.icer[1].write(0xFFFF_FFFF);
             });
         }
 
@@ -85,7 +87,8 @@ unsafe impl critical_section::Impl for CriticalSection {
             raw_critical_section(|| {
                 CS_FLAG.store(false, Ordering::Relaxed);
                 // restore only non-reserved irqs.
-                nvic.iser[0].write(CS_MASK & !RESERVED_IRQS);
+                nvic.iser[0].write(CS_MASK[0] & !RESERVED_IRQS);
+                nvic.iser[1].write(CS_MASK[1]);
             });
         }
     }
