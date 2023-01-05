@@ -30,7 +30,11 @@ struct CharacteristicArgs {
     #[darling(default)]
     indicate: bool,
     #[darling(default)]
-    report: Option<u8>,
+    input: Option<u8>,
+    #[darling(default)]
+    output: Option<u8>,
+    #[darling(default)]
+    feature: Option<u8>,
 }
 
 #[derive(Debug)]
@@ -196,7 +200,6 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
     let mut code_impl = TokenStream2::new();
     let mut code_build_chars = TokenStream2::new();
-    let mut code_build_desc = TokenStream2::new();
     let mut code_struct_init = TokenStream2::new();
     let mut code_on_write = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
@@ -220,9 +223,13 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let write_without_response = ch.args.write_without_response;
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
-        let report = ch.args.report;
+        let input_report = ch.args.input;
+        let output_report = ch.args.output;
+        let feature_report = ch.args.feature;
         let ty = &ch.ty;
         let ty_as_val = quote!(<#ty as #ble::GattValue>);
+
+        let mut code_build_desc = TokenStream2::new();
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
@@ -232,11 +239,26 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             vis: syn::Visibility::Inherited,
         });
 
-        if let Some(report) = report {
+        // Only one of input, output or feature is allowed
+        assert!(input_report.map_or(0, |_| 1) + output_report.map_or(0, |_| 1) + feature_report.map_or(0, |_| 1) <= 1,
+            "Only one of input, output or feature is allowed for each characteristic");
+
+        let report = if let Some(input_report) = input_report {
+            Some((input_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Input)))
+        } else if let Some(output_report) = output_report {
+            Some((output_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Output)))
+        } else if let Some(feature_report) = feature_report {
+            Some((feature_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Feature)))
+        } else {None};
+
+        if let Some((desc_id, desc_type)) = report {
             code_build_desc.extend(quote_spanned!(ch.span=>
-                let desc = #ble::gatt_server::characteristic::ReportDescriptor {id: #report, desc_type: 0x1};
+                let desc = #ble::gatt_server::characteristic::ReportDescriptor {
+                    id: #desc_id, 
+                    desc_type: #desc_type,
+                };
                 let desc_attr = #ble::gatt_server::characteristic::Attribute::new(&desc);
-                let _ = char.add_descriptor(::nrf_softdevice::ble::Uuid::new_16(0x2908), desc_attr);
+                let _ = char_builder.add_descriptor(::nrf_softdevice::ble::Uuid::new_16(0x2908), desc_attr);
             ));
         }
 
@@ -256,11 +278,11 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     ..Default::default()
                 };
                 let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
-                let mut char = service_builder.add_characteristic(#uuid, attr, metadata)?;
+                let mut char_builder = service_builder.add_characteristic(#uuid, attr, metadata)?;
 
                 #code_build_desc
 
-                char.build()
+                char_builder.build()
             };
         ));
 
