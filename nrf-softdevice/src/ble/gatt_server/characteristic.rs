@@ -267,7 +267,7 @@ impl Metadata {
 pub enum ReportDescriptorType {
     Input = 1,
     Output = 2,
-    Feature = 3
+    Feature = 3,
 }
 
 #[derive(Copy, Clone)]

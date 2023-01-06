@@ -240,21 +240,34 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         });
 
         // Only one of input, output or feature is allowed
-        assert!(input_report.map_or(0, |_| 1) + output_report.map_or(0, |_| 1) + feature_report.map_or(0, |_| 1) <= 1,
-            "Only one of input, output or feature is allowed for each characteristic");
+        assert!(
+            input_report.map_or(0, |_| 1) + output_report.map_or(0, |_| 1) + feature_report.map_or(0, |_| 1) <= 1,
+            "Only one of input, output or feature is allowed for each characteristic"
+        );
 
         let report = if let Some(input_report) = input_report {
-            Some((input_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Input)))
+            Some((
+                input_report,
+                quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Input),
+            ))
         } else if let Some(output_report) = output_report {
-            Some((output_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Output)))
+            Some((
+                output_report,
+                quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Output),
+            ))
         } else if let Some(feature_report) = feature_report {
-            Some((feature_report, quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Feature)))
-        } else {None};
+            Some((
+                feature_report,
+                quote!(#ble::gatt_server::characteristic::ReportDescriptorType::Feature),
+            ))
+        } else {
+            None
+        };
 
         if let Some((desc_id, desc_type)) = report {
             code_build_desc.extend(quote_spanned!(ch.span=>
                 let desc = #ble::gatt_server::characteristic::ReportDescriptor {
-                    id: #desc_id, 
+                    id: #desc_id,
                     desc_type: #desc_type,
                 };
                 let desc_attr = #ble::gatt_server::characteristic::Attribute::new(&desc);
