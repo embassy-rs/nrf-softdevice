@@ -56,13 +56,13 @@ async fn main(spawner: Spawner) {
 
     #[rustfmt::skip]
     let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
+        0x02, raw::BLE_GAP_AD_TYPE_FLAGS as u8, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
+        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
+        0x0a, raw::BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME as u8, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
     ];
     #[rustfmt::skip]
     let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
+        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
     ];
 
     let mut config = peripheral::Config::default();
