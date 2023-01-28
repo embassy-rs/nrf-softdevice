@@ -112,7 +112,7 @@ struct DeferredReply<const DEFERRED_TYPE: u8> {
 impl<const DEFERRED_TYPE: u8> Drop for DeferredReply<DEFERRED_TYPE> {
     fn drop(&mut self) {
         warn!("DeferredReply<{}> dropped without reply", DEFERRED_TYPE);
-        let res = unsafe { self.finalize(DEFERRED_TYPE, Err(super::GattError::AtterrAttributeNotFound)) };
+        let res = unsafe { self.finalize(DEFERRED_TYPE, Err(super::GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) };
 
         if let Err(_err) = res {
             warn!("sd_ble_gatts_rw_authorize_reply err {:?}", _err);
@@ -123,7 +123,6 @@ impl<const DEFERRED_TYPE: u8> Drop for DeferredReply<DEFERRED_TYPE> {
 #[cfg(feature = "ble-gatt-server")]
 impl<const DEFERRED_TYPE: u8> DeferredReply<DEFERRED_TYPE> {
     fn reply(mut self, res: Result<Option<&[u8]>, super::GattError>) -> Result<(), RawError> {
-        assert!(res != Err(super::GattError::Success));
         let res = unsafe { self.finalize(DEFERRED_TYPE, res) };
         core::mem::forget(self);
         res
@@ -138,14 +137,14 @@ impl<const DEFERRED_TYPE: u8> DeferredReply<DEFERRED_TYPE> {
         res: Result<Option<&[u8]>, super::GattError>,
     ) -> Result<(), RawError> {
         let (gatt_status, update, p_data, len) = match res {
-            Ok(Some(data)) => (super::GattError::Success, true, data.as_ptr(), data.len()),
-            Ok(None) => (super::GattError::Success, false, core::ptr::null(), 0),
-            Err(status) => (status, false, core::ptr::null(), 0),
+            Ok(Some(data)) => (super::GattStatus::SUCCESS, true, data.as_ptr(), data.len()),
+            Ok(None) => (super::GattStatus::SUCCESS, false, core::ptr::null(), 0),
+            Err(err) => (err.to_status(), false, core::ptr::null(), 0),
         };
 
         let res = if let Some(handle) = self.conn.handle() {
             let params = raw::ble_gatts_authorize_params_t {
-                gatt_status: u32::from(gatt_status) as u16,
+                gatt_status: gatt_status.into(),
                 _bitfield_1: raw::ble_gatts_authorize_params_t::new_bitfield_1(u8::from(update)),
                 offset: 0,
                 len: len as u16,
