@@ -53,7 +53,7 @@ heapless = "0.7.1"
 fixed = "1.5.0"
 futures = { version = "0.3.17", default-features = false }
 embedded-storage = "0.3.0"
-embedded-storage-async = "0.3.0"
+embedded-storage-async = "0.4.0"
 
 nrf52805-pac  = { version = "0.12.0", features = ["rt"], optional = true }
 nrf52810-pac  = { version = "0.12.0", features = ["rt"], optional = true }

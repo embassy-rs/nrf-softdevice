@@ -1,11 +1,10 @@
-use core::future::Future;
 use core::marker::PhantomData;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::signal::Signal;
 use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
-use embedded_storage_async::nor_flash::{AsyncNorFlash, AsyncReadNorFlash};
+use embedded_storage_async::nor_flash::{NorFlash as AsyncNorFlash, ReadNorFlash as AsyncReadNorFlash};
 
 use crate::util::DropBomb;
 use crate::{raw, RawError, Softdevice};
@@ -91,9 +90,8 @@ impl ReadNorFlash for Flash {
 impl AsyncReadNorFlash for Flash {
     const READ_SIZE: usize = 1;
 
-    type ReadFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    fn read<'a>(&'a mut self, address: u32, data: &'a mut [u8]) -> Self::ReadFuture<'a> {
-        async move { <Self as ReadNorFlash>::read(self, address, data) }
+    async fn read(&mut self, address: u32, data: &mut [u8]) -> Result<(), FlashError> {
+        <Self as ReadNorFlash>::read(self, address, data)
     }
 
     fn capacity(&self) -> usize {
@@ -105,72 +103,66 @@ impl AsyncNorFlash for Flash {
     const WRITE_SIZE: usize = 4;
     const ERASE_SIZE: usize = 4096;
 
-    type WriteFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    fn write<'a>(&'a mut self, offset: u32, data: &'a [u8]) -> Self::WriteFuture<'a> {
-        async move {
-            let data_ptr = data.as_ptr();
-            let data_len = data.len() as u32;
+    async fn write(&mut self, offset: u32, data: &[u8]) -> Result<(), FlashError> {
+        let data_ptr = data.as_ptr();
+        let data_len = data.len() as u32;
 
-            let address = offset as usize;
-            if address % 4 != 0 {
-                return Err(FlashError::AddressMisaligned);
-            }
-            if (data_ptr as u32) % 4 != 0 || data_len % 4 != 0 {
-                return Err(FlashError::BufferMisaligned);
-            }
-
-            // This is safe because we've checked ptr and len is aligned above
-            let words_ptr = data_ptr as *const u32;
-            let words_len = data_len / 4;
-
-            let bomb = DropBomb::new();
-            let ret = unsafe { raw::sd_flash_write(address as _, words_ptr, words_len) };
-            let ret = match RawError::convert(ret) {
-                Ok(()) => SIGNAL.wait().await,
-                Err(_e) => {
-                    warn!("sd_flash_write err {:?}", _e);
-                    Err(FlashError::Failed)
-                }
-            };
-
-            bomb.defuse();
-            ret
+        let address = offset as usize;
+        if address % 4 != 0 {
+            return Err(FlashError::AddressMisaligned);
         }
+        if (data_ptr as u32) % 4 != 0 || data_len % 4 != 0 {
+            return Err(FlashError::BufferMisaligned);
+        }
+
+        // This is safe because we've checked ptr and len is aligned above
+        let words_ptr = data_ptr as *const u32;
+        let words_len = data_len / 4;
+
+        let bomb = DropBomb::new();
+        let ret = unsafe { raw::sd_flash_write(address as _, words_ptr, words_len) };
+        let ret = match RawError::convert(ret) {
+            Ok(()) => SIGNAL.wait().await,
+            Err(_e) => {
+                warn!("sd_flash_write err {:?}", _e);
+                Err(FlashError::Failed)
+            }
+        };
+
+        bomb.defuse();
+        ret
     }
 
-    type EraseFuture<'a> = impl Future<Output = Result<(), FlashError>> + 'a;
-    fn erase<'a>(&'a mut self, from: u32, to: u32) -> Self::EraseFuture<'a> {
-        async move {
-            if from as usize % Self::PAGE_SIZE != 0 {
-                return Err(FlashError::AddressMisaligned);
-            }
-            if to as usize % Self::PAGE_SIZE != 0 {
-                return Err(FlashError::AddressMisaligned);
-            }
+    async fn erase(&mut self, from: u32, to: u32) -> Result<(), FlashError> {
+        if from as usize % Self::PAGE_SIZE != 0 {
+            return Err(FlashError::AddressMisaligned);
+        }
+        if to as usize % Self::PAGE_SIZE != 0 {
+            return Err(FlashError::AddressMisaligned);
+        }
 
-            let bomb = DropBomb::new();
-            for address in (from as usize..to as usize).step_by(Self::PAGE_SIZE) {
-                let page_number = (address / Self::PAGE_SIZE) as u32;
-                let ret = unsafe { raw::sd_flash_page_erase(page_number) };
-                match RawError::convert(ret) {
-                    Ok(()) => match SIGNAL.wait().await {
-                        Err(_e) => {
-                            warn!("sd_flash_page_erase err {:?}", _e);
-                            bomb.defuse();
-                            return Err(_e);
-                        }
-                        _ => {}
-                    },
+        let bomb = DropBomb::new();
+        for address in (from as usize..to as usize).step_by(Self::PAGE_SIZE) {
+            let page_number = (address / Self::PAGE_SIZE) as u32;
+            let ret = unsafe { raw::sd_flash_page_erase(page_number) };
+            match RawError::convert(ret) {
+                Ok(()) => match SIGNAL.wait().await {
                     Err(_e) => {
                         warn!("sd_flash_page_erase err {:?}", _e);
                         bomb.defuse();
-                        return Err(FlashError::Failed);
+                        return Err(_e);
                     }
+                    _ => {}
+                },
+                Err(_e) => {
+                    warn!("sd_flash_page_erase err {:?}", _e);
+                    bomb.defuse();
+                    return Err(FlashError::Failed);
                 }
             }
-
-            bomb.defuse();
-            Ok(())
         }
+
+        bomb.defuse();
+        Ok(())
     }
 }
