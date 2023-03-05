@@ -27,7 +27,7 @@ cortex-m-rt = "0.7.0"
 defmt = "0.3"
 defmt-rtt = "0.4.0"
 panic-probe = { version = "0.3", features= ["print-defmt"] }
-nrf-softdevice = { version = "0.1.0", path = "../nrf-softdevice", features = ["defmt", "nrf52840", "s140", "ble-peripheral", "ble-central", "critical-section-impl"] }
+nrf-softdevice = { version = "0.1.0", path = "../nrf-softdevice", features = ["nightly", "defmt", "nrf52840", "s140", "ble-peripheral", "ble-central", "critical-section-impl"] }
 nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140" }
 embedded-storage = "0.3.0"
 embedded-storage-async = "0.4.0"
