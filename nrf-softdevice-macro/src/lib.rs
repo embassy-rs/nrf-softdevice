@@ -48,10 +48,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s = struc
-                .ident
-                .span()
-                .unwrap();
+            let s = struc.ident.span().unwrap();
 
             #[cfg(feature = "nightly")]
             s.error("gatt_server structs must have named fields, not tuples.")
@@ -146,10 +143,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s =struc
-                .ident
-                .span()
-                .unwrap();
+            let s = struc.ident.span().unwrap();
 
             #[cfg(feature = "nightly")]
             s.error("gatt_service structs must have named fields, not tuples.")
@@ -440,10 +434,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s = struc
-                .ident
-                .span()
-                .unwrap();
+            let s = struc.ident.span().unwrap();
 
             #[cfg(feature = "nightly")]
             s.error("gatt_client structs must have named fields, not tuples.")
