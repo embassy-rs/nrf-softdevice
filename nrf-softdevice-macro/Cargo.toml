@@ -5,6 +5,9 @@ authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
+[features]
+nightly = []
+
 [dependencies]
 syn = { version = "1.0.39", features = ["full", "extra-traits"] }
 quote = "1.0.7"

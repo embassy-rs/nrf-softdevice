@@ -87,6 +87,7 @@ impl ReadNorFlash for Flash {
     }
 }
 
+#[cfg(feature = "nightly")]
 impl AsyncReadNorFlash for Flash {
     const READ_SIZE: usize = 1;
 
@@ -99,6 +100,7 @@ impl AsyncReadNorFlash for Flash {
     }
 }
 
+#[cfg(feature = "nightly")]
 impl AsyncNorFlash for Flash {
     const WRITE_SIZE: usize = 4;
     const ERASE_SIZE: usize = 4096;

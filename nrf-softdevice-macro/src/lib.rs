@@ -1,4 +1,4 @@
-#![feature(proc_macro_diagnostic)]
+#![cfg_attr(feature = "nightly", feature(proc_macro_diagnostic))]
 
 extern crate proc_macro;
 
@@ -48,12 +48,15 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
+            let s = struc
                 .ident
                 .span()
-                .unwrap()
-                .error("gatt_server structs must have named fields, not tuples.")
+                .unwrap();
+
+            #[cfg(feature = "nightly")]
+            s.error("gatt_server structs must have named fields, not tuples.")
                 .emit();
+
             return TokenStream::new();
         }
     };
@@ -143,11 +146,13 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
+            let s =struc
                 .ident
                 .span()
-                .unwrap()
-                .error("gatt_service structs must have named fields, not tuples.")
+                .unwrap();
+
+            #[cfg(feature = "nightly")]
+            s.error("gatt_service structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }
@@ -435,11 +440,13 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
+            let s = struc
                 .ident
                 .span()
-                .unwrap()
-                .error("gatt_client structs must have named fields, not tuples.")
+                .unwrap();
+
+            #[cfg(feature = "nightly")]
+            s.error("gatt_client structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }

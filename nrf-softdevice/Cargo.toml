@@ -32,6 +32,8 @@ ble-sec = []
 
 critical-section-impl = ["critical-section/restore-state-bool"]
 
+nightly = ["nrf-softdevice-macro/nightly"]
+
 # Workaround l2cap credit bug. If set, infinite credits are issued
 # to the peer in batches. The `credits` config when establishing the channel is ignored.
 # https://devzone.nordicsemi.com/f/nordic-q-a/81894/s140-7-3-0-softdevice-assertion-failed-at-pc-0xa806-using-l2cap
