@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# enable nightly toolchain
+cp rust-toolchain-nightly.toml rust-toolchain.toml
+
 set -euxo pipefail
 
 # build examples
