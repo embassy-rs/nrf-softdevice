@@ -7,8 +7,10 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
+use crate::ctxt::Ctxt;
 
 mod uuid;
+mod ctxt;
 
 use crate::uuid::Uuid;
 
@@ -42,16 +44,26 @@ struct Characteristic {
 
 #[proc_macro_attribute]
 pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
+
+    // Context for error reporting
+    #[cfg(not(feature = "nightly"))]
+    let ctxt = Ctxt::new();
+
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
     let struct_vis = &struc.vis;
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s = struc.ident.span().unwrap();
+            let s = struc.ident;
+
+            #[cfg(not(feature = "nightly"))]
+            ctxt.error_spanned_by(s, "gatt_server structs must have named fields, not tuples.");
 
             #[cfg(feature = "nightly")]
-            s.error("gatt_server structs must have named fields, not tuples.")
+            s.span()
+                .unwrap()
+                .error("gatt_server structs must have named fields, not tuples.")
                 .emit();
 
             return TokenStream::new();
@@ -122,6 +134,14 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
     };
+
+    #[cfg(not(feature = "nightly"))]
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into()
+    }
+
+    #[cfg(feature = "nightly")]
     result.into()
 }
 
@@ -129,6 +149,9 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
 pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+    #[cfg(not(feature = "nightly"))]
+    let ctxt = Ctxt::new();
 
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
@@ -143,10 +166,15 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s = struc.ident.span().unwrap();
+            let s = struc.ident;
+
+            #[cfg(not(feature = "nightly"))]
+            ctxt.error_spanned_by(s, "gatt_service structs must have named fields, not tuples.");
 
             #[cfg(feature = "nightly")]
-            s.error("gatt_service structs must have named fields, not tuples.")
+            s.span()
+                .unwrap()
+                .error("gatt_service structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }
@@ -414,6 +442,13 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
+    #[cfg(not(feature = "nightly"))]
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into()
+    }
+
+    #[cfg(feature = "nightly")]
     result.into()
 }
 
@@ -421,6 +456,10 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+
+    #[cfg(not(feature = "nightly"))]
+    let ctxt = Ctxt::new();
 
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
@@ -434,10 +473,15 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            let s = struc.ident.span().unwrap();
+            let s = struc.ident;
+
+            #[cfg(not(feature = "nightly"))]
+            ctxt.error_spanned_by(s, "gatt_client structs must have named fields, not tuples.");
 
             #[cfg(feature = "nightly")]
-            s.error("gatt_client structs must have named fields, not tuples.")
+            s.span()
+                .unwrap()
+                .error("gatt_client structs must have named fields, not tuples.")
                 .emit();
             return TokenStream::new();
         }
@@ -662,5 +706,12 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
+    #[cfg(not(feature = "nightly"))]
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into()
+    }
+
+    #[cfg(feature = "nightly")]
     result.into()
 }
