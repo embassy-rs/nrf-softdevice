@@ -32,7 +32,7 @@ ble-sec = []
 
 critical-section-impl = ["critical-section/restore-state-bool"]
 
-nightly = ["embedded-storage-async"]
+nightly = ["dep:embedded-storage-async"]
 
 # Workaround l2cap credit bug. If set, infinite credits are issued
 # to the peer in batches. The `credits` config when establishing the channel is ignored.
