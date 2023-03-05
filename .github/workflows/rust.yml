@@ -25,5 +25,7 @@ jobs:
 
       - name: Check fmt
         run: cargo fmt -- --check
-      - name: Build
+      - name: Build (nightly)
         run: ./ci.sh
+      - name: Build (stable)
+        run: ./ci-stable.sh
