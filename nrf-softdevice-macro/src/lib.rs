@@ -1,5 +1,3 @@
-#![feature(proc_macro_diagnostic)]
-
 extern crate proc_macro;
 
 use darling::FromMeta;
@@ -8,6 +6,9 @@ use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
 
+use crate::ctxt::Ctxt;
+
+mod ctxt;
 mod uuid;
 
 use crate::uuid::Uuid;
@@ -42,18 +43,19 @@ struct Characteristic {
 
 #[proc_macro_attribute]
 pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
+    // Context for error reporting
+    let ctxt = Ctxt::new();
+
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
     let struct_vis = &struc.vis;
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_server structs must have named fields, not tuples.")
-                .emit();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_server structs must have named fields, not tuples.");
+
             return TokenStream::new();
         }
     };
@@ -122,13 +124,19 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
     };
-    result.into()
+
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }
 
 #[proc_macro_attribute]
 pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+    let ctxt = Ctxt::new();
 
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
@@ -143,12 +151,10 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_service structs must have named fields, not tuples.")
-                .emit();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_service structs must have named fields, not tuples.");
+
             return TokenStream::new();
         }
     };
@@ -415,13 +421,18 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
-    result.into()
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }
 
 #[proc_macro_attribute]
 pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+    let ctxt = Ctxt::new();
 
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
@@ -435,12 +446,10 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_client structs must have named fields, not tuples.")
-                .emit();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_client structs must have named fields, not tuples.");
+
             return TokenStream::new();
         }
     };
@@ -664,5 +673,8 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
-    result.into()
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }
