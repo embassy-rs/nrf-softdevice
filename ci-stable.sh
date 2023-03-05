@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # enable stable toolchain
-cp rust-toolchain-stable.toml rust-toolchain.toml
+sed -i 's/channel.*/channel = "stable"/g' rust-toolchain.toml
 
 set -euxo pipefail
 
