@@ -80,7 +80,6 @@ impl<T> Portal<T> {
             });
         });
 
-        // safety: this runs from thread mode
         self.state.lock(|state| {
             let mut state = state.borrow_mut();
             match *state {
@@ -138,7 +137,6 @@ impl<T> Portal<T> {
             });
         });
 
-        // safety: this runs from thread mode
         self.state.lock(|state| {
             let mut state = state.borrow_mut();
             match *state {
