@@ -3,8 +3,8 @@ use core::mem;
 use core::mem::MaybeUninit;
 
 use embassy_sync::blocking_mutex::raw::{CriticalSectionRawMutex, ThreadModeRawMutex};
-use embassy_sync::signal::Signal;
 use embassy_sync::blocking_mutex::Mutex;
+use embassy_sync::signal::Signal;
 
 use crate::util::OnDrop;
 
@@ -24,8 +24,7 @@ enum State<T> {
 }
 
 unsafe impl<T> Send for Portal<T> {}
-
-unsafe impl<T> Sync for Portal<T> {}  // NOT TRUE!
+unsafe impl<T> Sync for Portal<T> {}
 
 #[cfg(not(feature = "usable-from-interrupts"))]
 fn assert_thread_mode() {
@@ -45,15 +44,11 @@ impl<T> Portal<T> {
     pub fn call(&self, val: T) -> bool {
         #[cfg(not(feature = "usable-from-interrupts"))]
         assert_thread_mode();
-        let maybe_func = self.state.lock(|state| {
-            match *state.borrow() {
-                State::None => None,
-                State::Done => None,
-                State::Running => panic!("Portal::call() called reentrantly"),
-                State::Waiting(func) => {
-                    Some(func)
-                }
-            }
+        let maybe_func = self.state.lock(|state| match *state.borrow() {
+            State::None => None,
+            State::Done => None,
+            State::Running => panic!("Portal::call() called reentrantly"),
+            State::Waiting(func) => Some(func),
         });
 
         // re-entrant calling possible here. Acceptable because Portal::call() panics.
@@ -66,8 +61,8 @@ impl<T> Portal<T> {
     }
 
     pub async fn wait_once<'a, R, F>(&'a self, mut func: F) -> R
-        where
-            F: FnMut(T) -> R + 'a,
+    where
+        F: FnMut(T) -> R + 'a,
     {
         #[cfg(not(feature = "usable-from-interrupts"))]
         assert_thread_mode();
@@ -88,7 +83,6 @@ impl<T> Portal<T> {
 
         let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
         let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
-
 
         let _bomb = OnDrop::new(|| {
             self.state.lock(|state| {
@@ -115,8 +109,8 @@ impl<T> Portal<T> {
 
     #[allow(unused)]
     pub async fn wait_many<'a, R, F>(&'a self, mut func: F) -> R
-        where
-            F: FnMut(T) -> Option<R> + 'a,
+    where
+        F: FnMut(T) -> Option<R> + 'a,
     {
         #[cfg(not(feature = "usable-from-interrupts"))]
         assert_thread_mode();
@@ -137,7 +131,9 @@ impl<T> Portal<T> {
                 *state = match func(val) {
                     None => State::Waiting(func_ptr),
                     Some(res) => {
-                        unsafe { result.as_mut_ptr().write(res); }
+                        unsafe {
+                            result.as_mut_ptr().write(res);
+                        }
                         signal.signal(());
                         State::Done
                     }
