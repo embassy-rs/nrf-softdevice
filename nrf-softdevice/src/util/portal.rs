@@ -42,6 +42,12 @@ impl<T> Portal<T> {
             State::Waiting(func) => Some(func),
         });
 
+        // Possible Improvement: Using the RefCell mutable borrow, it should be possible
+        // to prevent reentrant calling completely. My idea for this:
+        // Obtain a mutable reference at the start of the method, and then give it to the
+        // closure. Rust will gatekeep the function until the mutable reference disappears
+        // at the end of the closure.
+
         // re-entrant calling possible here. Acceptable because Portal::call() panics.
 
         if let Some(ptr) = maybe_func {
@@ -52,8 +58,8 @@ impl<T> Portal<T> {
     }
 
     pub async fn wait_once<'a, R, F>(&'a self, mut func: F) -> R
-        where
-            F: FnMut(T) -> R + 'a,
+    where
+        F: FnMut(T) -> R + 'a,
     {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
@@ -97,8 +103,8 @@ impl<T> Portal<T> {
 
     #[allow(unused)]
     pub async fn wait_many<'a, R, F>(&'a self, mut func: F) -> R
-        where
-            F: FnMut(T) -> Option<R> + 'a,
+    where
+        F: FnMut(T) -> Option<R> + 'a,
     {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
