@@ -32,7 +32,7 @@ ble-sec = []
 
 critical-section-impl = ["critical-section/restore-state-bool"]
 
-usable-from-interrupts = [ "critical-section-impl" ]
+usable-from-interrupts = []
 
 nightly = ["dep:embedded-storage-async"]
 
