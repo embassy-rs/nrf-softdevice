@@ -24,15 +24,8 @@ enum State<T> {
 }
 
 unsafe impl<T> Send for Portal<T> {}
-unsafe impl<T> Sync for Portal<T> {}
 
-#[cfg(not(feature = "usable-from-interrupts"))]
-fn assert_thread_mode() {
-    assert!(
-        cortex_m::peripheral::SCB::vect_active() == cortex_m::peripheral::scb::VectActive::ThreadMode,
-        "portals are not usable from interrupts. Activate the 'usable-from-interrupts' feature to allow this."
-    );
-}
+unsafe impl<T> Sync for Portal<T> {}
 
 impl<T> Portal<T> {
     pub const fn new() -> Self {
@@ -42,8 +35,6 @@ impl<T> Portal<T> {
     }
 
     pub fn call(&self, val: T) -> bool {
-        #[cfg(not(feature = "usable-from-interrupts"))]
-        assert_thread_mode();
         let maybe_func = self.state.lock(|state| match *state.borrow() {
             State::None => None,
             State::Done => None,
@@ -61,11 +52,9 @@ impl<T> Portal<T> {
     }
 
     pub async fn wait_once<'a, R, F>(&'a self, mut func: F) -> R
-    where
-        F: FnMut(T) -> R + 'a,
+        where
+            F: FnMut(T) -> R + 'a,
     {
-        #[cfg(not(feature = "usable-from-interrupts"))]
-        assert_thread_mode();
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
 
@@ -109,11 +98,9 @@ impl<T> Portal<T> {
 
     #[allow(unused)]
     pub async fn wait_many<'a, R, F>(&'a self, mut func: F) -> R
-    where
-        F: FnMut(T) -> Option<R> + 'a,
+        where
+            F: FnMut(T) -> Option<R> + 'a,
     {
-        #[cfg(not(feature = "usable-from-interrupts"))]
-        assert_thread_mode();
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
         let mut call_func = |val: T| {
