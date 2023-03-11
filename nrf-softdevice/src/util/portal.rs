@@ -1,6 +1,7 @@
 use core::cell::RefCell;
 use core::mem;
 use core::mem::MaybeUninit;
+use core::ptr::NonNull;
 
 use embassy_sync::blocking_mutex::raw::{CriticalSectionRawMutex, ThreadModeRawMutex};
 use embassy_sync::blocking_mutex::Mutex;
@@ -16,45 +17,37 @@ pub struct Portal<T> {
     state: Mutex<ThreadModeRawMutex, RefCell<State<T>>>,
 }
 
-enum State<T> {
-    None,
-    Running,
-    Waiting(*mut dyn FnMut(T)),
-    Done,
-}
+struct State<T>(Option<NonNull<dyn FnMut(T, &mut State<T>)>>);
 
 unsafe impl<T> Send for Portal<T> {}
 
 unsafe impl<T> Sync for Portal<T> {}
 
 impl<T> Portal<T> {
+    const INIT: Self = Portal {
+        state: Mutex::new(RefCell::new(State(None))),
+    };
     pub const fn new() -> Self {
-        Self {
-            state: Mutex::new(RefCell::new(State::None)),
-        }
+        Self::INIT
     }
 
     pub fn call(&self, val: T) -> bool {
-        let maybe_func = self.state.lock(|state| match *state.borrow() {
-            State::None => None,
-            State::Done => None,
-            State::Running => panic!("Portal::call() called reentrantly"),
-            State::Waiting(func) => Some(func),
-        });
-
         // Possible Improvement: Using the RefCell mutable borrow, it should be possible
         // to prevent reentrant calling completely. My idea for this:
         // Obtain a mutable reference at the start of the method, and then give it to the
         // closure. Rust will gatekeep the function until the mutable reference disappears
         // at the end of the closure.
 
-        // re-entrant calling possible here. Acceptable because Portal::call() panics.
-
-        if let Some(ptr) = maybe_func {
-            // Safety: This is transmuted from a FnMut, and therefore valid
-            unsafe { (*ptr)(val) };
-        }
-        true
+        self.state.lock(|state| {
+            let mut state = state.borrow_mut();
+            if let Some(ptr) = state.0 {
+                // Safety: This is transmuted from a FnMut, and therefore valid
+                unsafe { (*ptr.as_ptr())(val, &mut *state) };
+                true
+            } else {
+                false
+            }
+        })
     }
 
     pub async fn wait_once<'a, R, F>(&'a self, mut func: F) -> R
@@ -64,41 +57,20 @@ impl<T> Portal<T> {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
 
-        let mut call_func = |val: T| unsafe {
-            self.state.lock(|state| {
-                let mut state = state.borrow_mut();
-                // Set state to Running while running the function to avoid reentrancy.
-                *state = State::Running;
-                result.as_mut_ptr().write(func(val));
+        let mut call_func = |val: T, state: &mut State<T>| unsafe {
+            result.as_mut_ptr().write(func(val));
 
-                *state = State::Done;
-                signal.signal(());
-            });
+            signal.signal(());
+
+            *state = State(None)
+            // state gets dropped here, which allows calling the function again
         };
 
-        let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
-        let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
-
-        let _bomb = OnDrop::new(|| {
-            self.state.lock(|state| {
-                let mut state = state.borrow_mut();
-                *state = State::None;
-            });
-        });
-
-        self.state.lock(|state| {
-            let mut state = state.borrow_mut();
-            match *state {
-                State::None => {}
-                _ => panic!("Multiple tasks waiting on same portal"),
-            }
-            *state = State::Waiting(func_ptr);
-        });
+        self.set_function_pointer(call_func);
 
         signal.wait().await;
 
         unsafe { result.assume_init() }
-        // dropbomb sets self.state = None
     }
 
     #[allow(unused)]
@@ -108,53 +80,51 @@ impl<T> Portal<T> {
     {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
-        let mut call_func = |val: T| {
-            self.state.lock(|state| {
-                let mut state = state.borrow_mut();
+        let mut call_func = |val: T, state: &mut State<T>| {
+            let func_ptr = match *state {
+                State(Some((p))) => p,
+                _ => unreachable!(),
+            };
 
-                let func_ptr = match *state {
-                    State::Waiting(p) => p,
-                    _ => unreachable!(),
-                };
+            // Set state to Running while running the function to avoid reentrancy.
 
-                // Set state to Running while running the function to avoid reentrancy.
-                *state = State::Running;
+            if let Some(res) = func(val) {
+                unsafe {
+                    result.as_mut_ptr().write(res);
+                }
+                signal.signal(());
+                *state = State(None)
+            }
 
-                *state = match func(val) {
-                    None => State::Waiting(func_ptr),
-                    Some(res) => {
-                        unsafe {
-                            result.as_mut_ptr().write(res);
-                        }
-                        signal.signal(());
-                        State::Done
-                    }
-                };
-            });
+            // state is dropped here, allowing re-entrant calling
         };
 
-        let func_ptr: *mut dyn FnMut(T) = &mut call_func as _;
-        let func_ptr: *mut dyn FnMut(T) = unsafe { mem::transmute(func_ptr) };
-
-        let _bomb = OnDrop::new(|| {
-            self.state.lock(|state| {
-                let mut state = state.borrow_mut();
-                *state = State::None;
-            });
-        });
-
-        self.state.lock(|state| {
-            let mut state = state.borrow_mut();
-            match *state {
-                State::None => {}
-                _ => panic!("Multiple tasks waiting on same portal"),
-            }
-            *state = State::Waiting(func_ptr);
-        });
+        self.set_function_pointer(call_func);
 
         signal.wait().await;
 
         unsafe { result.assume_init() }
-        // dropbomb sets self.state = None
+    }
+
+    /// Utility function for setting the current waiting function pointer
+    ///
+    /// # Panics
+    ///
+    /// This panics when [self.state] is not `State(None)`, and therefore there
+    /// is currently a task waiting on the portal.
+    fn set_function_pointer(&self, mut call_func: impl FnMut(T, &mut State<T>)) {
+        let func_ptr: *mut dyn FnMut(T, &mut State<T>) = &mut call_func as _;
+
+        // Safety: Needs to be validated!!!
+        let func_ptr: *mut dyn FnMut(T, &mut State<T>) = unsafe { mem::transmute(func_ptr) };
+
+        self.state.lock(|state| {
+            let mut state = state.borrow_mut();
+            match *state {
+                State(None) => {}
+                _ => panic!("Multiple tasks waiting on same portal"),
+            }
+            *state = State(NonNull::new(func_ptr));
+        });
     }
 }
