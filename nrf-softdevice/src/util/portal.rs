@@ -77,7 +77,7 @@ impl<T> Portal<T> {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
 
-        let mut call_func = |val: T, state: &mut State<T>| unsafe {
+        let call_func = |val: T, state: &mut State<T>| unsafe {
             result.as_mut_ptr().write(func(val));
 
             signal.signal(());
@@ -89,7 +89,7 @@ impl<T> Portal<T> {
         // If the future gets cancelled from the outside, this gets dropped,
         // and resets the state of the portal to None
         let _bomb = OnDrop::new(|| {
-            self.state.lock(|mut state| *(state.borrow_mut()) = State(None));
+            self.state.lock(|state| *(state.borrow_mut()) = State(None));
         });
 
         self.set_function_pointer(call_func);
