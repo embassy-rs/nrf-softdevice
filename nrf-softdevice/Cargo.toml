@@ -32,6 +32,8 @@ ble-sec = []
 
 critical-section-impl = ["critical-section/restore-state-bool"]
 
+usable-from-interrupts = []
+
 nightly = ["dep:embedded-storage-async"]
 
 # Workaround l2cap credit bug. If set, infinite credits are issued

@@ -5,10 +5,12 @@ pub struct DropBomb {
 }
 
 impl DropBomb {
+    #[allow(unused)]
     pub fn new() -> Self {
         Self { _private: () }
     }
 
+    #[allow(unused)]
     pub fn defuse(self) {
         mem::forget(self)
     }
