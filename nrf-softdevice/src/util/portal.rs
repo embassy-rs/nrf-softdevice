@@ -60,6 +60,12 @@ impl<T> Portal<T> {
             // state gets dropped here, which allows calling the function again
         };
 
+        // If the future gets cancelled from the outside, this gets dropped,
+        // and resets the state of the portal to None
+        let _bomb = OnDrop::new(|| {
+            self.state.lock(|mut state| *(state.borrow_mut()) = State(None));
+        });
+
         self.set_function_pointer(call_func);
 
         signal.wait().await;
@@ -80,7 +86,6 @@ impl<T> Portal<T> {
                 _ => unreachable!(),
             };
 
-
             if let Some(res) = func(val) {
                 unsafe {
                     result.as_mut_ptr().write(res);
@@ -88,9 +93,14 @@ impl<T> Portal<T> {
                 signal.signal(());
                 *state = State(None)
             }
-
-            // state is dropped here, allowing re-entrant calling
+            // state gets dropped here, which allows calling the function again
         };
+
+        // If the future gets cancelled from the outside, this gets dropped,
+        // and resets the state of the portal to None
+        let _bomb = OnDrop::new(|| {
+            self.state.lock(|mut state| *(state.borrow_mut()) = State(None));
+        });
 
         self.set_function_pointer(call_func);
 
