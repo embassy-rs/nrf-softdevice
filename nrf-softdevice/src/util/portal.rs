@@ -31,6 +31,14 @@ impl<T> Portal<T> {
         Self::INIT
     }
 
+    /// Execute the closure that the portal currently holds onto, if one is present.
+    ///
+    /// # Considerations
+    ///
+    /// This will block until the closure contained within the portal (if any) has finished executing.
+    /// This will be entirely done within a critical section, and can therefore *not be preceeded
+    /// by anything*. Be aware of this when calling this function.
+    ///
     pub fn call(&self, val: T) -> bool {
         self.state.lock(|state| {
             let mut state = state.borrow_mut();
@@ -44,6 +52,24 @@ impl<T> Portal<T> {
         })
     }
 
+    /// Wait until the portal is called once using the [Portal::call()] function.
+    ///
+    /// The closure will be called with the parameter provided to [Portal::call()].
+    /// The closure's result will be returned once it is available.
+    ///
+    ///
+    /// # Panics
+    ///
+    /// When a closure is already waiting to be executed on this portal, this
+    /// will panic
+    ///
+    /// # Considerations
+    ///
+    /// [Portal::call()] will block until the closure finished executing, which will be done within
+    /// a critical section. Therefore, even with concurrency frameworks and such, the closure will
+    /// lock the application for its run duration. So, the caller is responsible for creating
+    /// closures with short enough execution times to not massively disrupt the control flow of any
+    /// application, especially when this is used from a library
     pub async fn wait_once<'a, R, F>(&'a self, mut func: F) -> R
     where
         F: FnMut(T) -> R + 'a,
@@ -73,6 +99,26 @@ impl<T> Portal<T> {
         unsafe { result.assume_init() }
     }
 
+    /// Wait until the portal is called once the [Portal::call()] function, and the closure
+    /// returns `Some(T)`.
+    ///
+    /// The closure will be called with the parameter provided to [Portal::call()].
+    /// The closure's result will be returned once it is available
+    /// As long as the closure returns `None`, the next call to [Portal::call()] will once again
+    /// execute that closure. The future will only complete after the closure returns `Some(T)`.
+    ///
+    /// # Panics
+    ///
+    /// When a closure is already waiting to be executed on this portal, this
+    /// will panic
+    ///
+    /// # Considerations
+    ///
+    /// [Portal::call()] will block until the closure finished executing, which will be done within
+    /// a critical section. Therefore, even with concurrency frameworks and such, the closure will
+    /// lock the application for its run duration. So, the caller is responsible for creating
+    /// closures with short enough execution times to not massively disrupt the control flow of any
+    /// application, especially when this is used from a library
     #[allow(unused)]
     pub async fn wait_many<'a, R, F>(&'a self, mut func: F) -> R
     where
