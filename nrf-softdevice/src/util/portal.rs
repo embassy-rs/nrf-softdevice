@@ -32,12 +32,6 @@ impl<T> Portal<T> {
     }
 
     pub fn call(&self, val: T) -> bool {
-        // Possible Improvement: Using the RefCell mutable borrow, it should be possible
-        // to prevent reentrant calling completely. My idea for this:
-        // Obtain a mutable reference at the start of the method, and then give it to the
-        // closure. Rust will gatekeep the function until the mutable reference disappears
-        // at the end of the closure.
-
         self.state.lock(|state| {
             let mut state = state.borrow_mut();
             if let Some(ptr) = state.0 {
@@ -86,7 +80,6 @@ impl<T> Portal<T> {
                 _ => unreachable!(),
             };
 
-            // Set state to Running while running the function to avoid reentrancy.
 
             if let Some(res) = func(val) {
                 unsafe {
