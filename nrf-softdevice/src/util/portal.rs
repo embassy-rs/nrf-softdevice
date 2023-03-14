@@ -77,7 +77,7 @@ impl<T> Portal<T> {
         let signal = Signal::<CriticalSectionRawMutex, _>::new();
         let mut result: MaybeUninit<R> = MaybeUninit::uninit();
 
-        let call_func = |val: T, state: &mut State<T>| unsafe {
+        let mut call_func = |val: T, state: &mut State<T>| unsafe {
             result.as_mut_ptr().write(func(val));
 
             signal.signal(());
@@ -92,7 +92,7 @@ impl<T> Portal<T> {
             self.state.lock(|state| *(state.borrow_mut()) = State(None));
         });
 
-        self.set_function_pointer(call_func);
+        self.set_function_pointer(&mut call_func);
 
         signal.wait().await;
 
@@ -148,7 +148,7 @@ impl<T> Portal<T> {
             self.state.lock(|mut state| *(state.borrow_mut()) = State(None));
         });
 
-        self.set_function_pointer(call_func);
+        self.set_function_pointer(&mut call_func);
 
         signal.wait().await;
 
@@ -161,9 +161,7 @@ impl<T> Portal<T> {
     ///
     /// This panics when [self.state] is not `State(None)`, and therefore there
     /// is currently a task waiting on the portal.
-    fn set_function_pointer(&self, mut call_func: impl FnMut(T, &mut State<T>)) {
-        let func_ptr: *mut dyn FnMut(T, &mut State<T>) = &mut call_func as _;
-
+    fn set_function_pointer(&self, func_ptr: *mut (dyn FnMut(T, &mut State<T>) + '_)) {
         // Safety: Needs to be validated!!!
         let func_ptr: *mut dyn FnMut(T, &mut State<T>) = unsafe { mem::transmute(func_ptr) };
 
