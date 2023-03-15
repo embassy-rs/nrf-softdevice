@@ -10,8 +10,8 @@ use crate::ctxt::Ctxt;
 use crate::security_mode::SecurityMode;
 
 mod ctxt;
-mod uuid;
 mod security_mode;
+mod uuid;
 
 use crate::uuid::Uuid;
 
@@ -132,9 +132,7 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
 
     match ctxt.check() {
         Ok(()) => result.into(),
-        Err(e) => {
-            e.into()
-        }
+        Err(e) => e.into(),
     }
 }
 
@@ -200,7 +198,10 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
     if let Some(err) = err {
         let desc = err.to_string();
-        ctxt.error_spanned_by(err.write_errors(), format!("Parsing characteristics was unsuccessful: {}", desc));
+        ctxt.error_spanned_by(
+            err.write_errors(),
+            format!("Parsing characteristics was unsuccessful: {}", desc),
+        );
         return ctxt.check().unwrap_err().into();
     }
 
@@ -239,8 +240,9 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let security = if let Some(security) = ch.args.security {
             let security_inner = security.to_token_stream();
             quote!(attr = attr.read_security(#security_inner).write_security(#security_inner))
-        } else { quote!() };
-
+        } else {
+            quote!()
+        };
 
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
