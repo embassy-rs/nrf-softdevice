@@ -1,6 +1,6 @@
 extern crate proc_macro;
 
-use darling::FromMeta;
+use darling::{Error, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned};
@@ -127,7 +127,9 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
 
     match ctxt.check() {
         Ok(()) => result.into(),
-        Err(e) => e.into(),
+        Err(e) => {
+            e.into()
+        }
     }
 }
 
@@ -141,7 +143,8 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
-            return e.write_errors().into();
+            ctxt.error_spanned_by(e.write_errors(), "ServiceArgs Parsing failed");
+            return ctxt.check().unwrap_err().into();
         }
     };
 
@@ -155,11 +158,11 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
             ctxt.error_spanned_by(s, "gatt_service structs must have named fields, not tuples.");
 
-            return TokenStream::new();
+            return ctxt.check().unwrap_err().into();
         }
     };
     let mut fields = struct_fields.named.iter().cloned().collect::<Vec<syn::Field>>();
-    let mut err = None;
+    let mut err: Option<Error> = None;
     fields.retain(|field| {
         if let Some(attr) = field
             .attrs
@@ -171,7 +174,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             let args = match CharacteristicArgs::from_meta(&args) {
                 Ok(v) => v,
                 Err(e) => {
-                    err = Some(e.write_errors().into());
+                    err = Some(e);
                     return false;
                 }
             };
@@ -191,7 +194,9 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     });
 
     if let Some(err) = err {
-        return err;
+        let desc = err.to_string();
+        ctxt.error_spanned_by(err.write_errors(), format!("Parsing characteristics was unsuccessful: {}", desc));
+        return ctxt.check().unwrap_err().into();
     }
 
     //panic!("chars {:?}", chars);
