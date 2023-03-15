@@ -3,13 +3,15 @@ extern crate proc_macro;
 use darling::{Error, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote, quote_spanned};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 
 use crate::ctxt::Ctxt;
+use crate::security_mode::SecurityMode;
 
 mod ctxt;
 mod uuid;
+mod security_mode;
 
 use crate::uuid::Uuid;
 
@@ -17,6 +19,7 @@ use crate::uuid::Uuid;
 struct ServiceArgs {
     uuid: Uuid,
 }
+
 #[derive(Debug, FromMeta)]
 struct CharacteristicArgs {
     uuid: Uuid,
@@ -30,6 +33,8 @@ struct CharacteristicArgs {
     notify: bool,
     #[darling(default)]
     indicate: bool,
+    #[darling(default)]
+    security: Option<SecurityMode>,
 }
 
 #[derive(Debug)]
@@ -231,6 +236,12 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let ty = &ch.ty;
         let ty_as_val = quote!(<#ty as #ble::GattValue>);
 
+        let security = if let Some(security) = ch.args.security {
+            let security_inner = security.to_token_stream();
+            quote!(attr = attr.read_security(#security_inner).write_security(#security_inner))
+        } else { quote!() };
+
+
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
             ty: syn::Type::Verbatim(quote!(u16)),
@@ -246,6 +257,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 if #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE {
                     attr = attr.variable_len(#ty_as_val::MAX_SIZE as u16);
                 }
+                #security;
                 let props = #ble::gatt_server::characteristic::Properties {
                     read: #read,
                     write: #write,
