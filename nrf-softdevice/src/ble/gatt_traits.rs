@@ -107,7 +107,13 @@ impl<const N: usize> GattValue for [u8; N] {
     const MAX_SIZE: usize = N;
 
     fn from_gatt(data: &[u8]) -> Self {
-        unwrap!(data.try_into())
+        if data.len() < Self::MAX_SIZE {
+            let mut actual = [0; N];
+            actual[..data.len()].copy_from_slice(data);
+            actual
+        } else {
+            unwrap!(data.try_into())
+        }
     }
 
     fn to_gatt(&self) -> &[u8] {
