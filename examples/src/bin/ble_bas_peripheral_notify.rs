@@ -181,10 +181,8 @@ async fn main(spawner: Spawner) {
             Either::Left((_, _)) => {
                 info!("ADC encountered an error and stopped!")
             }
-            Either::Right((res, _)) => {
-                if let Err(e) = res {
-                    info!("gatt_server run exited with error: {:?}", e);
-                }
+            Either::Right((e, _)) => {
+                info!("gatt_server run exited with error: {:?}", e);
             }
         };
     }
