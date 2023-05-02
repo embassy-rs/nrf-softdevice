@@ -136,51 +136,61 @@ pub struct Properties {
 }
 
 impl Properties {
-    pub fn new() -> Self {
-        Self::default()
+    pub const fn new() -> Self {
+        Self {
+            broadcast: false,
+            read: false,
+            write_without_response: false,
+            write: false,
+            notify: false,
+            indicate: false,
+            signed_write: false,
+            queued_write: false,
+            write_user_description: false,
+        }
     }
 
-    pub fn broadcast(mut self) -> Self {
+    pub const fn broadcast(mut self) -> Self {
         self.broadcast = true;
         self
     }
 
-    pub fn read(mut self) -> Self {
+    pub const fn read(mut self) -> Self {
         self.read = true;
         self
     }
 
-    pub fn write_without_response(mut self) -> Self {
+    pub const fn write_without_response(mut self) -> Self {
         self.write_without_response = true;
         self
     }
 
-    pub fn write(mut self) -> Self {
+    pub const fn write(mut self) -> Self {
         self.write = true;
         self
     }
 
-    pub fn notify(mut self) -> Self {
+    pub const fn notify(mut self) -> Self {
         self.notify = true;
         self
     }
 
-    pub fn indicate(mut self) -> Self {
+    pub const fn indicate(mut self) -> Self {
         self.indicate = true;
         self
     }
 
-    pub fn signed_write(mut self) -> Self {
+    pub const fn signed_write(mut self) -> Self {
         self.signed_write = true;
         self
     }
 
-    pub fn queued_write(mut self) -> Self {
+    pub const fn queued_write(mut self) -> Self {
         self.queued_write = true;
         self
     }
 
-    pub fn write_user_description(mut self) -> Self {
+    pub const fn write_user_description(mut self) -> Self {
         self.write_user_description = true;
         self
     }
