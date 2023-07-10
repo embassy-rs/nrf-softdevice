@@ -27,7 +27,7 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
-use embassy_nrf::interrupt::{Interrupt, InterruptExt};
+use embassy_nrf::interrupt::InterruptExt;
 use embassy_nrf::peripherals::SAADC;
 use embassy_nrf::saadc::{AnyInput, Input, Saadc};
 use embassy_nrf::{bind_interrupts, interrupt, saadc};
@@ -46,7 +46,7 @@ fn init_adc(adc_pin: AnyInput, adc: SAADC) -> Saadc<'static, 1> {
     // Then we initialize the ADC. We are only using one channel in this example.
     let config = saadc::Config::default();
     let channel_cfg = saadc::ChannelConfig::single_ended(adc_pin.degrade_saadc());
-    unsafe { interrupt::SAADC::steal() }.set_priority(interrupt::Priority::P3);
+    interrupt::SAADC.set_priority(interrupt::Priority::P3);
     let saadc = saadc::Saadc::new(adc, Irqs, config, [channel_cfg]);
     saadc
 }
