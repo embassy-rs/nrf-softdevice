@@ -1,6 +1,5 @@
 use core::mem;
-
-use num_enum::{FromPrimitive, IntoPrimitive};
+use core::num::NonZeroU16;
 
 use crate::{raw, RawError};
 
@@ -422,39 +421,188 @@ fn random_address_hash(key: IdentityResolutionKey, r: [u8; 3]) -> [u8; 3] {
     res
 }
 
-#[rustfmt::skip]
-#[repr(u32)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-#[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, FromPrimitive)]
-pub enum GattError {
-    // This is not really an error, but IMO it's better to add it
-    // anyway, just in case someone mistakenly converts BLE_GATT_STATUS_SUCCESS into GattError.
-    // if they see "Success" they'll easily realize their mistake, if they see "Unknown" it'd be confusing.
-    Success = raw::BLE_GATT_STATUS_SUCCESS,
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub struct GattError(NonZeroU16);
 
-    #[num_enum(default)]
-    Unknown = raw::BLE_GATT_STATUS_UNKNOWN,
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub struct GattStatus(u16);
 
-    AtterrInvalid = raw::BLE_GATT_STATUS_ATTERR_INVALID,
-    AtterrInvalidHandle = raw::BLE_GATT_STATUS_ATTERR_INVALID_HANDLE,
-    AtterrReadNotPermitted = raw::BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED,
-    AtterrWriteNotPermitted = raw::BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED,
-    AtterrInvalidPdu = raw::BLE_GATT_STATUS_ATTERR_INVALID_PDU,
-    AtterrInsufAuthentication = raw::BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION,
-    AtterrRequestNotSupported = raw::BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED,
-    AtterrInvalidOffset = raw::BLE_GATT_STATUS_ATTERR_INVALID_OFFSET,
-    AtterrInsufAuthorization = raw::BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION,
-    AtterrPrepareQueueFull = raw::BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL,
-    AtterrAttributeNotFound = raw::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND,
-    AtterrAttributeNotLong = raw::BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG,
-    AtterrInsufEncKeySize = raw::BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE,
-    AtterrInvalidAttValLength = raw::BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH,
-    AtterrUnlikelyError = raw::BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR,
-    AtterrInsufEncryption = raw::BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION,
-    AtterrUnsupportedGroupType = raw::BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE,
-    AtterrInsufResources = raw::BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES,
-    AtterrCpsWriteReqRejected = raw::BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED,
-    AtterrCpsCccdConfigError = raw::BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR,
-    AtterrCpsProcAlrInProg = raw::BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG,
-    AtterrCpsOutOfRange = raw::BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE,
+impl GattError {
+    pub const fn new(err: u16) -> Option<Self> {
+        match NonZeroU16::new(err) {
+            Some(n) => Some(Self(n)),
+            None => None,
+        }
+    }
+
+    /// Construct an arbitrary ATT protocol error code
+    pub const fn from_att_error(err: u8) -> Self {
+        Self(unsafe { NonZeroU16::new_unchecked(0x100 + err as u16) })
+    }
+
+    pub const fn to_status(self) -> GattStatus {
+        GattStatus(self.0.get())
+    }
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for GattError {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::Format::format(&self.to_status(), fmt)
+    }
+}
+
+impl core::fmt::Debug for GattError {
+    fn fmt(&self, fmt: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&self.to_status(), fmt)
+    }
+}
+
+impl From<GattError> for u16 {
+    fn from(value: GattError) -> Self {
+        value.0.get()
+    }
+}
+
+impl GattStatus {
+    pub const SUCCESS: GattStatus = GattStatus(raw::BLE_GATT_STATUS_SUCCESS as u16);
+
+    pub const fn new(status: u16) -> Self {
+        Self(status)
+    }
+
+    pub const fn is_app_error(self) -> bool {
+        self.0 >= raw::BLE_GATT_STATUS_ATTERR_APP_BEGIN as u16 && self.0 <= raw::BLE_GATT_STATUS_ATTERR_APP_END as u16
+    }
+
+    pub const fn to_result(self) -> Result<(), GattError> {
+        match NonZeroU16::new(self.0) {
+            None => Ok(()),
+            Some(err) => Err(GattError(err)),
+        }
+    }
+}
+
+impl From<GattError> for GattStatus {
+    fn from(value: GattError) -> Self {
+        value.to_status()
+    }
+}
+
+impl From<u16> for GattStatus {
+    fn from(value: u16) -> Self {
+        Self(value)
+    }
+}
+
+impl From<GattStatus> for u16 {
+    fn from(value: GattStatus) -> Self {
+        value.0
+    }
+}
+
+macro_rules! error_codes {
+    (
+        $(
+            $(#[$docs:meta])*
+            ($konst:ident, $raw:ident, $phrase:expr);
+        )+
+    ) => {
+        impl GattError {
+        $(
+            $(#[$docs])*
+            pub const $konst: GattError = GattError(unsafe { NonZeroU16::new_unchecked(raw::$raw as u16) });
+        )+
+        }
+
+        #[cfg(feature = "defmt")]
+        impl defmt::Format for GattStatus {
+            fn format(&self, fmt: defmt::Formatter) {
+                if self.is_app_error() {
+                    defmt::write!(fmt, "Application Error: 0x{:02x}", self.0 as u8);
+                } else {
+                    match *self {
+                        Self::SUCCESS => defmt::write!(fmt, "Success"),
+                        $(
+                        Self::$konst => defmt::write!(fmt, $phrase),
+                        )+
+                        _ => defmt::write!(fmt, "Unknown GATT status: 0x{:04x}", self.0),
+                    }
+                }
+            }
+        }
+
+        impl core::fmt::Debug for GattStatus {
+            fn fmt(&self, fmt: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                if self.is_app_error() {
+                    core::write!(fmt, "Application Error: 0x{:02x}", self.0 as u8)
+                } else {
+                    match *self {
+                        Self::SUCCESS => core::write!(fmt, "Success"),
+                        $(
+                        Self::$konst => core::write!(fmt, $phrase),
+                        )+
+                        _ => core::write!(fmt, "Unknown GATT status: 0x{:04x}", self.0),
+                    }
+                }
+            }
+        }
+
+
+        impl GattStatus {
+        $(
+            $(#[$docs])*
+            pub const $konst: GattStatus = GattError::$konst.to_status();
+        )+
+        }
+    }
+}
+
+error_codes! {
+    /// Unknown or not applicable status.
+    (UNKNOWN, BLE_GATT_STATUS_UNKNOWN, "Unknown");
+    /// ATT Error: Invalid Error Code.
+    (ATTERR_INVALID, BLE_GATT_STATUS_ATTERR_INVALID, "Invalid Error Code");
+    /// ATT Error: Invalid Attribute Handle.
+    (ATTERR_INVALID_HANDLE, BLE_GATT_STATUS_ATTERR_INVALID_HANDLE, "Invalid Handle");
+    /// ATT Error: Read not permitted.
+    (ATTERR_READ_NOT_PERMITTED, BLE_GATT_STATUS_ATTERR_READ_NOT_PERMITTED, "Read Not Permitted");
+    /// ATT Error: Write not permitted.
+    (ATTERR_WRITE_NOT_PERMITTED, BLE_GATT_STATUS_ATTERR_WRITE_NOT_PERMITTED, "Write Not Permitted");
+    /// ATT Error: Used in ATT as Invalid PDU.
+    (ATTERR_INVALID_PDU, BLE_GATT_STATUS_ATTERR_INVALID_PDU, "Invalid PDU");
+    /// ATT Error: Authenticated link required.
+    (ATTERR_INSUF_AUTHENTICATION, BLE_GATT_STATUS_ATTERR_INSUF_AUTHENTICATION, "Insufficient Authentication");
+    /// ATT Error: Used in ATT as Request Not Supported.
+    (ATTERR_REQUEST_NOT_SUPPORTED, BLE_GATT_STATUS_ATTERR_REQUEST_NOT_SUPPORTED, "Request Not Supported");
+    /// ATT Error: Offset specified was past the end of the attribute.
+    (ATTERR_INVALID_OFFSET, BLE_GATT_STATUS_ATTERR_INVALID_OFFSET, "Invalid Offset");
+    /// ATT Error: Used in ATT as Insufficient Authorization.
+    (ATTERR_INSUF_AUTHORIZATION, BLE_GATT_STATUS_ATTERR_INSUF_AUTHORIZATION, "Insufficient Authorization");
+    /// ATT Error: Used in ATT as Prepare Queue Full.
+    (ATTERR_PREPARE_QUEUE_FULL, BLE_GATT_STATUS_ATTERR_PREPARE_QUEUE_FULL, "Prepare Queue Full");
+    /// ATT Error: Used in ATT as Attribute not found.
+    (ATTERR_ATTRIBUTE_NOT_FOUND, BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_FOUND, "Attribute Not Found");
+    /// ATT Error: Attribute cannot be read or written using read/write blob requests.
+    (ATTERR_ATTRIBUTE_NOT_LONG, BLE_GATT_STATUS_ATTERR_ATTRIBUTE_NOT_LONG, "Attribute Not Long");
+    /// ATT Error: Encryption key size used is insufficient.
+    (ATTERR_INSUF_ENC_KEY_SIZE, BLE_GATT_STATUS_ATTERR_INSUF_ENC_KEY_SIZE, "Insufficient Encryption Key Size");
+    /// ATT Error: Invalid value size.
+    (ATTERR_INVALID_ATT_VAL_LENGTH, BLE_GATT_STATUS_ATTERR_INVALID_ATT_VAL_LENGTH, "Invalid Attribute Value Size");
+    /// ATT Error: Very unlikely error.
+    (ATTERR_UNLIKELY_ERROR, BLE_GATT_STATUS_ATTERR_UNLIKELY_ERROR, "Unlikely Error");
+    /// ATT Error: Encrypted link required.
+    (ATTERR_INSUF_ENCRYPTION, BLE_GATT_STATUS_ATTERR_INSUF_ENCRYPTION, "Insufficient Encryption");
+    /// ATT Error: Attribute type is not a supported grouping attribute.
+    (ATTERR_UNSUPPORTED_GROUP_TYPE, BLE_GATT_STATUS_ATTERR_UNSUPPORTED_GROUP_TYPE, "Unsupported Group Type");
+    /// ATT Error: Insufficient resources.
+    (ATTERR_INSUF_RESOURCES, BLE_GATT_STATUS_ATTERR_INSUF_RESOURCES, "Insufficient Resources");
+    /// ATT Common Profile and Service Error: Write request rejected.
+    (ATTERR_CPS_WRITE_REQ_REJECTED, BLE_GATT_STATUS_ATTERR_CPS_WRITE_REQ_REJECTED, "Write Request Rejected");
+    /// ATT Common Profile and Service Error: Client Characteristic Configuration Descriptor improperly configured.
+    (ATTERR_CPS_CCCD_CONFIG_ERROR, BLE_GATT_STATUS_ATTERR_CPS_CCCD_CONFIG_ERROR, "Client Characteristic Configration Descriptor Improperly Configured");
+    /// ATT Common Profile and Service Error: Procedure Already in Progress.
+    (ATTERR_CPS_PROC_ALR_IN_PROG, BLE_GATT_STATUS_ATTERR_CPS_PROC_ALR_IN_PROG, "Procedure Already in Progress");
+    /// ATT Common Profile and Service Error: Out Of Range.
+    (ATTERR_CPS_OUT_OF_RANGE, BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE, "Out of Range");
 }

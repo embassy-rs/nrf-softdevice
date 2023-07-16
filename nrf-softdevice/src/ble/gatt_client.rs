@@ -224,7 +224,7 @@ async fn discover_inner<T: Client>(
         let descs = {
             match discover_descriptors(conn, start_handle, end_handle).await {
                 Ok(descs) => descs,
-                Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => Vec::new(),
+                Err(DiscoverError::Gatt(GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) => Vec::new(),
                 Err(err) => return Err(err),
             }
         };
@@ -249,7 +249,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
     let svc = match discover_service(conn, T::uuid()).await {
-        Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => Err(DiscoverError::ServiceNotFound),
+        Err(DiscoverError::Gatt(GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) => Err(DiscoverError::ServiceNotFound),
         x => x,
     }?;
 
@@ -261,7 +261,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
     let mut prev_char: Option<raw::ble_gattc_char_t> = None;
     while curr_handle < end_handle {
         let chars = match discover_characteristics(conn, curr_handle, end_handle).await {
-            Err(DiscoverError::Gatt(GattError::AtterrAttributeNotFound)) => break,
+            Err(DiscoverError::Gatt(GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) => break,
             x => x,
         }?;
         assert_ne!(chars.len(), 0);
@@ -492,10 +492,7 @@ pub fn try_write_without_response(conn: &Connection, handle: u16, buf: &[u8]) ->
 
 unsafe fn check_status(ble_evt: *const raw::ble_evt_t) -> Result<&'static raw::ble_gattc_evt_t, GattError> {
     let gattc_evt = get_union_field(ble_evt, &(*ble_evt).evt.gattc_evt);
-    match gattc_evt.gatt_status as u32 {
-        raw::BLE_GATT_STATUS_SUCCESS => Ok(gattc_evt),
-        err => Err(GattError::from(err as u32)),
-    }
+    GattStatus::from(gattc_evt.gatt_status).to_result().and(Ok(gattc_evt))
 }
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {

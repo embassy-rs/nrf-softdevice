@@ -244,7 +244,7 @@ dependencies = [
 [[package]]
 name = "embassy-cortex-m"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy?tag=embassy-executor-v0.1.1#758f5d7ea29f1df14d5ef59c82e4b7f22545d775"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
@@ -259,7 +259,7 @@ dependencies = [
 [[package]]
 name = "embassy-embedded-hal"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy?tag=embassy-executor-v0.1.1#758f5d7ea29f1df14d5ef59c82e4b7f22545d775"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "defmt",
  "embassy-sync",
@@ -274,8 +274,7 @@ dependencies = [
 [[package]]
 name = "embassy-executor"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4f2f7687ed60a799909eca1bf68b41e9f2ad03d740f0956a945ddabccc6aedb"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
@@ -290,7 +289,7 @@ dependencies = [
 [[package]]
 name = "embassy-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy?tag=embassy-executor-v0.1.1#758f5d7ea29f1df14d5ef59c82e4b7f22545d775"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "num-traits",
 ]
@@ -298,8 +297,7 @@ dependencies = [
 [[package]]
 name = "embassy-macros"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8f57fb96af50e126bb4ae0826604ac5b9f9ac1d32fb3576d552f7285bf68e67"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -310,7 +308,7 @@ dependencies = [
 [[package]]
 name = "embassy-nrf"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy?tag=embassy-executor-v0.1.1#758f5d7ea29f1df14d5ef59c82e4b7f22545d775"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "cfg-if",
  "cortex-m",
@@ -339,10 +337,8 @@ dependencies = [
 [[package]]
 name = "embassy-sync"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6ea38e6ea5d0361d087680f786c19a1454becb06174790280534a3be05ed839"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
- "atomic-polyfill 1.0.1",
  "cfg-if",
  "critical-section",
  "defmt",
@@ -354,8 +350,7 @@ dependencies = [
 [[package]]
 name = "embassy-time"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81c0c57d163dba8ff55a874966d9a1ae755859028308833923a1edeec1a6c215"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "atomic-polyfill 1.0.1",
  "cfg-if",
@@ -371,7 +366,7 @@ dependencies = [
 [[package]]
 name = "embassy-usb-driver"
 version = "0.1.0"
-source = "git+https://github.com/embassy-rs/embassy?tag=embassy-executor-v0.1.1#758f5d7ea29f1df14d5ef59c82e4b7f22545d775"
+source = "git+https://github.com/embassy-rs/embassy?rev=dadd6aafe9d5239b5f9718f446649a1de0d0cbcd#dadd6aafe9d5239b5f9718f446649a1de0d0cbcd"
 dependencies = [
  "defmt",
 ]
@@ -394,18 +389,18 @@ checksum = "129b101ddfee640565f7c07b301a31d95aa21e5acef21a491c307139f5fa4c91"
 
 [[package]]
 name = "embedded-hal-async"
-version = "0.1.0-alpha.3"
+version = "0.2.0-alpha.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c913f631bd08c253b85fdf0077061c64763d70e27803b04da5a49c5fb2a65057"
+checksum = "608a322808d65da06715e03109c0cb69f79a5459af756fba393ab83e875d4969"
 dependencies = [
  "embedded-hal 1.0.0-alpha.9",
 ]
 
 [[package]]
 name = "embedded-io"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33dfba9e6c113f2fd8537c943780a7345945e66c86972e356b1152e19481bcf5"
+checksum = "ef1a6892d9eef45c8fa6b9e0086428a2cca8491aca8f787c534a3d6d0bcb3ced"
 dependencies = [
  "defmt",
 ]

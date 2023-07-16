@@ -111,14 +111,14 @@ You have some control over that number by tweaking the SoftDevice configuration 
 - periph_role_count Maximum number of connections concurrently acting as a peripheral
 - central_role_count Maximum number of connections concurrently acting as a central
 
-Next you need to find out if your board has an external oscillator (which provides better battery life) But if in doubt just assume it doesnt and set the SoftDevice to use an internal clock. A common no external crystal configuration for nRF52 might be
+Next you need to find out if your board has an external oscillator (which provides better battery life) But if in doubt just assume it doesn't and set the SoftDevice to use an internal clock. A common no external crystal configuration for nRF52 might be
 
 ```rust
         clock: Some(raw::nrf_clock_lf_cfg_t {
             source: raw::NRF_CLOCK_LF_SRC_RC as u8,
             rc_ctiv: 16,
             rc_temp_ctiv: 2,
-            accuracy: raw::NRF_CLOCK_LF_ACCURACY_250_PPM as u8,
+            accuracy: raw::NRF_CLOCK_LF_ACCURACY_500_PPM as u8,
         }),
 ```
 
