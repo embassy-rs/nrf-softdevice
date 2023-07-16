@@ -1,5 +1,7 @@
 #![no_std]
-#![feature(type_alias_impl_trait)]
+#![cfg_attr(feature = "nightly", feature(async_fn_in_trait))]
+#![cfg_attr(feature = "nightly", feature(impl_trait_projections))]
+#![allow(incomplete_features)]
 
 pub(crate) mod util;
 

@@ -243,10 +243,8 @@ async fn main(spawner: Spawner) -> ! {
         info!("advertising done!");
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
-        let res = gatt_server::run(&conn, &server, |_| {}).await;
+        let e = gatt_server::run(&conn, &server, |_| {}).await;
 
-        if let Err(e) = res {
-            info!("gatt_server run exited with error: {:?}", e);
-        }
+        info!("gatt_server run exited with error: {:?}", e);
     }
 }

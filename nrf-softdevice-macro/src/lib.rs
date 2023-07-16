@@ -1,13 +1,16 @@
-#![feature(proc_macro_diagnostic)]
-
 extern crate proc_macro;
 
-use darling::FromMeta;
+use darling::{Error, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote, quote_spanned};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::spanned::Spanned;
 
+use crate::ctxt::Ctxt;
+use crate::security_mode::SecurityMode;
+
+mod ctxt;
+mod security_mode;
 mod uuid;
 
 use crate::uuid::Uuid;
@@ -16,6 +19,7 @@ use crate::uuid::Uuid;
 struct ServiceArgs {
     uuid: Uuid,
 }
+
 #[derive(Debug, FromMeta)]
 struct CharacteristicArgs {
     uuid: Uuid,
@@ -29,6 +33,8 @@ struct CharacteristicArgs {
     notify: bool,
     #[darling(default)]
     indicate: bool,
+    #[darling(default)]
+    security: Option<SecurityMode>,
 }
 
 #[derive(Debug)]
@@ -42,18 +48,19 @@ struct Characteristic {
 
 #[proc_macro_attribute]
 pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
+    // Context for error reporting
+    let ctxt = Ctxt::new();
+
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
     let struct_vis = &struc.vis;
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_server structs must have named fields, not tuples.")
-                .emit();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_server structs must have named fields, not tuples.");
+
             return TokenStream::new();
         }
     };
@@ -122,7 +129,11 @@ pub fn gatt_server(_args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
     };
-    result.into()
+
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }
 
 #[proc_macro_attribute]
@@ -130,10 +141,13 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
 
+    let ctxt = Ctxt::new();
+
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
         Err(e) => {
-            return e.write_errors().into();
+            ctxt.error_spanned_by(e.write_errors(), "ServiceArgs Parsing failed");
+            return ctxt.check().unwrap_err().into();
         }
     };
 
@@ -143,17 +157,15 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_service structs must have named fields, not tuples.")
-                .emit();
-            return TokenStream::new();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_service structs must have named fields, not tuples.");
+
+            return ctxt.check().unwrap_err().into();
         }
     };
     let mut fields = struct_fields.named.iter().cloned().collect::<Vec<syn::Field>>();
-    let mut err = None;
+    let mut err: Option<Error> = None;
     fields.retain(|field| {
         if let Some(attr) = field
             .attrs
@@ -165,7 +177,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             let args = match CharacteristicArgs::from_meta(&args) {
                 Ok(v) => v,
                 Err(e) => {
-                    err = Some(e.write_errors().into());
+                    err = Some(e);
                     return false;
                 }
             };
@@ -185,7 +197,12 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
     });
 
     if let Some(err) = err {
-        return err;
+        let desc = err.to_string();
+        ctxt.error_spanned_by(
+            err.write_errors(),
+            format!("Parsing characteristics was unsuccessful: {}", desc),
+        );
+        return ctxt.check().unwrap_err().into();
     }
 
     //panic!("chars {:?}", chars);
@@ -220,6 +237,13 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let ty = &ch.ty;
         let ty_as_val = quote!(<#ty as #ble::GattValue>);
 
+        let security = if let Some(security) = ch.args.security {
+            let security_inner = security.to_token_stream();
+            quote!(attr = attr.read_security(#security_inner).write_security(#security_inner))
+        } else {
+            quote!()
+        };
+
         fields.push(syn::Field {
             ident: Some(value_handle.clone()),
             ty: syn::Type::Verbatim(quote!(u16)),
@@ -235,6 +259,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 if #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE {
                     attr = attr.variable_len(#ty_as_val::MAX_SIZE as u16);
                 }
+                #security;
                 let props = #ble::gatt_server::characteristic::Properties {
                     read: #read,
                     write: #write,
@@ -328,7 +353,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
         if indicate {
             code_impl.extend(quote_spanned!(ch.span=>
-                fn #indicate_fn(
+                #fn_vis fn #indicate_fn(
                     &self,
                     conn: &#ble::Connection,
                     val: &#ty,
@@ -415,13 +440,18 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
-    result.into()
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }
 
 #[proc_macro_attribute]
 pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let args = syn::parse_macro_input!(args as syn::AttributeArgs);
     let mut struc = syn::parse_macro_input!(item as syn::ItemStruct);
+
+    let ctxt = Ctxt::new();
 
     let args = match ServiceArgs::from_list(&args) {
         Ok(v) => v,
@@ -435,12 +465,10 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let struct_fields = match &mut struc.fields {
         syn::Fields::Named(n) => n,
         _ => {
-            struc
-                .ident
-                .span()
-                .unwrap()
-                .error("gatt_client structs must have named fields, not tuples.")
-                .emit();
+            let s = struc.ident;
+
+            ctxt.error_spanned_by(s, "gatt_client structs must have named fields, not tuples.");
+
             return TokenStream::new();
         }
     };
@@ -509,6 +537,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         let write_fn = format_ident!("{}_write", ch.name);
         let write_wor_fn = format_ident!("{}_write_without_response", ch.name);
         let write_try_wor_fn = format_ident!("{}_try_write_without_response", ch.name);
+        let fn_vis = ch.vis.clone();
 
         let uuid = ch.args.uuid;
         let read = ch.args.read;
@@ -570,7 +599,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
         if read {
             code_impl.extend(quote_spanned!(ch.span=>
-                async fn #read_fn(&self) -> Result<#ty, #ble::gatt_client::ReadError> {
+                #fn_vis async fn #read_fn(&self) -> Result<#ty, #ble::gatt_client::ReadError> {
                     let mut buf = [0; #ty_as_val::MAX_SIZE];
                     let len = #ble::gatt_client::read(&self.conn, self.#value_handle, &mut buf).await?;
                     Ok(#ty_as_val::from_gatt(&buf[..len]))
@@ -580,15 +609,15 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
         if write {
             code_impl.extend(quote_spanned!(ch.span=>
-                async fn #write_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
+                #fn_vis async fn #write_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
                     let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write(&self.conn, self.#value_handle, buf).await
                 }
-                async fn #write_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
+                #fn_vis async fn #write_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
                     let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write_without_response(&self.conn, self.#value_handle, buf).await
                 }
-                fn #write_try_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::TryWriteError> {
+                #fn_vis fn #write_try_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::TryWriteError> {
                     let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::try_write_without_response(&self.conn, self.#value_handle, buf)
                 }
@@ -664,5 +693,8 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             #code_event_enum
         }
     };
-    result.into()
+    match ctxt.check() {
+        Ok(()) => result.into(),
+        Err(e) => e.into(),
+    }
 }

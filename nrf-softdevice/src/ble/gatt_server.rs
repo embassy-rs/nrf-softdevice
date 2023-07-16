@@ -163,36 +163,21 @@ impl From<RawError> for RegisterError {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub enum RunError {
-    Disconnected,
-    Raw(RawError),
-}
-
-impl From<RawError> for RunError {
-    fn from(err: RawError) -> Self {
-        Self::Raw(err)
-    }
-}
-
-impl From<DisconnectedError> for RunError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
-    }
-}
-
-pub async fn run<'m, F, S>(conn: &Connection, server: &S, mut f: F) -> Result<(), RunError>
+pub async fn run<'m, F, S>(conn: &Connection, server: &S, mut f: F) -> DisconnectedError
 where
     F: FnMut(S::Event),
     S: Server,
 {
-    let conn_handle = conn.with_state(|state| state.check_connected())?;
+    let conn_handle = match conn.with_state(|state| state.check_connected()) {
+        Ok(handle) => handle,
+        Err(DisconnectedError) => return DisconnectedError,
+    };
+
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             let ble_evt = &*ble_evt;
             if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {
-                return Some(Err(RunError::Disconnected));
+                return Some(DisconnectedError);
             }
 
             // If evt_id is not BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED, then it must be a GATTS event
@@ -314,7 +299,6 @@ pub fn get_value(_sd: &Softdevice, handle: u16, buf: &mut [u8]) -> Result<usize,
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetValueError {
-    Truncated,
     Raw(RawError),
 }
 

@@ -129,6 +129,9 @@ The SoftDevice does time-critical radio processing at high priorities. If its ti
 These mistakes WILL cause "assertion failed" errors, 100% guaranteed. If you do these only "a little bit", such as disabling all interrupts but for very short periods of time only, things may appear to work, but you will get "assertion failed" errors after hours
 of running. Make sure to follow them to the letter.
 
+The Softdevice Driver (e.g. `Softdevice::run()`) cannot be used from interrupts by default. However, the `usable-from-interrupts` feature enables this functionality. To use this feature, a `critical-section` implementation is required.
+This crate's internal implementation (`critical-section-impl` feature) is recommended, but other Softdevice-compatible implementations should also work.
+
 ### Critical sections
 
 Interrupts for certain peripherals and SWI/EGUs are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/sd_resource_reqs/hw_block_interrupt_vector.html?cp=4_7_4_0_6_0). Interrupt handlers for them are reserved by the softdevice, the handlers in your application won't be called.
