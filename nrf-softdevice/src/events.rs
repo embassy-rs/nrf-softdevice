@@ -8,7 +8,8 @@ use num_enum::{IntoPrimitive, TryFromPrimitive};
 use crate::pac::interrupt;
 use crate::{raw, RawError};
 
-static SWI2_WAKER: AtomicWaker = AtomicWaker::new();
+static SWI2_SOC_EVT_WAKER: AtomicWaker = AtomicWaker::new();
+static SWI2_BLE_EVT_WAKER: AtomicWaker = AtomicWaker::new();
 
 /// SoC events reported by the softdevice.
 #[rustfmt::skip]
@@ -58,9 +59,9 @@ const BLE_EVT_MAX_SIZE: u16 = 256;
 #[cfg(not(any(feature = "evt-max-size-256", feature = "evt-max-size-512")))]
 const BLE_EVT_MAX_SIZE: u16 = 128;
 
-pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
+pub(crate) async fn run_soc<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
     poll_fn(|cx| unsafe {
-        SWI2_WAKER.register(cx.waker());
+        SWI2_SOC_EVT_WAKER.register(cx.waker());
 
         let mut evt: u32 = 0;
         loop {
@@ -71,6 +72,14 @@ pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
             }
         }
 
+        Poll::Pending
+    })
+    .await
+}
+
+pub(crate) async fn run_ble() -> ! {
+    poll_fn(|cx| unsafe {
+        SWI2_BLE_EVT_WAKER.register(cx.waker());
         // Using u32 since the buffer has to be aligned to 4
         let mut evt: MaybeUninit<[u32; BLE_EVT_MAX_SIZE as usize / 4]> = MaybeUninit::uninit();
 
@@ -94,11 +103,13 @@ pub(crate) async fn run<F: FnMut(SocEvent)>(mut soc_evt_handler: F) -> ! {
 #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
 #[interrupt]
 unsafe fn SWI2() {
-    SWI2_WAKER.wake();
+    SWI2_SOC_EVT_WAKER.wake();
+    SWI2_BLE_EVT_WAKER.wake();
 }
 
 #[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
 #[interrupt]
 unsafe fn SWI2_EGU2() {
-    SWI2_WAKER.wake();
+    SWI2_SOC_EVT_WAKER.wake();
+    SWI2_BLE_EVT_WAKER.wake();
 }
