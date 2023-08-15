@@ -153,9 +153,8 @@ The default priority level for interrupts is 0, so for *every single interrupt* 
 ```rust
 use embassy_nrf::interrupt::{self, InterruptExt};
 
-let mut irq = interrupt::SPIM3;
-irq.set_priority(interrupt::Priority::P3);
-let mut spim = spim::Spim::new( p.SPI3, irq, p.P0_13, p.P0_16, p.P0_15, config);
+interrupt::SPIM3.set_priority(interrupt::Priority::P3);
+let mut spim = spim::Spim::new(p.SPI3, Irqs, p.P0_13, p.P0_16, p.P0_15, config);
 ```
 
 If you're using `embassy-nrf` with the `gpiote` or `time-driver-rtc1` features enabled, you'll need to edit your embassy_config to move those priorities:
