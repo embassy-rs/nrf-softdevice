@@ -175,7 +175,7 @@ If you are sure you have set interrupts correctly, but are still getting an erro
 [ERROR]Location<lib.rs:104>panicked at 'sd_softdevice_enable err SdmIncorrectInterruptConfiguration'
 ```
 
-Make sure you add the `defmt` feature to `embassy_nrf`.
+Make sure the `defmt` feature is enabled on `embassy_nrf`.
 
 You can then use this code to print whether an interrupt is enabled, and its priority:
 ```rust
