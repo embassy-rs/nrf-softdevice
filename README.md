@@ -177,15 +177,7 @@ If you are sure you have set interrupts correctly, but are still getting an erro
 
 You can use this code to print whether an interrupt is enabled, and its priority:
 ```rust
-let interrupt_numbers = [
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-    32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-    42, 45, 47
-    ];
-
-for &num in &interrupt_numbers {
+for num in 0..48 {
     let interrupt = unsafe { mem::transmute::<u16, Interrupt>(num) };
     let is_enabled = NVIC::is_enabled(interrupt);
     let priority = NVIC::get_priority(interrupt);
