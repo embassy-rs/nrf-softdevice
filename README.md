@@ -170,6 +170,33 @@ let peripherals = embassy_nrf::init(config);
 
 ## Troubleshooting
 
+If you are sure you have set interrupts correctly, but are still getting an error like below:
+```
+[ERROR]Location<lib.rs:104>panicked at 'sd_softdevice_enable err SdmIncorrectInterruptConfiguration'
+```
+
+You can use this code to print whether an interrupt is enabled, and its priority:
+```rust
+let interrupt_numbers = [
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
+    42, 45, 47
+    ];
+
+for &num in &interrupt_numbers {
+    let interrupt = unsafe { mem::transmute::<u16, Interrupt>(num) };
+    let is_enabled = NVIC::is_enabled(interrupt);
+    let priority = NVIC::get_priority(interrupt);
+
+    println!("Interrupt {}: Enabled = {}, Priority = {}", num, is_enabled, priority.to_be_bytes());
+}
+```
+
+Interrupt numbers map to what they are in the [`Interrupt` enum](https://docs.embassy.dev/embassy-nrf/git/nrf52832/interrupt/enum.Interrupt.html).
+A priority of 62 means the Interrupt has been set to P2, 96 means it has been set to P3.
+
 If your SoftDevice is hardfaulting on enable and you think you have everything right, make sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
 
 If the following linking error occurs
