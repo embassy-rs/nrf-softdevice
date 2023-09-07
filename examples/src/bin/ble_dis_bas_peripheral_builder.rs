@@ -13,7 +13,7 @@ use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
 
 const DEVICE_INFORMATION: Uuid = Uuid::new_16(0x180a);
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
@@ -26,6 +26,16 @@ const HARDWARE_REVISION: Uuid = Uuid::new_16(0x2a27);
 const SOFTWARE_REVISION: Uuid = Uuid::new_16(0x2a28);
 const MANUFACTURER_NAME: Uuid = Uuid::new_16(0x2a29);
 const PNP_ID: Uuid = Uuid::new_16(0x2a50);
+
+const ADV_DATA: &[u8] = generate_adv_data! {
+    flags: (GeneralDiscovery),
+    services: Complete16(HealthThermometer),
+    short_name: "HelloRust"
+};
+
+const SCAN_DATA: &[u8] = generate_scan_data! {
+    services: Complete16(HealthThermometer)
+};
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) -> ! {
@@ -227,20 +237,12 @@ async fn main(spawner: Spawner) {
     let server = unwrap!(Server::new(sd, "12345678"));
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
-
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: ADV_DATA,
+            scan_data: SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");

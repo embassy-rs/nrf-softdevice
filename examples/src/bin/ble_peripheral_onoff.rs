@@ -13,7 +13,17 @@ use embassy_nrf::gpio::{Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral};
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+
+const ADV_DATA: &[u8] = generate_adv_data! {
+    flags: (GeneralDiscovery),
+    services: Complete16(HealthThermometer),
+    short_name: "HelloRust"
+};
+
+const SCAN_DATA: &[u8] = generate_scan_data! {
+    services: Complete16(HealthThermometer)
+};
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) -> ! {
@@ -32,20 +42,12 @@ struct Server {
 }
 
 async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
-
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: ADV_DATA,
+            scan_data: SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");

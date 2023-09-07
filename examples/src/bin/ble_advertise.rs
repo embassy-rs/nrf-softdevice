@@ -10,7 +10,19 @@ use core::mem;
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::peripheral;
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+
+const ADV_DATA: &[u8] = generate_adv_data! {
+    flags: (GeneralDiscovery),
+    services: Complete16(HealthThermometer), // if there were a lot of these there may not be room for the full name
+    short_name: "HelloRust"
+};
+
+// but we can put it in the scan data
+// so the full name is visible once connected
+const SCAN_DATA: &[u8] = generate_scan_data! {
+    full_name: "Hello, Rust!"
+};
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) -> ! {
@@ -54,19 +66,11 @@ async fn main(spawner: Spawner) {
     let sd = Softdevice::enable(&config);
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, raw::BLE_GAP_AD_TYPE_FLAGS as u8, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
-        0x0a, raw::BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME as u8, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
-    ];
-
     let mut config = peripheral::Config::default();
     config.interval = 50;
-    let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+    let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected {
+        adv_data: ADV_DATA,
+        scan_data: SCAN_DATA,
+    };
     unwrap!(peripheral::advertise(sd, adv, &config).await);
 }

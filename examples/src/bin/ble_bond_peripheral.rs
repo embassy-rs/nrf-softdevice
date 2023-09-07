@@ -17,11 +17,21 @@ use nrf_softdevice::ble::security::{IoCapabilities, SecurityHandler};
 use nrf_softdevice::ble::{
     gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, Uuid,
 };
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
 use static_cell::StaticCell;
 
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
 const BATTERY_LEVEL: Uuid = Uuid::new_16(0x2a19);
+
+const ADV_DATA: &[u8] = generate_adv_data! {
+    flags: (GeneralDiscovery),
+    services: Complete16(HealthThermometer),
+    short_name: "HelloRust"
+};
+
+const SCAN_DATA: &[u8] = generate_scan_data! {
+    services: Complete16(HealthThermometer)
+};
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -221,23 +231,15 @@ async fn main(spawner: Spawner) -> ! {
     let server = unwrap!(Server::new(sd));
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
-
     static BONDER: StaticCell<Bonder> = StaticCell::new();
     let bonder = BONDER.init(Bonder::default());
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: ADV_DATA,
+            scan_data: SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_pairable(sd, adv, &config, bonder).await);
 
         info!("advertising done!");

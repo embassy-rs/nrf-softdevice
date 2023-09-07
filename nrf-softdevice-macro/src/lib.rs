@@ -1,10 +1,14 @@
 extern crate proc_macro;
 
+use std::str::FromStr;
+
 use darling::{Error, FromMeta};
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, quote_spanned, ToTokens};
+use syn::parse::Parse;
 use syn::spanned::Spanned;
+use syn::{parenthesized, Ident, LitStr, Token};
 
 use crate::ctxt::Ctxt;
 use crate::security_mode::SecurityMode;
@@ -12,6 +16,8 @@ use crate::security_mode::SecurityMode;
 mod ctxt;
 mod security_mode;
 mod uuid;
+
+use strum_macros::EnumString;
 
 use crate::uuid::Uuid;
 
@@ -697,4 +703,403 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         Ok(()) => result.into(),
         Err(e) => e.into(),
     }
+}
+
+/// Advertisement Data Generation Macro
+///
+/// Helpful Resources:
+/// BLE Advertising Data Basics: https://docs.silabs.com/bluetooth/4.0/general/adv-and-scanning/bluetooth-adv-data-basics
+/// Assigned Numbers: https://btprodspecificationrefs.blob.core.windows.net/assigned-numbers/Assigned%20Number%20Types/Assigned_Numbers.pdf
+/// Core Specification Supplement 9: https://www.bluetooth.com/specifications/specs/core-specification-supplement-9/
+///
+/// TODO: replace panics with compiler_error
+
+/// Helper funcs
+
+fn half_word_to_reversed_bytes(value: u16) -> TokenStream2 {
+    let big = ((value >> 8) & 0xff) as u8;
+    let small = (value & 0xff) as u8;
+
+    quote! { #small, #big }
+}
+
+/// Parsers and Types
+
+#[derive(Debug)]
+struct Set<T> {
+    items: Vec<T>,
+}
+
+impl<T> Parse for Set<T>
+where
+    T: Parse + PartialEq,
+{
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let mut items = Vec::new();
+
+        let content;
+        parenthesized!(content in input);
+
+        while !content.is_empty() {
+            let item: T = content.parse()?;
+            if items.contains(&item) {
+                panic!("Identifiers must be unique.")
+            }
+            items.push(item);
+
+            if content.is_empty() {
+                break;
+            }
+
+            content.parse::<Token![,]>()?;
+        }
+
+        Ok(Set { items })
+    }
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Debug, PartialEq, Clone, Copy, EnumString)]
+#[repr(u8)]
+enum Flag {
+    LimitedDiscovery = 0b1,
+    GeneralDiscovery = 0b10,
+    LE_Only = 0b100,
+
+    // i don't understand these but in case people want them
+    Bit3 = 0b1000,
+    Bit4 = 0b10000,
+    // the rest are "reserved for future use"
+}
+
+impl Parse for Flag {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let ident: Ident = input.parse()?;
+
+        if let Ok(flag) = Flag::from_str(ident.to_string().as_str()) {
+            Ok(flag)
+        } else {
+            Err(input.error("Expected flag identifier."))
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, EnumString)]
+#[repr(u16)]
+enum BasicService {
+    GenericAccess = 0x1800,
+    GenericAttribute,
+    ImmediateAlert,
+    LinkLoss,
+    TxPower,
+    CurrentTime,
+    ReferenceTimeUpdate,
+    NextDSTChange,
+    Glucose,
+    HealthThermometer,
+    DeviceInformation,
+    HeartRate,
+    PhoneAlertStatus,
+    Battery,
+    BloodPressure,
+    AlertNotification,
+    HumanInterfaceDevice,
+    ScanParameters,
+    RunnnigSpeedAndCadence,
+    AutomationIO,
+    CyclingSpeedAndCadence,
+    CyclingPower,
+    LocationAndNavigation,
+    EnvironmentalSensing,
+    BodyComposition,
+    UserData,
+    WeightScale,
+    BondManagement,
+    ContinousGlucoseMonitoring,
+    InternetProtocolSupport,
+    IndoorPositioning,
+    PulseOximeter,
+    HTTPProxy,
+    TransportDiscovery,
+    ObjectTransfer,
+    FitnessMachine,
+    MeshProvisioning,
+    MeshProxy,
+    ReconnectionConfiguration,
+    InsulinDelivery,
+    BinarySensor,
+    EmergencyConfiguration,
+    AuthorizationControl,
+    PhysicalActivityMonitor,
+    ElapsedTime,
+    GenericHealthSensor,
+    AudioInputControl,
+    VolumeControl,
+    VolumeOffsetControl,
+    CoordinatedSetIdentification,
+    DeviceTime,
+    MediaControl,
+    GenericMediaControl, // why??
+    ConstantToneExtension,
+    TelephoneBearer,
+    GenericTelephoneBearer,
+    MicrophoneControl,
+    AudioStreamControl,
+    BroadcastAudioScan,
+    PublishedAudioScan,
+    BasicAudioCapabilities,
+    BroadcastAudioAnnouncement,
+    CommonAudio,
+    HearingAccess,
+    TelephonyAndMediaAudio,
+    PublicBroadcastAnnouncement,
+    ElectronicShelfLabel,
+    GamingAudio,
+    MeshProxySolicitation,
+}
+
+#[derive(Debug, PartialEq)]
+enum Service {
+    Basic16(BasicService),
+    Custom(String),
+}
+
+impl Parse for Service {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let ident: Ident = input.parse()?;
+
+        match ident.to_string().as_str() {
+            "Custom" => {
+                let content;
+                parenthesized!(content in input);
+                let uuid: LitStr = content.parse()?;
+                Ok(Self::Custom(uuid.value()))
+            }
+            _ => {
+                if let Ok(service) = BasicService::from_str("GenericAccess") {
+                    Ok(Service::Basic16(service))
+                } else {
+                    Err(input.error("Expected service identifier."))
+                }
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+#[repr(u8)]
+enum Services {
+    Incomplete(u8, Vec<Service>),
+    Complete(u8, Vec<Service>),
+}
+
+impl Parse for Services {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let ident: Ident = input.parse()?;
+        let services: Set<Service> = input.parse()?;
+
+        match ident.to_string().as_str() {
+            "Incomplete16" => Ok(Self::Incomplete(0x02, services.items)),
+            "Complete16" => Ok(Self::Complete(0x03, services.items)),
+            "Incomplete32" => Ok(Self::Incomplete(0x04, services.items)),
+            "Complete32" => Ok(Self::Complete(0x05, services.items)),
+            "Incomplete128" => Ok(Self::Incomplete(0x06, services.items)),
+            "Complete128" => Ok(Self::Complete(0x07, services.items)),
+            _ => Err(input.error("Expected service list.")),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct AdvertisementData {
+    flags: Option<Set<Flag>>,
+    services: Option<Services>,
+    short_name: Option<LitStr>,
+    full_name: Option<LitStr>,
+}
+
+macro_rules! ingest_unique_pattern {
+    ($NAME:ident, $TYPE:ty, $INPUT:ident) => {
+        if let Some(_) = $NAME {
+            panic!("Mutliple {}(s) provided.", stringify!($NAME))
+        } else {
+            let tmp: $TYPE = $INPUT.parse()?;
+            $NAME = Some(tmp);
+        }
+    };
+}
+
+impl Parse for AdvertisementData {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let mut flag = None;
+        let mut service = None;
+        let mut short_name = None;
+        let mut full_name = None;
+
+        while !input.is_empty() {
+            let ident: Ident = input.parse()?;
+            input.parse::<syn::Token![:]>()?;
+
+            match ident.to_string().as_str() {
+                "flags" => {
+                    ingest_unique_pattern!(flag, Set<Flag>, input);
+                }
+                "services" => {
+                    ingest_unique_pattern!(service, Services, input);
+                }
+                "short_name" => {
+                    ingest_unique_pattern!(short_name, LitStr, input);
+                }
+                "full_name" => {
+                    ingest_unique_pattern!(full_name, LitStr, input);
+                }
+                unknown => {
+                    panic!("Unexpected adv data field: \"{}\"", unknown);
+                }
+            }
+
+            if input.is_empty() {
+                break;
+            }
+
+            input.parse::<syn::Token![,]>()?;
+        }
+
+        Ok(AdvertisementData {
+            flags: flag,
+            services: service,
+            short_name,
+            full_name,
+        })
+    }
+}
+
+/// Renderers for each AD type
+
+fn render_flags(input: Set<Flag>) -> (u8, TokenStream2) {
+    let result = input.items.iter().fold(0, |partial, flag| partial + flag.clone() as u8);
+
+    (
+        2,
+        quote! {
+            2u8, 1u8, #result
+        },
+    )
+}
+
+fn render_services(services: Services) -> (u8, TokenStream2) {
+    match services {
+        Services::Incomplete(ad, services) | Services::Complete(ad, services) => {
+            let mut length = 1u8;
+
+            let renders: Vec<TokenStream2> = services
+                .iter()
+                .map(|service| match service {
+                    Service::Basic16(service) => {
+                        length += 2;
+                        half_word_to_reversed_bytes(service.clone() as u16)
+                    }
+                    Service::Custom(string) => {
+                        length += 16;
+
+                        if let Ok(uuid) = Uuid::from_string(string) {
+                            match uuid {
+                                Uuid::Uuid128(bytes) => {
+                                    quote! { #(#bytes),* }
+                                }
+                                _ => {
+                                    panic!("Invalid UUID. Custom UUIDs must be 16 bytes.");
+                                }
+                            }
+                        } else {
+                            panic!("Could not parse string literal as UUID.");
+                        }
+                    }
+                })
+                .collect();
+
+            (
+                length,
+                quote! {
+                    #length, #ad, #(#renders),*
+                },
+            )
+        }
+    }
+}
+
+fn render_name(full: bool, input: LitStr) -> (u8, TokenStream2) {
+    let string = input.value();
+    let length = (string.len() + 1) as u8;
+    let ad = if full { 9u8 } else { 8u8 };
+
+    let as_bytes: Vec<TokenStream2> = string
+        .chars()
+        .map(|c| {
+            let i = c as u8;
+            quote! { #i }
+        })
+        .collect();
+
+    (length, quote! { #length, #ad, #(#as_bytes),* })
+}
+
+/// Helpers for macro-level logic
+/// and bringing all the renderers together
+
+macro_rules! use_renderer {
+    ($DATA:ident, $LENGTH:ident, $CFGs:ident, $ATTR:ident, $ENTRY:expr) => {
+        if let Some($ATTR) = $DATA.$ATTR {
+            let (len, tokens) = $ENTRY;
+            $LENGTH += len + 1;
+            $CFGs.push(tokens);
+        }
+    };
+}
+
+fn generate_data(input: TokenStream) -> (u8, TokenStream) {
+    let input: TokenStream2 = TokenStream2::from(input);
+    let data: AdvertisementData = syn::parse2(input).unwrap();
+
+    let mut configs: Vec<TokenStream2> = Vec::new();
+    let mut length = 0u8;
+
+    use_renderer!(data, length, configs, flags, render_flags(flags));
+    use_renderer!(data, length, configs, services, render_services(services));
+    use_renderer!(data, length, configs, short_name, render_name(true, short_name));
+    use_renderer!(data, length, configs, full_name, render_name(true, full_name));
+
+    (
+        length,
+        quote! {
+            &[
+                #(#configs),*
+            ]
+        }
+        .into(),
+    )
+}
+
+/// Macros
+
+#[proc_macro]
+pub fn generate_adv_data(input: TokenStream) -> TokenStream {
+    let (len, tokens) = generate_data(input);
+
+    if len > 31 {
+        panic!("Advertisement data may not exceed 31 bytes. Try using incomplete lists, or shortened names. You can put more info in the scan data.")
+    }
+
+    tokens
+}
+
+#[proc_macro]
+pub fn generate_scan_data(input: TokenStream) -> TokenStream {
+    let (len, tokens) = generate_data(input);
+
+    if len > 31 {
+        panic!("Scan data may not exceed 31 bytes. Try using incomplete lists, or shortened names.")
+    }
+
+    tokens
 }

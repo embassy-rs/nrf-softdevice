@@ -35,11 +35,21 @@ use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
-use nrf_softdevice::{raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
 
 bind_interrupts!(struct Irqs {
     SAADC => saadc::InterruptHandler;
 });
+
+const ADV_DATA: &[u8] = generate_adv_data! {
+    flags: (GeneralDiscovery),
+    services: Complete16(HealthThermometer),
+    short_name: "HelloRust"
+};
+
+const SCAN_DATA: &[u8] = generate_scan_data! {
+    services: Complete16(HealthThermometer)
+};
 
 /// Initializes the SAADC peripheral in single-ended mode on the given pin.
 fn init_adc(adc_pin: AnyInput, adc: SAADC) -> Saadc<'static, 1> {
@@ -140,21 +150,13 @@ async fn main(spawner: Spawner) {
 
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
-
     loop {
         let config = peripheral::Config::default();
 
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: ADV_DATA,
+            scan_data: SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
         info!("advertising done! I have a connection.");
 
