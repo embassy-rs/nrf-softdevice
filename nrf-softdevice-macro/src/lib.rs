@@ -798,7 +798,7 @@ enum BasicService {
     Glucose,
     HealthThermometer,
     DeviceInformation,
-    HeartRate,
+    HeartRate = 0x180d,
     PhoneAlertStatus,
     Battery,
     BloodPressure,
@@ -808,7 +808,7 @@ enum BasicService {
     RunnnigSpeedAndCadence,
     AutomationIO,
     CyclingSpeedAndCadence,
-    CyclingPower,
+    CyclingPower = 0x1818,
     LocationAndNavigation,
     EnvironmentalSensing,
     BodyComposition,
@@ -826,14 +826,14 @@ enum BasicService {
     MeshProvisioning,
     MeshProxy,
     ReconnectionConfiguration,
-    InsulinDelivery,
+    InsulinDelivery = 0x183a,
     BinarySensor,
     EmergencyConfiguration,
     AuthorizationControl,
     PhysicalActivityMonitor,
     ElapsedTime,
     GenericHealthSensor,
-    AudioInputControl,
+    AudioInputControl = 0x1843,
     VolumeControl,
     VolumeOffsetControl,
     CoordinatedSetIdentification,
@@ -875,8 +875,8 @@ impl Parse for Service {
                 let uuid: LitStr = content.parse()?;
                 Ok(Self::Custom(uuid.value()))
             }
-            _ => {
-                if let Ok(service) = BasicService::from_str("GenericAccess") {
+            other => {
+                if let Ok(service) = BasicService::from_str(other) {
                     Ok(Service::Basic16(service))
                 } else {
                     Err(input.error("Expected service identifier."))
