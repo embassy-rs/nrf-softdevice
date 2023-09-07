@@ -887,7 +887,6 @@ impl Parse for Service {
 }
 
 #[derive(Debug)]
-#[repr(u8)]
 enum Services {
     Incomplete(u8, Vec<Service>),
     Complete(u8, Vec<Service>),
