@@ -35,7 +35,7 @@ use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
-use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, raw, Softdevice};
 
 bind_interrupts!(struct Irqs {
     SAADC => saadc::InterruptHandler;
@@ -47,7 +47,7 @@ const ADV_DATA: &[u8] = generate_adv_data! {
     short_name: "HelloRust"
 };
 
-const SCAN_DATA: &[u8] = generate_scan_data! {
+const SCAN_DATA: &[u8] = generate_adv_data! {
     services: Complete16(HealthThermometer)
 };
 

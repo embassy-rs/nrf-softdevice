@@ -13,7 +13,7 @@ use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
-use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, raw, Softdevice};
 
 const DEVICE_INFORMATION: Uuid = Uuid::new_16(0x180a);
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
@@ -33,7 +33,7 @@ const ADV_DATA: &[u8] = generate_adv_data! {
     short_name: "HelloRust"
 };
 
-const SCAN_DATA: &[u8] = generate_scan_data! {
+const SCAN_DATA: &[u8] = generate_adv_data! {
     services: Complete16(HealthThermometer)
 };
 

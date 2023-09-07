@@ -17,7 +17,7 @@ use nrf_softdevice::ble::security::{IoCapabilities, SecurityHandler};
 use nrf_softdevice::ble::{
     gatt_server, peripheral, Connection, EncryptionInfo, IdentityKey, MasterId, SecurityMode, Uuid,
 };
-use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, raw, Softdevice};
 use static_cell::StaticCell;
 
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
@@ -29,7 +29,7 @@ const ADV_DATA: &[u8] = generate_adv_data! {
     short_name: "HelloRust"
 };
 
-const SCAN_DATA: &[u8] = generate_scan_data! {
+const SCAN_DATA: &[u8] = generate_adv_data! {
     services: Complete16(HealthThermometer)
 };
 

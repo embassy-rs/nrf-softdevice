@@ -13,7 +13,7 @@ use embassy_nrf::gpio::{Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
 use nrf_softdevice::ble::{gatt_server, peripheral};
-use nrf_softdevice::{generate_adv_data, generate_scan_data, raw, Softdevice};
+use nrf_softdevice::{generate_adv_data, raw, Softdevice};
 
 const ADV_DATA: &[u8] = generate_adv_data! {
     flags: (GeneralDiscovery),
@@ -21,7 +21,7 @@ const ADV_DATA: &[u8] = generate_adv_data! {
     short_name: "HelloRust"
 };
 
-const SCAN_DATA: &[u8] = generate_scan_data! {
+const SCAN_DATA: &[u8] = generate_adv_data! {
     services: Complete16(HealthThermometer)
 };
 

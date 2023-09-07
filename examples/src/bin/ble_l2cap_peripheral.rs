@@ -11,7 +11,7 @@ use core::ptr::NonNull;
 use defmt::*;
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::{l2cap, peripheral};
-use nrf_softdevice::{ble, generate_adv_data, generate_scan_data, raw, RawError, Softdevice};
+use nrf_softdevice::{ble, generate_adv_data, raw, RawError, Softdevice};
 
 const PSM: u16 = 0x2349;
 
@@ -21,7 +21,7 @@ const ADV_DATA: &[u8] = generate_adv_data! {
     short_name: "HelloRst"
 };
 
-const SCAN_DATA: &[u8] = generate_scan_data! {
+const SCAN_DATA: &[u8] = generate_adv_data! {
     full_name: "Hello, Rust!"
 };
 

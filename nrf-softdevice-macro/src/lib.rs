@@ -1083,22 +1083,22 @@ fn generate_data(input: TokenStream) -> (u8, TokenStream) {
 
 #[proc_macro]
 pub fn generate_adv_data(input: TokenStream) -> TokenStream {
-    let (len, tokens) = generate_data(input);
+    let (_, tokens) = generate_data(input);
 
-    if len > 31 {
-        panic!("Advertisement data may not exceed 31 bytes. Try using incomplete lists, or shortened names. You can put more info in the scan data.")
-    }
-
-    tokens
-}
-
-#[proc_macro]
-pub fn generate_scan_data(input: TokenStream) -> TokenStream {
-    let (len, tokens) = generate_data(input);
-
-    if len > 31 {
-        panic!("Scan data may not exceed 31 bytes. Try using incomplete lists, or shortened names.")
-    }
+    // if len > 31 {
+    //     panic!("Advertisement data may not exceed 31 bytes. Try using incomplete lists, or shortened names. You can put more info in the scan data.")
+    // }
 
     tokens
 }
+
+// #[proc_macro]
+// pub fn generate_scan_data(input: TokenStream) -> TokenStream {
+//     let (len, tokens) = generate_data(input);
+
+//     // if len > 31 {
+//     //     panic!("Scan data may not exceed 31 bytes. Try using incomplete lists, or shortened names.")
+//     // }
+
+//     tokens
+// }
