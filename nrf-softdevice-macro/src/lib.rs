@@ -999,15 +999,16 @@ fn render_services(services: Services) -> (u8, TokenStream2) {
                         half_word_to_reversed_bytes(service.clone() as u16)
                     }
                     Service::Custom(string) => {
-                        length += 16;
-
+                        
                         if let Ok(uuid) = Uuid::from_string(string) {
                             match uuid {
                                 Uuid::Uuid128(bytes) => {
+                                    length += 16;
                                     quote! { #(#bytes),* }
                                 }
-                                _ => {
-                                    panic!("Invalid UUID. Custom UUIDs must be 16 bytes.");
+                                Uuid::Uuid16(int) => {
+                                    length += 2;
+                                    half_word_to_reversed_bytes(int)
                                 }
                             }
                         } else {
