@@ -999,7 +999,6 @@ fn render_services(services: Services) -> (u8, TokenStream2) {
                         half_word_to_reversed_bytes(service.clone() as u16)
                     }
                     Service::Custom(string) => {
-                        
                         if let Ok(uuid) = Uuid::from_string(string) {
                             match uuid {
                                 Uuid::Uuid128(bytes) => {
