@@ -13,16 +13,14 @@ members = [
     "examples",
 ]
 
-exclude = [
-    "nrf-softdevice-gen"
-]
+exclude = ["nrf-softdevice-gen"]
 
 [patch.crates-io]
-embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "8a811cfcf75b25fe81168134bf0cf8a8d387c391" }
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "8a811cfcf75b25fe81168134bf0cf8a8d387c391" }
-embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "8a811cfcf75b25fe81168134bf0cf8a8d387c391" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "8a811cfcf75b25fe81168134bf0cf8a8d387c391" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "8a811cfcf75b25fe81168134bf0cf8a8d387c391" }
+embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "ce662766be80d75b5f9294ae4b792f7db252ccd3" }
+embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "ce662766be80d75b5f9294ae4b792f7db252ccd3" }
+embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "ce662766be80d75b5f9294ae4b792f7db252ccd3" }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "ce662766be80d75b5f9294ae4b792f7db252ccd3" }
+embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "ce662766be80d75b5f9294ae4b792f7db252ccd3" }
 
 [profile.release]
 codegen-units = 1
