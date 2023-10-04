@@ -21,11 +21,37 @@ pub struct Descriptor {
     pub handle: u16,
 }
 
+#[repr(u8)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[non_exhaustive]
+pub enum HvxType {
+    Invalid = 0,
+    Notification,
+    Indication,
+}
+
+pub struct InvalidHvxTypeError;
+
+impl TryFrom<u8> for HvxType {
+    type Error = InvalidHvxTypeError;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match u32::from(value) {
+            raw::BLE_GATT_HVX_INVALID => Ok(HvxType::Invalid),
+            raw::BLE_GATT_HVX_NOTIFICATION => Ok(HvxType::Notification),
+            raw::BLE_GATT_HVX_INDICATION => Ok(HvxType::Indication),
+            _ => Err(InvalidHvxTypeError),
+        }
+    }
+}
+
 /// Trait for implementing GATT clients.
 pub trait Client {
     type Event;
 
-    fn on_notify(&self, conn: &Connection, handle: u16, data: &[u8]) -> Option<Self::Event>;
+    /// Handles notification and indication events from the GATT server.
+    fn on_hvx(&self, conn: &Connection, type_: HvxType, handle: u16, data: &[u8]) -> Option<Self::Event>;
 
     /// Get the UUID of the GATT service. This is used by [`discover`] to search for the
     /// service in the GATT server.
@@ -614,7 +640,14 @@ where
                         params.type_,
                         v
                     );
-                    client.on_notify(&conn, params.handle, v)
+
+                    match params.type_.try_into() {
+                        Ok(type_) => client.on_hvx(&conn, type_, params.handle, v),
+                        Err(_) => {
+                            error!("gatt_client invalid hvx type: {}", params.type_);
+                            None
+                        }
+                    }
                 }
                 _ => None,
             };

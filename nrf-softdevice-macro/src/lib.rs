@@ -517,7 +517,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let mut code_disc_char = TokenStream2::new();
     let mut code_disc_done = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
-    let mut code_on_notify = TokenStream2::new();
+    let mut code_on_hvx = TokenStream2::new();
 
     let ble = quote!(::nrf_softdevice::ble);
 
@@ -648,7 +648,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_notification(#ty),
             ));
-            code_on_notify.extend(quote_spanned!(ch.span=>
+            code_on_hvx.extend(quote_spanned!(ch.span=>
                 if handle == self.#value_handle {
                     if data.len() < #ty_as_val::MIN_SIZE {
                         return None;
@@ -674,10 +674,10 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         impl #ble::gatt_client::Client for #struct_name {
             type Event = #event_enum_name;
 
-            fn on_notify(&self, _conn: &::nrf_softdevice::ble::Connection, handle: u16, data: &[u8]) -> Option<Self::Event> {
+            fn on_hvx(&self, _conn: &::nrf_softdevice::ble::Connection, type_: ::nrf_softdevice::ble::gatt_client::HvxType, handle: u16, data: &[u8]) -> Option<Self::Event> {
                 use #ble::gatt_client::Client;
 
-                #code_on_notify
+                #code_on_hvx
                 None
             }
 
