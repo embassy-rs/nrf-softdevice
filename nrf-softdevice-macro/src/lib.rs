@@ -657,6 +657,14 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                     }
                 }
             ));
+
+            if !indicate {
+                code_impl.extend(quote_spanned!(ch.span=>
+                    #fn_vis async fn #cccd_write_fn(&self, notifications: bool) -> Result<(), #ble::gatt_client::WriteError> {
+                        #ble::gatt_client::write(&self.conn, self.#cccd_handle, &[if notifications { 0x01 } else { 0x00 }, 0x00]).await
+                    }
+                ));
+            }
         }
     }
 
