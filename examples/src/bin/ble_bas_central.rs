@@ -84,9 +84,7 @@ async fn main(spawner: Spawner) {
     info!("read battery level: {}", val);
 
     // Enable battery level notifications from the peripheral
-    gatt_client::write(&conn, client.battery_level_cccd_handle, &[0x01, 0x00])
-        .await
-        .unwrap();
+    client.battery_level_cccd_write(true).await.unwrap();
 
     // Receive notifications
     gatt_client::run(&conn, &client, |event| match event {
