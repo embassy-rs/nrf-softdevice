@@ -21,8 +21,38 @@ pub struct Descriptor {
     pub handle: u16,
 }
 
+#[repr(u8)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[non_exhaustive]
+pub enum HvxType {
+    Invalid = 0,
+    Notification,
+    Indication,
+}
+
+pub struct InvalidHvxTypeError;
+
+impl TryFrom<u8> for HvxType {
+    type Error = InvalidHvxTypeError;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match u32::from(value) {
+            raw::BLE_GATT_HVX_INVALID => Ok(HvxType::Invalid),
+            raw::BLE_GATT_HVX_NOTIFICATION => Ok(HvxType::Notification),
+            raw::BLE_GATT_HVX_INDICATION => Ok(HvxType::Indication),
+            _ => Err(InvalidHvxTypeError),
+        }
+    }
+}
+
 /// Trait for implementing GATT clients.
 pub trait Client {
+    type Event;
+
+    /// Handles notification and indication events from the GATT server.
+    fn on_hvx(&self, conn: &Connection, type_: HvxType, handle: u16, data: &[u8]) -> Option<Self::Event>;
+
     /// Get the UUID of the GATT service. This is used by [`discover`] to search for the
     /// service in the GATT server.
     fn uuid() -> Uuid;
@@ -578,4 +608,55 @@ const PORTAL_NEW: Portal<*const raw::ble_evt_t> = Portal::new();
 static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [PORTAL_NEW; CONNS_MAX];
 pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
     &PORTALS[conn_handle as usize]
+}
+
+pub async fn run<'a, F, C>(conn: &Connection, client: &C, mut f: F) -> DisconnectedError
+where
+    F: FnMut(C::Event),
+    C: Client,
+{
+    let handle = match conn.with_state(|state| state.check_connected()) {
+        Ok(handle) => handle,
+        Err(e) => return e,
+    };
+
+    portal(handle)
+        .wait_many(|ble_evt| unsafe {
+            let ble_evt = &*ble_evt;
+            if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {
+                return Some(DisconnectedError);
+            }
+
+            // We have a GATTC event
+            let gattc_evt = get_union_field(ble_evt, &ble_evt.evt.gattc_evt);
+            let conn = unwrap!(Connection::from_handle(gattc_evt.conn_handle));
+            let evt = match ble_evt.header.evt_id as u32 {
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_HVX => {
+                    let params = get_union_field(ble_evt, &gattc_evt.params.hvx);
+                    let v = get_flexarray(ble_evt, &params.data, params.len as usize);
+                    trace!(
+                        "GATT_HVX write handle={:?} type={:?} data={:?}",
+                        params.handle,
+                        params.type_,
+                        v
+                    );
+
+                    match params.type_.try_into() {
+                        Ok(type_) => client.on_hvx(&conn, type_, params.handle, v),
+                        Err(_) => {
+                            error!("gatt_client invalid hvx type: {}", params.type_);
+                            None
+                        }
+                    }
+                }
+                _ => None,
+            };
+
+            if let Some(evt) = evt {
+                f(evt);
+            }
+
+            None
+        })
+        .await
 }
