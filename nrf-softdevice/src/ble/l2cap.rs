@@ -381,6 +381,7 @@ impl<P: Packet> Channel<P> {
                         .wait_once(|ble_evt| unsafe {
                             match (*ble_evt).header.evt_id as u32 {
                                 raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_TX => (),
+                                raw::BLE_L2CAP_EVTS_BLE_L2CAP_EVT_CH_RELEASED => (),
                                 _ => unreachable!("Invalid event"),
                             }
                         })
