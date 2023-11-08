@@ -3,6 +3,7 @@ use core::iter::FusedIterator;
 
 use raw::ble_gap_conn_params_t;
 
+use super::PhySet;
 #[cfg(feature = "ble-sec")]
 use crate::ble::security::SecurityHandler;
 use crate::ble::types::{Address, AddressType, Role, SecurityMode};
@@ -55,6 +56,23 @@ impl From<DisconnectedError> for IgnoreSlaveLatencyError {
 
 #[cfg(feature = "ble-peripheral")]
 impl From<RawError> for IgnoreSlaveLatencyError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+pub enum PhyUpdateError {
+    Disconnected,
+    Raw(RawError),
+}
+
+impl From<DisconnectedError> for PhyUpdateError {
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+impl From<RawError> for PhyUpdateError {
     fn from(err: RawError) -> Self {
         Self::Raw(err)
     }
@@ -473,6 +491,26 @@ impl Connection {
 
     pub fn iter() -> ConnectionIter {
         ConnectionIter(0)
+    }
+
+    /// Send a request to the connected device to change the PHY.
+    ///
+    /// Note that this just initiates the PHY change, it does not wait for completion.
+    /// Immediately after return, the active PHYs will still be the old ones, and after some time
+    /// they should change to the new ones.
+    pub fn phy_update(&mut self, tx_phys: PhySet, rx_phys: PhySet) -> Result<(), PhyUpdateError> {
+        let conn_handle = self.with_state(|state| state.check_connected())?;
+        let p_gap_phys = raw::ble_gap_phys_t {
+            tx_phys: tx_phys as u8,
+            rx_phys: rx_phys as u8,
+        };
+        let ret = unsafe { raw::sd_ble_gap_phy_update(conn_handle, &p_gap_phys) };
+        if let Err(err) = RawError::convert(ret) {
+            warn!("sd_ble_gap_phy_update err {:?}", err);
+            return Err(err.into());
+        }
+
+        Ok(())
     }
 }
 
