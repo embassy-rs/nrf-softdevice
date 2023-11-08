@@ -68,18 +68,6 @@ pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Con
 
                     match Connection::new(conn_handle, role, peer_address, conn_params) {
                         Ok(conn) => {
-                            let phys = config.scan_config.phys;
-                            if phys as u8 & PhySet::M2 as u8 != 0 {
-                                let p_gap_phys = raw::ble_gap_phys_t {
-                                    tx_phys: phys as u8,
-                                    rx_phys: phys as u8,
-                                };
-                                let ret = raw::sd_ble_gap_phy_update(conn_handle, &p_gap_phys);
-                                if let Err(_err) = RawError::convert(ret) {
-                                    warn!("sd_ble_gap_phy_update err {:?}", _err);
-                                }
-                            }
-
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                             crate::ble::gap::do_data_length_update(conn_handle, ptr::null());
 
