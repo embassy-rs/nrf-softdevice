@@ -1,4 +1,13 @@
 //! Link-Layer Control and Adaptation Protocol
+//!
+//! This module allows you to establish L2CAP connection oriented channels
+//! with the peer.
+//!
+//! Unless configured with the `"ble-l2cap-credit-workaround"` feature, the
+//! driver will use credit based control flow, giving the peer a limited number
+//! of messages they can send. Only if the receive buffer has enough space
+//! more credits will be issued to the peer. Otherwise the peer has to wait
+//! before it can send more messages.
 
 use core::marker::PhantomData;
 use core::ptr::NonNull;
@@ -127,13 +136,42 @@ pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t>
     &PORTALS[conn_handle as usize]
 }
 
+/// A Packet is a byte buffer for packet data.
+/// Similar to a `Vec<u8>` it has a length and a capacity.
+/// The capacity however is the fixed value `MTU`.
+///
+/// You need to implement this trait to give the L2CAP driver
+/// a method to allocate and free the space for the packets
+/// sent and received on a channel.
 pub trait Packet: Sized {
+    /// The maximum size a packet can have.
     const MTU: usize;
+    /// Allocate a new buffer with space for `MTU` bytes.
+    /// Return `None` when the allocation can't be fulfilled.
+    ///
+    /// This function is called by the L2CAP driver when it needs
+    /// space to receive a packet into.
+    /// It will later call `from_raw_parts` with the buffer and the
+    /// amount of bytes it has received.
     fn allocate() -> Option<NonNull<u8>>;
+    /// Take ownership of the packet buffer.
+    /// Returns a pointer to the buffer and the number of bytes in the buffer.
+    ///
+    /// To free the memory the driver will call `from_raw_parts` later
+    /// and drop the value.
     fn into_raw_parts(self) -> (NonNull<u8>, usize);
+    /// Construct a `Packet` from a pointer to a buffer and the number of bytes
+    /// written to the buffer.
+    ///
+    /// SAFETY: `ptr` must be a pointer previously returned by either
+    /// `allocate` or `ìnto_raw_parts`.
+    /// `len` must be the number of bytes in the buffer and must not be larger
+    /// than `MTU`.
     unsafe fn from_raw_parts(ptr: NonNull<u8>, len: usize) -> Self;
 }
 
+/// The L2CAP driver.
+/// Must be supplied with an implementation of `Packet`.
 pub struct L2cap<P: Packet> {
     _private: PhantomData<*mut P>,
 }
@@ -142,6 +180,8 @@ static IS_INIT: AtomicBool = AtomicBool::new(false);
 static mut PACKET_FREE: Option<unsafe fn(NonNull<u8>)> = None;
 
 impl<P: Packet> L2cap<P> {
+    /// Initialize the driver.
+    /// Panics if called multiple times.
     pub fn init(_sd: &Softdevice) -> Self {
         if IS_INIT
             .compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire)
@@ -160,6 +200,9 @@ impl<P: Packet> L2cap<P> {
         Self { _private: PhantomData }
     }
 
+    /// Send a setup request to the peer to establish a channel with the PSM given
+    /// in `psm`. The peer will accept the request and establish a channel if it
+    /// deems the PSM acceptable.
     pub async fn setup(&self, conn: &Connection, config: &Config, psm: u16) -> Result<Channel<P>, SetupError> {
         let sd = unsafe { Softdevice::steal() };
 
@@ -227,12 +270,18 @@ impl<P: Packet> L2cap<P> {
             .await
     }
 
+    /// Listen for setup requests of the peer.
+    /// When a setup request with the PSM given in `psm` comes in the channel
+    /// is established.
     pub async fn listen(&self, conn: &Connection, config: &Config, psm: u16) -> Result<Channel<P>, SetupError> {
         self.listen_with(conn, config, move |got_psm| got_psm == psm)
             .await
             .map(|(_, ch)| ch)
     }
 
+    /// Listen for setup requests of the peer.
+    /// When a setup request comes in the PSM sent by the peer is passed to the
+    /// `accept_psm` function. If it returns `true` the channel is established.
     pub async fn listen_with(
         &self,
         conn: &Connection,
@@ -317,10 +366,14 @@ impl<P: Packet> L2cap<P> {
     }
 }
 
+/// Configuration for an L2CAP channel.
 pub struct Config {
+    /// Number of credits that the SoftDevice will make sure the peer
+    /// has every time it starts using a new reception buffer.
     pub credits: u16,
 }
 
+/// An L2CAP connection oriented channel.
 pub struct Channel<P: Packet> {
     _private: PhantomData<*mut P>,
     conn: Connection,
@@ -338,10 +391,15 @@ impl<P: Packet> Clone for Channel<P> {
 }
 
 impl<P: Packet> Channel<P> {
+    /// Get the underlying connection.
     pub fn connection(&self) -> &Connection {
         &self.conn
     }
 
+    /// Try to queue a packet for transmission.
+    ///
+    /// This takes ownership of the packet but you will get it back in the
+    /// `TxQueueFull` error if the queue is full.
     pub fn try_tx(&self, sdu: P) -> Result<(), TxError<P>> {
         let conn_handle = self.conn.with_state(|s| s.check_connected())?;
 
@@ -367,6 +425,7 @@ impl<P: Packet> Channel<P> {
         }
     }
 
+    /// Asynchronously transmit a packet.
     pub async fn tx(&self, mut sdu: P) -> Result<(), TxError<P>> {
         let conn_handle = self.conn.with_state(|s| s.check_connected())?;
 
@@ -395,6 +454,7 @@ impl<P: Packet> Channel<P> {
         }
     }
 
+    /// Asynchronously receive a packet.
     pub async fn rx(&self) -> Result<P, RxError> {
         let conn_handle = self.conn.with_state(|s| s.check_connected())?;
 
