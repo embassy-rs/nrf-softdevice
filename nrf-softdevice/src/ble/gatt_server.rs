@@ -32,6 +32,7 @@ pub struct CharacteristicHandles {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct ServiceHandle(u16);
 
 impl ServiceHandle {
@@ -42,6 +43,7 @@ impl ServiceHandle {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct IncludedServiceHandle(u16);
 
 impl IncludedServiceHandle {
@@ -52,6 +54,7 @@ impl IncludedServiceHandle {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct DescriptorHandle(u16);
 
 impl DescriptorHandle {
@@ -63,6 +66,7 @@ impl DescriptorHandle {
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[non_exhaustive]
 pub enum WriteOp {
     Request = 1,
@@ -153,6 +157,7 @@ pub trait Service: Sized {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum RegisterError {
     Raw(RawError),
 }
@@ -269,6 +274,7 @@ where
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum GetValueError {
     Truncated,
     Raw(RawError),
@@ -298,6 +304,7 @@ pub fn get_value(_sd: &Softdevice, handle: u16, buf: &mut [u8]) -> Result<usize,
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum SetValueError {
     Raw(RawError),
 }
@@ -322,6 +329,7 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum NotifyValueError {
     Disconnected,
     Raw(RawError),
@@ -359,6 +367,7 @@ pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), No
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum IndicateValueError {
     Disconnected,
     Raw(RawError),
@@ -396,6 +405,7 @@ pub fn indicate_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), 
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum GetSysAttrsError {
     DataSize(usize),
     Disconnected,
@@ -422,6 +432,7 @@ pub fn get_sys_attrs(conn: &Connection, buf: &mut [u8]) -> Result<usize, GetSysA
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum SetSysAttrsError {
     Disconnected,
     Raw(RawError),

@@ -5,6 +5,7 @@ use crate::raw;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum IoCapabilities {
     None,
     DisplayYesNo,

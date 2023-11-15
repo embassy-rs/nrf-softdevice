@@ -12,6 +12,7 @@ use crate::{raw, RawError, Softdevice};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum ConnectError {
     Timeout,
     NoAddresses,
@@ -127,6 +128,7 @@ impl<'a> Default for ConnectConfig<'a> {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum ScanError {
     Timeout,
     Raw(RawError),

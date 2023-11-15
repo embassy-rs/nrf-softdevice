@@ -6,6 +6,7 @@ use crate::raw;
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct AttributeMetadata {
     pub read: SecurityMode,
     pub write: SecurityMode,
@@ -58,6 +59,7 @@ impl AttributeMetadata {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Attribute<T: AsRef<[u8]>> {
     pub metadata: AttributeMetadata,
     pub value: T,
@@ -115,6 +117,7 @@ impl<T: AsRef<[u8]>> Attribute<T> {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct UserDescription {
     pub metadata: Option<AttributeMetadata>,
     pub value: &'static [u8],
@@ -123,6 +126,7 @@ pub struct UserDescription {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Properties {
     pub broadcast: bool,
     pub read: bool,
@@ -220,6 +224,8 @@ impl Properties {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
+#[cfg_attr(feature = "serde", serde(bound(deserialize = "'de: 'static")))]
 pub struct Metadata {
     pub properties: Properties,
     pub user_description: Option<UserDescription>,

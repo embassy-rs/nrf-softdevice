@@ -65,6 +65,7 @@ impl PartialEq for Uuid {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum Role {
     #[cfg(feature = "ble-central")]
     Central,
@@ -86,6 +87,7 @@ impl Role {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum SecurityMode {
     NoAccess,
     Open,
@@ -136,6 +138,7 @@ impl SecurityMode {
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum AddressType {
     /// Public (identity) address
     Public = 0x00,
@@ -151,6 +154,7 @@ pub enum AddressType {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct InvalidAddressType;
 
 impl TryFrom<u8> for AddressType {
@@ -176,6 +180,7 @@ impl TryFrom<u8> for AddressType {
 // Note: this type MUST be layout-compatible with raw::ble_gap_addr_t
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Address {
     // bit 0: is resolved private address
     // bits 7-1: type
@@ -236,6 +241,7 @@ impl defmt::Format for Address {
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(i8)]
 pub enum TxPower {
@@ -261,6 +267,7 @@ pub enum TxPower {
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum Phy {
@@ -274,6 +281,7 @@ pub enum Phy {
 }
 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[derive(Eq, PartialEq, Copy, Clone)]
 #[repr(u8)]
 pub enum PhySet {
@@ -300,6 +308,7 @@ pub enum PhySet {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct MasterId {
     /// Encrypted diversifier
     pub ediv: u16,
@@ -320,6 +329,7 @@ impl MasterId {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct EncryptionInfo {
     /// Long term key
     pub ltk: [u8; 16],
@@ -342,6 +352,7 @@ impl EncryptionInfo {
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct IdentityResolutionKey {
     irk: [u8; 16],
 }
@@ -361,6 +372,7 @@ impl IdentityResolutionKey {
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct IdentityKey {
     /// Identity resolution key
     pub irk: IdentityResolutionKey,

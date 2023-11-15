@@ -24,6 +24,7 @@ pub struct Descriptor {
 #[repr(u8)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 #[non_exhaustive]
 pub enum HvxType {
     Invalid = 0,
@@ -77,6 +78,7 @@ pub trait Client {
 /// Error type for [`discover`]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum DiscoverError {
     /// Connection is disconnected.
     Disconnected,
@@ -314,6 +316,7 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum ReadError {
     Disconnected,
     Truncated,
@@ -375,6 +378,7 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum WriteError {
     Disconnected,
     Timeout,
@@ -474,6 +478,7 @@ pub async fn write_without_response(conn: &Connection, handle: u16, buf: &[u8]) 
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum TryWriteError {
     Disconnected,
     BufferFull,
@@ -532,6 +537,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum MtuExchangeError {
     /// Connection is disconnected.
     Disconnected,

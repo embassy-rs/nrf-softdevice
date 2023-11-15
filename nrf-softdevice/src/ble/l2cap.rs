@@ -73,6 +73,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum TxError<P: Packet> {
     Disconnected,
     TxQueueFull(P),
@@ -92,6 +93,7 @@ impl<P: Packet> From<RawError> for TxError<P> {
 }
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum RxError {
     Disconnected,
     AllocateFailed,
@@ -112,6 +114,7 @@ impl From<RawError> for RxError {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum SetupError {
     Disconnected,
     Refused,

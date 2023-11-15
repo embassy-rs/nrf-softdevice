@@ -18,6 +18,7 @@ struct RawAdvertisement<'a> {
 /// Connectable advertisement types, which can accept connections from interested Central devices.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum ConnectableAdvertisement<'a> {
     ScannableUndirected {
         adv_data: &'a [u8],
@@ -95,6 +96,7 @@ impl<'a> From<ConnectableAdvertisement<'a>> for RawAdvertisement<'a> {
 /// only used to broadcast information in the air.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum NonconnectableAdvertisement<'a> {
     ScannableUndirected {
         adv_data: &'a [u8],
@@ -204,6 +206,7 @@ impl<'a> From<NonconnectableAdvertisement<'a>> for RawAdvertisement<'a> {
 /// Error for [`advertise_start`]
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum AdvertiseError {
     Timeout,
     NoFreeConn,
@@ -399,6 +402,7 @@ where
 #[repr(u8)]
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum FilterPolicy {
     #[default]
     Any = raw::BLE_GAP_ADV_FP_ANY as u8,

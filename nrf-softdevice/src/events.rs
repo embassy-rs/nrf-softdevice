@@ -16,6 +16,7 @@ static SWI2_BLE_EVT_WAKER: AtomicWaker = AtomicWaker::new();
 #[repr(u32)]
 #[derive(Debug, PartialEq, Eq, Clone, Copy, IntoPrimitive, TryFromPrimitive)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize,serde::Serialize))]
 pub enum SocEvent {
     Hfclkstarted = raw::NRF_SOC_EVTS_NRF_EVT_HFCLKSTARTED,
     PowerFailureWarning = raw::NRF_SOC_EVTS_NRF_EVT_POWER_FAILURE_WARNING,
