@@ -16,7 +16,7 @@ cd nrf-softdevice
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,defmt
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,log
-
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,serde
 
 # build softdevice+chip combinations (with all supported features enabled)
 # This htis each softdevice and each chip at least once.
