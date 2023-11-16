@@ -81,8 +81,8 @@ targets = ["thumbv7em-none-eabi"]
 features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi", "ble-sec"]
 
 [package.metadata.embassy_docs]
-src_base = "https://github.com/embassy-rs/nrf-softdevice/blob/nrf-softdevice-mbr-v$VERSION/nrf-softdevice-mbr/src/"
-src_base_git = "https://github.com/embassy-rs/nrf-softdevice/blob/$COMMIT/nrf-softdevice-mbr/src/"
+src_base = "https://github.com/embassy-rs/nrf-softdevice/blob/nrf-softdevice-mbr-v$VERSION/nrf-softdevice/src/"
+src_base_git = "https://github.com/embassy-rs/nrf-softdevice/blob/$COMMIT/nrf-softdevice/src/"
 target = "thumbv7em-none-eabi"
 flavors = [
     { name = "s112", features = ["nrf52832", "s112", "ble-peripheral", "ble-gatt-server", "ble-gatt-client", "ble-rssi", "ble-sec"] },
