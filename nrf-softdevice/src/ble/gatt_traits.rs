@@ -126,9 +126,10 @@ impl<const N: usize> GattValue for String<N> {
     const MAX_SIZE: usize = N;
 
     fn from_gatt(data: &[u8]) -> Self {
-        String::from(unwrap!(
-            core::str::from_utf8(data).map_err(|_| FromGattError::InvalidCharacter)
-        ))
+        unwrap!(
+            String::from_utf8(unwrap!(Vec::from_slice(data).map_err(|_| FromGattError::InvalidLength)))
+                .map_err(|_| FromGattError::InvalidCharacter)
+        )
     }
 
     fn to_gatt(&self) -> &[u8] {

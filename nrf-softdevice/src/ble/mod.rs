@@ -9,7 +9,6 @@ mod types;
 pub use connection::*;
 pub use gap::*;
 pub use gatt_traits::*;
-pub use replies::*;
 pub use types::*;
 
 mod common;
@@ -31,6 +30,9 @@ pub mod gatt_server;
 
 #[cfg(feature = "ble-l2cap")]
 pub mod l2cap;
+
+#[cfg(any(feature = "ble-gatt-server", feature = "ble-sec"))]
+pub use replies::*;
 
 use core::mem;
 
