@@ -60,7 +60,7 @@ cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,ble-l2cap-credit-wrokaround,ble-rssi
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,ble-l2cap-credit-workaround,ble-rssi
 
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-peripheral
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-peripheral,ble-gatt-server
@@ -79,4 +79,4 @@ cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-server
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client
 cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server
-cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,ble-l2cap-credit-wrokaround,ble-rssi
+cargo build --target thumbv7em-none-eabihf -p nrf-softdevice --features s140,nrf52840,ble-sec,ble-central,ble-peripheral,ble-l2cap,ble-gatt-client,ble-gatt-server,ble-l2cap-credit-workaround,ble-rssi
