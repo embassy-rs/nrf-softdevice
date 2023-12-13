@@ -18,7 +18,7 @@ use crate::ble::*;
 use crate::util::{get_union_field, Portal};
 use crate::{raw, RawError, Softdevice};
 
-#[cfg(feature = "ble-l2cap-credit-wrokaround")]
+#[cfg(feature = "ble-l2cap-credit-workaround")]
 fn credit_hack_refill(conn: u16, cid: u16) {
     const CREDITS_MAX: u16 = 0xFFFF;
     const CREDITS_MIN: u16 = 1024;
@@ -243,7 +243,7 @@ impl<P: Packet> L2cap<P> {
 
                         // default is 1
                         let _ = config.credits;
-                        #[cfg(not(feature = "ble-l2cap-credit-wrokaround"))]
+                        #[cfg(not(feature = "ble-l2cap-credit-workaround"))]
                         if config.credits != 1 {
                             let ret =
                                 raw::sd_ble_l2cap_ch_flow_control(conn_handle, cid, config.credits, ptr::null_mut());
@@ -322,7 +322,7 @@ impl<P: Packet> L2cap<P> {
 
                             // default is 1
                             let _ = config.credits;
-                            #[cfg(not(feature = "ble-l2cap-credit-wrokaround"))]
+                            #[cfg(not(feature = "ble-l2cap-credit-workaround"))]
                             if config.credits != 1 {
                                 let ret = raw::sd_ble_l2cap_ch_flow_control(
                                     conn_handle,
@@ -473,7 +473,7 @@ impl<P: Packet> Channel<P> {
             return Err(err.into());
         }
 
-        #[cfg(feature = "ble-l2cap-credit-wrokaround")]
+        #[cfg(feature = "ble-l2cap-credit-workaround")]
         credit_hack_refill(conn_handle, self.cid);
 
         portal(conn_handle)
