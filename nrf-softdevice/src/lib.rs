@@ -64,12 +64,12 @@ compile_error!("No chip feature activated. You must activate exactly one of the 
     all(feature = "nrf52832", feature = "nrf52840"),
     all(feature = "nrf52833", feature = "nrf52840"),
 ))]
-compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
+compile_error!("Multiple chip features activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
 
 // https://www.nordicsemi.com/Software-and-tools/Software/Bluetooth-Software
 //
-//      | Central  Peripheral  L2CAP-CoC | nrf52805  nrf52810  nrf52811  nrf52820  nrf52832  nrf52833, nrf52840
-// -----|--------------------------------|--------------------------------------------------------------------------
+//      | Central  Peripheral  L2CAP-CoC | nrf52805  nrf52810  nrf52811  nrf52820  nrf52832  nrf52833  nrf52840
+// -----|--------------------------------|----------------------------------------------------------------------
 // s112 |              X                 |    X         X         X         X         X
 // s113 |              X           X     |    X         X         X         X         X         X         X
 // s122 |    X                           |                                  X                   X
