@@ -79,7 +79,9 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 
 To run an example, simply use `cargo run` from the `examples` folder:
 
-- `cd examples && cargo run --bin ble_bas_peripheral`
+- `cd examples && cargo run --bin ble_bas_peripheral --features nrf52840`
+
+Examples can also built for nrf52832 chip targeting S132 softdevice.
 
 ## Configuring a SoftDevice
 
