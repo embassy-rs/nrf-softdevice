@@ -38,7 +38,9 @@ async fn main(spawner: Spawner) {
             event_length: 6,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 128 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
+            attr_tab_size: raw::BLE_GATTS_ATTR_TAB_SIZE_DEFAULT,
+        }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,

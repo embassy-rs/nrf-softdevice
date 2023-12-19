@@ -91,7 +91,9 @@ async fn main(spawner: Spawner) {
             write_cmd_tx_queue_size: 0,
         }),
         conn_gatts: Some(raw::ble_gatts_conn_cfg_t { hvn_tx_queue_size: 0 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 512 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
+            attr_tab_size: raw::BLE_GATTS_ATTR_TAB_SIZE_DEFAULT,
+        }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 5,
