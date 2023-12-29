@@ -34,7 +34,7 @@ use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
 use nrf_softdevice::ble::{
-    advertisement_builder::{AdvertisementData, BasicService, Complete16, Flag, FullName, ShortName},
+    advertisement_builder::{AdvertisementData, BasicService, Complete16, Flag, ShortName},
     gatt_server, peripheral, Connection,
 };
 use nrf_softdevice::{raw, Softdevice};

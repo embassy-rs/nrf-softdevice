@@ -9,7 +9,7 @@ use core::mem;
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::{
-    advertisement_builder::{AdvertisementData, BasicService, Complete16, Flag, FullName, ShortName},
+    advertisement_builder::{AdvertisementData, BasicService, Complete16, Flag, ShortName},
     gatt_server, peripheral,
 };
 use nrf_softdevice::{raw, Softdevice};
