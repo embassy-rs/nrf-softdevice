@@ -74,6 +74,9 @@ nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", opti
 
 nrf-softdevice-macro = { version = "0.1.0", path = "../nrf-softdevice-macro" }
 
+[dev-dependencies]
+uuid = { version = "1.6.1", default-features = false }
+
 [package.metadata.docs.rs]
 targets = ["thumbv7em-none-eabi"]
 features = ["nrf52840", "s140", "ble-central", "ble-peripheral", "ble-l2cap", "ble-gatt-server", "ble-gatt-client", "ble-rssi", "ble-sec"]

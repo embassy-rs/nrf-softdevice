@@ -13,12 +13,17 @@ pub use types::*;
 
 mod common;
 
+#[cfg(test)]
+mod tests;
+
 #[cfg(feature = "ble-sec")]
 pub mod security;
 
 #[cfg(feature = "ble-central")]
 pub mod central;
 
+#[cfg(feature = "ble-peripheral")]
+pub mod advertisement_builder;
 #[cfg(feature = "ble-peripheral")]
 pub mod peripheral;
 
