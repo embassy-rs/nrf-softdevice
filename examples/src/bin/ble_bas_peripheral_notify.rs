@@ -153,8 +153,8 @@ async fn main(spawner: Spawner) {
         let config = peripheral::Config::default();
 
         let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data: adv_data.as_slice(),
-            scan_data: scan_data.as_slice(),
+            adv_data: unwrap!(adv_data.as_slice()),
+            scan_data: unwrap!(scan_data.as_slice()),
         };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
         info!("advertising done! I have a connection.");

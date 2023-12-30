@@ -1,4 +1,12 @@
+#[cfg(feature = "defmt")]
+use defmt::Format;
+
 const ADV_LEN: usize = 31;
+
+#[cfg_attr(feature = "defmt", derive(Format))]
+pub enum Error {
+    Oversize,
+}
 
 #[allow(non_camel_case_types)]
 #[repr(u8)]
@@ -209,7 +217,12 @@ impl AdvertisementData {
     }
 
     fn write(&mut self, data: &[u8]) {
-        self.buf[self.ptr..self.ptr + data.len()].copy_from_slice(data);
+        let end = self.ptr + data.len();
+
+        if end < ADV_LEN {
+            self.buf[self.ptr..end].copy_from_slice(data);
+        }
+
         self.ptr += data.len();
     }
 
@@ -224,8 +237,10 @@ impl AdvertisementData {
     }
 
     /// View the resulting advertisement data in the form of a byte slice.
-    pub fn as_slice(&self) -> &[u8] {
-        &self.buf[..self.ptr]
+    pub fn as_slice(&self) -> Result<&[u8], Error> {
+        (self.ptr < ADV_LEN)
+            .then(|| &self.buf[..self.ptr])
+            .ok_or(Error::Oversize)
     }
 
     /// Add flags to the advertisement data.

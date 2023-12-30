@@ -71,8 +71,8 @@ async fn main(spawner: Spawner) {
     let scan_data = AdvertisementData::new().name(FullName("Hello, Rust!"));
 
     let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected {
-        adv_data: adv_data.as_slice(),
-        scan_data: scan_data.as_slice(),
+        adv_data: unwrap!(adv_data.as_slice()),
+        scan_data: unwrap!(scan_data.as_slice()),
     };
     unwrap!(peripheral::advertise(sd, adv, &config).await);
 }

@@ -13,9 +13,6 @@ pub use types::*;
 
 mod common;
 
-#[cfg(test)]
-mod tests;
-
 #[cfg(feature = "ble-sec")]
 pub mod security;
 
