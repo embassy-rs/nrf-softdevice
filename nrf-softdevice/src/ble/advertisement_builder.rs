@@ -265,4 +265,17 @@ impl AdvertisementData {
     pub fn name<N: Name>(self, name: N) -> Self {
         self.raw(N::AD, name.inner().as_bytes())
     }
+
+    /// If the full name fits within the remaining space, it is used. Otherwise the short name is used.
+    ///
+    /// *Note: This modifier should be placed last.*
+    pub fn adapt_name(self, full: FullName, short: ShortName) -> Self {
+        let full_len = full.inner().len();
+
+        if self.ptr + full_len <= ADV_LEN {
+            self.name(full)
+        } else {
+            self.name(short)
+        }
+    }
 }
