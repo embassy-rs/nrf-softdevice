@@ -34,7 +34,7 @@ use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
 use nrf_softdevice::ble::{
-    advertisement_builder::{AdvertisementData, BasicService, Complete16, Flag, ShortName},
+    advertisement_builder::{BasicService, Complete16, Flag, ShortName, StandardAdvertisementData},
     gatt_server, peripheral, Connection,
 };
 use nrf_softdevice::{raw, Softdevice};
@@ -142,12 +142,12 @@ async fn main(spawner: Spawner) {
 
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let adv_data = AdvertisementData::new()
+    let adv_data = StandardAdvertisementData::new()
         .flags([Flag::GeneralDiscovery])
         .services(Complete16([BasicService::HealthThermometer]))
         .name(ShortName("HelloRust"));
 
-    let scan_data = AdvertisementData::new().services(Complete16([BasicService::HealthThermometer]));
+    let scan_data = StandardAdvertisementData::new().services(Complete16([BasicService::HealthThermometer]));
 
     loop {
         let config = peripheral::Config::default();

@@ -1,7 +1,8 @@
 #[cfg(feature = "defmt")]
 use defmt::Format;
 
-const ADV_LEN: usize = 31;
+const STD_LEN: usize = 31;
+const EXT_LEN: usize = 254;
 
 #[cfg_attr(feature = "defmt", derive(Format))]
 pub enum Error {
@@ -54,7 +55,7 @@ pub enum Flag {
 pub trait Service {
     const SIZE: usize;
 
-    fn render(self, adv: &mut AdvertisementData);
+    fn render<const N: usize>(self, adv: &mut AdvertisementData<N>);
 }
 
 pub trait ServiceList<S: Service, const N: usize> {
@@ -140,7 +141,7 @@ pub enum BasicService {
 impl Service for BasicService {
     const SIZE: usize = 2;
 
-    fn render(self, adv: &mut AdvertisementData) {
+    fn render<const N: usize>(self, adv: &mut AdvertisementData<N>) {
         let data = (self as u16).swap_bytes().to_be_bytes();
         adv.write(&data);
     }
@@ -151,7 +152,7 @@ pub struct CustomService(pub [u8; 16]);
 impl Service for CustomService {
     const SIZE: usize = 16;
 
-    fn render(mut self, adv: &mut AdvertisementData) {
+    fn render<const N: usize>(mut self, adv: &mut AdvertisementData<N>) {
         self.0.reverse();
         adv.write(&self.0);
     }
@@ -203,23 +204,20 @@ macro_rules! impl_name {
 impl_name!(ShortName, ShortName);
 impl_name!(FullName, FullName);
 
-pub struct AdvertisementData {
-    buf: [u8; ADV_LEN],
+pub struct AdvertisementData<const N: usize> {
+    buf: [u8; N],
     ptr: usize,
 }
 
-impl AdvertisementData {
+impl<const K: usize> AdvertisementData<K> {
     pub fn new() -> Self {
-        Self {
-            buf: [0; ADV_LEN],
-            ptr: 0,
-        }
+        Self { buf: [0; K], ptr: 0 }
     }
 
     fn write(&mut self, data: &[u8]) {
         let end = self.ptr + data.len();
 
-        if end <= ADV_LEN {
+        if end <= K {
             self.buf[self.ptr..end].copy_from_slice(data);
         }
 
@@ -238,7 +236,7 @@ impl AdvertisementData {
 
     /// View the resulting advertisement data in the form of a byte slice.
     pub fn as_slice(&self) -> Result<&[u8], Error> {
-        (self.ptr <= ADV_LEN)
+        (self.ptr <= K)
             .then(|| &self.buf[..self.ptr])
             .ok_or(Error::Oversize { expected: self.ptr })
     }
@@ -272,10 +270,13 @@ impl AdvertisementData {
     pub fn adapt_name(self, full: FullName, short: ShortName) -> Self {
         let full_len = full.inner().len();
 
-        if self.ptr + full_len <= ADV_LEN {
+        if self.ptr + full_len <= K {
             self.name(full)
         } else {
             self.name(short)
         }
     }
 }
+
+pub type StandardAdvertisementData = AdvertisementData<STD_LEN>;
+pub type ExtendedAdvertisementData = AdvertisementData<EXT_LEN>;
