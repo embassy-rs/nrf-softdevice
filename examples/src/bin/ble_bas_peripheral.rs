@@ -77,12 +77,17 @@ async fn main(spawner: Spawner) {
     #[rustfmt::skip]
     let adv_data = &[
         0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
+        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_MORE_AVAILABLE as u8,
+            0x0f, 0x18, // Battery service
+        0x0a, raw::BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME as u8,
+            b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
     ];
     #[rustfmt::skip]
     let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
+        0x11, raw::BLE_GAP_AD_TYPE_128BIT_SERVICE_UUID_COMPLETE as u8,
+            // The UUID 9e7312e0-2354-11eb-9f10-fbc30a63cf38 of FooService
+            0xe0, 0x12, 0x73, 0x9e, 0x54, 0x23, 0xeb, 0x11,
+            0x9f, 0x10, 0xfb, 0xc3, 0x0a, 0x63, 0xcf, 0x38,
     ];
 
     loop {

@@ -144,6 +144,7 @@ async fn main(spawner: Spawner) {
             if key == 0x06
                 && value
                     == &[
+                        // The 128bit UUID shared with l2cap_peripheral.rs
                         0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
                     ]
             {
