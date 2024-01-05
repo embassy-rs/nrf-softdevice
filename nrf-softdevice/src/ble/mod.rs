@@ -20,6 +20,8 @@ pub mod security;
 pub mod central;
 
 #[cfg(feature = "ble-peripheral")]
+pub mod advertisement_builder;
+#[cfg(feature = "ble-peripheral")]
 pub mod peripheral;
 
 #[cfg(feature = "ble-gatt-client")]

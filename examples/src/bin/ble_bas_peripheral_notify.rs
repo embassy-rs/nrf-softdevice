@@ -33,7 +33,10 @@ use embassy_nrf::{bind_interrupts, interrupt, saadc};
 use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
-use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
+use nrf_softdevice::ble::{
+    advertisement_builder::{BasicService, Complete16, Flag, ShortName, StandardAdvertisementData},
+    gatt_server, peripheral, Connection,
+};
 use nrf_softdevice::{raw, Softdevice};
 
 bind_interrupts!(struct Irqs {
@@ -139,21 +142,20 @@ async fn main(spawner: Spawner) {
 
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
+    let adv_data = StandardAdvertisementData::new()
+        .flags([Flag::GeneralDiscovery])
+        .services(Complete16([BasicService::HealthThermometer]))
+        .name(ShortName("HelloRust"));
+
+    let scan_data = StandardAdvertisementData::new().services(Complete16([BasicService::HealthThermometer]));
 
     loop {
         let config = peripheral::Config::default();
 
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: unwrap!(adv_data.as_slice()),
+            scan_data: unwrap!(scan_data.as_slice()),
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
         info!("advertising done! I have a connection.");
 
