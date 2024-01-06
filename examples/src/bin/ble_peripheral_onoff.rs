@@ -11,6 +11,9 @@ use embassy_executor::Spawner;
 use embassy_nrf::gpio::{Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
+use nrf_softdevice::ble::advertisement_builder::{
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
+};
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
@@ -31,20 +34,24 @@ struct Server {
 }
 
 async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .full_name("HelloRust")
+        .build();
+
+    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .services_128(
+            ServiceList::Complete,
+            &[0x9e7312e0_2354_11eb_9f10_fbc30a62cf38_u128.to_le_bytes()],
+        )
+        .build();
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: &ADV_DATA,
+            scan_data: &SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");

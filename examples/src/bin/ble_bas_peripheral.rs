@@ -78,13 +78,16 @@ async fn main(spawner: Spawner) {
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery])
-        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
-        .short_name("HelloRust")
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::BATTERY])
+        .full_name("HelloRust")
         .build();
 
     static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
+        .services_128(
+            ServiceList::Complete,
+            &[0x9e7312e0_2354_11eb_9f10_fbc30a62cf38_u128.to_le_bytes()],
+        )
         .build();
 
     loop {

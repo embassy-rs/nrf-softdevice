@@ -62,9 +62,9 @@ async fn main(spawner: Spawner) {
     config.interval = 50;
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery])
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
         .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER]) // if there were a lot of these there may not be room for the full name
-        .short_name("HelloRust")
+        .short_name("Hello")
         .build();
 
     // but we can put it in the scan data

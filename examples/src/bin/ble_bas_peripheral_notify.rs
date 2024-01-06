@@ -143,14 +143,12 @@ async fn main(spawner: Spawner) {
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery])
-        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
-        .short_name("HelloRust")
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::BATTERY])
+        .full_name("HelloRust")
         .build();
 
-    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
-        .build();
+    static SCAN_DATA: [u8; 0] = [];
 
     loop {
         let config = peripheral::Config::default();
