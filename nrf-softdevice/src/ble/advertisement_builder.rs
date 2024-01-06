@@ -313,7 +313,7 @@ impl<const K: usize> AdvertisementBuilder<K> {
         self.raw(AdvertisementDataType::FULL_NAME, name.as_bytes())
     }
 
-    /// If the full name fits within the remaining space, it is used. Otherwise the short name is used.
+    /// Adds the provided string as a name, truncating and typing as needed.
     ///
     /// *Note: This modifier should be placed last.*
     pub const fn adapt_name(self, name: &str) -> Self {
