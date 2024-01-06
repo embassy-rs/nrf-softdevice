@@ -8,10 +8,10 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
-use nrf_softdevice::ble::{
-    advertisement_builder::{BasicService, Complete16, Flag, ShortName, StandardAdvertisementData},
-    gatt_server, peripheral,
+use nrf_softdevice::ble::advertisement_builder::{
+    BasicService, Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
 };
+use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
 #[embassy_executor::task]
@@ -77,18 +77,21 @@ async fn main(spawner: Spawner) {
     let server = unwrap!(Server::new(sd));
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    let adv_data = StandardAdvertisementData::new()
-        .flags([Flag::GeneralDiscovery])
-        .services(Complete16([BasicService::HealthThermometer]))
-        .name(ShortName("HelloRust"));
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery])
+        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer])
+        .short_name("HelloRust")
+        .build();
 
-    let scan_data = StandardAdvertisementData::new().services(Complete16([BasicService::HealthThermometer]));
+    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer])
+        .build();
 
     loop {
         let config = peripheral::Config::default();
         let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
-            adv_data: unwrap!(adv_data.as_slice()),
-            scan_data: unwrap!(scan_data.as_slice()),
+            adv_data: &ADV_DATA,
+            scan_data: &SCAN_DATA,
         };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 

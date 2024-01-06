@@ -9,7 +9,7 @@ use core::mem;
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::advertisement_builder::{
-    BasicService, Complete16, Flag, FullName, ShortName, StandardAdvertisementData,
+    BasicService, Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
 };
 use nrf_softdevice::ble::peripheral;
 use nrf_softdevice::{raw, Softdevice};
@@ -61,18 +61,19 @@ async fn main(spawner: Spawner) {
     let mut config = peripheral::Config::default();
     config.interval = 50;
 
-    let adv_data = StandardAdvertisementData::new()
-        .flags([Flag::GeneralDiscovery])
-        .services(Complete16([BasicService::HealthThermometer])) // if there were a lot of these there may not be room for the full name
-        .name(ShortName("HelloRust"));
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery])
+        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer]) // if there were a lot of these there may not be room for the full name
+        .short_name("HelloRust")
+        .build();
 
     // but we can put it in the scan data
     // so the full name is visible once connected
-    let scan_data = StandardAdvertisementData::new().name(FullName("Hello, Rust!"));
+    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new().full_name("Hello, Rust!").build();
 
     let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected {
-        adv_data: unwrap!(adv_data.as_slice()),
-        scan_data: unwrap!(scan_data.as_slice()),
+        adv_data: &ADV_DATA,
+        scan_data: &SCAN_DATA,
     };
     unwrap!(peripheral::advertise(sd, adv, &config).await);
 }

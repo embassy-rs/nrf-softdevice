@@ -33,10 +33,10 @@ pub mod gatt_server;
 #[cfg(feature = "ble-l2cap")]
 pub mod l2cap;
 
+use core::mem;
+
 #[cfg(any(feature = "ble-gatt-server", feature = "ble-sec"))]
 pub use replies::*;
-
-use core::mem;
 
 use crate::{raw, RawError, Softdevice};
 
