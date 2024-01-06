@@ -34,7 +34,7 @@ use embassy_time::{Duration, Timer};
 use futures::future::{select, Either};
 use futures::pin_mut;
 use nrf_softdevice::ble::advertisement_builder::{
-    BasicService, Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
 };
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection};
 use nrf_softdevice::{raw, Softdevice};
@@ -144,12 +144,12 @@ async fn main(spawner: Spawner) {
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
         .flags(&[Flag::GeneralDiscovery])
-        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
         .short_name("HelloRust")
         .build();
 
     static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER])
         .build();
 
     loop {

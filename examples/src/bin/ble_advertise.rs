@@ -9,7 +9,7 @@ use core::mem;
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::advertisement_builder::{
-    BasicService, Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
 };
 use nrf_softdevice::ble::peripheral;
 use nrf_softdevice::{raw, Softdevice};
@@ -63,7 +63,7 @@ async fn main(spawner: Spawner) {
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
         .flags(&[Flag::GeneralDiscovery])
-        .services_16(ServiceList::Complete, &[BasicService::HealthThermometer]) // if there were a lot of these there may not be room for the full name
+        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER]) // if there were a lot of these there may not be room for the full name
         .short_name("HelloRust")
         .build();
 
