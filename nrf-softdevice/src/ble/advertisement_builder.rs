@@ -209,17 +209,27 @@ impl<const K: usize> AdvertisementBuilder<K> {
     }
 
     const fn write(mut self, data: &[u8]) -> Self {
-        let end = self.ptr + data.len();
-
-        let mut i = 0;
-        while self.ptr < K && i < data.len() {
-            self.buf[self.ptr] = data[i];
-            i += 1;
-            self.ptr += 1;
+        if self.ptr + data.len() <= K {
+            let mut i = 0;
+            while i < data.len() {
+                self.buf[self.ptr] = data[i];
+                i += 1;
+                self.ptr += 1;
+            }
+        } else {
+            // Overflow, but still track how much data was attempted to be written
+            self.ptr += data.len();
         }
 
-        self.ptr = end;
         self
+    }
+
+    pub const fn capacity() -> usize {
+        K
+    }
+
+    pub const fn len(&self) -> usize {
+        self.ptr
     }
 
     /// Write raw bytes to the advertisement data.
