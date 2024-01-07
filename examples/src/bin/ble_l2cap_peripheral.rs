@@ -9,6 +9,9 @@ use core::ptr::NonNull;
 
 use defmt::*;
 use embassy_executor::Spawner;
+use nrf_softdevice::ble::advertisement_builder::{
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
+};
 use nrf_softdevice::ble::{l2cap, peripheral};
 use nrf_softdevice::{ble, raw, RawError, Softdevice};
 
@@ -115,20 +118,27 @@ async fn main(spawner: Spawner) {
 
     info!("My address: {:?}", ble::get_address(sd));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x11, 0x06, 0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
-        0x02, 0x09, b'H',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[ ];
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .services_128(
+            ServiceList::Complete,
+            &[[
+                0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
+            ]],
+        )
+        .short_name("H")
+        .build();
+
+    static SCAN_DATA: [u8; 0] = [];
 
     let l = l2cap::L2cap::<Packet>::init(sd);
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: &ADV_DATA,
+            scan_data: &SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
