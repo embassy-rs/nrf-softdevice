@@ -15,13 +15,6 @@ members = [
 
 exclude = ["nrf-softdevice-gen"]
 
-[patch.crates-io]
-embassy-nrf = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
-embassy-executor = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
-embassy-macros = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
-embassy-sync = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy", rev = "85d5f42562ca9374e3200d652616af9533346c5e" }
-
 [profile.release]
 codegen-units = 1
 debug = 2

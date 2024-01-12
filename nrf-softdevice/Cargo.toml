@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
+description = "Rust interface to nRF SoftDevice"
+repository = "https://github.com/embassy-rs/nrf-softdevice"
+categories = ["embedded", "hardware-support", "no-std"]
+keywords = ["arm", "cortex-m", "nrf52", "nrf-softdevice"]
 
 [features]
 
