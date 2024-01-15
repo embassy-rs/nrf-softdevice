@@ -1,5 +1,9 @@
 #![no_std]
 #![allow(incomplete_features)]
+#![cfg_attr(
+    docsrs,
+    doc = "<div style='padding:30px;background:#810;color:#fff;text-align:center;'><p>You might want to <a href='https://docs.embassy.dev/nrf-softdevice'>browse the `nrf-softdevice` documentation on the Embassy website</a> instead.</p><p>The documentation here on `docs.rs` is built for a single chip and single softdevice only (nRF52840 and s140 in particular), while on the Embassy website you can pick your exact combination from the top menu. Available APIs change depending on the chip and softdevice.</p></div>\n\n"
+)]
 
 pub(crate) mod util;
 
