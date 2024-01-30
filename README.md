@@ -49,7 +49,8 @@ Some softdevices support only some chips, check Nordic's documentation for detai
 
 ## Setting up your build environment
 
-This project uses new toolchain features, often only to be found in nightly. Please ensure that your toolchains are up to date:
+This project used to require nightly toolchain features, which have been recently stabilized.
+Therefore please ensure that your toolchains are up to date, by fetching latest stable toolchain:
 
 ```
 rustup update
