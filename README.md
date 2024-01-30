@@ -49,16 +49,17 @@ Some softdevices support only some chips, check Nordic's documentation for detai
 
 ## Setting up your build environment
 
-This project uses new toolchain features, often only to be found in nightly. Please ensure that your toolchains are up to date:
+This project used to require nightly toolchain features, which have been recently stabilized.
+Therefore please ensure that your toolchains are up to date, by fetching latest stable toolchain:
 
 ```
 rustup update
 ```
 
-You will also need [`probe-run`](https://ferrous-systems.com/blog/probe-run/) - a utility to enable `cargo run` to run embedded applications on a device:
+You will also need [`probe-rs`](https://probe.rs/) - a utility to enable `cargo run` to run embedded applications on a device:
 
 ```
-cargo install probe-run
+cargo install probe-rs --features cli
 ```
 
 ## Running examples
@@ -72,8 +73,8 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 - Unzip
 - As a debug client, if you are using 
   - probe-rs:
-    - Erase the flash with `probe-rs-cli erase --chip nrf52840`
-    - Flash the SoftDevice with `probe-rs-cli download --chip nrf52840 --format hex s140_nrf52_7.X.X_softdevice.hex`
+    - Erase the flash with `probe-rs erase --chip nrf52840_xxAA` (You may have to supply additional `--allow-erase-all` argument).
+    - Flash the SoftDevice with `probe-rs download --verify --format hex --chip nRF52840_xxAA s140_nrf52_7.X.X_softdevice.hex`
   - nrfjprog:
     - Flash the SoftDevice with `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
 
