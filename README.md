@@ -59,7 +59,7 @@ rustup update
 You will also need [`probe-rs`](https://probe.rs/) - a utility to enable `cargo run` to run embedded applications on a device:
 
 ```
-cargo install probe-rs
+cargo install probe-rs --features cli
 ```
 
 ## Running examples
