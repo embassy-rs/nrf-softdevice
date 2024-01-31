@@ -220,15 +220,49 @@ impl Properties {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct PresentationFormat {
+    pub format: u8,
+    pub exponent: i8,
+    pub unit: u16,
+    pub name_space: u8,
+    pub description: u16,
+}
+
+impl PresentationFormat {
+    pub(crate) fn into_raw(self) -> raw::ble_gatts_char_pf_t {
+        self.into_raw_inner(raw::BLE_GATTS_VLOC_STACK as u8)
+    }
+
+    #[cfg(feature = "alloc")]
+    pub(crate) fn into_raw_user(self) -> raw::ble_gatts_char_pf_t {
+        self.into_raw_inner(raw::BLE_GATTS_VLOC_USER as u8)
+    }
+
+    fn into_raw_inner(self, vloc: u8) -> raw::ble_gatts_char_pf_t {
+        raw::ble_gatts_char_pf_t {
+            format: self.format.into(),
+            exponent: self.exponent.into(),
+            unit: self.unit.into(),
+            name_space: self.name_space.into(),
+            desc: self.description.into(),
+        }
+    }
+}
+
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Metadata {
     pub properties: Properties,
     pub user_description: Option<UserDescription>,
+    pub cpfd: Option<PresentationFormat>,
     pub cccd: Option<AttributeMetadata>,
     pub sccd: Option<AttributeMetadata>,
 }
 
 impl Metadata {
-    pub fn new(properties: Properties) -> Self {
+    pub fn new(properties: Properties, pf: Option<PresentationFormat>) -> Self {
+        let cpfd = pf;
+
         let cccd = if properties.indicate || properties.notify {
             Some(AttributeMetadata::default())
         } else {
@@ -243,6 +277,7 @@ impl Metadata {
 
         Metadata {
             properties,
+            cpfd,
             cccd,
             sccd,
             ..Default::default()
