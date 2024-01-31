@@ -12,7 +12,7 @@ use nrf_softdevice::ble::advertisement_builder::{
     Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
 };
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
-use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
+use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, PresentationFormat, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
@@ -86,7 +86,7 @@ impl DeviceInformationService {
     ) -> Result<Option<CharacteristicHandles>, RegisterError> {
         if let Some(val) = val {
             let attr = Attribute::new(val);
-            let md = Metadata::new(Properties::new().read());
+            let md = Metadata::new(Properties::new().read(), None);
             Ok(Some(sb.add_characteristic(uuid, attr, md)?.build()))
         } else {
             Ok(None)
@@ -99,7 +99,7 @@ impl DeviceInformationService {
             unsafe { core::slice::from_raw_parts(pnp_id as *const _ as *const u8, core::mem::size_of::<PnPID>()) };
 
         let attr = Attribute::new(val);
-        let md = Metadata::new(Properties::new().read());
+        let md = Metadata::new(Properties::new().read(), None);
         Ok(sb.add_characteristic(PNP_ID, attr, md)?.build())
     }
 }
@@ -114,7 +114,16 @@ impl BatteryService {
         let mut service_builder = ServiceBuilder::new(sd, BATTERY_SERVICE)?;
 
         let attr = Attribute::new(&[0u8]);
-        let metadata = Metadata::new(Properties::new().read().notify());
+        let metadata = Metadata::new(
+            Properties::new().read().notify(),
+            Some(PresentationFormat {
+                format: raw::BLE_GATT_CPF_FORMAT_UINT8 as u8,
+                exponent: 0,  /* Value * 10 ^ 0 */
+                unit: 0x27AD, /* Percentage */
+                name_space: raw::BLE_GATT_CPF_NAMESPACE_BTSIG as u8,
+                description: raw::BLE_GATT_CPF_NAMESPACE_DESCRIPTION_UNKNOWN as u16,
+            }),
+        );
         let characteristic_builder = service_builder.add_characteristic(BATTERY_LEVEL, attr, metadata)?;
         let characteristic_handles = characteristic_builder.build();
 

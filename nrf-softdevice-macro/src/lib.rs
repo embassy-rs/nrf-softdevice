@@ -268,7 +268,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     indicate: #indicate,
                     ..Default::default()
                 };
-                let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
+                let metadata = #ble::gatt_server::characteristic::Metadata::new(props, None);
                 service_builder.add_characteristic(#uuid, attr, metadata)?.build()
             };
         ));
