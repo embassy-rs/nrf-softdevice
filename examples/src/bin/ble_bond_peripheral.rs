@@ -125,7 +125,7 @@ impl BatteryService {
         let mut service_builder = ServiceBuilder::new(sd, BATTERY_SERVICE)?;
 
         let attr = Attribute::new(&[0u8]).security(SecurityMode::JustWorks);
-        let metadata = Metadata::new(Properties::new().read().notify(), None);
+        let metadata = Metadata::new(Properties::new().read().notify());
         let characteristic_builder = service_builder.add_characteristic(BATTERY_LEVEL, attr, metadata)?;
         let characteristic_handles = characteristic_builder.build();
 
