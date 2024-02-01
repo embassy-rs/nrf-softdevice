@@ -12,7 +12,7 @@ use nrf_softdevice::ble::advertisement_builder::{
     Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
 };
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
-use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
+use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Presentation, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
@@ -114,7 +114,13 @@ impl BatteryService {
         let mut service_builder = ServiceBuilder::new(sd, BATTERY_SERVICE)?;
 
         let attr = Attribute::new(&[0u8]);
-        let metadata = Metadata::new(Properties::new().read().notify());
+        let metadata = Metadata::new(Properties::new().read().notify()).presentation(Presentation {
+            format: raw::BLE_GATT_CPF_FORMAT_UINT8 as u8,
+            exponent: 0,  /* Value * 10 ^ 0 */
+            unit: 0x27AD, /* Percentage */
+            name_space: raw::BLE_GATT_CPF_NAMESPACE_BTSIG as u8,
+            description: raw::BLE_GATT_CPF_NAMESPACE_DESCRIPTION_UNKNOWN as u16,
+        });
         let characteristic_builder = service_builder.add_characteristic(BATTERY_LEVEL, attr, metadata)?;
         let characteristic_handles = characteristic_builder.build();
 

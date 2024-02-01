@@ -220,9 +220,32 @@ impl Properties {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct Presentation {
+    pub format: u8,
+    pub exponent: i8,
+    pub unit: u16,
+    pub name_space: u8,
+    pub description: u16,
+}
+
+impl Presentation {
+    pub(crate) fn into_raw(self) -> raw::ble_gatts_char_pf_t {
+        raw::ble_gatts_char_pf_t {
+            format: self.format.into(),
+            exponent: self.exponent.into(),
+            unit: self.unit.into(),
+            name_space: self.name_space.into(),
+            desc: self.description.into(),
+        }
+    }
+}
+
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Metadata {
     pub properties: Properties,
     pub user_description: Option<UserDescription>,
+    pub cpfd: Option<Presentation>,
     pub cccd: Option<AttributeMetadata>,
     pub sccd: Option<AttributeMetadata>,
 }
@@ -249,24 +272,22 @@ impl Metadata {
         }
     }
 
-    pub fn with_security(properties: Properties, write_security: SecurityMode) -> Self {
-        let cccd = if properties.indicate || properties.notify {
-            Some(AttributeMetadata::default().write_security(write_security))
-        } else {
-            None
+    pub fn presentation(self, presentation: Presentation) -> Self {
+        let cpfd = Some(presentation);
+        Metadata { cpfd, ..self }
+    }
+
+    pub fn security(self, security: SecurityMode) -> Self {
+        let cccd = match self.cccd {
+            Some(cccd) => Some(cccd.write_security(security)),
+            None => None,
         };
 
-        let sccd = if properties.broadcast {
-            Some(AttributeMetadata::default().write_security(write_security))
-        } else {
-            None
+        let sccd = match self.sccd {
+            Some(sccd) => Some(sccd.write_security(security)),
+            None => None,
         };
 
-        Metadata {
-            properties,
-            cccd,
-            sccd,
-            ..Default::default()
-        }
+        Metadata { cccd, sccd, ..self }
     }
 }
