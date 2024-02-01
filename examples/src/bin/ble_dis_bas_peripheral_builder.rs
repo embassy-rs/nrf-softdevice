@@ -114,7 +114,7 @@ impl BatteryService {
         let mut service_builder = ServiceBuilder::new(sd, BATTERY_SERVICE)?;
 
         let attr = Attribute::new(&[0u8]);
-        let metadata = Metadata::new(Properties::new().read().notify()).presentation(PresentationFormat {
+        let metadata = Metadata::new(Properties::new().read().notify()).presentation(Presentation {
             format: raw::BLE_GATT_CPF_FORMAT_UINT8 as u8,
             exponent: 0,  /* Value * 10 ^ 0 */
             unit: 0x27AD, /* Percentage */
