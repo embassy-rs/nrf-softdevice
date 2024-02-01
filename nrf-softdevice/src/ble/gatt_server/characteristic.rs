@@ -272,22 +272,36 @@ impl Metadata {
         }
     }
 
+    #[deprecated = "Use new(properties).security(write_security) instead."]
+    pub fn with_security(properties: Properties, write_security: SecurityMode) -> Self {
+        let cccd = if properties.indicate || properties.notify {
+            Some(AttributeMetadata::default().write_security(write_security))
+        } else {
+            None
+        };
+
+        let sccd = if properties.broadcast {
+            Some(AttributeMetadata::default().write_security(write_security))
+        } else {
+            None
+        };
+
+        Metadata {
+            properties,
+            cccd,
+            sccd,
+            ..Default::default()
+        }
+    }
+
     pub fn presentation(self, presentation: Presentation) -> Self {
         let cpfd = Some(presentation);
         Metadata { cpfd, ..self }
     }
 
-    pub fn security(self, security: SecurityMode) -> Self {
-        let cccd = match self.cccd {
-            Some(cccd) => Some(cccd.write_security(security)),
-            None => None,
-        };
-
-        let sccd = match self.sccd {
-            Some(sccd) => Some(sccd.write_security(security)),
-            None => None,
-        };
-
+    pub fn security(self, write_security: SecurityMode) -> Self {
+        let cccd = self.cccd.map(|cccd| cccd.write_security(write_security));
+        let sccd = self.sccd.map(|sccd| sccd.write_security(write_security));
         Metadata { cccd, sccd, ..self }
     }
 }
