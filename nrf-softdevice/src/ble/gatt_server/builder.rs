@@ -10,7 +10,7 @@ extern crate alloc;
 #[cfg(feature = "alloc")]
 use alloc::boxed::Box;
 
-use super::characteristic::{self, AttributeMetadata, PresentationFormat};
+use super::characteristic::{self, AttributeMetadata, Presentation};
 use super::{CharacteristicHandles, DescriptorHandle, IncludedServiceHandle, RegisterError, ServiceHandle};
 use crate::ble::Uuid;
 use crate::{raw, RawError, Softdevice};
@@ -83,7 +83,7 @@ impl<'a> ServiceBuilder<'a> {
         let user_desc_md = char_md
             .user_description
             .and_then(|x| x.metadata.map(AttributeMetadata::into_raw));
-        let cpfd_md = char_md.cpfd.map(PresentationFormat::into_raw);
+        let cpfd_md = char_md.cpfd.map(Presentation::into_raw);
         let cccd_md = char_md.cccd.map(AttributeMetadata::into_raw);
         let sccd_md = char_md.sccd.map(AttributeMetadata::into_raw);
 
