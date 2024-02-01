@@ -230,15 +230,6 @@ pub struct Presentation {
 
 impl Presentation {
     pub(crate) fn into_raw(self) -> raw::ble_gatts_char_pf_t {
-        self.into_raw_inner(raw::BLE_GATTS_VLOC_STACK as u8)
-    }
-
-    #[cfg(feature = "alloc")]
-    pub(crate) fn into_raw_user(self) -> raw::ble_gatts_char_pf_t {
-        self.into_raw_inner(raw::BLE_GATTS_VLOC_USER as u8)
-    }
-
-    fn into_raw_inner(self, vloc: u8) -> raw::ble_gatts_char_pf_t {
         raw::ble_gatts_char_pf_t {
             format: self.format.into(),
             exponent: self.exponent.into(),
