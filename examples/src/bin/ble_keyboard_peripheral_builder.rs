@@ -429,6 +429,10 @@ impl gatt_server::Server for Server {
 	}
 }
 
+struct HidSecurityHandler {}
+
+impl SecurityHandler for HidSecurityHandler {}
+
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
 	info!("Hello World!");
@@ -484,13 +488,15 @@ async fn main(spawner: Spawner) {
 		)
 		.build();
 
+	static SEC: HidSecurityHandler = HidSecurityHandler {};
+
 	loop {
 		let config = peripheral::Config::default();
 		let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
 			adv_data: &ADV_DATA,
 			scan_data: &SCAN_DATA,
 		};
-		let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
+		let conn = peripheral::advertise_pairable(sd, adv, &config, &SEC).await.unwrap();
 
 		info!("advertising done!");
 
