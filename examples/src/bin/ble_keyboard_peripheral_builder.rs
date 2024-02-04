@@ -15,6 +15,7 @@ use nrf_softdevice::ble::advertisement_builder::{
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Presentation, Properties};
 use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
+use nrf_softdevice::ble::security::SecurityHandler;
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
 
