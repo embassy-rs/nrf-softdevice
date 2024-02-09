@@ -1,6 +1,14 @@
 #![no_std]
 #![no_main]
-#![feature(decl_macro)]
+
+macro_rules! count {
+	() => { 0u8 };
+	($x:tt $($xs:tt)*) => {1u8 + count!($($xs)*)};
+}
+
+macro_rules! hid {
+	($(( $($xs:tt),*)),+ $(,)?) => { &[ $( (count!($($xs)*)-1) | $($xs),* ),* ] };
+}
 
 #[path = "../example_common.rs"]
 mod example_common;
@@ -137,16 +145,6 @@ const HID_REPORT_DESCRIPTOR: &[u8] = hid!(
     (HIDINPUT, 0x02),           // INPUT (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
     (END_COLLECTION),           // END_COLLECTION
 );
-
-#[allow(unused_macros)]
-macro count {
-	() => { 0u8 },
-	($x:tt $($xs:tt)*) => {1u8 + count!($($xs)*)}
-}
-
-pub macro hid {
-	($(( $($xs:tt),*)),+ $(,)?) => { &[ $( (count!($($xs)*)-1) | $($xs),* ),* ] }
-}
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) -> ! {
