@@ -69,5 +69,9 @@ name = "ble_peripheral_onoff"
 required-features = ["ble-gatt-server"]
 
 [[bin]]
+name = "ble_keyboard_peripheral_builder"
+required-features = ["ble-gatt-server"]
+
+[[bin]]
 name = "flash"
 required-features = []
