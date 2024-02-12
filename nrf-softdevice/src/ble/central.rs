@@ -10,13 +10,25 @@ use crate::ble::{Address, Connection};
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{raw, RawError, Softdevice};
 
+#[cfg(feature = "ble-gatt-client")]
+use crate::ble::gatt_client::MtuExchangeError;
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ConnectError {
     Timeout,
     NoAddresses,
     NoFreeConn,
+    #[cfg(feature = "ble-gatt-client")]
+    MtuExchange(MtuExchangeError),
     Raw(RawError),
+}
+
+#[cfg(feature = "ble-gatt-client")]
+impl From<MtuExchangeError> for ConnectError {
+    fn from(err: MtuExchangeError) -> Self {
+        ConnectError::MtuExchange(err)
+    }
 }
 
 impl From<RawError> for ConnectError {
@@ -93,7 +105,7 @@ pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Con
     #[cfg(feature = "ble-gatt-client")]
     {
         let mtu = config.att_mtu.unwrap_or(_sd.att_mtu);
-        unwrap!(crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await);
+        crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await?;
     }
 
     Ok(conn)
