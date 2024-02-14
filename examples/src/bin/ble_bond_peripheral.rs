@@ -25,6 +25,8 @@ use static_cell::StaticCell;
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
 const BATTERY_LEVEL: Uuid = Uuid::new_16(0x2a19);
 
+const PERIPHERAL_REQUESTS_SECURITY: bool = false;
+
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
     sd.run().await;
@@ -245,6 +247,13 @@ async fn main(spawner: Spawner) -> ! {
         let conn = unwrap!(peripheral::advertise_pairable(sd, adv, &config, bonder).await);
 
         info!("advertising done!");
+
+        if PERIPHERAL_REQUESTS_SECURITY {
+            if let Err(err) = conn.request_security() {
+                error!("Security request failed: {:?}", err);
+                continue;
+            }
+        }
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let e = gatt_server::run(&conn, &server, |_| {}).await;

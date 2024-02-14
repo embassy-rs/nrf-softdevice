@@ -4,6 +4,8 @@ use core::iter::FusedIterator;
 use raw::ble_gap_conn_params_t;
 
 use super::PhySet;
+#[cfg(feature = "ble-central")]
+use crate::ble::gap::default_security_params;
 #[cfg(feature = "ble-sec")]
 use crate::ble::security::SecurityHandler;
 use crate::ble::types::{Address, AddressType, Role, SecurityMode};
@@ -73,6 +75,52 @@ impl From<DisconnectedError> for PhyUpdateError {
 }
 
 impl From<RawError> for PhyUpdateError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
+pub enum AuthenticateError {
+    Disconnected,
+    Raw(RawError),
+}
+
+#[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
+impl From<DisconnectedError> for AuthenticateError {
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+#[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
+impl From<RawError> for AuthenticateError {
+    fn from(err: RawError) -> Self {
+        Self::Raw(err)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg(all(feature = "ble-central", feature = "ble-sec"))]
+pub enum EncryptError {
+    Disconnected,
+    NoSecurityHandler,
+    PeerKeysNotFound,
+    Raw(RawError),
+}
+
+#[cfg(all(feature = "ble-central", feature = "ble-sec"))]
+impl From<DisconnectedError> for EncryptError {
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
+    }
+}
+
+#[cfg(all(feature = "ble-central", feature = "ble-sec"))]
+impl From<RawError> for EncryptError {
     fn from(err: RawError) -> Self {
         Self::Raw(err)
     }
@@ -507,6 +555,97 @@ impl Connection {
         let ret = unsafe { raw::sd_ble_gap_phy_update(conn_handle, &p_gap_phys) };
         if let Err(err) = RawError::convert(ret) {
             warn!("sd_ble_gap_phy_update err {:?}", err);
+            return Err(err.into());
+        }
+
+        Ok(())
+    }
+
+    #[cfg(feature = "ble-central")]
+    /// Send a pairing request to the peripheral.
+    pub fn request_pairing(&self) -> Result<(), AuthenticateError> {
+        let (conn_handle, sec_params) = self.with_state(|state| {
+            assert!(
+                state.role == Role::Central,
+                "Connection::request_pairing may only be called for connections in the central role"
+            );
+
+            let conn_handle = state.check_connected()?;
+
+            #[cfg(not(feature = "ble-sec"))]
+            let sec_params = default_security_params();
+            #[cfg(feature = "ble-sec")]
+            let sec_params = state
+                .security
+                .handler
+                .map(|h| h.security_params(self))
+                .unwrap_or_else(default_security_params);
+
+            Ok::<_, AuthenticateError>((conn_handle, sec_params))
+        })?;
+
+        let ret = unsafe { raw::sd_ble_gap_authenticate(conn_handle, &sec_params) };
+        if let Err(err) = RawError::convert(ret) {
+            warn!("sd_ble_gap_authenticate err {:?}", err);
+            return Err(err.into());
+        }
+
+        Ok(())
+    }
+
+    #[cfg(feature = "ble-peripheral")]
+    /// Send a security request to the central.
+    pub fn request_security(&self) -> Result<(), AuthenticateError> {
+        let (conn_handle, sec_params) = self.with_state(|state| {
+            assert!(
+                state.role == Role::Peripheral,
+                "Connection::request_security may only be called for connections in the peripheral role"
+            );
+
+            let conn_handle = state.check_connected()?;
+
+            #[cfg(not(feature = "ble-sec"))]
+            let sec_params = unsafe { core::mem::zeroed() };
+            #[cfg(feature = "ble-sec")]
+            let sec_params = state
+                .security
+                .handler
+                .map(|h| {
+                    let mut p: raw::ble_gap_sec_params_t = unsafe { core::mem::zeroed() };
+                    p.set_bond(h.can_bond(self) as u8);
+                    p.set_mitm(h.request_mitm_protection(self) as u8);
+                    p
+                })
+                .unwrap_or_else(|| unsafe { core::mem::zeroed() });
+
+            Ok::<_, AuthenticateError>((conn_handle, sec_params))
+        })?;
+
+        let ret = unsafe { raw::sd_ble_gap_authenticate(conn_handle, &sec_params) };
+        if let Err(err) = RawError::convert(ret) {
+            warn!("sd_ble_gap_authenticate err {:?}", err);
+            return Err(err.into());
+        }
+
+        Ok(())
+    }
+
+    #[cfg(all(feature = "ble-central", feature = "ble-sec"))]
+    /// Initiate GAP encryption with the peripheral using stored keys
+    pub fn encrypt(&self) -> Result<(), EncryptError> {
+        let (conn_handle, (master_id, ltk)) = self.with_state(|state| {
+            let conn_handle = state.check_connected()?;
+            state
+                .security
+                .handler
+                .ok_or(EncryptError::NoSecurityHandler)
+                .and_then(|handler| handler.get_peripheral_key(self).ok_or(EncryptError::PeerKeysNotFound))
+                .map(|keys| (conn_handle, keys))
+        })?;
+
+        let ret = unsafe { raw::sd_ble_gap_encrypt(conn_handle, master_id.as_raw(), ltk.as_raw()) };
+        if let Err(err) = RawError::convert(ret) {
+            warn!("sd_ble_gap_authenticate err {:?}", err);
             return Err(err.into());
         }
 
