@@ -417,7 +417,7 @@ pub struct Config {
     pub timeout: Option<u16>,
     pub max_events: Option<u8>,
 
-    /// Advertising interval, in 0.625us units
+    /// Advertising interval, in 625us units
     pub interval: u32,
 
     pub filter_policy: FilterPolicy,
