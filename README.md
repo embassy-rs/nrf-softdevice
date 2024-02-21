@@ -173,6 +173,8 @@ let peripherals = embassy_nrf::init(config);
 
 ## Troubleshooting
 
+### Interrupt priorities
+
 If you are sure you have set interrupts correctly, but are still getting an error like below:
 ```
 [ERROR]Location<lib.rs:104>panicked at 'sd_softdevice_enable err SdmIncorrectInterruptConfiguration'
@@ -182,18 +184,42 @@ Make sure the `defmt` feature is enabled on `embassy_nrf`.
 
 You can then use this code to print whether an interrupt is enabled, and its priority:
 ```rust
-for num in 0..48 {
-    let interrupt = unsafe { mem::transmute::<u16, Interrupt>(num) };
+// NB! MAX_IRQ depends on chip used, for example: nRF52840 has 48 IRQs, nRF52832 has 38.
+const MAX_IRQ: u16 = ...;
+
+use embassy_nrf::interrupt::{Interrupt, InterruptExt};
+for num in 0..=MAX_IRQ {
+    let interrupt = unsafe { core::mem::transmute::<u16, Interrupt>(num) };
     let is_enabled = InterruptExt::is_enabled(interrupt);
     let priority = InterruptExt::get_priority(interrupt);
 
-    println!("Interrupt {}: Enabled = {}, Priority = {}", num, is_enabled, priority);
+    defmt::println!("Interrupt {}: Enabled = {}, Priority = {}", num, is_enabled, priority);
 }
 ```
 
 Interrupt numbers map to what they are in the [`Interrupt` enum](https://docs.embassy.dev/embassy-nrf/git/nrf52832/interrupt/enum.Interrupt.html).
 
 If your SoftDevice is hardfaulting on enable and you think you have everything right, make sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
+
+### Peripheral conflicts
+
+If the following runtime error occurs
+```
+Softdevice memory access violation. Your program accessed registers for a peripheral reserved to the softdevice. PC=2a644 PREGION=8192
+```
+check which peripherals are used by application.
+
+Softdevice uses number of peripherals for its functionality when its enabled (and even disabled), and therefore
+enforces certain limits to [availability of peripherals](https://infocenter.nordicsemi.com/topic/sds_s132/SDS/s1xx/sd_resource_reqs/hw_block_interrupt_vector.html):
+
+1. Open - peripheral is not used by SoftDevice and application has full access.
+2. Blocked - peripheral is used by SoftDevice, and all application access is disabled. Though, certain peripherals (RADIO, TIMER0, CCM, and AAR) could be accessed via the Softdevice Radio Timeslot API.
+3. Restricted - peripheral is used by SoftDevice, but it can have limited access via SoftDevice API. For example
+[`FLASH`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/flash.rs),
+[`RNG`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/random.rs) and
+[`TEMP`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/temperature.rs) peripherals.
+
+### Linking issues
 
 If the following linking error occurs
 ```
