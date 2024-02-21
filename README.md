@@ -201,6 +201,23 @@ Interrupt numbers map to what they are in the [`Interrupt` enum](https://docs.em
 
 If your SoftDevice is hardfaulting on enable and you think you have everything right, make sure to go back and do a full chip erase or recover, and reflash the SoftDevice again. A few bytes of empty space after the SoftDevice are required to be 0xFF, but might not be if the softdevice was flashed over an existing binary.
 
+### Peripheral conflicts
+
+If the following runtime error occurs
+```
+Softdevice memory access violation. Your program accessed registers for a peripheral reserved to the softdevice. PC=2a644 PREGION=8192
+```
+check which peripherals are used by application.
+
+Softdevice uses number of peripherals for its functionality when its enabled (and even disabled), and therefore
+enforces certain limits to [availability of peripherals](https://infocenter.nordicsemi.com/topic/sds_s132/SDS/s1xx/sd_resource_reqs/hw_block_interrupt_vector.html):
+
+1. Open - peripheral is not used by SoftDevice and application has full access.
+2. Blocked - peripheral is used by SoftDevice, and all application access is disabled. Though, certain peripherals (RADIO, TIMER0, CCM, and AAR) could be accessed via the Softdevice Radio Timeslot API.
+3. Restricted - peripheral is used by SoftDevice, but it can have limited access via SoftDevice API. For example
+[`FLASH`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/flash.rs),
+[`RNG`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/random.rs) and
+[`TEMP`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/temperature.rs) peripherals.
 
 ### Linking issues
 
