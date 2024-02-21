@@ -182,12 +182,16 @@ Make sure the `defmt` feature is enabled on `embassy_nrf`.
 
 You can then use this code to print whether an interrupt is enabled, and its priority:
 ```rust
-for num in 0..48 {
-    let interrupt = unsafe { mem::transmute::<u16, Interrupt>(num) };
+// NB! MAX_IRQ depends on chip used, for example: nRF52840 has 48 IRQs, nRF52832 has 38.
+const MAX_IRQ: u16 = ...;
+
+use embassy_nrf::interrupt::{Interrupt, InterruptExt};
+for num in 0..=MAX_IRQ {
+    let interrupt = unsafe { core::mem::transmute::<u16, Interrupt>(num) };
     let is_enabled = InterruptExt::is_enabled(interrupt);
     let priority = InterruptExt::get_priority(interrupt);
 
-    println!("Interrupt {}: Enabled = {}, Priority = {}", num, is_enabled, priority);
+    defmt::println!("Interrupt {}: Enabled = {}, Priority = {}", num, is_enabled, priority);
 }
 ```
 
