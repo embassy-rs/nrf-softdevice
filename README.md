@@ -56,22 +56,18 @@ Therefore please ensure that your toolchains are up to date, by fetching latest 
 rustup update
 ```
 
-You will also need [`probe-rs`](https://probe.rs/) - a utility to enable `cargo run` to run embedded applications on a device:
-
-```
-cargo install probe-rs --features cli
-```
+You will also need [`probe-rs`](https://probe.rs/) - a utility to enable `cargo run` to run embedded applications on a device. Install it following the instructions on [`the probe-rs website`](https://probe.rs/).
 
 ## Running examples
 
-The following instructions are for the S140 and nRF52840-DK. You may have to adjust accordingly and can do so by modifying the `cargo.toml` of the examples folder - 
+The following instructions are for the S140 and nRF52840-DK. You may have to adjust accordingly and can do so by modifying the `cargo.toml` of the examples folder -
 please check out the `nrf-softdevice` and `nrf-softdevice-s140` dependency declarations.
 
 Flashing the softdevice is required. It is NOT part of the built binary. You only need to do it once at the beginning, or after doing full chip erases.
 
 - Download SoftDevice S140 from Nordic's website [here](https://www.nordicsemi.com/Software-and-tools/Software/S140/Download). Supported versions are 7.x.x
 - Unzip
-- As a debug client, if you are using 
+- As a debug client, if you are using
   - probe-rs:
     - Erase the flash with `probe-rs erase --chip nrf52840_xxAA` (You may have to supply additional `--allow-erase-all` argument).
     - Flash the SoftDevice with `probe-rs download --verify --format hex --chip nRF52840_xxAA s140_nrf52_7.X.X_softdevice.hex`
@@ -149,9 +145,9 @@ Make sure you're not using any library that internally uses `cortex_m::interrupt
 
 ### Interrupt priority
 
-Interrupt priority levels 0, 1, and 4 are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/processor_avail_interrupt_latency/exception_mgmt_sd.html?cp=4_7_4_0_15_1). Make sure to not use them. 
+Interrupt priority levels 0, 1, and 4 are [reserved for the SoftDevice](https://infocenter.nordicsemi.com/topic/sds_s140/SDS/s1xx/processor_avail_interrupt_latency/exception_mgmt_sd.html?cp=4_7_4_0_15_1). Make sure to not use them.
 
-The default priority level for interrupts is 0, so for *every single interrupt* you enable, make sure to set the priority level explicitly. For example:
+The default priority level for interrupts is 0, so for _every single interrupt_ you enable, make sure to set the priority level explicitly. For example:
 
 ```rust
 use embassy_nrf::interrupt::{self, InterruptExt};
@@ -176,6 +172,7 @@ let peripherals = embassy_nrf::init(config);
 ### Interrupt priorities
 
 If you are sure you have set interrupts correctly, but are still getting an error like below:
+
 ```
 [ERROR]Location<lib.rs:104>panicked at 'sd_softdevice_enable err SdmIncorrectInterruptConfiguration'
 ```
@@ -183,6 +180,7 @@ If you are sure you have set interrupts correctly, but are still getting an erro
 Make sure the `defmt` feature is enabled on `embassy_nrf`.
 
 You can then use this code to print whether an interrupt is enabled, and its priority:
+
 ```rust
 // NB! MAX_IRQ depends on chip used, for example: nRF52840 has 48 IRQs, nRF52832 has 38.
 const MAX_IRQ: u16 = ...;
@@ -204,9 +202,11 @@ If your SoftDevice is hardfaulting on enable and you think you have everything r
 ### Peripheral conflicts
 
 If the following runtime error occurs
+
 ```
 Softdevice memory access violation. Your program accessed registers for a peripheral reserved to the softdevice. PC=2a644 PREGION=8192
 ```
+
 check which peripherals are used by application.
 
 Softdevice uses number of peripherals for its functionality when its enabled (and even disabled), and therefore
@@ -215,16 +215,18 @@ enforces certain limits to [availability of peripherals](https://infocenter.nord
 1. Open - peripheral is not used by SoftDevice and application has full access.
 2. Blocked - peripheral is used by SoftDevice, and all application access is disabled. Though, certain peripherals (RADIO, TIMER0, CCM, and AAR) could be accessed via the Softdevice Radio Timeslot API.
 3. Restricted - peripheral is used by SoftDevice, but it can have limited access via SoftDevice API. For example
-[`FLASH`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/flash.rs),
-[`RNG`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/random.rs) and
-[`TEMP`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/temperature.rs) peripherals.
+   [`FLASH`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/flash.rs),
+   [`RNG`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/random.rs) and
+   [`TEMP`](https://github.com/embassy-rs/nrf-softdevice/blob/master/nrf-softdevice/src/temperature.rs) peripherals.
 
 ### Linking issues
 
 If the following linking error occurs
+
 ```
 rust-lld: error: undefined symbol: _critical_section_release
 ```
+
 make sure the feature `critical-section-impl` is enabled and also that the softdevice is included in the code, e.g. `use nrf_softdevice as _;`.
 
 If running the firmware timeouts after flashing, make sure the size and location of the RAM and FLASH region in the linker script is correct.
