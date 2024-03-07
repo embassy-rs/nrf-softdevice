@@ -265,6 +265,7 @@ impl BatteryService {
 
 #[nrf_softdevice::gatt_service(uuid = "1812")]
 pub struct HidService {
+    // If you have multiple descriptors, just add them all
     #[characteristic(
         uuid = "2A4D",
         security = "justworks",
@@ -273,6 +274,7 @@ pub struct HidService {
         notify,
         value = "[0u8, 1u8]",
         descriptor(uuid = "2908", security = "justworks", value = "[0, 1]")
+        descriptor(uuid = "2902", security = "justworks", value = "[0, 1]")
     )]
     pub input_report: [u8; 8],
 

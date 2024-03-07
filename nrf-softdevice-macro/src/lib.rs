@@ -46,8 +46,8 @@ struct CharacteristicArgs {
     security: Option<SecurityMode>,
     #[darling(default)]
     value: Option<syn::Expr>,
-    #[darling(default)]
-    descriptor: Option<DescriptorArgs>,
+    #[darling(default, multiple)]
+    descriptor: Vec<DescriptorArgs>,
 }
 
 #[derive(Debug)]
@@ -253,8 +253,12 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
             Some(v) => quote! { #v },
             None => quote! { [123u8; #ty_as_val::MIN_SIZE] },
         };
-        let descriptor = match &ch.args.descriptor {
-            Some(descriptor_args) => {
+
+        let descriptors: Vec<TokenStream2> = ch
+            .args
+            .descriptor
+            .iter()
+            .map(|descriptor_args| {
                 let descriptor_uuid = descriptor_args.uuid;
                 let security = descriptor_args.security.as_ref().unwrap();
                 let value = descriptor_args.value.as_ref().unwrap();
@@ -268,9 +272,8 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                             .variable_len(#value.len() as u16)
                         )?;
                 }
-            }
-            None => quote!(),
-        };
+            })
+            .collect();
 
         let security = if let Some(security) = ch.args.security {
             let security_inner = security.to_token_stream();
@@ -306,7 +309,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                 let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
                 let mut cb = service_builder.add_characteristic(#uuid, attr, metadata)?;
 
-                #descriptor
+                #(#descriptors)*
 
                 cb.build()
             };
