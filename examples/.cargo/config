@@ -1,5 +1,5 @@
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
-runner = "probe-run --chip nRF52840_xxAA"
+runner = "probe-rs run --chip nRF52833_xxAA --probe 0d28:0204:99053602000528335418b85ba0163719000000006e052820"
 
 [build]
 # Pick ONE of these compilation targets

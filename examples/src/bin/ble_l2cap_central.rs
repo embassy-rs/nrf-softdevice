@@ -10,7 +10,7 @@ use core::{mem, slice};
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::l2cap::Packet as _;
-use nrf_softdevice::ble::{central, l2cap, Address, TxPower};
+use nrf_softdevice::ble::{central, l2cap, Address, AddressType, TxPower};
 use nrf_softdevice::{raw, Softdevice};
 
 const PSM: u16 = 0x2349;
@@ -22,7 +22,7 @@ async fn softdevice_task(sd: &'static Softdevice) -> ! {
 
 use atomic_pool::{pool, Box};
 
-pool!(PacketPool: [[u8; 512]; 10]);
+pool!(PacketPool: [[u8; 23]; 20]);
 
 struct Packet {
     len: usize,
@@ -37,16 +37,16 @@ impl Format for Packet {
 
 impl Packet {
     fn new(data: &[u8]) -> Self {
-        let mut buf = unwrap!(Box::<PacketPool>::new([0; 512]));
+        let mut buf = unwrap!(Box::<PacketPool>::new([0; 23]));
         buf[..data.len()].copy_from_slice(data);
         Packet { len: data.len(), buf }
     }
 }
 
 impl l2cap::Packet for Packet {
-    const MTU: usize = 512;
+    const MTU: usize = 23;
     fn allocate() -> Option<NonNull<u8>> {
-        if let Some(buf) = Box::<PacketPool>::new([0; 512]) {
+        if let Some(buf) = Box::<PacketPool>::new([0; 23]) {
             let ptr = Box::into_raw(buf).cast::<u8>();
             info!("allocate {}", ptr.as_ptr() as u32);
             Some(ptr)
@@ -66,7 +66,7 @@ impl l2cap::Packet for Packet {
         info!("from_raw_parts {}", ptr.as_ptr() as u32);
         Self {
             len,
-            buf: Box::from_raw(ptr.cast::<[u8; 512]>()),
+            buf: Box::from_raw(ptr.cast::<[u8; 23]>()),
         }
     }
 }
@@ -110,8 +110,8 @@ async fn main(spawner: Spawner) {
         }),
         conn_l2cap: Some(raw::ble_l2cap_conn_cfg_t {
             ch_count: 1,
-            rx_mps: 247,
-            tx_mps: 247,
+            rx_mps: 23,
+            tx_mps: 23,
             rx_queue_size: 10,
             tx_queue_size: 10,
         }),
@@ -123,9 +123,19 @@ async fn main(spawner: Spawner) {
 
     info!("Scanning for peer...");
 
+
+    use heapless::Vec;
+    let mut found: Vec<Address, 64> = Vec::new();
+    const ADDR_1: Address = Address::new(AddressType::Public, [0xf5, 0x9f, 0x1a, 0x05, 0xe4, 0xee]);
+    const ADDR_2: Address = Address::new(AddressType::Public, [0xee, 0xe4, 0x05, 0x1a, 0x9f, 0xf5]);
+    const ADDR_3: Address = Address::new(AddressType::Public, [0xd1, 0x92, 0x61, 0xec, 0x43, 0x0a]);
+    const ADDR_4: Address = Address::new(AddressType::Public, [0x0a, 0x43, 0xec, 0x61, 0x92, 0xd1]);
     let config = central::ScanConfig {
-        whitelist: None,
-        tx_power: TxPower::ZerodBm,
+        whitelist: Some(&[&ADDR_1, &ADDR_2, &ADDR_3, &ADDR_4]),
+        tx_power: TxPower::Minus40dBm,
+        active: true,
+        interval: 3000,
+        window: 2000,
         ..Default::default()
     };
     let res = central::scan(sd, &config, |params| unsafe {
@@ -141,13 +151,18 @@ async fn main(spawner: Spawner) {
             let key = data[1];
             let value = &data[2..len + 1];
 
-            if key == 0x06
-                && value
-                    == &[
-                        0xeb, 0x04, 0x8b, 0xfd, 0x5b, 0x03, 0x21, 0xb5, 0xeb, 0x11, 0x65, 0x2f, 0x18, 0xce, 0x9c, 0x82,
-                    ]
-            {
-                return Some(Address::from_raw(params.peer_addr));
+            let address = Address::from_raw(params.peer_addr);
+            if !found.contains(&address) {
+                if key == 0x08 {
+                    info!("Found {} = {:02x}", core::str::from_utf8(value).unwrap(), address);
+                } else {
+                    info!("Found {:02x}", address);
+                }
+                found.push(address);
+            }
+
+            if address == ADDR_1 {
+                return Some(address);
             }
             data = &data[len + 1..];
         }
@@ -165,7 +180,7 @@ async fn main(spawner: Spawner) {
     info!("connected");
 
     let l = l2cap::L2cap::<Packet>::init(sd);
-    let config = l2cap::Config { credits: 8 };
+    let config = l2cap::Config { credits: 20 };
     let ch = unwrap!(l.setup(&conn, &config, PSM).await);
     info!("l2cap connected");
 
@@ -173,5 +188,11 @@ async fn main(spawner: Spawner) {
         unwrap!(ch.tx(Packet::new(&[i; Packet::MTU])).await);
         info!("l2cap tx done");
     }
+
+    for i in 0..10 {
+        let packet = unwrap!(ch.rx().await);
+        info!("l2cap rx done: {:02x}", packet);
+    }
+
     futures::future::pending::<()>().await;
 }
