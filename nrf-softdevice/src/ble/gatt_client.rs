@@ -527,7 +527,11 @@ unsafe fn check_status(ble_evt: *const raw::ble_evt_t) -> Result<&'static raw::b
 
 pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
     let gattc_evt = get_union_field(ble_evt, &(*ble_evt).evt.gattc_evt);
-    portal(gattc_evt.conn_handle).call(ble_evt);
+    if (*ble_evt).header.evt_id == raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_HVX as u16 {
+        hvx_portal(gattc_evt.conn_handle).call(ble_evt);
+    } else {
+        portal(gattc_evt.conn_handle).call(ble_evt);
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -606,8 +610,12 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
 
 const PORTAL_NEW: Portal<*const raw::ble_evt_t> = Portal::new();
 static PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [PORTAL_NEW; CONNS_MAX];
+static HVX_PORTALS: [Portal<*const raw::ble_evt_t>; CONNS_MAX] = [PORTAL_NEW; CONNS_MAX];
 pub(crate) fn portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
     &PORTALS[conn_handle as usize]
+}
+pub(crate) fn hvx_portal(conn_handle: u16) -> &'static Portal<*const raw::ble_evt_t> {
+    &HVX_PORTALS[conn_handle as usize]
 }
 
 pub async fn run<'a, F, C>(conn: &Connection, client: &C, mut f: F) -> DisconnectedError
@@ -620,7 +628,7 @@ where
         Err(e) => return e,
     };
 
-    portal(handle)
+    hvx_portal(handle)
         .wait_many(|ble_evt| unsafe {
             let ble_evt = &*ble_evt;
             if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {

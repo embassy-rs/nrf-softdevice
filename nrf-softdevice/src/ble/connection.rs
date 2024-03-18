@@ -224,6 +224,8 @@ impl ConnectionState {
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
         crate::ble::gatt_client::portal(conn_handle).call(_ble_evt);
+        #[cfg(feature = "ble-gatt-client")]
+        crate::ble::gatt_client::hvx_portal(conn_handle).call(_ble_evt);
         #[cfg(feature = "ble-gatt-server")]
         crate::ble::gatt_server::portal(conn_handle).call(_ble_evt);
         #[cfg(feature = "ble-l2cap")]
