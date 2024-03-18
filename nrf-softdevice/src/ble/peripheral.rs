@@ -374,7 +374,7 @@ where
                         Err(_) => {
                             raw::sd_ble_gap_disconnect(
                                 conn_handle,
-                                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
+                                raw::BLE_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES as _,
                             );
                             Err(AdvertiseError::NoFreeConn)
                         }

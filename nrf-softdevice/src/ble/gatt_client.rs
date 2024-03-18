@@ -632,7 +632,8 @@ where
         .wait_many(|ble_evt| unsafe {
             let ble_evt = &*ble_evt;
             if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {
-                return Some(DisconnectedError);
+                let gap_evt = get_union_field(ble_evt, &ble_evt.evt.gap_evt);
+                return Some(DisconnectedError::from_raw(gap_evt.params.disconnected.reason));
             }
 
             // We have a GATTC event

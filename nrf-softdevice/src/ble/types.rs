@@ -611,3 +611,122 @@ error_codes! {
     /// ATT Common Profile and Service Error: Out Of Range.
     (ATTERR_CPS_OUT_OF_RANGE, BLE_GATT_STATUS_ATTERR_CPS_OUT_OF_RANGE, "Out of Range");
 }
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+pub struct HciStatus(u8);
+
+impl HciStatus {
+    pub const fn new(status: u8) -> Self {
+        Self(status)
+    }
+}
+
+impl From<u8> for HciStatus {
+    fn from(value: u8) -> Self {
+        Self(value)
+    }
+}
+
+impl From<HciStatus> for u8 {
+    fn from(value: HciStatus) -> Self {
+        value.0
+    }
+}
+
+macro_rules! hci_status_codes {
+    (
+        $(
+            $(#[$docs:meta])*
+            ($konst:ident, $raw:expr, $phrase:expr);
+        )+
+    ) => {
+        impl HciStatus {
+        $(
+            $(#[$docs])*
+            pub const $konst: HciStatus = HciStatus($raw as u8);
+        )+
+        }
+
+        #[cfg(feature = "defmt")]
+        impl defmt::Format for HciStatus {
+            fn format(&self, fmt: defmt::Formatter) {
+                match *self {
+                    $(
+                    Self::$konst => defmt::write!(fmt, $phrase),
+                    )+
+                    _ => defmt::write!(fmt, "Unknown HCI status: 0x{:02x}", self.0),
+                }
+            }
+        }
+
+        impl core::fmt::Debug for HciStatus {
+            fn fmt(&self, fmt: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match *self {
+                    $(
+                    Self::$konst => core::write!(fmt, $phrase),
+                    )+
+                    _ => core::write!(fmt, "Unknown HCI status: 0x{:02x}", self.0),
+                }
+            }
+        }
+    }
+}
+
+hci_status_codes! {
+    /// Success
+    (SUCCESS, raw::BLE_HCI_STATUS_CODE_SUCCESS, "Success");
+    /// Unknown HCI Command
+    (UNKNOWN_BTLE_COMMAND, raw::BLE_HCI_STATUS_CODE_UNKNOWN_BTLE_COMMAND, "Unknown HCI Command");
+    /// Unknown Connection Identifier
+    (UNKNOWN_CONNECTION_IDENTIFIER, raw::BLE_HCI_STATUS_CODE_UNKNOWN_CONNECTION_IDENTIFIER, "Unknown Connection Identifier");
+    /// Authentication Failure
+    (AUTHENTICATION_FAILURE, raw::BLE_HCI_AUTHENTICATION_FAILURE, "Authentication Failure");
+    /// PIN Or Key Missing
+    (PIN_OR_KEY_MISSING, raw::BLE_HCI_STATUS_CODE_PIN_OR_KEY_MISSING, "PIN Or Key Missing");
+    /// Memory Capacity Exceeded
+    (MEMORY_CAPACITY_EXCEEDED, raw::BLE_HCI_MEMORY_CAPACITY_EXCEEDED, "Memory Capacity Exceeded");
+    /// Connection Timeout
+    (CONNECTION_TIMEOUT, raw::BLE_HCI_CONNECTION_TIMEOUT, "Connection Timeout");
+    /// Command Disallowed
+    (COMMAND_DISALLOWED, raw::BLE_HCI_STATUS_CODE_COMMAND_DISALLOWED, "Command Disallowed");
+    /// Invalid HCI Command Parameters
+    (INVALID_BTLE_COMMAND_PARAMETERS, raw::BLE_HCI_STATUS_CODE_INVALID_BTLE_COMMAND_PARAMETERS, "Invalid HCI Command Parameters");
+    /// Remote User Terminated Connection
+    (REMOTE_USER_TERMINATED_CONNECTION, raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION, "Remote User Terminated Connection");
+    /// Remote Device Terminated Connection due to Low Resources
+    (REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES, raw::BLE_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES, "Remote Device Terminated Connection due to Low Resources");
+    /// Remote Device Terminated Connection due to Power Off
+    (REMOTE_DEV_TERMINATION_DUE_TO_POWER_OFF, raw::BLE_HCI_REMOTE_DEV_TERMINATION_DUE_TO_POWER_OFF, "Remote Device Terminated Connection due to Power Off");
+    /// Connection Terminated by Local Host
+    (LOCAL_HOST_TERMINATED_CONNECTION, raw::BLE_HCI_LOCAL_HOST_TERMINATED_CONNECTION, "Connection Terminated by Local Host");
+    /// Unsupported Remote Feature
+    (UNSUPPORTED_REMOTE_FEATURE, raw::BLE_HCI_UNSUPPORTED_REMOTE_FEATURE, "Unsupported Remote Feature");
+    /// Invalid LMP Parameters
+    (INVALID_LMP_PARAMETERS, raw::BLE_HCI_STATUS_CODE_INVALID_LMP_PARAMETERS, "Invalid LMP Parameters");
+    /// Unspecified Error
+    (UNSPECIFIED_ERROR, raw::BLE_HCI_STATUS_CODE_UNSPECIFIED_ERROR, "Unspecified Error");
+    /// LMP Response Timeout
+    (LMP_RESPONSE_TIMEOUT, raw::BLE_HCI_STATUS_CODE_LMP_RESPONSE_TIMEOUT, "LMP Response Timeout");
+    /// LMP Error Transaction Collision
+    (LMP_ERROR_TRANSACTION_COLLISION, raw::BLE_HCI_STATUS_CODE_LMP_ERROR_TRANSACTION_COLLISION, "LMP Error Transaction Collision");
+    /// LMP PDU Not Allowed
+    (LMP_PDU_NOT_ALLOWED, raw::BLE_HCI_STATUS_CODE_LMP_PDU_NOT_ALLOWED, "LMP PDU Not Allowed");
+    /// Instant Passed
+    (INSTANT_PASSED, raw::BLE_HCI_INSTANT_PASSED, "Instant Passed");
+    /// Pairing With Unit Key Not Supported
+    (PAIRING_WITH_UNIT_KEY_UNSUPPORTED, raw::BLE_HCI_PAIRING_WITH_UNIT_KEY_UNSUPPORTED, "Pairing With Unit Key Not Supported");
+    /// Different Transaction Collision
+    (DIFFERENT_TRANSACTION_COLLISION, raw::BLE_HCI_DIFFERENT_TRANSACTION_COLLISION, "Different Transaction Collision");
+    /// Parameter Out Of Mandatory Range
+    (PARAMETER_OUT_OF_MANDATORY_RANGE, raw::BLE_HCI_PARAMETER_OUT_OF_MANDATORY_RANGE, "Parameter Out Of Mandatory Range");
+    /// Controller Busy
+    (CONTROLLER_BUSY, raw::BLE_HCI_CONTROLLER_BUSY, "Controller Busy");
+    /// Unacceptable Connection Parameters
+    (CONN_INTERVAL_UNACCEPTABLE, raw::BLE_HCI_CONN_INTERVAL_UNACCEPTABLE, "Unacceptable Connection Parameters");
+    /// Advertising Timeout
+    (DIRECTED_ADVERTISER_TIMEOUT, raw::BLE_HCI_DIRECTED_ADVERTISER_TIMEOUT, "Advertising Timeout");
+    /// Connection Terminated due to MIC Failure
+    (CONN_TERMINATED_DUE_TO_MIC_FAILURE, raw::BLE_HCI_CONN_TERMINATED_DUE_TO_MIC_FAILURE, "Connection Terminated due to MIC Failure");
+    /// Connection Failed to be Established
+    (CONN_FAILED_TO_BE_ESTABLISHED, raw::BLE_HCI_CONN_FAILED_TO_BE_ESTABLISHED, "Connection Failed to be Established");
+}
