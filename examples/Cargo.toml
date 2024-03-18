@@ -61,7 +61,15 @@ name = "ble_bas_peripheral_notify"
 required-features = ["ble-gatt-server"]
 
 [[bin]]
+name = "ble_bond_peripheral"
+required-features = ["ble-gatt-server"]
+
+[[bin]]
 name = "ble_bas_central"
+required-features = ["ble-gatt-client"]
+
+[[bin]]
+name = "ble_bond_central"
 required-features = ["ble-gatt-client"]
 
 [[bin]]

@@ -308,6 +308,11 @@ pub struct MasterId {
 }
 
 impl MasterId {
+    pub fn as_raw(&self) -> &raw::ble_gap_master_id_t {
+        // Safety: `Self` has the same layout as `raw::ble_gap_master_id_t` and no uninitialized (padding) bytes
+        unsafe { mem::transmute(self) }
+    }
+
     pub fn from_raw(raw: raw::ble_gap_master_id_t) -> Self {
         MasterId {
             ediv: raw.ediv,

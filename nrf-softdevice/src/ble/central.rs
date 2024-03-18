@@ -6,7 +6,7 @@
 use core::{mem, ptr};
 
 use crate::ble::types::*;
-use crate::ble::{Address, Connection};
+use crate::ble::{Address, Connection, OutOfConnsError};
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{raw, RawError, Softdevice};
 
@@ -39,8 +39,27 @@ impl From<RawError> for ConnectError {
 
 pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
+pub async fn connect(sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Connection, ConnectError> {
+    connect_inner(sd, config, Connection::new).await
+}
+
+#[cfg(feature = "ble-sec")]
+pub async fn connect_with_security(
+    sd: &Softdevice,
+    config: &ConnectConfig<'_>,
+    security_handler: &'static dyn crate::ble::security::SecurityHandler,
+) -> Result<Connection, ConnectError> {
+    connect_inner(sd, config, |conn_handle, role, peer_address, conn_params| {
+        Connection::with_security_handler(conn_handle, role, peer_address, conn_params, security_handler)
+    })
+    .await
+}
+
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
-pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Connection, ConnectError> {
+async fn connect_inner<F>(_sd: &Softdevice, config: &ConnectConfig<'_>, new_conn: F) -> Result<Connection, ConnectError>
+where
+    F: Fn(u16, Role, Address, raw::ble_gap_conn_params_t) -> Result<Connection, OutOfConnsError>,
+{
     if let Some(w) = config.scan_config.whitelist {
         if w.len() == 0 {
             return Err(ConnectError::NoAddresses);
@@ -78,7 +97,7 @@ pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Con
                     let conn_params = params.conn_params;
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
-                    match Connection::new(conn_handle, role, peer_address, conn_params) {
+                    match new_conn(conn_handle, role, peer_address, conn_params) {
                         Ok(conn) => {
                             #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
                             crate::ble::gap::do_data_length_update(conn_handle, ptr::null());
