@@ -177,8 +177,7 @@ where
         .wait_many(|ble_evt| unsafe {
             let ble_evt = &*ble_evt;
             if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {
-                let gap_evt = get_union_field(ble_evt, &ble_evt.evt.gap_evt);
-                return Some(DisconnectedError::from_raw(gap_evt.params.disconnected.reason));
+                return Some(DisconnectedError::from_evt(ble_evt));
             }
 
             // If evt_id is not BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED, then it must be a GATTS event
@@ -324,7 +323,7 @@ pub fn set_value(_sd: &Softdevice, handle: u16, val: &[u8]) -> Result<(), SetVal
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum NotifyValueError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
@@ -335,8 +334,8 @@ impl From<RawError> for NotifyValueError {
 }
 
 impl From<DisconnectedError> for NotifyValueError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -361,7 +360,7 @@ pub fn notify_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), No
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum IndicateValueError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
@@ -372,8 +371,8 @@ impl From<RawError> for IndicateValueError {
 }
 
 impl From<DisconnectedError> for IndicateValueError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -399,13 +398,13 @@ pub fn indicate_value(conn: &Connection, handle: u16, val: &[u8]) -> Result<(), 
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum GetSysAttrsError {
     DataSize(usize),
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for GetSysAttrsError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -424,13 +423,13 @@ pub fn get_sys_attrs(conn: &Connection, buf: &mut [u8]) -> Result<usize, GetSysA
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetSysAttrsError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for SetSysAttrsError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 

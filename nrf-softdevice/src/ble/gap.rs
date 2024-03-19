@@ -357,7 +357,7 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
                     Err(EncryptError::NoSecurityHandler) | Err(EncryptError::PeerKeysNotFound) => {
                         conn.request_pairing()
                     }
-                    Err(EncryptError::Disconnected) => Err(AuthenticateError::Disconnected),
+                    Err(EncryptError::Disconnected(err)) => Err(AuthenticateError::Disconnected(err)),
                     Err(EncryptError::Raw(err)) => Err(AuthenticateError::Raw(err)),
                 };
                 #[cfg(not(feature = "ble-sec"))]

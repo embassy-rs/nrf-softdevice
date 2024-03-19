@@ -21,29 +21,32 @@ pub(crate) struct OutOfConnsError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub struct DisconnectedError {
-    pub reason: HciStatus,
-}
+pub struct DisconnectedError(pub HciStatus);
 
 impl DisconnectedError {
-    pub(crate) fn from_raw(reason: u8) -> Self {
-        Self {
-            reason: HciStatus::new(reason),
-        }
+    pub(crate) unsafe fn from_evt(ble_evt: *const raw::ble_evt_t) -> Self {
+        assert_eq!(
+            u32::from((*ble_evt).header.evt_id),
+            raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED,
+            "bug: creating DisconnectedError from non-disconnect event"
+        );
+        let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
+        let reason = HciStatus::new(gap_evt.params.disconnected.reason);
+        Self(reason)
     }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub(crate) enum ConnHandle {
-    Disconnected(HciStatus),
+    Disconnected(DisconnectedError),
     Connected(u16),
 }
 
 impl ConnHandle {
     const fn to_result(self) -> Result<u16, DisconnectedError> {
         match self {
-            ConnHandle::Disconnected(reason) => Err(DisconnectedError { reason }),
+            ConnHandle::Disconnected(reason) => Err(reason),
             ConnHandle::Connected(handle) => Ok(handle),
         }
     }
@@ -63,13 +66,13 @@ impl ConnHandle {
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetConnParamsError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for SetConnParamsError {
-    fn from(_err: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -83,14 +86,14 @@ impl From<RawError> for SetConnParamsError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(feature = "ble-peripheral")]
 pub enum IgnoreSlaveLatencyError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 #[cfg(feature = "ble-peripheral")]
 impl From<DisconnectedError> for IgnoreSlaveLatencyError {
-    fn from(_err: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -118,13 +121,13 @@ impl From<DisconnectedError> for DataLengthUpdateError {
 }
 
 pub enum PhyUpdateError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for PhyUpdateError {
-    fn from(_err: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -138,14 +141,14 @@ impl From<RawError> for PhyUpdateError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
 pub enum AuthenticateError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Raw(RawError),
 }
 
 #[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
 impl From<DisconnectedError> for AuthenticateError {
-    fn from(_err: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -160,7 +163,7 @@ impl From<RawError> for AuthenticateError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(all(feature = "ble-central", feature = "ble-sec"))]
 pub enum EncryptError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     NoSecurityHandler,
     PeerKeysNotFound,
     Raw(RawError),
@@ -168,8 +171,8 @@ pub enum EncryptError {
 
 #[cfg(all(feature = "ble-central", feature = "ble-sec"))]
 impl From<DisconnectedError> for EncryptError {
-    fn from(_err: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -264,7 +267,7 @@ impl ConnectionState {
         // can go into .bss instead of .data, which saves flash space.
         Self {
             refcount: 0,
-            conn_handle: ConnHandle::Disconnected(HciStatus::SUCCESS),
+            conn_handle: ConnHandle::Disconnected(DisconnectedError(HciStatus::SUCCESS)),
             #[cfg(feature = "ble-central")]
             role: Role::Central,
             #[cfg(not(feature = "ble-central"))]
@@ -327,13 +330,8 @@ impl ConnectionState {
 
         ibh.set(None);
 
-        let reason = unsafe {
-            get_union_field(ble_evt, &(*ble_evt).evt.gap_evt)
-                .params
-                .disconnected
-                .reason
-        };
-        self.conn_handle = ConnHandle::Disconnected(HciStatus::new(reason));
+        let reason = unsafe { DisconnectedError::from_evt(ble_evt) };
+        self.conn_handle = ConnHandle::Disconnected(reason);
 
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]

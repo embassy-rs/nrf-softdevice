@@ -79,7 +79,7 @@ pub trait Client {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DiscoverError {
     /// Connection is disconnected.
-    Disconnected,
+    Disconnected(DisconnectedError),
     /// No service with the given UUID found in the server.
     ServiceNotFound,
     /// Service with the given UUID found, but it's missing some required characteristics.
@@ -89,8 +89,8 @@ pub enum DiscoverError {
 }
 
 impl From<DisconnectedError> for DiscoverError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -120,7 +120,9 @@ pub(crate) async fn discover_service(conn: &Connection, uuid: Uuid) -> Result<ra
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Err(DiscoverError::Disconnected(DisconnectedError::from_evt(ble_evt)))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.prim_srvc_disc_rsp);
@@ -170,7 +172,9 @@ async fn discover_characteristics(
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Err(DiscoverError::Disconnected(DisconnectedError::from_evt(ble_evt)))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_CHAR_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.char_disc_rsp);
@@ -211,7 +215,9 @@ async fn discover_descriptors(
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(DiscoverError::Disconnected),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Err(DiscoverError::Disconnected(DisconnectedError::from_evt(ble_evt)))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_DESC_DISC_RSP => {
                     let gattc_evt = check_status(ble_evt)?;
                     let params = get_union_field(ble_evt, &gattc_evt.params.desc_disc_rsp);
@@ -315,15 +321,15 @@ pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ReadError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Truncated,
     Gatt(GattError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for ReadError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -351,7 +357,9 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(ReadError::Disconnected)),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Some(Err(ReadError::Disconnected(DisconnectedError::from_evt(ble_evt))))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_READ_RSP => {
                     let gattc_evt = match check_status(ble_evt) {
                         Ok(evt) => evt,
@@ -376,15 +384,15 @@ pub async fn read(conn: &Connection, handle: u16, buf: &mut [u8]) -> Result<usiz
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WriteError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     Timeout,
     Gatt(GattError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for WriteError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -422,7 +430,9 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
     portal(conn_handle)
         .wait_many(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(WriteError::Disconnected)),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Some(Err(WriteError::Disconnected(DisconnectedError::from_evt(ble_evt))))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_RSP => {
                     match check_status(ble_evt) {
                         Ok(_) => {}
@@ -430,9 +440,7 @@ pub async fn write(conn: &Connection, handle: u16, buf: &[u8]) -> Result<(), Wri
                     };
                     Some(Ok(()))
                 }
-                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => {
-                    return Some(Err(WriteError::Timeout));
-                }
+                raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_TIMEOUT => Some(Err(WriteError::Timeout)),
                 _ => None,
             }
         })
@@ -463,7 +471,9 @@ pub async fn write_without_response(conn: &Connection, handle: u16, buf: &[u8]) 
         portal(conn_handle)
             .wait_many(|ble_evt| unsafe {
                 match (*ble_evt).header.evt_id as u32 {
-                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Some(Err(WriteError::Disconnected)),
+                    raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                        Some(Err(WriteError::Disconnected(DisconnectedError::from_evt(ble_evt))))
+                    }
                     raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_WRITE_CMD_TX_COMPLETE => Some(Ok(())),
                     _ => None,
                 }
@@ -475,15 +485,15 @@ pub async fn write_without_response(conn: &Connection, handle: u16, buf: &[u8]) 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum TryWriteError {
-    Disconnected,
+    Disconnected(DisconnectedError),
     BufferFull,
     Gatt(GattError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for TryWriteError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -538,14 +548,14 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum MtuExchangeError {
     /// Connection is disconnected.
-    Disconnected,
+    Disconnected(DisconnectedError),
     Gatt(GattError),
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for MtuExchangeError {
-    fn from(_: DisconnectedError) -> Self {
-        Self::Disconnected
+    fn from(err: DisconnectedError) -> Self {
+        Self::Disconnected(err)
     }
 }
 
@@ -589,7 +599,9 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
     portal(conn_handle)
         .wait_once(|ble_evt| unsafe {
             match (*ble_evt).header.evt_id as u32 {
-                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => return Err(MtuExchangeError::Disconnected),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED => {
+                    Err(MtuExchangeError::Disconnected(DisconnectedError::from_evt(ble_evt)))
+                }
                 raw::BLE_GATTC_EVTS_BLE_GATTC_EVT_EXCHANGE_MTU_RSP => {
                     let gattc_evt = match check_status(ble_evt) {
                         Ok(evt) => evt,
@@ -632,8 +644,7 @@ where
         .wait_many(|ble_evt| unsafe {
             let ble_evt = &*ble_evt;
             if u32::from(ble_evt.header.evt_id) == raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED {
-                let gap_evt = get_union_field(ble_evt, &ble_evt.evt.gap_evt);
-                return Some(DisconnectedError::from_raw(gap_evt.params.disconnected.reason));
+                return Some(DisconnectedError::from_evt(ble_evt));
             }
 
             // We have a GATTC event
