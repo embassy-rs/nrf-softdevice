@@ -35,6 +35,33 @@ impl DisconnectedError {
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub(crate) enum ConnHandle {
+    Disconnected(HciStatus),
+    Connected(u16),
+}
+
+impl ConnHandle {
+    const fn to_result(self) -> Result<u16, DisconnectedError> {
+        match self {
+            ConnHandle::Disconnected(reason) => Err(DisconnectedError { reason }),
+            ConnHandle::Connected(handle) => Ok(handle),
+        }
+    }
+
+    const fn handle(self) -> Option<u16> {
+        match self {
+            ConnHandle::Disconnected(_) => None,
+            ConnHandle::Connected(handle) => Some(handle),
+        }
+    }
+
+    const fn is_connected(&self) -> bool {
+        matches!(self, ConnHandle::Connected(_))
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetConnParamsError {
     Disconnected,
     Raw(RawError),
@@ -210,7 +237,7 @@ pub(crate) struct ConnectionState {
     // However, disconnection is not complete until the event GAP_DISCONNECTED.
     // so there's a small gap of time where the ConnectionState is not "free" even if refcount=0.
     pub refcount: u8,
-    pub conn_handle: Result<u16, DisconnectedError>,
+    pub conn_handle: ConnHandle,
 
     pub disconnecting: bool,
     pub role: Role,
@@ -237,9 +264,7 @@ impl ConnectionState {
         // can go into .bss instead of .data, which saves flash space.
         Self {
             refcount: 0,
-            conn_handle: Err(DisconnectedError {
-                reason: HciStatus::CONN_FAILED_TO_BE_ESTABLISHED,
-            }),
+            conn_handle: ConnHandle::Disconnected(HciStatus::SUCCESS),
             #[cfg(feature = "ble-central")]
             role: Role::Central,
             #[cfg(not(feature = "ble-central"))]
@@ -264,7 +289,7 @@ impl ConnectionState {
         }
     }
     pub(crate) fn check_connected(&mut self) -> Result<u16, DisconnectedError> {
-        self.conn_handle
+        self.conn_handle.to_result()
     }
 
     pub(crate) fn disconnect(&mut self) -> Result<(), DisconnectedError> {
@@ -286,7 +311,10 @@ impl ConnectionState {
     }
 
     pub(crate) fn on_disconnected(&mut self, ble_evt: *const raw::ble_evt_t) {
-        let conn_handle = unwrap!(self.conn_handle, "bug: on_disconnected when already disconnected");
+        let conn_handle = unwrap!(
+            self.conn_handle.to_result(),
+            "bug: on_disconnected when already disconnected"
+        );
 
         let ibh = index_by_handle(conn_handle);
         let _index = unwrap!(ibh.get(), "bug: conn_handle has no index");
@@ -305,7 +333,7 @@ impl ConnectionState {
                 .disconnected
                 .reason
         };
-        self.conn_handle = Err(DisconnectedError::from_raw(reason));
+        self.conn_handle = ConnHandle::Disconnected(HciStatus::new(reason));
 
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
@@ -368,7 +396,7 @@ impl Drop for Connection {
             );
 
             if state.refcount == 0 {
-                if state.conn_handle.is_ok() {
+                if state.conn_handle.is_connected() {
                     trace!("conn {:?}: dropped, disconnecting", self.index);
                     // We still leave conn_handle set, because the connection is
                     // not really disconnected until we get GAP_DISCONNECTED event.
@@ -409,7 +437,7 @@ impl Connection {
     }
 
     pub fn handle(&self) -> Option<u16> {
-        self.with_state(|state| state.conn_handle.ok())
+        self.with_state(|state| state.conn_handle.handle())
     }
 
     pub fn from_handle(conn_handle: u16) -> Option<Connection> {
@@ -431,7 +459,7 @@ impl Connection {
             // Initialize
             *state = ConnectionState {
                 refcount: 1,
-                conn_handle: Ok(conn_handle),
+                conn_handle: ConnHandle::Connected(conn_handle),
                 role,
                 peer_address,
                 security_mode: SecurityMode::Open,
@@ -753,7 +781,7 @@ impl Iterator for ConnectionIter {
             unsafe {
                 for (i, s) in STATES[n..].iter().enumerate() {
                     let state = &mut *s.get();
-                    if state.conn_handle.is_ok() {
+                    if state.conn_handle.is_connected() {
                         let index = (n + i) as u8;
                         state.refcount =
                             unwrap!(state.refcount.checked_add(1), "Too many references to same connection");
@@ -795,7 +823,7 @@ fn allocate_index<T>(f: impl FnOnce(u8, &mut ConnectionState) -> T) -> Result<T,
     unsafe {
         for (i, s) in STATES.iter().enumerate() {
             let state = &mut *s.get();
-            if state.refcount == 0 && state.conn_handle.is_err() {
+            if state.refcount == 0 && !state.conn_handle.is_connected() {
                 return Ok(f(i as u8, state));
             }
         }
