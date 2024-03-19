@@ -680,7 +680,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                 #cccd_handle: 0,
             ));
             code_disc_done.extend(quote_spanned!(ch.span=>
-                if self.#value_handle == 0 {
+                if self.#cccd_handle == 0 {
                     return Err(#ble::gatt_client::DiscoverError::ServiceIncomplete);
                 }
             ));
@@ -746,6 +746,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
 
+    let vis = struc.vis.clone();
     let result = quote! {
         #struc
 
@@ -789,7 +790,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        enum #event_enum_name {
+        #vis enum #event_enum_name {
             #code_event_enum
         }
     };
