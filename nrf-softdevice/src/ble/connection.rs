@@ -21,58 +21,52 @@ pub(crate) struct OutOfConnsError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub struct DisconnectedError(pub HciStatus);
-
-impl DisconnectedError {
-    pub(crate) unsafe fn from_evt(ble_evt: *const raw::ble_evt_t) -> Self {
-        assert_eq!(
-            u32::from((*ble_evt).header.evt_id),
-            raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED,
-            "bug: creating DisconnectedError from non-disconnect event"
-        );
-        let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
-        let reason = HciStatus::new(gap_evt.params.disconnected.reason);
-        Self(reason)
-    }
-}
+pub struct DisconnectedError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub(crate) enum ConnHandle {
-    Disconnected(DisconnectedError),
+pub(crate) enum ConnHandleState {
+    Disconnected(HciStatus),
     Connected(u16),
 }
 
-impl ConnHandle {
+impl ConnHandleState {
     const fn to_result(self) -> Result<u16, DisconnectedError> {
         match self {
-            ConnHandle::Disconnected(reason) => Err(reason),
-            ConnHandle::Connected(handle) => Ok(handle),
+            ConnHandleState::Disconnected(_) => Err(DisconnectedError),
+            ConnHandleState::Connected(handle) => Ok(handle),
         }
     }
 
     const fn handle(self) -> Option<u16> {
         match self {
-            ConnHandle::Disconnected(_) => None,
-            ConnHandle::Connected(handle) => Some(handle),
+            ConnHandleState::Disconnected(_) => None,
+            ConnHandleState::Connected(handle) => Some(handle),
         }
     }
 
     const fn is_connected(&self) -> bool {
-        matches!(self, ConnHandle::Connected(_))
+        matches!(self, ConnHandleState::Connected(_))
+    }
+
+    const fn disconnect_reason(self) -> Option<HciStatus> {
+        match self {
+            ConnHandleState::Disconnected(reason) => Some(reason),
+            ConnHandleState::Connected(_) => None,
+        }
     }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SetConnParamsError {
-    Disconnected(DisconnectedError),
+    Disconnected,
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for SetConnParamsError {
-    fn from(err: DisconnectedError) -> Self {
-        Self::Disconnected(err)
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
     }
 }
 
@@ -86,14 +80,14 @@ impl From<RawError> for SetConnParamsError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(feature = "ble-peripheral")]
 pub enum IgnoreSlaveLatencyError {
-    Disconnected(DisconnectedError),
+    Disconnected,
     Raw(RawError),
 }
 
 #[cfg(feature = "ble-peripheral")]
 impl From<DisconnectedError> for IgnoreSlaveLatencyError {
-    fn from(err: DisconnectedError) -> Self {
-        Self::Disconnected(err)
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
     }
 }
 
@@ -121,13 +115,13 @@ impl From<DisconnectedError> for DataLengthUpdateError {
 }
 
 pub enum PhyUpdateError {
-    Disconnected(DisconnectedError),
+    Disconnected,
     Raw(RawError),
 }
 
 impl From<DisconnectedError> for PhyUpdateError {
-    fn from(err: DisconnectedError) -> Self {
-        Self::Disconnected(err)
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
     }
 }
 
@@ -141,14 +135,14 @@ impl From<RawError> for PhyUpdateError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
 pub enum AuthenticateError {
-    Disconnected(DisconnectedError),
+    Disconnected,
     Raw(RawError),
 }
 
 #[cfg(any(feature = "ble-central", feature = "ble-peripheral"))]
 impl From<DisconnectedError> for AuthenticateError {
-    fn from(err: DisconnectedError) -> Self {
-        Self::Disconnected(err)
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
     }
 }
 
@@ -163,7 +157,7 @@ impl From<RawError> for AuthenticateError {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[cfg(all(feature = "ble-central", feature = "ble-sec"))]
 pub enum EncryptError {
-    Disconnected(DisconnectedError),
+    Disconnected,
     NoSecurityHandler,
     PeerKeysNotFound,
     Raw(RawError),
@@ -171,8 +165,8 @@ pub enum EncryptError {
 
 #[cfg(all(feature = "ble-central", feature = "ble-sec"))]
 impl From<DisconnectedError> for EncryptError {
-    fn from(err: DisconnectedError) -> Self {
-        Self::Disconnected(err)
+    fn from(_err: DisconnectedError) -> Self {
+        Self::Disconnected
     }
 }
 
@@ -240,7 +234,7 @@ pub(crate) struct ConnectionState {
     // However, disconnection is not complete until the event GAP_DISCONNECTED.
     // so there's a small gap of time where the ConnectionState is not "free" even if refcount=0.
     pub refcount: u8,
-    pub conn_handle: ConnHandle,
+    pub conn_handle: ConnHandleState,
 
     pub disconnecting: bool,
     pub role: Role,
@@ -267,7 +261,7 @@ impl ConnectionState {
         // can go into .bss instead of .data, which saves flash space.
         Self {
             refcount: 0,
-            conn_handle: ConnHandle::Disconnected(DisconnectedError(HciStatus::SUCCESS)),
+            conn_handle: ConnHandleState::Disconnected(HciStatus::SUCCESS),
             #[cfg(feature = "ble-central")]
             role: Role::Central,
             #[cfg(not(feature = "ble-central"))]
@@ -315,7 +309,7 @@ impl ConnectionState {
 
     pub(crate) fn on_disconnected(&mut self, ble_evt: *const raw::ble_evt_t) {
         let conn_handle = unwrap!(
-            self.conn_handle.to_result(),
+            self.conn_handle.handle(),
             "bug: on_disconnected when already disconnected"
         );
 
@@ -330,8 +324,16 @@ impl ConnectionState {
 
         ibh.set(None);
 
-        let reason = unsafe { DisconnectedError::from_evt(ble_evt) };
-        self.conn_handle = ConnHandle::Disconnected(reason);
+        let reason = unsafe {
+            assert_eq!(
+                u32::from((*ble_evt).header.evt_id),
+                raw::BLE_GAP_EVTS_BLE_GAP_EVT_DISCONNECTED,
+                "bug: on_disconnected called with non-disconnect event"
+            );
+            let gap_evt = get_union_field(ble_evt, &(*ble_evt).evt.gap_evt);
+            HciStatus::new(gap_evt.params.disconnected.reason)
+        };
+        self.conn_handle = ConnHandleState::Disconnected(reason);
 
         // Signal possible in-progess operations that the connection has disconnected.
         #[cfg(feature = "ble-gatt-client")]
@@ -434,6 +436,10 @@ impl Connection {
         self.with_state(|state| state.disconnect_with_reason(reason))
     }
 
+    pub fn disconnect_reason(&self) -> Option<HciStatus> {
+        self.with_state(|state| state.conn_handle.disconnect_reason())
+    }
+
     pub fn handle(&self) -> Option<u16> {
         self.with_state(|state| state.conn_handle.handle())
     }
@@ -457,7 +463,7 @@ impl Connection {
             // Initialize
             *state = ConnectionState {
                 refcount: 1,
-                conn_handle: ConnHandle::Connected(conn_handle),
+                conn_handle: ConnHandleState::Connected(conn_handle),
                 role,
                 peer_address,
                 security_mode: SecurityMode::Open,
