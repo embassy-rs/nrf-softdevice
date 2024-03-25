@@ -370,12 +370,7 @@ where
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
                     match f(conn_handle, role, peer_address, conn_params) {
-                        Ok(conn) => {
-                            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-                            gap::do_data_length_update(conn_handle, ptr::null());
-
-                            Ok(conn)
-                        }
+                        Ok(conn) => Ok(conn),
                         Err(_) => {
                             raw::sd_ble_gap_disconnect(
                                 conn_handle,
