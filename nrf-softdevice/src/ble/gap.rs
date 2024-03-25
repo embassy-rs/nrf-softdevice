@@ -133,7 +133,9 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
             );
 
             let conn_handle = gap_evt.conn_handle;
-            do_data_length_update(conn_handle, core::ptr::null());
+            if let Some(mut conn) = Connection::from_handle(conn_handle) {
+                let _ = conn.data_length_update(None);
+            }
         }
         #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
         raw::BLE_GAP_EVTS_BLE_GAP_EVT_DATA_LENGTH_UPDATE => {
@@ -371,29 +373,6 @@ pub(crate) unsafe fn on_evt(ble_evt: *const raw::ble_evt_t) {
         // BLE_GAP_EVTS_BLE_GAP_EVT_SCAN_REQ_REPORT
         // BLE_GAP_EVTS_BLE_GAP_EVT_QOS_CHANNEL_SURVEY_REPORT
         _ => {}
-    }
-}
-
-#[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-pub(crate) unsafe fn do_data_length_update(conn_handle: u16, params: *const raw::ble_gap_data_length_params_t) {
-    let mut dl_limitation = core::mem::zeroed();
-    let ret = raw::sd_ble_gap_data_length_update(conn_handle, params, &mut dl_limitation);
-    if let Err(_err) = RawError::convert(ret) {
-        warn!("sd_ble_gap_data_length_update err {:?}", _err);
-
-        if dl_limitation.tx_payload_limited_octets != 0 || dl_limitation.rx_payload_limited_octets != 0 {
-            warn!(
-                "The requested TX/RX packet length is too long by {:?}/{:?} octets.",
-                dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets
-            );
-        }
-
-        if dl_limitation.tx_rx_time_limited_us != 0 {
-            warn!(
-                "The requested combination of TX and RX packet lengths is too long by {:?} us",
-                dl_limitation.tx_rx_time_limited_us
-            );
-        }
     }
 }
 
