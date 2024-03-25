@@ -63,22 +63,19 @@ impl From<RawError> for IgnoreSlaveLatencyError {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
+#[derive(Debug, Clone, Copy)]
 pub enum DataLengthUpdateError {
     Disconnected,
+    NotSupported(raw::ble_gap_data_length_limitation_t),
+    Resources(raw::ble_gap_data_length_limitation_t),
     Raw(RawError),
 }
 
+#[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
 impl From<DisconnectedError> for DataLengthUpdateError {
     fn from(_err: DisconnectedError) -> Self {
         Self::Disconnected
-    }
-}
-
-impl From<RawError> for DataLengthUpdateError {
-    fn from(err: RawError) -> Self {
-        Self::Raw(err)
     }
 }
 
@@ -571,7 +568,7 @@ impl Connection {
     pub fn data_length_update(
         &mut self,
         params: Option<&raw::ble_gap_data_length_params_t>,
-    ) -> Result<raw::ble_gap_data_length_limitation_t, DataLengthUpdateError> {
+    ) -> Result<(), DataLengthUpdateError> {
         let conn_handle = self.with_state(|state| state.check_connected())?;
 
         let params = params.map(core::ptr::from_ref).unwrap_or(core::ptr::null());
@@ -580,24 +577,31 @@ impl Connection {
 
         if let Err(err) = RawError::convert(ret) {
             warn!("sd_ble_gap_data_length_update err {:?}", err);
-            return Err(err.into());
+
+            if dl_limitation.tx_payload_limited_octets != 0 || dl_limitation.rx_payload_limited_octets != 0 {
+                warn!(
+                    "The requested TX/RX packet length is too long by {:?}/{:?} octets.",
+                    dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets
+                );
+            }
+
+            if dl_limitation.tx_rx_time_limited_us != 0 {
+                warn!(
+                    "The requested combination of TX and RX packet lengths is too long by {:?} us",
+                    dl_limitation.tx_rx_time_limited_us
+                );
+            }
+
+            let err = match err {
+                RawError::NotSupported => DataLengthUpdateError::NotSupported(dl_limitation),
+                RawError::Resources => DataLengthUpdateError::Resources(dl_limitation),
+                err => DataLengthUpdateError::Raw(err),
+            };
+
+            return Err(err);
         }
 
-        if dl_limitation.tx_payload_limited_octets != 0 || dl_limitation.rx_payload_limited_octets != 0 {
-            warn!(
-                "The requested TX/RX packet length is too long by {:?}/{:?} octets.",
-                dl_limitation.tx_payload_limited_octets, dl_limitation.rx_payload_limited_octets
-            );
-        }
-
-        if dl_limitation.tx_rx_time_limited_us != 0 {
-            warn!(
-                "The requested combination of TX and RX packet lengths is too long by {:?} us",
-                dl_limitation.tx_rx_time_limited_us
-            );
-        }
-
-        Ok(dl_limitation)
+        Ok(())
     }
 
     /// Send a request to the connected device to change the PHY.
