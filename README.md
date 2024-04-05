@@ -40,7 +40,10 @@ The following softdevices are supported.
 
 The following nRF chips are supported
 
+- nRF52805
 - nRF52810
+- nRF52811
+- nRF52820
 - nRF52832
 - nRF52833
 - nRF52840
