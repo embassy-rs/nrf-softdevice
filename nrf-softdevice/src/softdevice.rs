@@ -70,7 +70,7 @@ fn get_app_ram_base() -> u32 {
         static mut __sdata: u32;
     }
 
-    unsafe { &mut __sdata as *mut u32 as u32 }
+    unsafe { ptr::addr_of!(__sdata) as u32 }
 }
 
 fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
