@@ -1,6 +1,6 @@
 //! Bluetooth Peripheral operations. Peripheral devices emit advertisements, and optionally accept connections from Central devices.
 
-use core::{mem, ptr};
+use core::ptr;
 
 use crate::ble::*;
 use crate::util::{get_union_field, OnDrop, Portal};
@@ -220,16 +220,12 @@ static mut ADV_HANDLE: u8 = raw::BLE_GAP_ADV_SET_HANDLE_NOT_SET as u8;
 pub(crate) static ADV_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
 fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), AdvertiseError> {
-    let mut adv_params: raw::ble_gap_adv_params_t = unsafe { mem::zeroed() };
+    let mut adv_params: raw::ble_gap_adv_params_t = unsafe { core::mem::zeroed() };
 
     adv_params.properties.type_ = adv.kind;
     adv_params.properties.set_anonymous(u8::from(adv.anonymous));
 
-    adv_params.p_peer_addr = adv
-        .peer
-        .as_ref()
-        .map(|x| x.as_raw() as *const _)
-        .unwrap_or(core::ptr::null());
+    adv_params.p_peer_addr = adv.peer.as_ref().map(|x| x.as_raw() as *const _).unwrap_or(ptr::null());
     adv_params.primary_phy = config.primary_phy as u8;
     adv_params.secondary_phy = config.secondary_phy as u8;
     adv_params.duration = config.timeout.map(|t| t.max(1)).unwrap_or(0);
@@ -259,7 +255,8 @@ fn start_adv(adv: RawAdvertisement<'_>, config: &Config) -> Result<(), Advertise
         scan_rsp_data: map_data(adv.scan_data),
     };
 
-    let ret = unsafe { raw::sd_ble_gap_adv_set_configure(&mut ADV_HANDLE as _, &datas as _, &adv_params as _) };
+    let ret =
+        unsafe { raw::sd_ble_gap_adv_set_configure(ptr::addr_of!(ADV_HANDLE) as _, &datas as _, &adv_params as _) };
     RawError::convert(ret).map_err(|err| {
         warn!("sd_ble_gap_adv_set_configure err {:?}", err);
         err
