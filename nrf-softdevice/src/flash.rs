@@ -85,7 +85,18 @@ impl ReadNorFlash for Flash {
     }
 
     fn capacity(&self) -> usize {
-        256 * 4096
+        #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811",))]
+        return 48 * 4096; // 192KB
+
+        #[cfg(feature = "nrf52820")]
+        return 64 * 4096; // 256KB
+
+        // TODO: nrf52832 has also "lite" edition (QFAB) with 256KB/32KB of flash/RAM
+        #[cfg(any(feature = "nrf52832", feature = "nrf52833",))]
+        return 128 * 4096; // 512KB
+
+        #[cfg(feature = "nrf52840")]
+        return 256 * 4096; // 1024KB
     }
 }
 
