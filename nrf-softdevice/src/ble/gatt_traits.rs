@@ -66,7 +66,7 @@ impl<T: Primitive> FixedGattValue for T {
         if data.len() != Self::SIZE {
             panic!("Bad len")
         }
-        unsafe { *(data.as_ptr() as *const Self) }
+        unsafe { (data.as_ptr() as *const Self).read_unaligned() }
     }
 
     fn to_gatt(&self) -> &[u8] {
