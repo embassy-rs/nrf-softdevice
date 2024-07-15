@@ -55,7 +55,7 @@ pub trait Client {
 
     /// Get the UUID of the GATT service. This is used by [`discover`] to search for the
     /// service in the GATT server.
-    fn uuid() -> Uuid;
+    fn uuid(&self) -> Uuid;
 
     /// Create a new instance in a "not-yet-discovered" state.
     fn new_undiscovered(conn: Connection) -> Self;
@@ -278,12 +278,12 @@ async fn discover_inner<T: Client>(
 pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> {
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
-    let svc = match discover_service(conn, T::uuid()).await {
+    let mut client = T::new_undiscovered(conn.clone());
+
+    let svc = match discover_service(conn, client.uuid()).await {
         Err(DiscoverError::Gatt(GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) => Err(DiscoverError::ServiceNotFound),
         x => x,
     }?;
-
-    let mut client = T::new_undiscovered(conn.clone());
 
     let mut curr_handle = svc.handle_range.start_handle;
     let end_handle = svc.handle_range.end_handle;
