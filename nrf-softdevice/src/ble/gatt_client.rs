@@ -58,7 +58,7 @@ pub trait Client {
     fn uuid(&self) -> Uuid;
 
     /// Create a new instance in a "not-yet-discovered" state.
-    fn new_undiscovered(conn: Connection) -> Self;
+    fn new_undiscovered(uuid: Uuid, conn: Connection) -> Self;
 
     /// Called by [`discover`] for every discovered characteristic. Implementations must
     /// check if they're interested in the UUID of the characteristic, and save their
@@ -275,10 +275,10 @@ async fn discover_inner<T: Client>(
 
 /// Discover a service in the peer's GATT server and construct a Client instance
 /// to use it.
-pub async fn discover<T: Client>(conn: &Connection) -> Result<T, DiscoverError> {
+pub async fn discover<T: Client>(uuid: &Uuid, conn: &Connection) -> Result<T, DiscoverError> {
     // TODO handle drop. Probably doable gracefully (no DropBomb)
 
-    let mut client = T::new_undiscovered(conn.clone());
+    let mut client = T::new_undiscovered(uuid.clone(), conn.clone());
 
     let svc = match discover_service(conn, client.uuid()).await {
         Err(DiscoverError::Gatt(GattError::ATTERR_ATTRIBUTE_NOT_FOUND)) => Err(DiscoverError::ServiceNotFound),
