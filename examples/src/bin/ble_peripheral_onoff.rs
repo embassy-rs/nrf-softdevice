@@ -124,10 +124,8 @@ async fn main(spawner: Spawner) {
     info!("Press button 1 to enable, button 2 to disable");
     #[cfg(feature = "microbit-v2")]
     let (b1_pin, b2_pin) = (p.P0_14, p.P0_23);
-    #[cfg(feature = "nrf52840-dk")]
+    #[cfg(any(feature = "nrf52840-dk", feature = "nrf52832-dk"))]
     let (b1_pin, b2_pin) = (p.P0_11, p.P0_12);
-    #[cfg(not(any(feature = "nrf52840-dk", feature = "microbit-v2")))]
-    panic!("unsupported board");
 
     let button1 = Input::new(b1_pin.degrade(), Pull::Up);
     let button2 = Input::new(b2_pin.degrade(), Pull::Up);

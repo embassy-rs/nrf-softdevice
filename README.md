@@ -81,7 +81,7 @@ To run an example, simply use `cargo run` from the `examples` folder:
 
 - `cd examples && cargo run --bin ble_bas_peripheral --features nrf52840-dk`
 
-Examples can also built for nrf52832 chip targeting S132 softdevice (feature flag `nrf52832`, board is unknown), or for nrf52833 targeting S140 softdevice on the BBC micro:bit v2 (feature flag `microbit-v2`). In these cases, edit `.cargo/config.toml` as needed.
+Examples can also built for nrf52832 development kit targeting S132 softdevice (feature flag `nrf52832-dk`), or for nrf52833 targeting S140 softdevice on the BBC micro:bit v2 (feature flag `microbit-v2`). In these cases, edit `.cargo/config.toml` as needed.
 
 ## Configuring a SoftDevice
 

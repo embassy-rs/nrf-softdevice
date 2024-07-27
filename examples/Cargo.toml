@@ -37,6 +37,7 @@ nrf52840 = [
 ]
 
 nrf52840-dk = ["nrf52840"]
+nrf52832-dk = ["nrf52832"]
 microbit-v2 = ["nrf52833"]
 
 [dependencies]
