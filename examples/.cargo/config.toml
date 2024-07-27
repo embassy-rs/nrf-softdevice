@@ -1,4 +1,7 @@
 [target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# Pick ONE of these chip targets
+#runner = "probe-rs run --chip nRF52832_xxAA"
+#runner = "probe-rs run --chip nRF52833_xxAA"
 runner = "probe-rs run --chip nRF52840_xxAA"
 
 [build]
