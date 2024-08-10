@@ -187,7 +187,7 @@ where
         len: BUF_LEN as u16,
     };
 
-    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, &BUF_DATA) };
+    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, ptr::addr_of!(BUF_DATA)) };
     match RawError::convert(ret) {
         Ok(()) => {}
         Err(err) => {
@@ -218,7 +218,7 @@ where
                     }
 
                     // Resume scan
-                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), &BUF_DATA);
+                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), ptr::addr_of!(BUF_DATA));
                     match RawError::convert(ret) {
                         Ok(()) => {}
 
