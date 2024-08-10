@@ -6,8 +6,9 @@ set -euxo pipefail
 #===============
 
 cd examples
-cargo build --target thumbv7em-none-eabihf --features nrf52832 --bins
-cargo build --target thumbv7em-none-eabihf --features nrf52840 --bins
+cargo build --target thumbv7em-none-eabihf --features nrf52832-dk --bins
+cargo build --target thumbv7em-none-eabihf --features microbit-v2 --bins
+cargo build --target thumbv7em-none-eabihf --features nrf52840-dk --bins
 cd ..
 
 

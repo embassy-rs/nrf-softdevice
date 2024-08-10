@@ -23,12 +23,22 @@ nrf52832 = [
   "nrf-softdevice/s132",
   "dep:nrf-softdevice-s132"
 ]
+nrf52833 = [
+  "embassy-nrf/nrf52833",
+  "nrf-softdevice/nrf52833",
+  "nrf-softdevice/s140",
+  "dep:nrf-softdevice-s140"
+]
 nrf52840 = [
   "embassy-nrf/nrf52840",
   "nrf-softdevice/nrf52840",
   "nrf-softdevice/s140",
   "dep:nrf-softdevice-s140"
 ]
+
+nrf52840-dk = ["nrf52840"]
+nrf52832-dk = ["nrf52832"]
+microbit-v2 = ["nrf52833"]
 
 [dependencies]
 embassy-executor = { version = "0.5.0", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt", "integrated-timers"]}

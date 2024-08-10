@@ -16,6 +16,8 @@ use std::path::PathBuf;
 fn linker_data() -> &'static [u8] {
     #[cfg(feature = "nrf52832")]
     return include_bytes!("memory-nrf52832.x");
+    #[cfg(feature = "nrf52833")]
+    return include_bytes!("memory-nrf52833.x");
     #[cfg(feature = "nrf52840")]
     return include_bytes!("memory-nrf52840.x");
 
@@ -24,9 +26,8 @@ fn linker_data() -> &'static [u8] {
         feature = "nrf52810",
         feature = "nrf52811",
         feature = "nrf52820",
-        feature = "nrf52833",
     ))]
-    panic!("Unable to build examples for currently selected chip due to missing chip-specific linker configuration (memory.x)");
+    panic!("Unable to build examples for currently selected chip due to missing chip-specific linker configuration (memory.x)")
 }
 
 fn main() {

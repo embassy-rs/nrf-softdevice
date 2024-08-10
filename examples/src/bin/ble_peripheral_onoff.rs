@@ -121,10 +121,15 @@ async fn main(spawner: Spawner) {
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
     info!("Bluetooth is OFF");
-    info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
+    info!("Press button 1 to enable, button 2 to disable");
+    #[cfg(feature = "microbit-v2")]
+    let (b1_pin, b2_pin) = (p.P0_14, p.P0_23);
+    #[cfg(any(feature = "nrf52840-dk", feature = "nrf52832-dk"))]
+    let (b1_pin, b2_pin) = (p.P0_11, p.P0_12);
 
-    let button1 = Input::new(p.P0_11.degrade(), Pull::Up);
-    let button2 = Input::new(p.P0_12.degrade(), Pull::Up);
+    let button1 = Input::new(b1_pin.degrade(), Pull::Up);
+    let button2 = Input::new(b2_pin.degrade(), Pull::Up);
+
     pin_mut!(button1);
     pin_mut!(button2);
     loop {
