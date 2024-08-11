@@ -20,14 +20,6 @@ fn linker_data() -> &'static [u8] {
     return include_bytes!("memory-nrf52833.x");
     #[cfg(feature = "nrf52840")]
     return include_bytes!("memory-nrf52840.x");
-
-    #[cfg(any(
-        feature = "nrf52805",
-        feature = "nrf52810",
-        feature = "nrf52811",
-        feature = "nrf52820",
-    ))]
-    panic!("Unable to build examples for currently selected chip due to missing chip-specific linker configuration (memory.x)")
 }
 
 fn main() {

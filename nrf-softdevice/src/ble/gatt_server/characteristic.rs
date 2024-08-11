@@ -37,11 +37,6 @@ impl AttributeMetadata {
         self.into_raw_inner(raw::BLE_GATTS_VLOC_STACK as u8)
     }
 
-    #[cfg(feature = "alloc")]
-    pub(crate) fn into_raw_user(self) -> raw::ble_gatts_attr_md_t {
-        self.into_raw_inner(raw::BLE_GATTS_VLOC_USER as u8)
-    }
-
     fn into_raw_inner(self, vloc: u8) -> raw::ble_gatts_attr_md_t {
         raw::ble_gatts_attr_md_t {
             read_perm: self.read.into_raw(),

@@ -4,12 +4,6 @@ use core::marker::PhantomData;
 use core::mem;
 use core::ptr::null;
 
-#[cfg(feature = "alloc")]
-extern crate alloc;
-
-#[cfg(feature = "alloc")]
-use alloc::boxed::Box;
-
 use super::characteristic::{self, AttributeMetadata, Presentation};
 use super::{CharacteristicHandles, DescriptorHandle, IncludedServiceHandle, RegisterError, ServiceHandle};
 use crate::ble::Uuid;
@@ -51,18 +45,6 @@ impl<'a> ServiceBuilder<'a> {
     ) -> Result<CharacteristicBuilder<'_>, RegisterError> {
         let value = attr.value.as_ref();
         let attr_md = attr.metadata.into_raw();
-        self.add_characteristic_inner(uuid, value, attr.max_len, &attr_md, md)
-    }
-
-    #[cfg(feature = "alloc")]
-    pub fn add_characteristic_app(
-        &mut self,
-        uuid: Uuid,
-        attr: characteristic::Attribute<Box<[u8]>>,
-        md: characteristic::Metadata,
-    ) -> Result<CharacteristicBuilder<'_>, RegisterError> {
-        let value = Box::leak(attr.value);
-        let attr_md = attr.metadata.into_raw_user();
         self.add_characteristic_inner(uuid, value, attr.max_len, &attr_md, md)
     }
 
@@ -149,17 +131,6 @@ impl<'a> CharacteristicBuilder<'a> {
     ) -> Result<DescriptorHandle, RegisterError> {
         let value = attr.value.as_ref();
         let attr_md = attr.metadata.into_raw();
-        self.add_descriptor_inner(uuid, value, attr.max_len, &attr_md)
-    }
-
-    #[cfg(feature = "alloc")]
-    pub fn add_descriptor_app(
-        &mut self,
-        uuid: Uuid,
-        attr: characteristic::Attribute<Box<[u8]>>,
-    ) -> Result<DescriptorHandle, RegisterError> {
-        let value = Box::leak(attr.value);
-        let attr_md = attr.metadata.into_raw_user();
         self.add_descriptor_inner(uuid, value, attr.max_len, &attr_md)
     }
 

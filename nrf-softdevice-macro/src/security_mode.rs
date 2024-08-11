@@ -3,7 +3,6 @@ use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SecurityMode {
     NoAccess,
     Open,
