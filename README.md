@@ -73,7 +73,7 @@ Flashing the softdevice is required. It is NOT part of the built binary. You onl
 - As a debug client, if you are using
   - probe-rs:
     - Erase the flash with `probe-rs erase --chip nrf52840_xxAA` (You may have to supply additional `--allow-erase-all` argument).
-    - Flash the SoftDevice with `probe-rs download --verify --format hex --chip nRF52840_xxAA s140_nrf52_7.X.X_softdevice.hex`
+    - Flash the SoftDevice with `probe-rs download --verify --binary-format hex --chip nRF52840_xxAA s140_nrf52_7.X.X_softdevice.hex`
   - nrfjprog:
     - Flash the SoftDevice with `nrfjprog --family NRF52 --chiperase --verify --program s140_nrf52_7.0.1_softdevice.hex`
 
