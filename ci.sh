@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+export RUSTFLAGS=-Dwarnings
+
 # Build examples
 #===============
 

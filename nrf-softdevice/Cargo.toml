@@ -12,13 +12,13 @@ rust-version = "1.76"
 
 [features]
 
-nrf52805 = ["nrf52805-pac"]
-nrf52810 = ["nrf52810-pac"]
-nrf52811 = ["nrf52811-pac"]
-nrf52820 = ["nrf52820-pac"]
-nrf52832 = ["nrf52832-pac"]
-nrf52833 = ["nrf52833-pac"]
-nrf52840 = ["nrf52840-pac"]
+nrf52805 = []
+nrf52810 = []
+nrf52811 = []
+nrf52820 = []
+nrf52832 = []
+nrf52833 = []
+nrf52840 = []
 
 s112 = ["nrf-softdevice-s112"]
 s113 = ["nrf-softdevice-s113"]
@@ -56,20 +56,11 @@ num_enum = { version = "0.7.0", default-features = false }
 embassy-sync = { version = "0.6.0" }
 embassy-futures = { version = "0.1.1" }
 cortex-m = "0.7.2"
-cortex-m-rt = ">=0.6.15,<0.8"
 heapless = "0.8.0"
 fixed = "1.5.0"
 futures = { version = "0.3.17", default-features = false }
 embedded-storage = "0.3.1"
 embedded-storage-async = { version = "0.4.1" }
-
-nrf52805-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52810-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52811-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52820-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52832-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52833-pac  = { version = "0.12.0", features = ["rt"], optional = true }
-nrf52840-pac  = { version = "0.12.0", features = ["rt"], optional = true }
 
 nrf-softdevice-s112 = { version = "0.1.1", path = "../nrf-softdevice-s112", optional = true }
 nrf-softdevice-s113 = { version = "0.1.1", path = "../nrf-softdevice-s113", optional = true }
