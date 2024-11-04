@@ -1,19 +1,17 @@
 {
   "editor.formatOnSave": true,
-  "rust-analyzer.cargo.allFeatures": false,
-  "rust-analyzer.checkOnSave.allFeatures": false,
+  "rust-analyzer.imports.granularity.group": "module",
+  "rust-analyzer.cargo.allTargets": false,
   "rust-analyzer.cargo.target": "thumbv7em-none-eabihf",
-  "rust-analyzer.checkOnSave.allTargets": false,
-  "rust-analyzer.procMacro.enable": true,
   "rust-analyzer.linkedProjects": [
     "examples/Cargo.toml"
+  ],
+  "rust-analyzer.cargo.features": [
+    "nrf52840-dk"
   ],
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/target/**": true,
   },
-  "rust-analyzer.imports.granularity.group": "module",
-  "rust-analyzer.cargo.buildScripts.enable": true,
-  "rust-analyzer.procMacro.attributes.enable": false,
 }

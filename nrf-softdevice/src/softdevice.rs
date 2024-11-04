@@ -3,7 +3,9 @@ use core::mem::MaybeUninit;
 use core::ptr;
 use core::sync::atomic::{AtomicBool, Ordering};
 
-use crate::{pac, raw, RawError, SocEvent};
+use cortex_m::peripheral::NVIC;
+
+use crate::{raw, Interrupt, RawError, SocEvent};
 
 unsafe extern "C" fn fault_handler(id: u32, pc: u32, info: u32) {
     match (id, info) {
@@ -70,7 +72,7 @@ fn get_app_ram_base() -> u32 {
         static mut __sdata: u32;
     }
 
-    unsafe { ptr::addr_of!(__sdata) as u32 }
+    ptr::addr_of!(__sdata) as u32
 }
 
 fn cfg_set(id: u32, cfg: &raw::ble_cfg_t) {
@@ -259,10 +261,7 @@ impl Softdevice {
         }
 
         unsafe {
-            #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
-            pac::NVIC::unmask(pac::interrupt::SWI2);
-            #[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
-            pac::NVIC::unmask(pac::interrupt::SWI2_EGU2);
+            NVIC::unmask(Interrupt::SWI2_EGU2);
         }
 
         #[cfg(feature = "ble-gatt")]

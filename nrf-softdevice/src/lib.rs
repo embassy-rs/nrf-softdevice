@@ -122,20 +122,6 @@ compile_error!("The selected softdevice does not support ble-peripheral.");
 ))]
 compile_error!("The selected softdevice does not support ble-l2cap.");
 
-#[cfg(feature = "nrf52805")]
-use nrf52805_pac as pac;
-#[cfg(feature = "nrf52810")]
-use nrf52810_pac as pac;
-#[cfg(feature = "nrf52811")]
-use nrf52811_pac as pac;
-#[cfg(feature = "nrf52820")]
-use nrf52820_pac as pac;
-#[cfg(feature = "nrf52832")]
-use nrf52832_pac as pac;
-#[cfg(feature = "nrf52833")]
-use nrf52833_pac as pac;
-#[cfg(feature = "nrf52840")]
-use nrf52840_pac as pac;
 #[cfg(feature = "s112")]
 pub use nrf_softdevice_s112 as raw;
 #[cfg(feature = "s113")]
@@ -169,3 +155,27 @@ pub use temperature::temperature_celsius;
 mod random;
 pub use nrf_softdevice_macro::*;
 pub use random::random_bytes;
+
+// Numbers of interrupts we care about are identical in all nRF52xxx.
+// We copypaste the enum here to avoid depending on the PAC, which avoids version conflicts.
+#[allow(non_camel_case_types, dead_code)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+enum Interrupt {
+    POWER_CLOCK = 0,
+    RADIO = 1,
+    TIMER0 = 8,
+    RTC0 = 11,
+    TEMP = 12,
+    RNG = 13,
+    ECB = 14,
+    CCM_AAR = 15,
+    SWI2_EGU2 = 22,
+    SWI5_EGU5 = 25,
+}
+
+unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {
+    #[inline]
+    fn number(self) -> u16 {
+        self as u16
+    }
+}

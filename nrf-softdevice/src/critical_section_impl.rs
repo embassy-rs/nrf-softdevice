@@ -1,20 +1,10 @@
 use core::arch::asm;
 use core::sync::atomic::{compiler_fence, AtomicBool, Ordering};
 
-use crate::pac::{Interrupt, NVIC};
+use cortex_m::peripheral::NVIC;
 
-#[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
-const RESERVED_IRQS: u32 = (1 << (Interrupt::POWER_CLOCK as u8))
-    | (1 << (Interrupt::RADIO as u8))
-    | (1 << (Interrupt::RTC0 as u8))
-    | (1 << (Interrupt::TIMER0 as u8))
-    | (1 << (Interrupt::RNG as u8))
-    | (1 << (Interrupt::ECB as u8))
-    | (1 << (Interrupt::CCM_AAR as u8))
-    | (1 << (Interrupt::TEMP as u8))
-    | (1 << (Interrupt::SWI5 as u8));
+use crate::Interrupt;
 
-#[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
 const RESERVED_IRQS: u32 = (1 << (Interrupt::POWER_CLOCK as u8))
     | (1 << (Interrupt::RADIO as u8))
     | (1 << (Interrupt::RTC0 as u8))
