@@ -105,9 +105,24 @@ pub(crate) async fn run_ble() -> ! {
 )]
 #[cfg_attr(
     not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")),
-    export_name = "SWI2_EGU2"
+    export_name = "EGU2_SWI2"
+)]
+#[cfg_attr(
+    not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")),
+    allow(dead_code)
 )]
 unsafe extern "C" fn swi2_irq_handler() {
+    SWI2_SOC_EVT_WAKER.wake();
+    SWI2_BLE_EVT_WAKER.wake();
+}
+
+/// Support older PACs which use a different name for the SWI2 interrupt
+#[cfg_attr(
+    not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")),
+    export_name = "SWI2_EGU2"
+)]
+#[allow(dead_code)]
+unsafe extern "C" fn old_swi2_irq_handler() {
     SWI2_SOC_EVT_WAKER.wake();
     SWI2_BLE_EVT_WAKER.wake();
 }
