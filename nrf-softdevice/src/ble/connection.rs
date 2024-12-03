@@ -301,6 +301,12 @@ impl ConnectionState {
         }
 
         let ret = unsafe { raw::sd_ble_gap_disconnect(conn_handle, reason.into()) };
+        // This case can occur in normal operation if e.g. the connection was
+        // already being disconnected when disconnect() is called, so
+        // return as error instead of a panic.
+        if ret == raw::NRF_ERROR_INVALID_STATE {
+            return Err(DisconnectedError);
+        }
         unwrap!(RawError::convert(ret), "sd_ble_gap_disconnect");
 
         self.disconnecting = true;
