@@ -1,7 +1,9 @@
 #![no_std]
-#![cfg_attr(feature = "nightly", feature(async_fn_in_trait))]
-#![cfg_attr(feature = "nightly", feature(impl_trait_projections))]
 #![allow(incomplete_features)]
+#![cfg_attr(
+    docsrs,
+    doc = "<div style='padding:30px;background:#810;color:#fff;text-align:center;'><p>You might want to <a href='https://docs.embassy.dev/nrf-softdevice'>browse the `nrf-softdevice` documentation on the Embassy website</a> instead.</p><p>The documentation here on `docs.rs` is built for a single chip and single softdevice only (nRF52840 and s140 in particular), while on the Embassy website you can pick your exact combination from the top menu. Available APIs change depending on the chip and softdevice.</p></div>\n\n"
+)]
 
 pub(crate) mod util;
 
@@ -66,12 +68,12 @@ compile_error!("No chip feature activated. You must activate exactly one of the 
     all(feature = "nrf52832", feature = "nrf52840"),
     all(feature = "nrf52833", feature = "nrf52840"),
 ))]
-compile_error!("Multile chip features activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
+compile_error!("Multiple chip features activated. You must activate exactly one of the following features: nrf52810, nrf52811, nrf52832, nrf52833, nrf52840");
 
 // https://www.nordicsemi.com/Software-and-tools/Software/Bluetooth-Software
 //
-//      | Central  Peripheral  L2CAP-CoC | nrf52805  nrf52810  nrf52811  nrf52820  nrf52832  nrf52833, nrf52840
-// -----|--------------------------------|--------------------------------------------------------------------------
+//      | Central  Peripheral  L2CAP-CoC | nrf52805  nrf52810  nrf52811  nrf52820  nrf52832  nrf52833  nrf52840
+// -----|--------------------------------|----------------------------------------------------------------------
 // s112 |              X                 |    X         X         X         X         X
 // s113 |              X           X     |    X         X         X         X         X         X         X
 // s122 |    X                           |                                  X                   X
@@ -120,20 +122,6 @@ compile_error!("The selected softdevice does not support ble-peripheral.");
 ))]
 compile_error!("The selected softdevice does not support ble-l2cap.");
 
-#[cfg(feature = "nrf52805")]
-use nrf52805_pac as pac;
-#[cfg(feature = "nrf52810")]
-use nrf52810_pac as pac;
-#[cfg(feature = "nrf52811")]
-use nrf52811_pac as pac;
-#[cfg(feature = "nrf52820")]
-use nrf52820_pac as pac;
-#[cfg(feature = "nrf52832")]
-use nrf52832_pac as pac;
-#[cfg(feature = "nrf52833")]
-use nrf52833_pac as pac;
-#[cfg(feature = "nrf52840")]
-use nrf52840_pac as pac;
 #[cfg(feature = "s112")]
 pub use nrf_softdevice_s112 as raw;
 #[cfg(feature = "s113")]
@@ -167,3 +155,27 @@ pub use temperature::temperature_celsius;
 mod random;
 pub use nrf_softdevice_macro::*;
 pub use random::random_bytes;
+
+// Numbers of interrupts we care about are identical in all nRF52xxx.
+// We copypaste the enum here to avoid depending on the PAC, which avoids version conflicts.
+#[allow(non_camel_case_types, dead_code)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+enum Interrupt {
+    POWER_CLOCK = 0,
+    RADIO = 1,
+    TIMER0 = 8,
+    RTC0 = 11,
+    TEMP = 12,
+    RNG = 13,
+    ECB = 14,
+    CCM_AAR = 15,
+    SWI2_EGU2 = 22,
+    SWI5_EGU5 = 25,
+}
+
+unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {
+    #[inline]
+    fn number(self) -> u16 {
+        self as u16
+    }
+}

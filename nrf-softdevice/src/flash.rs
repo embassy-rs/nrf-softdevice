@@ -4,8 +4,9 @@ use core::sync::atomic::{AtomicBool, Ordering};
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::signal::Signal;
 use embedded_storage::nor_flash::{ErrorType, NorFlashError, NorFlashErrorKind, ReadNorFlash};
-#[cfg(feature = "nightly")]
-use embedded_storage_async::nor_flash::{NorFlash as AsyncNorFlash, ReadNorFlash as AsyncReadNorFlash};
+use embedded_storage_async::nor_flash::{
+    MultiwriteNorFlash, NorFlash as AsyncNorFlash, ReadNorFlash as AsyncReadNorFlash,
+};
 
 use crate::util::DropBomb;
 use crate::{raw, RawError, Softdevice};
@@ -84,11 +85,21 @@ impl ReadNorFlash for Flash {
     }
 
     fn capacity(&self) -> usize {
-        256 * 4096
+        #[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811",))]
+        return 48 * 4096; // 192KB
+
+        #[cfg(feature = "nrf52820")]
+        return 64 * 4096; // 256KB
+
+        // TODO: nrf52832 has also "lite" edition (QFAB) with 256KB/32KB of flash/RAM
+        #[cfg(any(feature = "nrf52832", feature = "nrf52833",))]
+        return 128 * 4096; // 512KB
+
+        #[cfg(feature = "nrf52840")]
+        return 256 * 4096; // 1024KB
     }
 }
 
-#[cfg(feature = "nightly")]
 impl AsyncReadNorFlash for Flash {
     const READ_SIZE: usize = 1;
 
@@ -101,7 +112,6 @@ impl AsyncReadNorFlash for Flash {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl AsyncNorFlash for Flash {
     const WRITE_SIZE: usize = 4;
     const ERASE_SIZE: usize = 4096;
@@ -169,3 +179,11 @@ impl AsyncNorFlash for Flash {
         Ok(())
     }
 }
+
+/// According to Nordic, it is possible to perform multiple writes but only changing a bit from 1 -> 0, which
+/// is what MultiwriteNorFlash is for.
+///
+/// "The NVMC is only able to write 0 to bits in flash memory that are erased (set to 1). It cannot rewrite a bit back to 1.
+/// Only full 32-bit words can be written to flash memory using the NVMC interface. To write less than 32 bits, write the data
+/// as a full 32-bit word and set all the bits that should remain unchanged in the word to 1."
+impl MultiwriteNorFlash for Flash {}

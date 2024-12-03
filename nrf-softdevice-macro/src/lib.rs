@@ -21,6 +21,15 @@ struct ServiceArgs {
 }
 
 #[derive(Debug, FromMeta)]
+struct DescriptorArgs {
+    uuid: Uuid,
+    #[darling(default)]
+    security: Option<SecurityMode>,
+    #[darling(default)]
+    value: Option<syn::Expr>,
+}
+
+#[derive(Debug, FromMeta)]
 struct CharacteristicArgs {
     uuid: Uuid,
     #[darling(default)]
@@ -35,6 +44,10 @@ struct CharacteristicArgs {
     indicate: bool,
     #[darling(default)]
     security: Option<SecurityMode>,
+    #[darling(default)]
+    value: Option<syn::Expr>,
+    #[darling(default, multiple)]
+    descriptor: Vec<DescriptorArgs>,
 }
 
 #[derive(Debug)]
@@ -236,6 +249,31 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
         let indicate = ch.args.indicate;
         let ty = &ch.ty;
         let ty_as_val = quote!(<#ty as #ble::GattValue>);
+        let value = match &ch.args.value {
+            Some(v) => quote! { #v },
+            None => quote! { [123u8; #ty_as_val::MIN_SIZE] },
+        };
+
+        let descriptors: Vec<TokenStream2> = ch
+            .args
+            .descriptor
+            .iter()
+            .map(|descriptor_args| {
+                let descriptor_uuid = descriptor_args.uuid;
+                let security = descriptor_args.security.as_ref().unwrap();
+                let value = descriptor_args.value.as_ref().unwrap();
+
+                quote! {
+                    let _ = cb
+                        .add_descriptor(
+                            #descriptor_uuid,
+                            #ble::gatt_server::characteristic::Attribute::new(#value)
+                            .security(#security)
+                            .variable_len(#value.len() as u16)
+                        )?;
+                }
+            })
+            .collect();
 
         let security = if let Some(security) = ch.args.security {
             let security_inner = security.to_token_stream();
@@ -254,7 +292,7 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
 
         code_build_chars.extend(quote_spanned!(ch.span=>
             let #char_name = {
-                let val = [123u8; #ty_as_val::MIN_SIZE];
+                let val = #value;
                 let mut attr = #ble::gatt_server::characteristic::Attribute::new(&val);
                 if #ty_as_val::MAX_SIZE != #ty_as_val::MIN_SIZE {
                     attr = attr.variable_len(#ty_as_val::MAX_SIZE as u16);
@@ -269,7 +307,11 @@ pub fn gatt_service(args: TokenStream, item: TokenStream) -> TokenStream {
                     ..Default::default()
                 };
                 let metadata = #ble::gatt_server::characteristic::Metadata::new(props);
-                service_builder.add_characteristic(#uuid, attr, metadata)?.build()
+                let mut cb = service_builder.add_characteristic(#uuid, attr, metadata)?;
+
+                #(#descriptors)*
+
+                cb.build()
             };
         ));
 
@@ -517,6 +559,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
     let mut code_disc_char = TokenStream2::new();
     let mut code_disc_done = TokenStream2::new();
     let mut code_event_enum = TokenStream2::new();
+    let mut code_on_hvx = TokenStream2::new();
 
     let ble = quote!(::nrf_softdevice::ble);
 
@@ -537,6 +580,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         let write_fn = format_ident!("{}_write", ch.name);
         let write_wor_fn = format_ident!("{}_write_without_response", ch.name);
         let write_try_wor_fn = format_ident!("{}_try_write_without_response", ch.name);
+        let cccd_write_fn = format_ident!("{}_cccd_write", ch.name);
         let fn_vis = ch.vis.clone();
 
         let uuid = ch.args.uuid;
@@ -636,7 +680,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                 #cccd_handle: 0,
             ));
             code_disc_done.extend(quote_spanned!(ch.span=>
-                if self.#value_handle == 0 {
+                if self.#cccd_handle == 0 {
                     return Err(#ble::gatt_client::DiscoverError::ServiceIncomplete);
                 }
             ));
@@ -647,12 +691,62 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             code_event_enum.extend(quote_spanned!(ch.span=>
                 #case_notification(#ty),
             ));
+            code_on_hvx.extend(quote_spanned!(ch.span=>
+                if handle == self.#value_handle && type_ == ::nrf_softdevice::ble::gatt_client::HvxType::Notification {
+                    if data.len() < #ty_as_val::MIN_SIZE {
+                        return None;
+                    } else {
+                        return Some(#event_enum_name::#case_notification(#ty_as_val::from_gatt(data)));
+                    }
+                }
+            ));
+
+            if !indicate {
+                code_impl.extend(quote_spanned!(ch.span=>
+                    #fn_vis async fn #cccd_write_fn(&self, notifications: bool) -> Result<(), #ble::gatt_client::WriteError> {
+                        #ble::gatt_client::write(&self.conn, self.#cccd_handle, &[if notifications { 0x01 } else { 0x00 }, 0x00]).await
+                    }
+                ));
+            }
+        }
+
+        if indicate {
+            let case_indication = format_ident!("{}Indication", name_pascal);
+            code_event_enum.extend(quote_spanned!(ch.span=>
+                #case_indication(#ty),
+            ));
+            code_on_hvx.extend(quote_spanned!(ch.span=>
+                if handle == self.#value_handle && type_ == ::nrf_softdevice::ble::gatt_client::HvxType::Indication {
+                    if data.len() < #ty_as_val::MIN_SIZE {
+                        return None;
+                    } else {
+                        return Some(#event_enum_name::#case_indication(#ty_as_val::from_gatt(data)));
+                    }
+                }
+            ));
+
+            if !notify {
+                code_impl.extend(quote_spanned!(ch.span=>
+                    #fn_vis async fn #cccd_write_fn(&self, indications: bool) -> Result<(), #ble::gatt_client::WriteError> {
+                        #ble::gatt_client::write(&self.conn, self.#cccd_handle, &[if indications { 0x02 } else { 0x00 }, 0x00]).await
+                    }
+                ));
+            }
+        }
+
+        if indicate && notify {
+            code_impl.extend(quote_spanned!(ch.span=>
+                #fn_vis async fn #cccd_write_fn(&self, indications: bool, notifications: bool) -> Result<(), #ble::gatt_client::WriteError> {
+                    #ble::gatt_client::write(&self.conn, self.#cccd_handle, &[if indications { 0x02 } else { 0x00 } | if notifications { 0x01 } else { 0x00 }, 0x00]).await
+                }
+            ));
         }
     }
 
     let uuid = args.uuid;
     struct_fields.named = syn::punctuated::Punctuated::from_iter(fields);
 
+    let vis = struc.vis.clone();
     let result = quote! {
         #struc
 
@@ -662,7 +756,14 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         impl #ble::gatt_client::Client for #struct_name {
-            //type Event = #event_enum_name;
+            type Event = #event_enum_name;
+
+            fn on_hvx(&self, _conn: &::nrf_softdevice::ble::Connection, type_: ::nrf_softdevice::ble::gatt_client::HvxType, handle: u16, data: &[u8]) -> Option<Self::Event> {
+                use #ble::gatt_client::Client;
+
+                #code_on_hvx
+                None
+            }
 
             fn uuid() -> #ble::Uuid {
                 #uuid
@@ -689,7 +790,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
             }
         }
 
-        enum #event_enum_name {
+        #vis enum #event_enum_name {
             #code_event_enum
         }
     };

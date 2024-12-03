@@ -1,6 +1,6 @@
 [package]
 name = "nrf-softdevice-s132"
-version = "0.1.1"
+version = "0.1.2"
 description = "Low-level bindings for the Nordic nRF SoftDevice S132"
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 repository = "https://github.com/embassy-rs/nrf-softdevice"

@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(type_alias_impl_trait)]
 
 #[path = "../example_common.rs"]
 mod example_common;
@@ -10,6 +9,9 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
+use nrf_softdevice::ble::advertisement_builder::{
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
+};
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Properties};
 use nrf_softdevice::ble::gatt_server::{set_sys_attrs, RegisterError, WriteOp};
@@ -22,6 +24,8 @@ use static_cell::StaticCell;
 
 const BATTERY_SERVICE: Uuid = Uuid::new_16(0x180f);
 const BATTERY_LEVEL: Uuid = Uuid::new_16(0x2a19);
+
+const PERIPHERAL_REQUESTS_SECURITY: bool = false;
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) {
@@ -199,7 +203,9 @@ async fn main(spawner: Spawner) -> ! {
             event_length: 24,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
+            attr_tab_size: raw::BLE_GATTS_ATTR_TAB_SIZE_DEFAULT,
+        }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -221,26 +227,33 @@ async fn main(spawner: Spawner) -> ! {
     let server = unwrap!(Server::new(sd));
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::BATTERY])
+        .full_name("HelloRust")
+        .build();
+
+    static SCAN_DATA: [u8; 0] = [];
 
     static BONDER: StaticCell<Bonder> = StaticCell::new();
     let bonder = BONDER.init(Bonder::default());
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: &ADV_DATA,
+            scan_data: &SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_pairable(sd, adv, &config, bonder).await);
 
         info!("advertising done!");
+
+        if PERIPHERAL_REQUESTS_SECURITY {
+            if let Err(err) = conn.request_security() {
+                error!("Security request failed: {:?}", err);
+                continue;
+            }
+        }
 
         // Run the GATT server on the connection. This returns when the connection gets disconnected.
         let e = gatt_server::run(&conn, &server, |_| {}).await;

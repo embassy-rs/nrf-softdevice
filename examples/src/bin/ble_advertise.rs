@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(type_alias_impl_trait)]
 
 #[path = "../example_common.rs"]
 mod example_common;
@@ -9,6 +8,9 @@ use core::mem;
 
 use defmt::{info, *};
 use embassy_executor::Spawner;
+use nrf_softdevice::ble::advertisement_builder::{
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
+};
 use nrf_softdevice::ble::peripheral;
 use nrf_softdevice::{raw, Softdevice};
 
@@ -33,7 +35,9 @@ async fn main(spawner: Spawner) {
             event_length: 24,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
+            attr_tab_size: raw::BLE_GATTS_ATTR_TAB_SIZE_DEFAULT,
+        }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -54,19 +58,22 @@ async fn main(spawner: Spawner) {
     let sd = Softdevice::enable(&config);
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, raw::BLE_GAP_AD_TYPE_FLAGS as u8, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
-        0x0a, raw::BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME as u8, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, raw::BLE_GAP_AD_TYPE_16BIT_SERVICE_UUID_COMPLETE as u8, 0x09, 0x18,
-    ];
-
     let mut config = peripheral::Config::default();
     config.interval = 50;
-    let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER]) // if there were a lot of these there may not be room for the full name
+        .short_name("Hello")
+        .build();
+
+    // but we can put it in the scan data
+    // so the full name is visible once connected
+    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new().full_name("Hello, Rust!").build();
+
+    let adv = peripheral::NonconnectableAdvertisement::ScannableUndirected {
+        adv_data: &ADV_DATA,
+        scan_data: &SCAN_DATA,
+    };
     unwrap!(peripheral::advertise(sd, adv, &config).await);
 }

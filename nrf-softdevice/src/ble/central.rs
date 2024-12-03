@@ -6,9 +6,12 @@
 use core::{mem, ptr};
 
 use crate::ble::types::*;
-use crate::ble::{Address, Connection};
+use crate::ble::{Address, Connection, OutOfConnsError};
 use crate::util::{get_union_field, OnDrop, Portal};
 use crate::{raw, RawError, Softdevice};
+
+#[cfg(feature = "ble-gatt-client")]
+use crate::ble::gatt_client::MtuExchangeError;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -16,7 +19,16 @@ pub enum ConnectError {
     Timeout,
     NoAddresses,
     NoFreeConn,
+    #[cfg(feature = "ble-gatt-client")]
+    MtuExchange(MtuExchangeError),
     Raw(RawError),
+}
+
+#[cfg(feature = "ble-gatt-client")]
+impl From<MtuExchangeError> for ConnectError {
+    fn from(err: MtuExchangeError) -> Self {
+        ConnectError::MtuExchange(err)
+    }
 }
 
 impl From<RawError> for ConnectError {
@@ -27,8 +39,27 @@ impl From<RawError> for ConnectError {
 
 pub(crate) static CONNECT_PORTAL: Portal<*const raw::ble_evt_t> = Portal::new();
 
+pub async fn connect(sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Connection, ConnectError> {
+    connect_inner(sd, config, Connection::new).await
+}
+
+#[cfg(feature = "ble-sec")]
+pub async fn connect_with_security(
+    sd: &Softdevice,
+    config: &ConnectConfig<'_>,
+    security_handler: &'static dyn crate::ble::security::SecurityHandler,
+) -> Result<Connection, ConnectError> {
+    connect_inner(sd, config, |conn_handle, role, peer_address, conn_params| {
+        Connection::with_security_handler(conn_handle, role, peer_address, conn_params, security_handler)
+    })
+    .await
+}
+
 // Begins an ATT MTU exchange procedure, followed by a data length update request as necessary.
-pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Connection, ConnectError> {
+async fn connect_inner<F>(_sd: &Softdevice, config: &ConnectConfig<'_>, new_conn: F) -> Result<Connection, ConnectError>
+where
+    F: Fn(u16, Role, Address, raw::ble_gap_conn_params_t) -> Result<Connection, OutOfConnsError>,
+{
     if let Some(w) = config.scan_config.whitelist {
         if w.len() == 0 {
             return Err(ConnectError::NoAddresses);
@@ -66,17 +97,12 @@ pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Con
                     let conn_params = params.conn_params;
                     debug!("connected role={:?} peer_addr={:?}", role, peer_address);
 
-                    match Connection::new(conn_handle, role, peer_address, conn_params) {
-                        Ok(conn) => {
-                            #[cfg(any(feature = "s113", feature = "s132", feature = "s140"))]
-                            crate::ble::gap::do_data_length_update(conn_handle, ptr::null());
-
-                            Ok(conn)
-                        }
+                    match new_conn(conn_handle, role, peer_address, conn_params) {
+                        Ok(conn) => Ok(conn),
                         Err(_) => {
                             raw::sd_ble_gap_disconnect(
                                 conn_handle,
-                                raw::BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION as _,
+                                raw::BLE_HCI_REMOTE_DEV_TERMINATION_DUE_TO_LOW_RESOURCES as _,
                             );
                             Err(ConnectError::NoFreeConn)
                         }
@@ -93,7 +119,7 @@ pub async fn connect(_sd: &Softdevice, config: &ConnectConfig<'_>) -> Result<Con
     #[cfg(feature = "ble-gatt-client")]
     {
         let mtu = config.att_mtu.unwrap_or(_sd.att_mtu);
-        unwrap!(crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await);
+        crate::ble::gatt_client::att_mtu_exchange(&conn, mtu).await?;
     }
 
     Ok(conn)
@@ -161,7 +187,7 @@ where
         len: BUF_LEN as u16,
     };
 
-    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, &BUF_DATA) };
+    let ret = unsafe { raw::sd_ble_gap_scan_start(&scan_params, ptr::addr_of!(BUF_DATA)) };
     match RawError::convert(ret) {
         Ok(()) => {}
         Err(err) => {
@@ -192,7 +218,7 @@ where
                     }
 
                     // Resume scan
-                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), &BUF_DATA);
+                    let ret = raw::sd_ble_gap_scan_start(ptr::null(), ptr::addr_of!(BUF_DATA));
                     match RawError::convert(ret) {
                         Ok(()) => {}
 

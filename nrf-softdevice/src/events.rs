@@ -5,7 +5,6 @@ use embassy_sync::waitqueue::AtomicWaker;
 use futures::future::poll_fn;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-use crate::pac::interrupt;
 use crate::{raw, RawError};
 
 static SWI2_SOC_EVT_WAKER: AtomicWaker = AtomicWaker::new();
@@ -100,16 +99,24 @@ pub(crate) async fn run_ble() -> ! {
     .await
 }
 
-#[cfg(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"))]
-#[interrupt]
-unsafe fn SWI2() {
+#[cfg_attr(
+    any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811"),
+    export_name = "SWI2"
+)]
+#[cfg_attr(
+    not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")),
+    export_name = "EGU2_SWI2"
+)]
+unsafe extern "C" fn swi2_irq_handler() {
     SWI2_SOC_EVT_WAKER.wake();
     SWI2_BLE_EVT_WAKER.wake();
 }
 
+/// `nrf528xx_pac` and early versions of `nrf_pac` name the SWI2 interrupt `SWI2_EGU2` instead of `EGU2_SWI2`
 #[cfg(not(any(feature = "nrf52805", feature = "nrf52810", feature = "nrf52811")))]
-#[interrupt]
-unsafe fn SWI2_EGU2() {
+#[allow(dead_code)]
+#[export_name = "SWI2_EGU2"]
+unsafe extern "C" fn old_swi2_irq_handler() {
     SWI2_SOC_EVT_WAKER.wake();
     SWI2_BLE_EVT_WAKER.wake();
 }

@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(type_alias_impl_trait)]
 
 #[path = "../example_common.rs"]
 mod example_common;
@@ -12,6 +11,9 @@ use embassy_executor::Spawner;
 use embassy_nrf::gpio::{Input, Pin as _, Pull};
 use embassy_nrf::interrupt::Priority;
 use futures::pin_mut;
+use nrf_softdevice::ble::advertisement_builder::{
+    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList,
+};
 use nrf_softdevice::ble::{gatt_server, peripheral};
 use nrf_softdevice::{raw, Softdevice};
 
@@ -32,20 +34,24 @@ struct Server {
 }
 
 async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
-    #[rustfmt::skip]
-    let adv_data = &[
-        0x02, 0x01, raw::BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE as u8,
-        0x03, 0x03, 0x09, 0x18,
-        0x0a, 0x09, b'H', b'e', b'l', b'l', b'o', b'R', b'u', b's', b't',
-    ];
-    #[rustfmt::skip]
-    let scan_data = &[
-        0x03, 0x03, 0x09, 0x18,
-    ];
+    static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .full_name("HelloRust")
+        .build();
+
+    static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
+        .services_128(
+            ServiceList::Complete,
+            &[0x9e7312e0_2354_11eb_9f10_fbc30a62cf38_u128.to_le_bytes()],
+        )
+        .build();
 
     loop {
         let config = peripheral::Config::default();
-        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected { adv_data, scan_data };
+        let adv = peripheral::ConnectableAdvertisement::ScannableUndirected {
+            adv_data: &ADV_DATA,
+            scan_data: &SCAN_DATA,
+        };
         let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
 
         info!("advertising done!");
@@ -90,7 +96,9 @@ async fn main(spawner: Spawner) {
             event_length: 24,
         }),
         conn_gatt: Some(raw::ble_gatt_conn_cfg_t { att_mtu: 256 }),
-        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t { attr_tab_size: 32768 }),
+        gatts_attr_tab_size: Some(raw::ble_gatts_cfg_attr_tab_size_t {
+            attr_tab_size: raw::BLE_GATTS_ATTR_TAB_SIZE_DEFAULT,
+        }),
         gap_role_count: Some(raw::ble_gap_cfg_role_count_t {
             adv_set_count: 1,
             periph_role_count: 3,
@@ -113,10 +121,15 @@ async fn main(spawner: Spawner) {
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
     info!("Bluetooth is OFF");
-    info!("Press nrf52840-dk button 1 to enable, button 2 to disable");
+    info!("Press button 1 to enable, button 2 to disable");
+    #[cfg(feature = "microbit-v2")]
+    let (b1_pin, b2_pin) = (p.P0_14, p.P0_23);
+    #[cfg(any(feature = "nrf52840-dk", feature = "nrf52832-dk"))]
+    let (b1_pin, b2_pin) = (p.P0_11, p.P0_12);
 
-    let button1 = Input::new(p.P0_11.degrade(), Pull::Up);
-    let button2 = Input::new(p.P0_12.degrade(), Pull::Up);
+    let button1 = Input::new(b1_pin.degrade(), Pull::Up);
+    let button2 = Input::new(b2_pin.degrade(), Pull::Up);
+
     pin_mut!(button1);
     pin_mut!(button2);
     loop {

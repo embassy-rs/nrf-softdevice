@@ -37,11 +37,6 @@ impl AttributeMetadata {
         self.into_raw_inner(raw::BLE_GATTS_VLOC_STACK as u8)
     }
 
-    #[cfg(feature = "alloc")]
-    pub(crate) fn into_raw_user(self) -> raw::ble_gatts_attr_md_t {
-        self.into_raw_inner(raw::BLE_GATTS_VLOC_USER as u8)
-    }
-
     fn into_raw_inner(self, vloc: u8) -> raw::ble_gatts_attr_md_t {
         raw::ble_gatts_attr_md_t {
             read_perm: self.read.into_raw(),
@@ -220,9 +215,32 @@ impl Properties {
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct Presentation {
+    pub format: u8,
+    pub exponent: i8,
+    pub unit: u16,
+    pub name_space: u8,
+    pub description: u16,
+}
+
+impl Presentation {
+    pub(crate) fn into_raw(self) -> raw::ble_gatts_char_pf_t {
+        raw::ble_gatts_char_pf_t {
+            format: self.format.into(),
+            exponent: self.exponent.into(),
+            unit: self.unit.into(),
+            name_space: self.name_space.into(),
+            desc: self.description.into(),
+        }
+    }
+}
+
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Metadata {
     pub properties: Properties,
     pub user_description: Option<UserDescription>,
+    pub cpfd: Option<Presentation>,
     pub cccd: Option<AttributeMetadata>,
     pub sccd: Option<AttributeMetadata>,
 }
@@ -249,6 +267,7 @@ impl Metadata {
         }
     }
 
+    #[deprecated = "Use new(properties).security(write_security) instead."]
     pub fn with_security(properties: Properties, write_security: SecurityMode) -> Self {
         let cccd = if properties.indicate || properties.notify {
             Some(AttributeMetadata::default().write_security(write_security))
@@ -268,5 +287,16 @@ impl Metadata {
             sccd,
             ..Default::default()
         }
+    }
+
+    pub fn presentation(self, presentation: Presentation) -> Self {
+        let cpfd = Some(presentation);
+        Metadata { cpfd, ..self }
+    }
+
+    pub fn security(self, write_security: SecurityMode) -> Self {
+        let cccd = self.cccd.map(|cccd| cccd.write_security(write_security));
+        let sccd = self.sccd.map(|sccd| sccd.write_security(write_security));
+        Metadata { cccd, sccd, ..self }
     }
 }

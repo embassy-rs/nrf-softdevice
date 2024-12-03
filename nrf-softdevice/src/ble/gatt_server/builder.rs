@@ -4,13 +4,7 @@ use core::marker::PhantomData;
 use core::mem;
 use core::ptr::null;
 
-#[cfg(feature = "alloc")]
-extern crate alloc;
-
-#[cfg(feature = "alloc")]
-use alloc::boxed::Box;
-
-use super::characteristic::{self, AttributeMetadata};
+use super::characteristic::{self, AttributeMetadata, Presentation};
 use super::{CharacteristicHandles, DescriptorHandle, IncludedServiceHandle, RegisterError, ServiceHandle};
 use crate::ble::Uuid;
 use crate::{raw, RawError, Softdevice};
@@ -54,18 +48,6 @@ impl<'a> ServiceBuilder<'a> {
         self.add_characteristic_inner(uuid, value, attr.max_len, &attr_md, md)
     }
 
-    #[cfg(feature = "alloc")]
-    pub fn add_characteristic_app(
-        &mut self,
-        uuid: Uuid,
-        attr: characteristic::Attribute<Box<[u8]>>,
-        md: characteristic::Metadata,
-    ) -> Result<CharacteristicBuilder<'_>, RegisterError> {
-        let value = Box::leak(attr.value);
-        let attr_md = attr.metadata.into_raw_user();
-        self.add_characteristic_inner(uuid, value, attr.max_len, &attr_md, md)
-    }
-
     fn add_characteristic_inner(
         &mut self,
         uuid: Uuid,
@@ -83,6 +65,7 @@ impl<'a> ServiceBuilder<'a> {
         let user_desc_md = char_md
             .user_description
             .and_then(|x| x.metadata.map(AttributeMetadata::into_raw));
+        let cpfd_md = char_md.cpfd.map(Presentation::into_raw);
         let cccd_md = char_md.cccd.map(AttributeMetadata::into_raw);
         let sccd_md = char_md.sccd.map(AttributeMetadata::into_raw);
 
@@ -92,7 +75,7 @@ impl<'a> ServiceBuilder<'a> {
             p_char_user_desc: char_md.user_description.map_or(null(), |x| x.value.as_ptr()),
             char_user_desc_max_size: char_md.user_description.map_or(0, |x| x.max_len),
             char_user_desc_size: char_md.user_description.map_or(0, |x| x.value.len() as u16),
-            p_char_pf: null(),
+            p_char_pf: cpfd_md.as_ref().map_or(null(), |x| x as _),
             p_user_desc_md: user_desc_md.as_ref().map_or(null(), |x| x as _),
             p_cccd_md: cccd_md.as_ref().map_or(null(), |x| x as _),
             p_sccd_md: sccd_md.as_ref().map_or(null(), |x| x as _),
@@ -148,17 +131,6 @@ impl<'a> CharacteristicBuilder<'a> {
     ) -> Result<DescriptorHandle, RegisterError> {
         let value = attr.value.as_ref();
         let attr_md = attr.metadata.into_raw();
-        self.add_descriptor_inner(uuid, value, attr.max_len, &attr_md)
-    }
-
-    #[cfg(feature = "alloc")]
-    pub fn add_descriptor_app(
-        &mut self,
-        uuid: Uuid,
-        attr: characteristic::Attribute<Box<[u8]>>,
-    ) -> Result<DescriptorHandle, RegisterError> {
-        let value = Box::leak(attr.value);
-        let attr_md = attr.metadata.into_raw_user();
         self.add_descriptor_inner(uuid, value, attr.max_len, &attr_md)
     }
 

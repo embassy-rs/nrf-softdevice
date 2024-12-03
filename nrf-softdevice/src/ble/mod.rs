@@ -9,7 +9,6 @@ mod types;
 pub use connection::*;
 pub use gap::*;
 pub use gatt_traits::*;
-pub use replies::*;
 pub use types::*;
 
 mod common;
@@ -20,6 +19,8 @@ pub mod security;
 #[cfg(feature = "ble-central")]
 pub mod central;
 
+#[cfg(feature = "ble-peripheral")]
+pub mod advertisement_builder;
 #[cfg(feature = "ble-peripheral")]
 pub mod peripheral;
 
@@ -33,6 +34,9 @@ pub mod gatt_server;
 pub mod l2cap;
 
 use core::mem;
+
+#[cfg(any(feature = "ble-gatt-server", feature = "ble-sec"))]
+pub use replies::*;
 
 use crate::{raw, RawError, Softdevice};
 

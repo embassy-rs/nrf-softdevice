@@ -66,7 +66,7 @@ impl<T: Primitive> FixedGattValue for T {
         if data.len() != Self::SIZE {
             panic!("Bad len")
         }
-        unsafe { *(data.as_ptr() as *const Self) }
+        unsafe { (data.as_ptr() as *const Self).read_unaligned() }
     }
 
     fn to_gatt(&self) -> &[u8] {
@@ -126,9 +126,10 @@ impl<const N: usize> GattValue for String<N> {
     const MAX_SIZE: usize = N;
 
     fn from_gatt(data: &[u8]) -> Self {
-        String::from(unwrap!(
-            core::str::from_utf8(data).map_err(|_| FromGattError::InvalidCharacter)
-        ))
+        unwrap!(
+            String::from_utf8(unwrap!(Vec::from_slice(data).map_err(|_| FromGattError::InvalidLength)))
+                .map_err(|_| FromGattError::InvalidCharacter)
+        )
     }
 
     fn to_gatt(&self) -> &[u8] {

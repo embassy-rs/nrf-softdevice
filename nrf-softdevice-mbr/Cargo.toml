@@ -1,6 +1,6 @@
 [package]
 name = "nrf-softdevice-mbr"
-version = "0.1.1"
+version = "0.2.0"
 description = "Low-level bindings for the MBR included in all Nordic nRF SoftDevices"
 authors = ["Dario Nieuwenhuis <dirbaio@dirbaio.net>"]
 repository = "https://github.com/embassy-rs/nrf-softdevice"

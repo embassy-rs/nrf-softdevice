@@ -1,6 +1,15 @@
 #![no_std]
 #![no_main]
 
+macro_rules! count {
+	() => { 0u8 };
+	($x:tt $($xs:tt)*) => {1u8 + count!($($xs)*)};
+}
+
+macro_rules! hid {
+	($(( $($xs:tt),*)),+ $(,)?) => { &[ $( (count!($($xs)*)-1) | $($xs),* ),* ] };
+}
+
 #[path = "../example_common.rs"]
 mod example_common;
 
@@ -9,11 +18,12 @@ use core::mem;
 use defmt::{info, *};
 use embassy_executor::Spawner;
 use nrf_softdevice::ble::advertisement_builder::{
-    Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
+    AdvertisementDataType, Flag, LegacyAdvertisementBuilder, LegacyAdvertisementPayload, ServiceList, ServiceUuid16,
 };
 use nrf_softdevice::ble::gatt_server::builder::ServiceBuilder;
 use nrf_softdevice::ble::gatt_server::characteristic::{Attribute, Metadata, Presentation, Properties};
-use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, WriteOp};
+use nrf_softdevice::ble::gatt_server::{CharacteristicHandles, RegisterError, Service, WriteOp};
+use nrf_softdevice::ble::security::SecurityHandler;
 use nrf_softdevice::ble::{gatt_server, peripheral, Connection, Uuid};
 use nrf_softdevice::{raw, Softdevice};
 
@@ -28,6 +38,107 @@ const HARDWARE_REVISION: Uuid = Uuid::new_16(0x2a27);
 const SOFTWARE_REVISION: Uuid = Uuid::new_16(0x2a28);
 const MANUFACTURER_NAME: Uuid = Uuid::new_16(0x2a29);
 const PNP_ID: Uuid = Uuid::new_16(0x2a50);
+
+// Main items
+pub const HIDINPUT: u8 = 0x80;
+pub const HIDOUTPUT: u8 = 0x90;
+pub const FEATURE: u8 = 0xb0;
+pub const COLLECTION: u8 = 0xa0;
+pub const END_COLLECTION: u8 = 0xc0;
+
+// Global items
+pub const USAGE_PAGE: u8 = 0x04;
+pub const LOGICAL_MINIMUM: u8 = 0x14;
+pub const LOGICAL_MAXIMUM: u8 = 0x24;
+pub const PHYSICAL_MINIMUM: u8 = 0x34;
+pub const PHYSICAL_MAXIMUM: u8 = 0x44;
+pub const UNIT_EXPONENT: u8 = 0x54;
+pub const UNIT: u8 = 0x64;
+pub const REPORT_SIZE: u8 = 0x74; //bits
+pub const REPORT_ID: u8 = 0x84;
+pub const REPORT_COUNT: u8 = 0x94; //bytes
+pub const PUSH: u8 = 0xa4;
+pub const POP: u8 = 0xb4;
+
+// Local items
+pub const USAGE: u8 = 0x08;
+pub const USAGE_MINIMUM: u8 = 0x18;
+pub const USAGE_MAXIMUM: u8 = 0x28;
+pub const DESIGNATOR_INDEX: u8 = 0x38;
+pub const DESIGNATOR_MINIMUM: u8 = 0x48;
+pub const DESIGNATOR_MAXIMUM: u8 = 0x58;
+pub const STRING_INDEX: u8 = 0x78;
+pub const STRING_MINIMUM: u8 = 0x88;
+pub const STRING_MAXIMUM: u8 = 0x98;
+pub const DELIMITER: u8 = 0xa8;
+
+const KEYBOARD_ID: u8 = 0x01;
+const MEDIA_KEYS_ID: u8 = 0x02;
+
+const HID_REPORT_DESCRIPTOR: &[u8] = hid!(
+    (USAGE_PAGE, 0x01), // USAGE_PAGE (Generic Desktop Ctrls)
+    (USAGE, 0x06),      // USAGE (Keyboard)
+    (COLLECTION, 0x01), // COLLECTION (Application)
+    // ------------------------------------------------- Keyboard
+    (REPORT_ID, KEYBOARD_ID), //   REPORT_ID (1)
+    (USAGE_PAGE, 0x07),       //   USAGE_PAGE (Kbrd/Keypad)
+    (USAGE_MINIMUM, 0xE0),    //   USAGE_MINIMUM (0xE0)
+    (USAGE_MAXIMUM, 0xE7),    //   USAGE_MAXIMUM (0xE7)
+    (LOGICAL_MINIMUM, 0x00),  //   LOGICAL_MINIMUM (0)
+    (LOGICAL_MAXIMUM, 0x01),  //   Logical Maximum (1)
+    (REPORT_SIZE, 0x01),      //   REPORT_SIZE (1)
+    (REPORT_COUNT, 0x08),     //   REPORT_COUNT (8)
+    (HIDINPUT, 0x02),         //   INPUT (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    (REPORT_COUNT, 0x01),     //   REPORT_COUNT (1) ; 1 byte (Reserved)
+    (REPORT_SIZE, 0x08),      //   REPORT_SIZE (8)
+    (HIDINPUT, 0x01),         //   INPUT (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    (REPORT_COUNT, 0x05),     //   REPORT_COUNT (5) ; 5 bits (Num lock, Caps lock, Scroll lock, Compose, Kana)
+    (REPORT_SIZE, 0x01),      //   REPORT_SIZE (1)
+    (USAGE_PAGE, 0x08),       //   USAGE_PAGE (LEDs)
+    (USAGE_MINIMUM, 0x01),    //   USAGE_MINIMUM (0x01) ; Num Lock
+    (USAGE_MAXIMUM, 0x05),    //   USAGE_MAXIMUM (0x05) ; Kana
+    (HIDOUTPUT, 0x02),        //   OUTPUT (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    (REPORT_COUNT, 0x01),     //   REPORT_COUNT (1) ; 3 bits (Padding)
+    (REPORT_SIZE, 0x03),      //   REPORT_SIZE (3)
+    (HIDOUTPUT, 0x01),        //   OUTPUT (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    (REPORT_COUNT, 0x06),     //   REPORT_COUNT (6) ; 6 bytes (Keys)
+    (REPORT_SIZE, 0x08),      //   REPORT_SIZE(8)
+    (LOGICAL_MINIMUM, 0x00),  //   LOGICAL_MINIMUM(0)
+    (LOGICAL_MAXIMUM, 0x65),  //   LOGICAL_MAXIMUM(0x65) ; 101 keys
+    (USAGE_PAGE, 0x07),       //   USAGE_PAGE (Kbrd/Keypad)
+    (USAGE_MINIMUM, 0x00),    //   USAGE_MINIMUM (0)
+    (USAGE_MAXIMUM, 0x65),    //   USAGE_MAXIMUM (0x65)
+    (HIDINPUT, 0x00),         //   INPUT (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    (END_COLLECTION),         // END_COLLECTION
+    // ------------------------------------------------- Media Keys
+    (USAGE_PAGE, 0x0C),         // USAGE_PAGE (Consumer)
+    (USAGE, 0x01),              // USAGE (Consumer Control)
+    (COLLECTION, 0x01),         // COLLECTION (Application)
+    (REPORT_ID, MEDIA_KEYS_ID), //   REPORT_ID (2)
+    (USAGE_PAGE, 0x0C),         //   USAGE_PAGE (Consumer)
+    (LOGICAL_MINIMUM, 0x00),    //   LOGICAL_MINIMUM (0)
+    (LOGICAL_MAXIMUM, 0x01),    //   LOGICAL_MAXIMUM (1)
+    (REPORT_SIZE, 0x01),        //   REPORT_SIZE (1)
+    (REPORT_COUNT, 0x10),       //   REPORT_COUNT (16)
+    (USAGE, 0xB5),              //   USAGE (Scan Next Track)     ; bit 0: 1
+    (USAGE, 0xB6),              //   USAGE (Scan Previous Track) ; bit 1: 2
+    (USAGE, 0xB7),              //   USAGE (Stop)                ; bit 2: 4
+    (USAGE, 0xCD),              //   USAGE (Play/Pause)          ; bit 3: 8
+    (USAGE, 0xE2),              //   USAGE (Mute)                ; bit 4: 16
+    (USAGE, 0xE9),              //   USAGE (Volume Increment)    ; bit 5: 32
+    (USAGE, 0xEA),              //   USAGE (Volume Decrement)    ; bit 6: 64
+    (USAGE, 0x23, 0x02),        //   Usage (WWW Home)            ; bit 7: 128
+    (USAGE, 0x94, 0x01),        //   Usage (My Computer) ; bit 0: 1
+    (USAGE, 0x92, 0x01),        //   Usage (Calculator)  ; bit 1: 2
+    (USAGE, 0x2A, 0x02),        //   Usage (WWW fav)     ; bit 2: 4
+    (USAGE, 0x21, 0x02),        //   Usage (WWW search)  ; bit 3: 8
+    (USAGE, 0x26, 0x02),        //   Usage (WWW stop)    ; bit 4: 16
+    (USAGE, 0x24, 0x02),        //   Usage (WWW back)    ; bit 5: 32
+    (USAGE, 0x83, 0x01),        //   Usage (Media sel)   ; bit 6: 64
+    (USAGE, 0x8A, 0x01),        //   Usage (Mail)        ; bit 7: 128
+    (HIDINPUT, 0x02),           // INPUT (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    (END_COLLECTION),           // END_COLLECTION
+);
 
 #[embassy_executor::task]
 async fn softdevice_task(sd: &'static Softdevice) -> ! {
@@ -152,9 +263,32 @@ impl BatteryService {
     }
 }
 
+#[nrf_softdevice::gatt_service(uuid = "1812")]
+pub struct HidService {
+    // If you have multiple descriptors, just add them all
+    #[characteristic(
+        uuid = "2A4D",
+        security = "justworks",
+        read,
+        write,
+        notify,
+        value = "[0u8, 1u8]",
+        descriptor(uuid = "2908", security = "justworks", value = "[0, 1]"),
+        descriptor(uuid = "2902", security = "justworks", value = "[0, 1]")
+    )]
+    pub input_report: [u8; 8],
+
+    #[characteristic(uuid = "2A4A", security = "justworks", read, value = "[0x1, 0x1, 0x0, 0x03]")]
+    pub hid_info: u8,
+
+    #[characteristic(uuid = "2A4B", security = "justworks", read, value = "HID_REPORT_DESCRIPTOR")]
+    pub report_map: [u8; HID_REPORT_DESCRIPTOR.len()],
+}
+
 struct Server {
     _dis: DeviceInformationService,
     bas: BatteryService,
+    hid: HidService,
 }
 
 impl Server {
@@ -177,7 +311,9 @@ impl Server {
 
         let bas = BatteryService::new(sd)?;
 
-        Ok(Self { _dis: dis, bas })
+        let hid = HidService::new(sd)?;
+
+        Ok(Self { _dis: dis, bas, hid })
     }
 }
 
@@ -192,10 +328,15 @@ impl gatt_server::Server for Server {
         _offset: usize,
         data: &[u8],
     ) -> Option<Self::Event> {
+        self.hid.on_write(handle, data);
         self.bas.on_write(handle, data);
         None
     }
 }
+
+struct HidSecurityHandler {}
+
+impl SecurityHandler for HidSecurityHandler {}
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -239,16 +380,27 @@ async fn main(spawner: Spawner) {
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
         .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
-        .services_16(ServiceList::Incomplete, &[ServiceUuid16::BATTERY])
+        .services_16(
+            ServiceList::Incomplete,
+            &[ServiceUuid16::BATTERY, ServiceUuid16::HUMAN_INTERFACE_DEVICE],
+        )
         .full_name("HelloRust")
+        // Change the appearance (icon of the bluetooth device) to a keyboard
+        .raw(AdvertisementDataType::APPEARANCE, &[0xC1, 0x03])
         .build();
 
     static SCAN_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
         .services_16(
             ServiceList::Complete,
-            &[ServiceUuid16::DEVICE_INFORMATION, ServiceUuid16::BATTERY],
+            &[
+                ServiceUuid16::DEVICE_INFORMATION,
+                ServiceUuid16::BATTERY,
+                ServiceUuid16::HUMAN_INTERFACE_DEVICE,
+            ],
         )
         .build();
+
+    static SEC: HidSecurityHandler = HidSecurityHandler {};
 
     loop {
         let config = peripheral::Config::default();
@@ -256,7 +408,7 @@ async fn main(spawner: Spawner) {
             adv_data: &ADV_DATA,
             scan_data: &SCAN_DATA,
         };
-        let conn = unwrap!(peripheral::advertise_connectable(sd, adv, &config).await);
+        let conn = peripheral::advertise_pairable(sd, adv, &config, &SEC).await.unwrap();
 
         info!("advertising done!");
 
