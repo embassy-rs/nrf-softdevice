@@ -153,6 +153,7 @@ mod temperature;
 pub use temperature::temperature_celsius;
 
 mod random;
+#[cfg(feature = "macros")]
 pub use nrf_softdevice_macro::*;
 pub use random::random_bytes;
 
