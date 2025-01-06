@@ -825,7 +825,7 @@ pub(crate) fn with_state<T>(index: u8, f: impl FnOnce(&mut ConnectionState) -> T
 
 fn allocate_index<T>(f: impl FnOnce(u8, &mut ConnectionState) -> T) -> Result<T, OutOfConnsError> {
     unsafe {
-        for (i, s) in STATES.iter().enumerate() {
+        for (i, s) in (&*(&raw const STATES)).iter().enumerate() {
             let state = &mut *s.get();
             if state.refcount == 0 && !state.conn_handle.is_connected() {
                 return Ok(f(i as u8, state));
