@@ -183,7 +183,7 @@ where
     // has been dropped and the scanning has been stopped.
     static mut BUF: [u8; BUF_LEN] = [0u8; BUF_LEN];
     static mut BUF_DATA: raw::ble_data_t = raw::ble_data_t {
-        p_data: unsafe { BUF.as_mut_ptr() },
+        p_data: unsafe { (&mut *(&raw mut BUF)).as_mut_ptr() },
         len: BUF_LEN as u16,
     };
 

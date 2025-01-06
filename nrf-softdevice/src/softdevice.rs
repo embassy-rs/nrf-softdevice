@@ -287,7 +287,7 @@ impl Softdevice {
         };
 
         unsafe {
-            let p = SOFTDEVICE.as_mut_ptr();
+            let p = (&mut *(&raw mut SOFTDEVICE)).as_mut_ptr();
             p.write(sd);
             &mut *p
         }
@@ -298,7 +298,7 @@ impl Softdevice {
     /// (a call to [`enable`] has returned without error) and no `&mut` references
     /// to the softdevice are active
     pub unsafe fn steal() -> &'static Softdevice {
-        &*SOFTDEVICE.as_ptr()
+        &*(&*(&raw const SOFTDEVICE)).as_ptr()
     }
 
     /// Runs the softdevice event handling loop.
