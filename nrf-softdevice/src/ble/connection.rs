@@ -301,6 +301,12 @@ impl ConnectionState {
         }
 
         let ret = unsafe { raw::sd_ble_gap_disconnect(conn_handle, reason.into()) };
+        // This case can occur in normal operation if e.g. the connection was
+        // already being disconnected when disconnect() is called, so
+        // return as error instead of a panic.
+        if ret == raw::NRF_ERROR_INVALID_STATE {
+            return Err(DisconnectedError);
+        }
         unwrap!(RawError::convert(ret), "sd_ble_gap_disconnect");
 
         self.disconnecting = true;
@@ -825,7 +831,7 @@ pub(crate) fn with_state<T>(index: u8, f: impl FnOnce(&mut ConnectionState) -> T
 
 fn allocate_index<T>(f: impl FnOnce(u8, &mut ConnectionState) -> T) -> Result<T, OutOfConnsError> {
     unsafe {
-        for (i, s) in STATES.iter().enumerate() {
+        for (i, s) in (&*(&raw const STATES)).iter().enumerate() {
             let state = &mut *s.get();
             if state.refcount == 0 && !state.conn_handle.is_connected() {
                 return Ok(f(i as u8, state));
