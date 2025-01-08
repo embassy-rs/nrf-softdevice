@@ -11,6 +11,7 @@ keywords = ["arm", "cortex-m", "nrf52", "nrf-softdevice"]
 rust-version = "1.76"
 
 [features]
+default = ["macros"]
 
 nrf52805 = []
 nrf52810 = []
@@ -38,6 +39,8 @@ ble-sec = []
 critical-section-impl = ["critical-section/restore-state-bool"]
 
 usable-from-interrupts = []
+
+macros = ["dep:nrf-softdevice-macro"]
 
 # Workaround l2cap credit bug. If set, infinite credits are issued
 # to the peer in batches. The `credits` config when establishing the channel is ignored.
@@ -68,7 +71,7 @@ nrf-softdevice-s122 = { version = "0.1.1", path = "../nrf-softdevice-s122", opti
 nrf-softdevice-s132 = { version = "0.1.1", path = "../nrf-softdevice-s132", optional = true }
 nrf-softdevice-s140 = { version = "0.1.1", path = "../nrf-softdevice-s140", optional = true }
 
-nrf-softdevice-macro = { version = "0.1.0", path = "../nrf-softdevice-macro" }
+nrf-softdevice-macro = { version = "0.1.0", path = "../nrf-softdevice-macro", optional = true }
 
 [package.metadata.docs.rs]
 targets = ["thumbv7em-none-eabi"]
