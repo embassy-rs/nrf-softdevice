@@ -116,7 +116,7 @@ impl<const K: usize> AdvertisementBuilder<K> {
         let mut i = 0;
         let mut bits = 0;
         while i < flags.len() {
-            bits |= flags[i].raw();
+            bits |= flags[i].to_u8();
             i += 1;
         }
 
@@ -133,7 +133,7 @@ impl<const K: usize> AdvertisementBuilder<K> {
         let mut res = self.write(&[(services.len() * 2) as u8 + 1, ad_type.to_u8()]);
         let mut i = 0;
         while i < services.len() {
-            res = res.write(&(services[i].raw()).to_le_bytes());
+            res = res.write(&(services[i].to_u16()).to_le_bytes());
             i += 1;
         }
         res
@@ -190,7 +190,7 @@ impl<const K: usize> AdvertisementBuilder<K> {
 
     /// Add an appearance to the advertisement data.
     pub const fn appearance(self, appearance: Appearance) -> Self {
-        self.raw(AdvertisementDataType::APPEARANCE, &appearance.raw().to_le_bytes())
+        self.raw(AdvertisementDataType::APPEARANCE, &appearance.to_u16().to_le_bytes())
     }
 }
 

@@ -12,7 +12,11 @@ impl Flag {
     pub const BIT4: Self = Self(0b10000);
     // the rest are "reserved for future use"
 
-    pub const fn raw(self) -> u8 {
+    pub const fn from_u8(value: u8) -> Self {
+        Self(value)
+    }
+
+    pub const fn to_u8(self) -> u8 {
         self.0
     }
 }
