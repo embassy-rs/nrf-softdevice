@@ -129,6 +129,7 @@ impl SecurityMode {
 
         raw::ble_gap_conn_sec_mode_t {
             _bitfield_1: raw::ble_gap_conn_sec_mode_t::new_bitfield_1(sm, lv),
+            _bitfield_align_1: [],
         }
     }
 }
