@@ -105,6 +105,7 @@ async fn main(spawner: Spawner) {
             central_role_count: 3,
             central_sec_count: 0,
             _bitfield_1: raw::ble_gap_cfg_role_count_t::new_bitfield_1(0),
+            _bitfield_align_1: [],
         }),
         gap_device_name: Some(raw::ble_gap_cfg_device_name_t {
             p_value: b"HelloRust" as *const u8 as _,
@@ -112,6 +113,7 @@ async fn main(spawner: Spawner) {
             max_len: 9,
             write_perm: unsafe { mem::zeroed() },
             _bitfield_1: raw::ble_gap_cfg_device_name_t::new_bitfield_1(raw::BLE_GATTS_VLOC_STACK as u8),
+            _bitfield_align_1: [],
         }),
         ..Default::default()
     };
