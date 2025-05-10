@@ -35,7 +35,7 @@ struct Server {
 
 async fn run_bluetooth(sd: &'static Softdevice, server: &Server) {
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .flags(&[Flag::GENERAL_DISCOVERY, Flag::LE_ONLY])
         .full_name("HelloRust")
         .build();
 

@@ -119,7 +119,7 @@ async fn main(spawner: Spawner) {
     info!("My address: {:?}", ble::get_address(sd));
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .flags(&[Flag::GENERAL_DISCOVERY, Flag::LE_ONLY])
         .services_128(
             ServiceList::Complete,
             &[[
