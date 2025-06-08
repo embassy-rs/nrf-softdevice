@@ -50,6 +50,11 @@ ble-l2cap-credit-workaround = []
 evt-max-size-256 = []
 evt-max-size-512 = []
 
+# Support more discovery characteristics in GATT clients,
+# may be needed with higher ATT_MTU and peripherals with 
+# many service characteristics
+discovery-chars-12 = []
+
 [dependencies]
 defmt = { version = "0.3", optional = true }
 log = { version = "0.4.11", optional = true }
