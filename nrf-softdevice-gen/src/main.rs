@@ -94,7 +94,7 @@ fn main() {
 
     let data = fs::read_to_string(&tmp_bindings_path).unwrap();
     let re = Regex::new(
-        r#"extern "C" \{(?P<doc>(?s).*?)pub fn (?P<name>sd_[A-Za-z0-9_]+)\((?P<args>(?s).*?)\) -> u32;\s+\}"#,
+        r#"unsafe extern "C" \{(?P<doc>(?s).*?)pub fn (?P<name>sd_[A-Za-z0-9_]+)\((?P<args>(?s).*?)\) -> u32;\s+\}"#,
     )
     .unwrap();
     let data = re.replace_all(&data, |m: &Captures| {
