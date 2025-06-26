@@ -106,7 +106,11 @@ impl From<RawError> for DiscoverError {
     }
 }
 
+#[cfg(not(feature = "discovery-chars-12"))]
 const DISC_CHARS_MAX: usize = 6;
+#[cfg(feature = "discovery-chars-12")]
+const DISC_CHARS_MAX: usize = 12;
+
 const DISC_DESCS_MAX: usize = 6;
 
 pub(crate) async fn discover_service(conn: &Connection, uuid: Uuid) -> Result<raw::ble_gattc_service_t, DiscoverError> {
