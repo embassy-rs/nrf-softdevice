@@ -143,7 +143,7 @@ async fn main(spawner: Spawner) {
     unwrap!(spawner.spawn(softdevice_task(sd)));
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .flags(&[Flag::GENERAL_DISCOVERY, Flag::LE_ONLY])
         .services_16(ServiceList::Complete, &[ServiceUuid16::BATTERY])
         .full_name("HelloRust")
         .build();
