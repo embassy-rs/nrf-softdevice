@@ -600,9 +600,9 @@ pub(crate) async fn att_mtu_exchange(conn: &Connection, mtu: u16) -> Result<(), 
                         Err(e) => return Err(e.into()),
                     };
                     let params = get_union_field(ble_evt, &gattc_evt.params.exchange_mtu_rsp);
-                    let mtu = params.server_rx_mtu;
-                    debug!("att mtu exchange: got mtu {:?}", mtu);
-                    conn.with_state(|state| state.att_mtu = mtu);
+                    let effective_mtu = mtu.min(params.server_rx_mtu).max(raw::BLE_GATT_ATT_MTU_DEFAULT as u16);
+                    debug!("att mtu exchange: got mtu {:?}", effective_mtu);
+                    conn.with_state(|state| state.att_mtu = effective_mtu);
 
                     Ok(())
                 }
