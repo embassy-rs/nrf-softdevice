@@ -586,6 +586,7 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
         let uuid = ch.args.uuid;
         let read = ch.args.read;
         let write = ch.args.write;
+        let write_without_response = ch.args.write_without_response;
         let notify = ch.args.notify;
         let indicate = ch.args.indicate;
         let ty = &ch.ty;
@@ -623,8 +624,14 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
 
         code_disc_char.extend(quote_spanned!(ch.span=>
             if let Some(char_uuid) = characteristic.uuid {
-                if char_uuid == self.#uuid_field {
-                    // TODO maybe check the char_props have the necessary operations allowed? read/write/notify/etc
+                if self.#value_handle == 0
+                    && char_uuid == self.#uuid_field
+                    && (!#read || characteristic.props.read() != 0)
+                    && (!#write || characteristic.props.write() != 0)
+                    && (!#write_without_response || characteristic.props.write_wo_resp() != 0)
+                    && (!#notify || characteristic.props.notify() != 0)
+                    && (!#indicate || characteristic.props.indicate() != 0)
+                {
                     self.#value_handle = characteristic.handle_value;
                     for desc in descriptors {
                         if let Some(_desc_uuid) = desc.uuid {
@@ -657,6 +664,11 @@ pub fn gatt_client(args: TokenStream, item: TokenStream) -> TokenStream {
                     let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write(&self.conn, self.#value_handle, buf).await
                 }
+            ));
+        }
+
+        if write_without_response {
+            code_impl.extend(quote_spanned!(ch.span=>
                 #fn_vis async fn #write_wor_fn(&self, val: &#ty) -> Result<(), #ble::gatt_client::WriteError> {
                     let buf = #ty_as_val::to_gatt(val);
                     #ble::gatt_client::write_without_response(&self.conn, self.#value_handle, buf).await
