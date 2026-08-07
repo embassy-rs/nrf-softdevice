@@ -62,7 +62,7 @@ async fn main(spawner: Spawner) {
     config.interval = 50;
 
     static ADV_DATA: LegacyAdvertisementPayload = LegacyAdvertisementBuilder::new()
-        .flags(&[Flag::GeneralDiscovery, Flag::LE_Only])
+        .flags(&[Flag::GENERAL_DISCOVERY, Flag::LE_ONLY])
         .services_16(ServiceList::Complete, &[ServiceUuid16::HEALTH_THERMOMETER]) // if there were a lot of these there may not be room for the full name
         .short_name("Hello")
         .build();
