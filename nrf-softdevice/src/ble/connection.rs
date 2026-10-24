@@ -406,7 +406,13 @@ impl Drop for Connection {
                     trace!("conn {:?}: dropped, disconnecting", self.index);
                     // We still leave conn_handle set, because the connection is
                     // not really disconnected until we get GAP_DISCONNECTED event.
-                    unwrap!(state.disconnect());
+                    // disconnect() returns DisconnectedError when the SoftDevice is
+                    // already tearing the link down (NRF_ERROR_INVALID_STATE, see
+                    // #281); the link is going away either way, so this is not an
+                    // error here.
+                    if state.disconnect().is_err() {
+                        trace!("conn {:?}: dropped, already disconnecting", self.index);
+                    }
                 } else {
                     trace!("conn {:?}: dropped, already disconnected", self.index);
                 }
